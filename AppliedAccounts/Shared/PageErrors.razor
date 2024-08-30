@@ -1,0 +1,84 @@
+﻿@using AppMessages;
+@using AppliedAccounts.Data;
+
+@code {
+    [Parameter]
+    public AppMessages Messages { get; set; } = MessageClass.Messages;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        Messages.ClearMessages();
+    }
+}
+
+<style>
+    .alert {
+        height: 35px;
+        font-size: small;
+        margin: 1px;
+        padding: 1px;
+    }
+    .messages {
+        margin-Top: 5px;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="messages">
+    @foreach (var Message in Messages.MyMessages)
+    {
+        @if (Message.MessageClass.Equals(Enums.Class.Error))
+        {
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Error:"><use xlink:href="#exclamation-triangle-fill" /></svg>
+
+                <div>@Message.MessageText</div>
+            </div>
+        }
+
+        @if (Message.MessageClass.Equals(Enums.Class.Alert))
+        {
+            <div class="alert alert-success d-flex align-items-center" role="alert">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Alert:"><use xlink:href="#exclamation-triangle-fill" /></svg>
+
+                <div>@Message.MessageText</div>
+            </div>
+        }
+
+        @if (Message.MessageClass.Equals(Enums.Class.Warrning))
+        {
+            <div class="alert alert-warning d-flex align-items-center" role="alert">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warrning:"><use xlink:href="#exclamation-triangle-fill" /></svg>
+
+                <div>@Message.MessageText</div>
+            </div>
+        }
+
+        @if (Message.MessageClass.Equals(Enums.Class.Critical))
+        {
+            <div class="alert alert-info d-flex align-items-center" role="alert">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Critical:"><use xlink:href="#exclamation-triangle-fill" /></svg>
+
+                <div>@Message.MessageText</div>
+            </div>
+        }
+
+        @if (Message.MessageClass.Equals(Enums.Class.Danger))
+        {
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill" /></svg>
+
+                <div>@Message.MessageText</div>
+            </div>
+        }
+        @if (Message.MessageClass.Equals(Enums.Class.Sucess))
+        {
+            <div class="alert alert-success d-flex align-items-center" role="alert">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#exclamation-triangle-fill" /></svg>
+
+                <div>@Message.MessageText</div>
+            </div>
+        }
+    }
+</div>

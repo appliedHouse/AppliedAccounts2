@@ -1,0 +1,28 @@
+﻿@inject NavigationManager NavManager;
+@using System.Data;
+
+
+
+@code {
+    [Parameter]
+    public string NavTo { get; set; } = string.Empty;
+
+    [Parameter]
+    public DataRow Row { get; set; }
+
+    [Parameter]
+    public string DBFile { get; set; } = string.Empty;
+
+
+    public void Delete()
+    {
+        var _Command = AppliedDB.Commands.Delete(Row, DBFile);
+        NavManager.NavigateTo(NavTo);
+    }
+
+}
+
+
+<button type="button" id="btn-delete" class="btn btn-link" title="Delete" @onclick="Delete">
+    <i class="bi bi-trash-fill btn-trash"></i>
+</button>

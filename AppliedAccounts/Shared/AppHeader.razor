@@ -1,0 +1,33 @@
+﻿@using AppliedAccounts.Authentication;
+@using AppliedAccounts.Data;
+@using System.Security.Claims;
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AppAuthState { get; set; }
+    private string _UserName { get; set; }
+
+    public string UserName()
+    {
+        return AppAuthState.Result.User.Identity.Name;
+    }
+}
+
+
+<div class="AppHeader">
+    <div class="AppTitle">
+        <h3>MODERN TECHNOLOGY SYSTEM</h3>
+    </div>
+</div>
+
+<div class="SubHeading">
+    <AuthorizeView>
+        <Authorized>
+            <h5 class="SubHeading">Hello @UserName()</h5>
+        </Authorized>
+        <NotAuthorized>
+            <h5 class="SubHeading">Hello Guest!</h5>
+        </NotAuthorized>
+    </AuthorizeView>
+    <a href="/">Home</a>
+</div>

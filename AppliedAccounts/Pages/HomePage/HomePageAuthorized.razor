@@ -1,0 +1,34 @@
+﻿@inject NavigationManager NavManager;
+@using AppliedAccounts.Data
+@inject IConfiguration Config;
+
+@code {
+    public Globals? AppValues { get; set; }
+    public string? BusinessPic { get; set; }
+    protected override void OnInitialized()
+    {
+        AppValues = new(Config);
+        BusinessPic = $".{AppValues.ImagesPath}/Accounts3.jpg";
+    }
+
+    public void Submit()
+    {
+        NavManager.NavigateTo("/Accounts/CashBook/1/New/1");   // Book ID, Voucher No, Language ID
+    }
+}
+
+<div id="container">
+    <button @onclick="Submit">Click</button>
+    <p><img class="img-fluid rounded mx-auto d-block mt-2" src="@BusinessPic" alt="" /></p>
+</div>
+
+<p>Base:</p><p>@AppValues.BasePath</p>
+<p>Temp Path:</p><p>@AppValues.DBTempPath</p>
+<p>Report Path:</p><p>@AppValues.ReportPath</p>
+<p>Image Path:</p><p>@AppValues.ImagesPath</p>
+<p>DB Path:</p><p>@AppValues.DBPath</p>
+<p>PDF Path:</p><p>@AppValues.PDFPath</p>
+<p>Author:</p><p>@AppValues.Author.Company</p>
+<p>Language:</p><p>@AppValues.Language.Title</p>
+<p>Currency:</p><p>@AppValues.Currency.Title</p>
+

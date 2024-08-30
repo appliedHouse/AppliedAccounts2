@@ -1,0 +1,84 @@
+﻿@page "/Config"
+@using AppliedAccounts.Data
+@using AppliedBlazorApp.Authentication
+@using AppliedDB
+
+@inject IConfiguration Config;
+@inject AuthenticationStateProvider authStateProvider;
+
+@code {
+    public Globals? AppValues { get; set; }
+    public AppUserModel? UserModel { get; set; }
+    public AppliedDB.DataSource? Source { get; set; }
+
+    public string? BasePath;
+    public string? RootPath;
+    public string? ClientPath;
+    public string? FileName;
+    public string? FullName;
+
+    protected override void OnInitialized()
+    {
+        UserModel = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        FileName = UserModel.DataFile;
+        AppValues = new(Config);
+        Source = new(UserModel);
+
+        BasePath = Directory.GetCurrentDirectory();
+        RootPath = "wwwroot";
+        ClientPath = "SQliteDB";
+        FullName = $"{BasePath}\\{RootPath}\\{ClientPath}\\{FileName}";
+    }
+}
+
+
+@if (@Source?.MyConnection != null)
+{
+
+    <table style="width:100%">
+        <thead>
+            <tr>
+                <th style="width:300px">Key</th>
+                <th style="width:600px">Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @* <tr><td>Base Path</td>      <td>@AppValues.BasePath     </td></tr>
+        <tr><td>Data Base Path</td> <td>@AppValues.DataBasePath </td></tr>
+        <tr><td>Report Path</td>    <td>@AppValues.ReportPath   </td></tr>
+        <tr><td>Image Path</td>     <td>@AppValues.ImagePath    </td></tr>
+        <tr><td>Report Path</td>    <td>@AppValues.ReportPath   </td></tr>
+        <tr><td>Temp Path</td>      <td>@AppValues.DBTempPath   </td></tr>
+        <tr><td>System Path</td>    <td>@AppValues.SystemPath</td></tr> *@
+
+            <tr><td>Client Connection String</td>      <td>@Source.MyConnection.ConnectionString</td></tr>
+
+
+        </tbody>
+    </table>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th style="width:300px">Key</th>
+                <th style="width:600px">Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Base   Path</td> <td>@BasePath </td></tr>
+            <tr><td>Root   Path</td> <td>@RootPath </td></tr>
+            <tr><td>Client Path</td> <td>@ClientPath </td></tr>
+            <tr><td>Source file</td> <td>@FileName </td></tr>
+            <tr><td>Full   Name</td> <td>@FullName </td></tr>
+            <tr><td>User  Model</td> <td>@UserModel?.DataFile</td></tr>
+        </tbody>
+    </table>
+
+    <br />
+    <hr />
+
+    @* <p>@Source.ConnectionString</p> *@
+    <p>Connection is not established.</p>
+}

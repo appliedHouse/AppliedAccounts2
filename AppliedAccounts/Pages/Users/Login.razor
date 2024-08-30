@@ -1,0 +1,200 @@
+﻿@layout LoginLayout
+@page "/Users/Login"
+@using AppliedAccounts.Data;
+@using AppliedBlazorApp.Authentication
+@using AppliedDB;
+
+
+@inject NavigationManager NavManager;
+@inject AuthenticationStateProvider authStateProvider;
+@inject Globals _Global
+
+@code {
+    Globals AppGlobals { get; set; } = new();
+    AppUserModel Model = new();
+    string NavToHome { get; set; } = string.Empty;
+    bool IsLogin { get; set; } = true;
+    int LanguageID { get; set; } = 1;                       // Default Language is 1 = English
+
+    protected override void OnInitialized()
+    {
+        AppGlobals = _Global;
+
+        Model.UserID = "CDC";
+        Model.Password = "Home123*";
+        Model.IsSaved = false;
+        Model.DataFile = "";
+        Model.Designation = "";
+        Model.Company = "";
+
+    }
+
+    public async void Submit()
+    {
+        UserProfile AppUser = new UserProfile(Model);
+
+        bool IsUser = AppUser.Profile.UserID.Equals(Model.UserID);
+        bool IsPSW = AppUser.Profile.Password.Equals(Model.Password);
+
+        if (IsUser && IsPSW)     // Validate the User Id and Password are equal.
+        {
+            var _newGUID = Guid.NewGuid();
+            var userAuthStateProvider = (UserAuthonticationStateProvider)authStateProvider;
+            await userAuthStateProvider.UpdateAuthonticateState(new UserSession
+                {
+                    UserName = AppUser.Profile.UserID,
+                    Role = AppUser.Profile.Role,
+                    DisplayName = AppUser.Profile.DisplayName,
+                    Designation = AppUser.Profile.Designation,
+                    Email = AppUser.Profile.UserEmail,
+                    SQLiteFile = AppUser.Profile.DataFile,
+                    CompanyName = AppUser.Profile.Company,
+                    PIN = "0000",
+                    SessionGuid = _newGUID,
+                    LanguageID = LanguageID,
+
+                    // Default Application Foler
+                    ClientsFolder = AppGlobals.DBPath ?? "SQLiteDB",
+                    UsersFolder = AppGlobals.DBPath ?? "SQLiteDB",
+                    ReportFolder = AppGlobals.ReportPath ?? "Reports",
+                    LanguageFolder = AppGlobals.LanguagesPath ?? "Languages",
+                    MessageFolder = AppGlobals.MessagesPath ?? "Messages",
+                    ImageFolder = AppGlobals.ImagesPath ?? "Images",
+                    SystemFolder = AppGlobals.SystemPath ?? "System",
+                    SessionFolder = AppGlobals.SessionPath ?? "Sessions",
+
+                });
+
+            // This will create a SQL Lite Database Table for local Session
+            // Values could be store and retrive 
+
+            // var _Path = Path.Combine(AppUser.Profile.DataPath, "System");
+            // AppliedBlazorApp.Data.AppLocalDBSession _SessionDB = new(_Path, _newGUID);
+            
+            // END.
+            
+            NavManager.NavigateTo("/", true);
+        }
+        else
+        {
+            IsLogin = false;
+        }
+    }
+
+    public void ReLoad()
+    {
+        IsLogin = true;
+        return;
+    }
+
+}
+
+
+<style>
+    .loginpage {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+
+    .login-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 500px;
+    }
+
+
+    .row-label {
+        width: 30%
+    }
+
+    .row-text {
+        width: 70%;
+    }
+
+    .bg-1 {
+        height: 60px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .bg-2 {
+        height: 60px;
+        align-items: center;
+        justify-content: center;
+    }
+
+</style>
+
+
+
+
+<div class="loginpage">
+    <div class="login-container">
+        <EditForm Model="@Model" OnValidSubmit="@Submit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            @if (!IsLogin)
+            {
+
+                <div class="alert alert-danger" role="alert">
+                    You are not login...
+                </div>
+                <br />
+
+                <button type="button" class="w-100 btn btn-lg btn-primary" @onclick="ReLoad">
+                   Reset Page
+                </button>
+
+            }
+            else
+            {
+                <div class="container align-content-center">
+                    <img class="mb-4" src="/images/Logo.jpg" alt="" width="75" height="75">
+                    <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+
+
+                    <div class="row bg-1">
+                        <div class="col-3">
+                            <label>User ID / Email</label>
+                        </div>
+                        <div class="col-6">
+                            <InputText @bind-Value="@Model.UserID"></InputText>
+                        </div>
+                    </div>
+
+                    <div class="row bg-2">
+                        <div class="col-3">
+                            <label>Password</label>
+                        </div>
+                        <div class="col-6">
+                            <InputText type="password" @bind-Value="@Model.Password"></InputText>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-9 mb-2">
+                            <label>
+                                <InputCheckbox @bind-Value="Model.IsSaved"></InputCheckbox>
+                                <span><label> Remember me</label></span>
+                            </label>
+                        </div>
+                    </div>
+                    <button class="w-100 btn btn-lg btn-primary" type="submit">
+                        Sign in
+                    </button>
+                    <p class="mt-5 mb-3 text-muted">Applied Software House</p>
+                </div>
+            }
+        </EditForm>
+    </div>
+</div>
+

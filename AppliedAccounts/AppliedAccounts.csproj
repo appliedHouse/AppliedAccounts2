@@ -7,17 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\SQLiteDB\CDC.db" />
-    <Content Remove="wwwroot\SQLiteDB\HFSSteel.db" />
-    <Content Remove="wwwroot\System\AppliedUsers.db" />
+    <Compile Remove="wwwroot\SQLiteDB\**" />
+    <Content Remove="wwwroot\SQLiteDB\**" />
+    <EmbeddedResource Remove="wwwroot\SQLiteDB\**" />
+    <None Remove="wwwroot\SQLiteDB\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\SQLiteDB\" />
+    <Folder Include="wwwroot\Images\" />
+    <Folder Include="wwwroot\Sessions\" />
+    <Folder Include="wwwroot\System\" />
+    <Folder Include="wwwroot\SQLiteTemp\" />
+    <Folder Include="wwwroot\PDFReports\" />
+    <Folder Include="wwwroot\Reports\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.JSInterop" Version="6.0.33" />
+    <PackageReference Include="BlazorJS" Version="2.1.6" />
   </ItemGroup>
 
   <ItemGroup>
