@@ -47,14 +47,8 @@
         Session = UserModel.Session;
         ClientDB = UserModel.DataFile;
 
-
         _Connections = new(UserModel);
-
-        if(_Connections.ClientConnection is not null) {}
-
         _true = true;
-
-
     }
 }
 
@@ -87,7 +81,7 @@
 <hr />
 
 
-@if (_Connections?.ClientConnection != null)
+@if (_Connections.GetSQLiteClient != null)
 {
 
     <table style="width:100%">
@@ -98,7 +92,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr><td>Client Connection String</td>      <td>@_Connections?.ClientConnection</td></tr>
+            <tr><td>Client Connection String</td>      <td>@_Connections.GetSQLiteClient</td></tr>
         </tbody>
     </table>
 }

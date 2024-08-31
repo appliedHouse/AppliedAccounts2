@@ -27,12 +27,16 @@ namespace AppliedAccounts.Models
             Units = Source.GetUnits();
             //Report = Print();
 
-            if (View_SalesInvoice.Rows.Count > 0)
-            {
-                InvoiceID = (int)View_SalesInvoice.Rows[0]["ID"];
-                IsRecordLoaded = SetSaleInvoiceRecord(InvoiceID);
-                //Report.ReportData.ReportTable = GetReportTable();
 
+            if (View_SalesInvoice is not null)
+            {
+                if (View_SalesInvoice.Rows.Count > 0)
+                {
+                    InvoiceID = (int)View_SalesInvoice.Rows[0]["ID"];
+                    IsRecordLoaded = SetSaleInvoiceRecord(InvoiceID);
+                    //Report.ReportData.ReportTable = GetReportTable();
+
+                }
             }
         }
 

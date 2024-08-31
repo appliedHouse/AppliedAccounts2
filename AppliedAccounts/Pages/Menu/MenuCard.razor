@@ -1,0 +1,80 @@
+﻿@using AppliedAccounts.Models
+@inject NavigationManager NavManager;
+
+@code {
+    [Parameter] public string PicPath { get; set; } = string.Empty;
+    [Parameter] public string Message { get; set; } = string.Empty;
+    [Parameter] public string NavTo { get; set; } = string.Empty;
+    [Parameter] public MenuCardModel Model { get; set; } = new(); 
+    public void Submit()
+    {
+        NavManager.NavigateTo(NavTo, true);
+    }
+
+
+}
+
+<style>
+    .mnuCard {
+        position: relative;
+        width: 320px;
+        height: 120px;
+        background-color: aliceblue;
+        margin: 10px;
+    }
+
+    .mnuImage {
+        position: absolute;
+        width: 150px;
+        height: 100px;
+        background-color: transparent;
+        margin: 9px;
+    }
+
+    .crd-img {
+        height: auto;
+        width: auto;
+    }
+
+    .btn-div {
+        position:absolute;
+        top:80px;
+        left:170px;
+        width:140px;
+        height:28.5px;
+        
+    }
+
+    .btn-nav {
+        width: 140px;
+        height: 28.5px;
+    }
+
+    .text-msg{
+        position:absolute;
+        top:10px;
+        left:170px;
+        width:140px;
+        height:65px;
+        background-color:transparent;
+        font-size:x-small
+    }
+
+</style>
+
+<section class="mnuCard">
+    <div class="mnuImage">
+        
+        <img class="card-img" src=@PicPath />
+    </div>
+    <div class="text-msg">
+        @Message;
+    </div>
+
+    <div class="btn-div">
+        <button type="submit" class="btn btn-primary btn-sm btn-nav" @onclick="Submit">Go</button>
+    </div>
+
+</section>
+
+

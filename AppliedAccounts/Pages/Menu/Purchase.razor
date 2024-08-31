@@ -1,0 +1,21 @@
+﻿@page "/Menu/Purchase"
+@attribute [Authorize];
+@inject NavigationManager NavManager;
+
+
+@code {
+    public string PurchaseInvoiceText { get; set; } = "Purchase stock";
+
+}
+
+<PageHeading Text="Stock Purchased"></PageHeading>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+            <MenuCard Message="@PurchaseInvoiceText" NavTo="/Stock/PurchaseInvoiceList" PicPath="./images/Cards/COA.jpg" />
+        </div>
+       
+    </div>
+</div>

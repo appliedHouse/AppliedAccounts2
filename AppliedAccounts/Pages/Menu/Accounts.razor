@@ -1,0 +1,55 @@
+﻿@page "/Menu/Accounts"
+@attribute [Authorize];
+@inject NavigationManager NavManager;
+@inject Globals _Global;
+@using AppliedAccounts.Models;
+
+@code {
+    public Globals? AppValues { get; set; }
+    public MenuCardModel? CardMenuModel { get; set; }
+    public string COAText = "A chart of accounts is a documents that list all the transactions.";
+    public string ClassText = "Classification of accounts are groups of chart of accounts.";
+    public string TypeText = "Type of Accounts are gategory of charts of accounts";
+
+
+    protected override void OnInitialized()
+    {
+
+        AppValues = _Global;
+        CardMenuModel = new() { TextMsg = "", NavTo = "", PicPath = "" };
+
+    }
+
+
+   
+    
+}
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+            <MenuCard Message=@COAText NavTo="/Accounts/COA1" PicPath="./images/Cards/COA.jpg" />
+        </div>
+        <div class="col-4">
+            <MenuCard Message=@ClassText NavTo="/Accounts/COAClass" PicPath="./images/Cards/COAClass.jpg" />
+        </div>
+        <div class="col-4">
+            <MenuCard Message=@TypeText NavTo="/Accounts/COANature" PicPath="./images/Cards/COANature.jpg" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <MenuCard Message=@TypeText NavTo="/Accounts/COANotes" PicPath="./images/Cards/COANotes.jpg" />
+        </div>
+        <div class="col-4">
+            <MenuCard Message=@TypeText NavTo="/Accounts/CashBook" PicPath="./images/Cards/Cashbook&Pencil.jpg" />
+        </div>
+    </div>
+
+</div>
+
+
+
+
+

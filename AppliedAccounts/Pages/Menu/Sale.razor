@@ -1,0 +1,27 @@
+﻿@page "/Menu/Sale"
+@attribute [Authorize];
+@inject NavigationManager NavManager;
+
+@code {
+    public void SalePage()
+    {
+        NavManager.NavigateTo("/Sale/SaleInvoiceList");
+    }
+}
+
+
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-12 align-content-between">
+            <div class="card" style="width: 18rem;">
+                <img src="./images/Cards/Sale.jpg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Sale</h5>
+                    <p class="card-text">Sales refers to the exchange of a product, commodity, service or delivery for money. It involves helping prospective clients or customers by listening to them and understanding their wants and needs to find them what they're looking for.. </p>
+                    <button type="submit" id="btn-page" class="btn btn-primary" @onclick="SalePage">Click</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

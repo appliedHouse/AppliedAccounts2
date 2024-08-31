@@ -1,0 +1,19 @@
+﻿body {
+}
+
+
+/* -----card styling------ */
+
+@media screen and (min-width: 768px) {
+    .cart-image {
+        height: 100px;
+        width: 130px;
+    }
+}
+
+@media screen and (max-width: 540px) {
+    .cart-image {
+        width: 100%;
+        height: auto;
+    }
+}

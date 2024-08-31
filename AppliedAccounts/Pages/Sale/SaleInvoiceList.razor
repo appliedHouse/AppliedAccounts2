@@ -1,0 +1,128 @@
+﻿@page "/Sale/SaleInvoiceList"
+@attribute [Authorize];
+@using AppliedAccounts.Libs;
+@using AppliedAccounts.Models;
+@* @using AppliedReports;
+ *@
+@inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager NavManager;
+@inject IJSRuntime js
+
+
+@code {
+    protected override void OnInitialized()
+    {
+        try
+        {
+            var AppUserProfile = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+            if (AppUserProfile != null) { Model = new(AppUserProfile); }
+            else { Model = new(); }
+            IsDataLoad = true;
+        }
+        catch (Exception)
+        {
+            IsDataLoad = false; ;
+        }
+
+
+    }
+
+    bool IsDataLoad = false;
+    string NoRecordFound = "No Record Found....";
+    string NavToNew = $"/Sale/SaleInvoice/New";
+}
+
+@if (IsDataLoad)
+{
+    <PageHeading Text="List of Sale Invoices" />
+
+    @* Page Errors Show *@
+    @if (@Model.MyMessages.Count > 0)
+    {
+        <PageErrors Messages="@Model.MyMessages"></PageErrors>
+    }
+
+    <EditForm Model=@Model>
+        <div class="container mb-2">
+            <div class="row mt-2" style="height:50px; background-color:lightblue; padding-top:5px">
+                <div class="col-4">
+                    <InputText @bind-Value="@Model.SearchText" class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
+                </div>
+                <div class="col-2">
+
+                    <button style="margin-top:5px;" class="btn btn-primary btn-sm" @onclick="()=>Model.Search()">Search</button>
+                </div>
+
+            </div>
+        </div>
+    </EditForm>
+
+    <div class="container">
+        <table class="AppTable">
+            <thead class="tb-head">
+                <tr class="tb-head-row">
+                    <td>Voucher</td>
+                    <td>Vou Date</td>
+                    <td>Inv Date</td>
+                    <td>Pay Date</td>
+                    <td>Client</td>
+                    <td>City</td>
+                    <td>Salesman</td>
+                    <td>Amount</td>
+                    <th class="td-btn">
+                        <PageNavTo Title="Edit" NavTo=@NavToNew />
+                        @* <button id="btnAdd" class="btn-Add" @onclick="()=>Model.Add()"><i class="bi bi-plus-circle-fill"></i></button> *@
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="tb-body">
+                @if (Model.Records.Count > 0)
+                {
+                    @foreach (SalesRecord _Record in @Model.Records)
+                    {
+                        var _NavTo = $"/Sale/SaleInvoice/{_Record.Vou_No}";
+
+                        <tr class="tb-body-row">
+                            <td>@_Record.Vou_No</td>
+                            <td>@AppFunctions.Date2Text(_Record.Vou_Date)</td>
+                            <td>@AppFunctions.Date2Text(_Record.Inv_Date)</td>
+                            <td>@AppFunctions.Date2Text(_Record.Pay_Date)</td>
+                            <td>@_Record.TitleCustomer</td>
+                            <td>@_Record.City</td>
+                            <td>@_Record.TitleSalesman</td>
+                            <td>@_Record.Amount</td>
+                            <td class="td-btn">
+                                <PageNavTo Title="Edit" NavTo=@_NavTo />
+                                <DeleteButton />
+                                @* <PrintButton PrintingModel=@Model.Report /> *@
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    @NoRecordFound
+
+                }
+            </tbody>
+            <tfoot class="tb-foot">
+                <tr class="tb-foot-row">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>@Model.TotalAmount</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+}
+else
+{
+    <p>@Model.Source.MyConnection.ConnectionString</p>
+    <h4>Data Load Error.....</h4>
+}
