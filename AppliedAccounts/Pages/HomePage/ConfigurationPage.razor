@@ -1,38 +1,93 @@
 ﻿@page "/Config"
 @using AppliedAccounts.Data
-@using AppliedBlazorApp.Authentication
 @using AppliedDB
 
 @inject IConfiguration Config;
 @inject AuthenticationStateProvider authStateProvider;
 
 @code {
-    public Globals? AppValues { get; set; }
+
     public AppUserModel? UserModel { get; set; }
     public AppliedDB.DataSource? Source { get; set; }
 
     public string? BasePath;
     public string? RootPath;
+    public string? UsersPath;
     public string? ClientPath;
-    public string? FileName;
-    public string? FullName;
+    public string? ImagesPath;
+    public string? LanguagePath;
+    public string? MessagePath;
+    public string? ReportPath;
+    public string? PDFPath;
+    public string? SystemPath;
+    public string? SessionPath;
+    public string? Session;
+    public string? ClientDB;
+    public static AppliedDB.Connections? _Connections;
+
+    private bool _true = true;
 
     protected override void OnInitialized()
     {
-        UserModel = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
-        FileName = UserModel.DataFile;
-        AppValues = new(Config);
+        var UserModel = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+
         Source = new(UserModel);
 
         BasePath = Directory.GetCurrentDirectory();
-        RootPath = "wwwroot";
-        ClientPath = "SQliteDB";
-        FullName = $"{BasePath}\\{RootPath}\\{ClientPath}\\{FileName}";
+        RootPath = UserModel.RootFolder;
+        UsersPath = UserModel.UsersFolder;
+        ClientPath = UserModel.ClientFolder;
+        ImagesPath = UserModel.ImagesFolder;
+        LanguagePath = UserModel.LanguageFolder;
+        MessagePath = UserModel.MessageFolder;
+        ReportPath = UserModel.ReportFolder;
+        PDFPath = UserModel.PDFFolder;
+        SystemPath = UserModel.SystemFolder;
+        SessionPath = UserModel.SessionFolder;
+        Session = UserModel.Session;
+        ClientDB = UserModel.DataFile;
+
+
+        _Connections = new(UserModel);
+
+        if(_Connections.ClientConnection is not null) {}
+
+        _true = true;
+
+
     }
 }
 
+<div class="container">
+    <div class="row">
+        <table>
+            <thead class="bg-light">
+                <tr>
+                    <th style="width:300px">Key</th>
+                    <th style="width:600px">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Base     Path</td> <td>@BasePath </td></tr>
+                <tr><td>Root     Path</td> <td>@RootPath </td></tr>
+                <tr><td>Users    Path</td> <td>@UsersPath </td></tr>
+                <tr><td>Client   Path</td> <td>@ClientPath </td></tr>
+                <tr><td>Images   Path</td> <td>@ImagesPath </td></tr>
+                <tr><td>Language Path</td> <td>@LanguagePath </td></tr>
+                <tr><td>Message  Path</td> <td>@ReportPath </td></tr>
+                <tr><td>PDFFile  Path</td> <td>@PDFPath </td></tr>
+                <tr><td>System   Path</td> <td>@SystemPath </td></tr>
+                <tr><td>Session  Path</td> <td>@SessionPath </td></tr>
+                <tr><td>Session  Text</td> <td>@Session </td></tr>
+                <tr><td>Client   DB  </td> <td>@ClientDB </td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<hr />
 
-@if (@Source?.MyConnection != null)
+
+@if (_Connections?.ClientConnection != null)
 {
 
     <table style="width:100%">
@@ -43,38 +98,13 @@
             </tr>
         </thead>
         <tbody>
-            @* <tr><td>Base Path</td>      <td>@AppValues.BasePath     </td></tr>
-        <tr><td>Data Base Path</td> <td>@AppValues.DataBasePath </td></tr>
-        <tr><td>Report Path</td>    <td>@AppValues.ReportPath   </td></tr>
-        <tr><td>Image Path</td>     <td>@AppValues.ImagePath    </td></tr>
-        <tr><td>Report Path</td>    <td>@AppValues.ReportPath   </td></tr>
-        <tr><td>Temp Path</td>      <td>@AppValues.DBTempPath   </td></tr>
-        <tr><td>System Path</td>    <td>@AppValues.SystemPath</td></tr> *@
-
-            <tr><td>Client Connection String</td>      <td>@Source.MyConnection.ConnectionString</td></tr>
-
-
+            <tr><td>Client Connection String</td>      <td>@_Connections?.ClientConnection</td></tr>
         </tbody>
     </table>
 }
 else
 {
-    <table>
-        <thead>
-            <tr>
-                <th style="width:300px">Key</th>
-                <th style="width:600px">Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td>Base   Path</td> <td>@BasePath </td></tr>
-            <tr><td>Root   Path</td> <td>@RootPath </td></tr>
-            <tr><td>Client Path</td> <td>@ClientPath </td></tr>
-            <tr><td>Source file</td> <td>@FileName </td></tr>
-            <tr><td>Full   Name</td> <td>@FullName </td></tr>
-            <tr><td>User  Model</td> <td>@UserModel?.DataFile</td></tr>
-        </tbody>
-    </table>
+
 
     <br />
     <hr />

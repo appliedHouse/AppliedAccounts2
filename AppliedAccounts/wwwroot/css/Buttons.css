@@ -1,0 +1,102 @@
+﻿
+.btn{
+    width:90px;
+}
+
+
+.btn-Edit {
+    color: royalblue;
+    padding: 1px;
+    border: 0px;
+    border-color: transparent;
+    background-color: transparent;
+    width:15px;
+}
+
+
+.btn-Del {
+    color: orangered;
+    padding: 1px;
+    margin: 1px;
+    border: 0px;
+    background-color: transparent;
+    width: 15px;
+}
+
+.btn-UnDel {
+    color: orangered;
+    padding: 1px;
+    margin: 1px;
+    border: 0px;
+}
+
+.btn-Add {
+    color: darkgreen;
+    background-color: transparent;
+    padding: 1px;
+    margin: 1px;
+    border: 0px;
+    width: 80px
+}
+
+.btn-New {
+    color: white;
+    background-color: royalblue;
+    width: 80px
+}
+
+.btn-Save {
+    color: white;
+    background-color: royalblue;
+    width: 80px
+}
+
+.btn-Delete {
+    color: white;
+    background-color: red;
+    padding: 1px;
+    margin: 1px;
+    border: 0px;
+    width: 80px
+}
+
+
+.btn-Back {
+    color: red;
+    background-color: gold;
+    width: 80px
+}
+
+.btn-trash{
+    color:red;
+}
+
+.btn-pencil{
+    color:blue;
+}
+
+.btn-center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.btn-Menu {
+    background-image: linear-gradient(#0dccea, #0d70ea);
+    border: 0;
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, .3) 0 5px 15px;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    font-family: Montserrat, sans-serif;
+    font-size: .9em;
+    margin: 5px;
+    padding: 10px 15px;
+    text-align: center;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}

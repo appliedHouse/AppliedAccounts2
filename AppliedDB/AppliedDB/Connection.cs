@@ -1,42 +1,66 @@
-﻿using AppMessages;
-using System;
-using System.Collections.Generic;
-using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data.SQLite;
 
 namespace AppliedDB
 {
     public class Connections : IConnections
     {
-        public SQLiteConnection? UsersConnection { get; set; } = GetUsersConnection();
-        public SQLiteConnection? ClientConnection { get; set; } = new();
-        public SQLiteConnection? MessageConnection { get; set; } = GetMessagesConnection();
-        public SQLiteConnection? LanguageConnection { get; set; } = GetLanguageConnection();
+        public SQLiteConnection? UsersConnection { get; set; } 
+        public SQLiteConnection? ClientConnection { get; set; } 
+        public SQLiteConnection? MessageConnection { get; set; } 
+        public SQLiteConnection? LanguageConnection { get; set; } 
+        public SQLiteConnection? SystemConnection { get; set; } 
+        public SQLiteConnection? SessionConnection { get; set; } 
         public static string BasePath => Directory.GetCurrentDirectory();
-        public static string RootPath = "wwwroot";
-        public static string ClientPath = "SQliteDB";
-        public static string MessagePath = "Messages";
-        public static string LanguagePath = "Languages";
+        public static string RootPath { get; set; } = "";
+        public static string UsersPath { get; set; } = "";
+        public static string ClientPath { get; set; } = "";
+        public static string ImagesPath { get; set; } = "";
+        public static string MessagePath { get; set; } = "";
+        public static string LanguagePath { get; set; } = "";
+        public static string ReportPath { get; set; } = "";
+        public static string PDFPath { get; set; } = "";
+        public static string SystemPath { get; set; } = "";
+        public static string SessionPath { get; set; } = "";
+
+
         public static string DB_Users = "AppliedUsers2.db";
-        public static string DB_Messages = "Messages.db";
+        public static string DB_Message = "Messages.db";
         public static string DB_Language = "Languages.db";
+        public static string DB_System = "System.db";
         public static string DB_Client { get; set; } = string.Empty;
+        public static string DB_Session { get; set; } = string.Empty;
 
-        public Connections()
+        public static AppUserModel AppUserProfile { get; set; }
+
+        public Connections() { }
+        public Connections(AppUserModel _UserProfile)
         {
+            AppUserProfile = _UserProfile;
+            DB_Client = AppUserProfile.DataFile;
+            DB_Session = AppUserProfile.Session;
             
-        }
+            RootPath = AppUserProfile.RootFolder;
+            UsersPath = AppUserProfile.UsersFolder;
+            ClientPath = AppUserProfile.ClientFolder;
+            ImagesPath = AppUserProfile.ImagesFolder;
+            LanguagePath = AppUserProfile.LanguageFolder;
+            ReportPath = AppUserProfile.MessageFolder;
+            PDFPath = AppUserProfile.MessageFolder;
+            SystemPath = AppUserProfile.SystemFolder;
+            SessionPath = AppUserProfile.SessionFolder;
 
-        public Connections(AppUserModel UserProfile)
-        {
-            DB_Client = UserProfile.DataFile;
+            UsersConnection = GetSQLiteConnection(Path.Combine(BasePath, RootPath, UsersPath, DB_Users));
+            ClientConnection = GetSQLiteConnection(Path.Combine(BasePath, RootPath, ClientPath, DB_Client));
+            LanguageConnection = GetSQLiteConnection(Path.Combine(BasePath, RootPath, LanguagePath, DB_Language));
+            MessageConnection = GetSQLiteConnection(Path.Combine(BasePath, RootPath, MessagePath, DB_Message));
+            SystemConnection = GetSQLiteConnection(Path.Combine(BasePath, RootPath, SystemPath, DB_System));
+            SessionConnection = GetSQLiteConnection(Path.Combine(BasePath, RootPath, SessionPath, DB_Session));
+
         }
 
         public static SQLiteConnection? GetUsersConnection()
         {
-            var DBFile = Path.Combine(BasePath, RootPath, ClientPath, "AppliedUsers2.db");
+            var DBFile = Path.Combine(BasePath, RootPath, UsersPath, DB_Users);
             if (File.Exists(DBFile))
             {
                 return GetClientConnection(DBFile);
@@ -45,7 +69,7 @@ namespace AppliedDB
         }
         public static SQLiteConnection? GetMessagesConnection()
         {
-            var DBFile = Path.Combine(BasePath, RootPath, MessagePath, "Messages.db");
+            var DBFile = Path.Combine(BasePath, RootPath, MessagePath, DB_Message);
             if (File.Exists(DBFile))
             {
                 return GetClientConnection(DBFile);
@@ -55,7 +79,7 @@ namespace AppliedDB
 
         public static SQLiteConnection? GetLanguageConnection()
         {
-            var DBFile = Path.Combine(BasePath, RootPath, LanguagePath, "Languages.db");
+            var DBFile = Path.Combine(BasePath, RootPath, LanguagePath, DB_Language);
             if (File.Exists(DBFile))
             {
                 return GetClientConnection(DBFile);
@@ -65,7 +89,7 @@ namespace AppliedDB
         public static SQLiteConnection? GetClientConnection(string _DBFile)
         {
 
-            var DBFile = Path.Combine(BasePath, RootPath, ClientPath, _DBFile);
+            var DBFile = Path.Combine(BasePath, RootPath, ClientPath, DB_Client);
             if (File.Exists(DBFile))
             {
                 try
@@ -81,12 +105,33 @@ namespace AppliedDB
             }
             return null;
         }
+        public static SQLiteConnection? GetSQLiteConnection(string _UsersDBFile)
+        {
+            
+            if (File.Exists(_UsersDBFile))
+            {
+                try
+                {
+                    SQLiteConnection _Connection = new();;
+                    _Connection.ConnectionString = $"Data Source={_UsersDBFile}";
+                    return _Connection;
+                }
+                catch (Exception)
+                {
+                    // Error handling code type here....
+                }
+            }
+            return null;
+
+        }
 
     }
 
     public interface IConnections
     {
         public SQLiteConnection? UsersConnection { get; set; }
+        public SQLiteConnection? ClientConnection { get; set; }
         public SQLiteConnection? MessageConnection { get; set; }
+        public SQLiteConnection? LanguageConnection { get; set; }
     }
 }

@@ -1,10 +1,9 @@
-﻿using AppliedAccounts.Authentication;
-using AppliedDB;
+﻿using AppliedDB;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.Security.Claims;
 
-namespace AppliedBlazorApp.Authentication
+namespace AppliedAccounts.Authentication
 {
     public class UserAuthonticationStateProvider : AuthenticationStateProvider
     {
@@ -43,7 +42,8 @@ namespace AppliedBlazorApp.Authentication
                                 new ("DisplayName",userSession.DisplayName),
                                 new ("PIN",userSession.PIN),
                                 new ("LanguageID",userSession.LanguageID.ToString()),
-                                
+                                new ("Session",userSession.SessionGuid.ToString()),
+
                                 new ("RootFolder",userSession.RootFolder.ToString()),
                                 new ("UsersFolder",userSession.UsersFolder.ToString()),
                                 new ("ClientsFolder",userSession.ClientsFolder.ToString()),  // Data base Folder
@@ -88,6 +88,7 @@ namespace AppliedBlazorApp.Authentication
                                 new ("DisplayName",userSession.DisplayName),
                                 new ("PIN",userSession.PIN),
                                 new ("LanguageID",userSession.LanguageID.ToString()),
+                                new ("Session",userSession.SessionGuid.ToString()),
 
                                 new ("RootFolder",userSession.RootFolder.ToString()),
                                 new ("UsersFolder",userSession.UsersFolder.ToString()),
@@ -126,6 +127,7 @@ namespace AppliedBlazorApp.Authentication
                 AppUser.Company = claims?.FirstOrDefault(x => x.Type.Equals("Company", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
                 AppUser.PIN = claims?.FirstOrDefault(x => x.Type.Equals("PIN", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
                 AppUser.LanguageID = int.Parse(claims?.FirstOrDefault(x => x.Type.Equals("LanguageID", StringComparison.OrdinalIgnoreCase))?.Value ?? "");
+                AppUser.Session = claims?.FirstOrDefault(x => x.Type.Equals("Session", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
 
 
                 // Default values

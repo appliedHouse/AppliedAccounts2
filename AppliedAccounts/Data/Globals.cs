@@ -7,7 +7,8 @@
         public string BasePath { get; set; } = string.Empty;
         public string RootPath { get; set; } = string.Empty;
         public string ReportPath { get; set; } = string.Empty;
-        public string DBPath { get; set; } = string.Empty;
+        public string UsersPath { get; set; } = string.Empty;
+        public string ClientPath { get; set; } = string.Empty;
         public string PDFPath { get; set; } = string.Empty;
         public string DBTempPath { get; set; } = string.Empty;
         public string SystemPath { get; set; } = string.Empty;
@@ -32,7 +33,8 @@
             LanguagesPath = Config.GetValue<string>("Paths:LanguagesPath");
             MessagesPath = Config.GetValue<string>("Paths:MessagesPath");
             PDFPath = Config.GetValue<string>("Paths:PDFPath");
-            DBPath = Config.GetValue<string>("Paths:DBPath");
+            ClientPath = Config.GetValue<string>("Paths:ClientPath");
+            UsersPath = Config.GetValue<string>("Paths:UsersPath");
             DBTempPath = Config.GetValue<string>("Paths:DBTempPath");
             SessionPath = Config.GetValue<string>("Paths:SessionPath");
 
@@ -77,7 +79,8 @@
         string LanguagesPath { get; set; }
         string MessagesPath { get; set; }
         string PDFPath { get; set; }
-        string DBPath { get; set; }
+        string ClientPath { get; set; }
+        string UsersPath { get; set; }
         string DBTempPath { get; set; }
         string SystemPath { get; set; }
     }

@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppReports", "AppliedReport
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppliedAccounts", "AppliedAccounts", "{9CF79BAA-782F-4A70-9F5B-1ABAD409D69B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppliedAccounts", "AppliedAccounts\AppliedAccounts.csproj", "{CD2CDCE7-1210-4CFC-BA9A-6FFB95F11492}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppliedAccounts", "AppliedAccounts\AppliedAccounts.csproj", "{CD2CDCE7-1210-4CFC-BA9A-6FFB95F11492}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F892C185-A73D-47EE-98AC-E893B57A3BD7}"
 	ProjectSection(SolutionItems) = preProject

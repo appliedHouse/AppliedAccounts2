@@ -1,0 +1,26 @@
+﻿@page "/Test";
+
+
+@inject AuthenticationStateProvider authStateProvider
+
+@code {
+   
+    public DataBaseClass DBClass; 
+
+
+    protected override void OnInitialized()
+    {
+        var UserAuthentication = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        DBClass = new(UserAuthentication);
+        Value1 = MyConfig.GetValue("Paths:DBPath","").ToString();
+        Value2 = MyEnvir.ContentRootPath;
+
+    }
+
+}
+
+
+@Value1;
+<br />
+@Value2;
+

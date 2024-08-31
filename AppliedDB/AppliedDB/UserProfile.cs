@@ -57,18 +57,22 @@ namespace AppliedDB
         private static DataRow GetUsersData(string _UserID)
         {
             var _CommandText = $"SELECT * FROM [Users] WHERE [UserID] = '{_UserID}'";
-            var _Connection = Connections.GetUsersConnection(); _Connection.Open();
-            SQLiteCommand _Command = new(_CommandText, _Connection);
-            SQLiteDataAdapter _Adapter = new(_Command);
-            DataSet _DataSet = new();
-            _Adapter.Fill(_DataSet, "Users");
-            _Connection.Close();
-
-            if (_DataSet.Tables.Count == 1)
+            var _Connection = Connections.GetUsersConnection();
+            if (_Connection is not null)
             {
-                return _DataSet.Tables[0].Rows[0];
-            }
 
+                _Connection.Open();
+                SQLiteCommand _Command = new(_CommandText, _Connection);
+                SQLiteDataAdapter _Adapter = new(_Command);
+                DataSet _DataSet = new();
+                _Adapter.Fill(_DataSet, "Users");
+                _Connection.Close();
+
+                if (_DataSet.Tables.Count == 1)
+                {
+                    return _DataSet.Tables[0].Rows[0];
+                }
+            }
             return GetEmptyRow();
         }
 

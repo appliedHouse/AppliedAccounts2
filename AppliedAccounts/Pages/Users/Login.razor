@@ -1,8 +1,9 @@
 ﻿@layout LoginLayout
 @page "/Users/Login"
 @using AppliedAccounts.Data;
-@using AppliedBlazorApp.Authentication
 @using AppliedDB;
+@using System.Data.SQLite
+@using System.Data
 
 
 @inject NavigationManager NavManager;
@@ -31,7 +32,7 @@
 
     public async void Submit()
     {
-        UserProfile AppUser = new UserProfile(Model);
+        UserProfile AppUser = GetUserProfile(Model);
 
         bool IsUser = AppUser.Profile.UserID.Equals(Model.UserID);
         bool IsPSW = AppUser.Profile.Password.Equals(Model.Password);
@@ -54,25 +55,27 @@
                     LanguageID = LanguageID,
 
                     // Default Application Foler
-                    ClientsFolder = AppGlobals.DBPath ?? "SQLiteDB",
-                    UsersFolder = AppGlobals.DBPath ?? "SQLiteDB",
+                    RootFolder = AppGlobals.RootPath ?? "wwwroot",
+                    ClientsFolder = AppGlobals.ClientPath ?? "SQLiteDB",
+                    UsersFolder = AppGlobals.UsersPath ?? "SQLiteDB",
                     ReportFolder = AppGlobals.ReportPath ?? "Reports",
                     LanguageFolder = AppGlobals.LanguagesPath ?? "Languages",
                     MessageFolder = AppGlobals.MessagesPath ?? "Messages",
                     ImageFolder = AppGlobals.ImagesPath ?? "Images",
+                    PDFFolder = AppGlobals.PDFPath ?? "PDFReport",
                     SystemFolder = AppGlobals.SystemPath ?? "System",
                     SessionFolder = AppGlobals.SessionPath ?? "Sessions",
 
                 });
 
             // This will create a SQL Lite Database Table for local Session
-            // Values could be store and retrive 
+            // Values could be store and retrive
 
             // var _Path = Path.Combine(AppUser.Profile.DataPath, "System");
-            // AppliedBlazorApp.Data.AppLocalDBSession _SessionDB = new(_Path, _newGUID);
-            
+            // AppliedAccounts.Data.AppLocalDBSession _SessionDB = new(_Path, _newGUID);
+
             // END.
-            
+
             NavManager.NavigateTo("/", true);
         }
         else
@@ -87,6 +90,53 @@
         return;
     }
 
+
+    private UserProfile GetUserProfile(AppUserModel _UserModel)
+    {
+        var _UserProfile = new UserProfile();
+        var _Profile = new AppUserModel();
+        var _UserID = _UserModel.UserID;
+        if (_UserModel != null)
+        {
+
+            var UsersDBFile = Path.Combine(AppGlobals.BasePath, AppGlobals.RootPath, AppGlobals.UsersPath, "AppliedUsers2.db");
+
+            var _CommandText = $"SELECT * FROM [Users] WHERE [UserID] = '{_UserID}'";
+            var _Connection = Connections.GetSQLiteConnection(UsersDBFile); _Connection.Open();
+            SQLiteCommand _Command = new(_CommandText, _Connection);
+            SQLiteDataAdapter _Adapter = new(_Command);
+            DataSet _DataSet = new();
+            _Adapter.Fill(_DataSet, "Users");
+            _Connection.Close();
+
+            if (_DataSet.Tables.Count == 1)
+            {
+                var _UserData = _DataSet.Tables[0].Rows[0];
+                if ((DataRow)_UserData != null)
+                {
+                    _UserProfile.Profile = new()
+                    {
+                        UserID = _UserData["UserID"].ToString() ?? "",
+                        Password = _UserData["Password"].ToString() ?? "",
+                        DisplayName = _UserData["DisplayName"].ToString() ?? "",
+                        Designation = _UserData["Designation"].ToString() ?? "",
+                        UserEmail = _UserData["UserEmail"].ToString() ?? "",
+                        Role = _UserData["Role"].ToString() ?? "",
+                        LastLogin = _UserData["LastLogin"].ToString() ?? "",
+                        Session = Guid.NewGuid().ToString(),
+                        DataFile = _UserData["DataFile"].ToString() ?? "",
+                        Company = _UserData["Company"].ToString() ?? "",
+                    };
+                }
+            }
+            else
+            {
+                NavManager.NavigateTo("/AppError");   
+            }
+        }
+
+        return _UserProfile;
+    }
 }
 
 
@@ -150,7 +200,7 @@
                 <br />
 
                 <button type="button" class="w-100 btn btn-lg btn-primary" @onclick="ReLoad">
-                   Reset Page
+                    Reset Page
                 </button>
 
             }

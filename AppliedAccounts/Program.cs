@@ -2,7 +2,7 @@ using AppliedDB;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using AppliedAccounts.Data;
-using AppliedBlazorApp.Authentication;
+using AppliedAccounts.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
