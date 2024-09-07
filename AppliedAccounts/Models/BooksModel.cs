@@ -1,4 +1,5 @@
-﻿using AppliedAccounts.Data;
+﻿using Microsoft.AspNetCore.Components;
+using AppliedAccounts.Data;
 using AppliedDB;
 using AppLanguages;
 using System.ComponentModel.DataAnnotations;
@@ -13,6 +14,10 @@ namespace AppliedAccounts.Models
     public class BooksModel
     {
         #region Variables
+
+        [Inject] public NavigationManager NavManager { set; get; } = default!;
+        [Inject] public Globals AppGlobals { get; set; } = default!;
+        [Inject] public IConfiguration Appconfig { get; set; } = default!;
 
         public string? Vou_No { get; set; }
         public int BookID { get; set; }
@@ -47,6 +52,8 @@ namespace AppliedAccounts.Models
 
         public BooksModel()
         {
+            NavManager.NavigateTo("/");
+
 
         }
 

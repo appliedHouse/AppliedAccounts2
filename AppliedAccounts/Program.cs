@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using AppliedAccounts.Data;
 using AppliedAccounts.Authentication;
 
+System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -15,6 +17,7 @@ builder.Services.AddSingleton<UserProfile>();
 builder.Services.AddSingleton<Globals>();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthonticationStateProvider>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

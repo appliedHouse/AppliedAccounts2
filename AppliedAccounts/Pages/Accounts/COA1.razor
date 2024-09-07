@@ -1,0 +1,166 @@
+﻿@page "/Accounts/COA1"
+@attribute [Authorize];
+@using AppliedAccounts.Libs;
+@using AppliedAccounts.Models;
+
+@inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager NavManager;
+@inject IJSRuntime js
+
+
+@code {
+    protected override void OnInitialized()
+    {
+        var AppUserProfile = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        if (AppUserProfile != null) { Model = new(AppUserProfile); IsPageValid = GetPageIsValid(); }
+        else { Model = new(); }
+    }
+
+    protected void Back() { NavManager.NavigateTo("/Menu/Accounts"); }
+}
+
+<PageHeading Text="Chart of Accounts" />
+
+@* Page Errors Show *@
+@if (Model.MyMessages.Count > 0)
+{
+    <PageErrors Messages="@Model.MyMessages"></PageErrors>
+}
+
+@if (IsPageValid)
+{
+
+    <EditForm Model="@Model">
+        <div class="container">
+            <InputNumber @bind-Value="@Model.Record.ID" placeholder="ID" id="ID" hidden></InputNumber>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@Model.Record.Code" class="form-control" id="txtCode" placeholder="Account Code" />
+                        <label for="txtCode">Code</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@Model.Record.Title" class="form-control" id="txtTitle" placeholder="Account Title" />
+                        <label for="txtTitle">Title of Account</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3 txt">
+                        <InputNumber @bind-Value="@Model.Record.OBal" class="form-control" id="txtOBal" placeholder="Voucher No" />
+                        <label for="txtOBal">Opening Balance</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <InputSelect id="coa_Class" @bind-Value="@Model.Record.Class" class="form-control">
+                            @foreach (var item in Model.ClassList)
+                            {
+                                <option value=@item.First().Key>@item.First().Value</option>
+                            }
+                        </InputSelect>
+                        <label for="coa_class">Account Class</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
+
+                        <InputSelect id="coa_nature" @bind-Value="@Model.Record.Nature" class="form-control">
+                            @foreach (var item in Model.NatureList)
+                            {
+                                <option value=@item.First().Key>@item.First().Value</option>
+                            }
+                        </InputSelect>
+                        <label for="coa_nature">Account Nature</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <InputSelect id="coa_notes" @bind-Value="@Model.Record.Notes" class="form-control">
+                            @foreach (var item in Model.NotesList)
+                            {
+                                <option value=@item.First().Key>@item.First().Value</option>
+                            }
+                        </InputSelect>
+                        <label></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mt-2 mb-2">
+            <div class="row">
+                <div class="col">
+                    <button type="button" class="btn btn-Save" @onclick="()=>Model.Save()">Save</button>
+                    <button type="button" class="btn btn-New" @onclick="()=>Model.Add()">New</button>
+                    <button type="button" class="btn btn-Back" @onclick="Back">Back</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="container mb-2">
+            <div class="row mt-2" style="height:50px; background-color:lightblue; padding-top:5px">
+                <div class="col-4">
+                    <InputText @bind-Value="@Model.SearchText" class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
+                </div>
+                <div class="col-2">
+                    <button style="margin-top:5px;" class="btn btn-primary btn-sm" @onclick="()=>Model.Search()">Search</button>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="container">
+            <table class="AppTable">
+                <thead class="tb-head">
+                    <tr class="tb-head-row">
+                        <th>Code</th>
+                        <th>Title</th>
+                        <th>Class</th>
+                        <th>Nature</th>
+                        <th>Notes</th>
+                        <th rowspan="2">
+                            Opening Balance
+                        </th>
+                        <th class="td-btn">
+                            <button id="btnAdd" class="btn-Add" @onclick="()=>Model.Add()"><i class="bi bi-plus-circle-fill"></i></button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="tb-body">
+                    @foreach (COARecord _Record in Model.Records)
+                    {
+                        <tr class="tb-body-row">
+                            <td>@_Record.Code</td>
+                            <td>@_Record.Title</td>
+                            <td>@_Record.TitleClass</td>
+                            <td>@_Record.TitleNature</td>
+                            <td>@_Record.TitleNote</td>
+                            <td class="amount">@_Record.OBal</td>
+                            <td class="td-btn">
+                                <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(()=> Model.Edit((int)_Record.ID))"><i class="bi bi-pencil-fill"></i></button>
+                                <label style="padding-left:5px; padding-right:5px;"> | </label>
+                                <button id="btnDel" type="submit" class="btn-Del" @onclick="(()=> Model.Delete((int)_Record.ID))"><i class="bi bi-trash-fill"></i></button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </EditForm>
+}
+else
+{
+    <div class="alert alert-danger d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill" /></svg>
+        <div>
+            @ErrorMessage
+        </div>
+    </div>
+}

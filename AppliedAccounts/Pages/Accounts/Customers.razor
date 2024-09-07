@@ -1,0 +1,168 @@
+﻿@page "/Pages/Customers"
+@page "/Customer/{ID:int}"
+@attribute [Authorize];
+@using AppliedAccounts.Libs;
+@using AppliedAccounts.Models;
+
+@inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager NavManager;
+@inject IJSRuntime js
+
+
+@code {
+
+    [Parameter]
+    public int ID { get; set; }
+    public bool IsDelete { get; set; } = false;
+
+    protected override void OnInitialized()
+    {
+        var AppUserProfile = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+
+        if (ID < 0) { IsDelete = true; ID = Math.Abs(ID); }
+
+        if (AppUserProfile != null) { Model = new(AppUserProfile, ID); }
+        else { Model = new(); }
+    }
+
+    public void Back() { NavManager.NavigateTo("/CustomerList"); }
+    public void Delete(int ID)
+    {
+        if (Model.Delete(ID)) { NavManager.NavigateTo("/CustomerList"); }
+    }
+}
+
+<style>
+    #Main {
+        background-color: bisque;
+    }
+</style>
+
+
+
+<PageHeading Text="Customer / Client Detail" />
+
+@* Page Errors Show *@
+@if (Model.MyMessages.Count > 0)
+{
+    <PageErrors Messages="@Model.MyMessages"></PageErrors>
+}
+
+@if (!Model.RecordNotFound)
+{
+
+    <EditForm Model="@Model">
+        <div class="container">
+            <InputNumber @bind-Value="@Model.Record.ID" placeholder="ID" id="ID" hidden></InputNumber>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@Model.Record.Code" class="form-control" id="txtCode" placeholder="Customer Code" />
+                        <label for="txtCode">Code</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@Model.Record.Title" class="form-control" id="txtTitle" placeholder="Customer Name" />
+                        <label for="txtTitle">Customer Name</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@Model.Record.Address1" class="form-control" id="txtAdd1" placeholder="Address Line 1" />
+                        <label for="txtVouNo">Address Line 1</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@Model.Record.Address2" class="form-control" id="txtAdd2" placeholder="Address Line 1" />
+                        <label for="txtVouNo">Address Line 2</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@Model.Record.City" class="form-control" id="txtCity" placeholder="City" />
+                        <label for="txtVouNo">City</label>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@Model.Record.Country" class="form-control" id="txtCountry" placeholder="Country" />
+                        <label for="txtVouNo">Country</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@Model.Record.Phone" class="form-control" id="txtPhone" placeholder="Phone" />
+                        <label for="txtPhone">Phone No.</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@Model.Record.Mobile" class="form-control" id="txtMobile" placeholder="Mobile" />
+                        <label for="txtMobile">Mobile No.</label>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@Model.Record.Email" class="form-control" id="txtEmail" placeholder="Email Address" />
+                        <label for="txtEmail">Email Address</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@Model.Record.NTN" class="form-control" id="txtNTN" placeholder="Income Tax Number" />
+                        <label for="txtNTN">Income Tax No.</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@Model.Record.CNIC" class="form-control" id="txtCNIC" placeholder="Personal Identity Number" />
+                        <label for="txtNTN">Personal Identity No.</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@Model.Record.Notes" class="form-control" id="txtNotes" placeholder="Notes, if any" />
+                        <label for="txtNotes">Remarks</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container mt-2">
+            <div class="row">
+                <div class="col">
+                    <button type="submit" id="btn-save" @onclick="()=>Model.Save()"
+                            class="btn btn-success">
+                        <i class="bi bi-check-square"></i> SAVE
+                    </button>
+
+                    <button type="submit" id="btn-back" @onclick="Back"
+                            class="btn btn-primary">
+                        <i class="bi bi-box-arrow-left"></i>
+                        BACK
+                    </button>
+
+                    @if (IsDelete)
+                    {
+                        <button type="submit" id="btn-Delet" @onclick="()=>Delete(Model.Record.ID)"
+                                class="btn btn-danger">
+                            <i class="bi bi-box-trash-fill"></i>
+                            DELETE
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </EditForm>
+}

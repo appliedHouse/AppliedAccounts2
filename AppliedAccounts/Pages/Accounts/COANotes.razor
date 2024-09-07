@@ -1,0 +1,90 @@
+﻿@page "/Accounts/COANotes"
+@attribute [Authorize]
+@using AppliedAccounts.Libs;
+@using AppliedAccounts.Models;
+@inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager NavManager;
+@inject IJSRuntime js
+
+@code {
+    protected override void OnInitialized()
+    {
+        var AppUserProfile = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        if (AppUserProfile != null) { Model = new(AppUserProfile); }
+        else { Model = new(); }
+    }
+
+    protected void Back() { NavManager.NavigateTo("/Menu/Accounts"); }
+}
+
+<PageHeading Text="Nature of Accounts"></PageHeading>
+
+@* Page Errors Show *@
+@if (Model.MyMessages.Count > 0)
+{
+    <PageErrors Messages="@Model.MyMessages"></PageErrors>
+}
+
+<EditForm Model="@Model">
+    <div class="container">
+        <InputNumber @bind-Value="@Model.Record.ID" placeholder="ID" id="ID" hidden></InputNumber>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-floating mb-3 txt">
+                    <InputText @bind-Value="@Model.Record.Code" class="form-control" id="txtCode" placeholder="Voucher No" />
+                    <label for="txtCode">Code</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-floating mb-3 txt">
+                    <InputText @bind-Value="@Model.Record.Title" class="form-control" id="txtTitle" placeholder="Voucher No" />
+                    <label for="txtTitle">Title of Account</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-2 mb-2">
+        <div class="row">
+            <div class="col">
+                <button type="button" class="btn btn-Save" @onclick="()=>Model.Save()">Save</button>
+                <button type="button" class="btn btn-New" @onclick="()=>Model.Add()">New</button>
+                <button type="button" class="btn btn-Back" @onclick="Back">Back</button>
+                @if (Model.IsDeleted)
+                {
+                    <button type="button" class="btn btn-Delete" @onclick="()=>Model.DeleteRow(Model.Record.ID)">Delete</button>
+                }
+            </div>
+        </div>
+
+    </div>
+
+    <div class="container">
+        <table class="AppTable">
+            <thead class="tb-head">
+                <tr class="tb-head-row">
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th class="td-btn">
+                        <button id="btnAdd" class="btn-Add" @onclick="()=>Model.Add()"><i class="bi bi-plus-circle-fill"></i></button>
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="tb-body">
+                @foreach (COANotesRecord _Record in Model.Records)
+                {
+                    <tr class="tb-body-row">
+                        <td>@_Record.Code</td>
+                        <td>@_Record.Title</td>
+
+                        <td class="td-btn">
+                            <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(()=> Model.Edit((int)_Record.ID))"><i class="bi bi-pencil-fill"></i></button>
+                            <label style="padding-left:5px; padding-right:5px;"> | </label>
+                            <button id="btnDel" type="submit" class="btn-Del" @onclick="(()=> Model.Delete((int)_Record.ID))"><i class="bi bi-trash-fill"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</EditForm>

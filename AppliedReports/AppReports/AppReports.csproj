@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ClosedXML_Excel" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Microsoft.ReportViewer.NETCore">
       <HintPath>C:\Users\aamir\.nuget\packages\reportviewercore.netcore\15.1.22\lib\net6.0\Microsoft.ReportViewer.NETCore.dll</HintPath>
     </Reference>

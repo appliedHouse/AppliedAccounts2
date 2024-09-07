@@ -1,0 +1,80 @@
+﻿@page "/CustomerList"
+@attribute [Authorize];
+@using AppliedAccounts.Libs;
+@using AppliedAccounts.Models;
+
+@inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager NavManager;
+@inject IJSRuntime js
+
+
+
+@code {
+    protected override void OnInitialized()
+    {
+        var AppUserProfile = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        if (AppUserProfile != null) { Model = new(AppUserProfile); }
+        else { Model = new(); }
+    }
+
+    public void Back() { NavManager.NavigateTo("/Menu/Accounts"); }
+    public void Add1() { NavManager.NavigateTo("/Customer/0"); }
+    public void Edit(int ID) { NavManager.NavigateTo($"/Customer/{ID}"); }
+    public void Delete(int ID) { NavManager.NavigateTo($"/Customer/{ID}"); }
+    public void Submit() { }
+}
+
+<PageHeading Text="List of Customers, Clients, Vendors" />
+
+<EditForm Model="@Model" OnSubmit="Submit">
+    <div class="container mb-2">
+        <div class="row mt-2" style="height:50px; background-color:lightblue; padding-top:5px">
+            <div class="col-4">
+                <InputText @bind-Value="@Model.SearchText" class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
+            </div>
+            <div class="col-2">
+                <button style="margin-top:5px;" class="btn btn-primary btn-sm" @onclick="()=>Model.Search()">Search</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="container">
+        <table class="table-list">
+            <thead class="tb-head">
+                <tr class="tb-head-row">
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Address 1</th>
+                    <th>Address 2</th>
+                    <th>City</th>
+                    <th>Country</th>
+                    <th>
+                        <button id="btnAdd" @onclick="Add1" class="btn btn-success">Add</button>
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody class="tb-body">
+                @foreach (var _Record in Model.Records)
+                {
+                    <tr class="tb-body-row">
+                        <td>@_Record.Code</td>
+                        <td>@_Record.Title</td>
+                        <td>@_Record.Address1</td>
+                        <td>@_Record.Address2</td>
+                        <td>@_Record.City</td>
+                        <td>@_Record.Country</td>
+                        <td class="td-btn">
+                            <button id="btnEdit" type="submit" class="btn-Edit" @onclick="()=>Edit(_Record.ID)"><i class="bi bi-pencil-fill"></i></button>
+                            <label style="padding-left:5px; padding-right:5px;"> | </label>
+                            <button id="btnDel" type="submit" class="btn-Del" @onclick="()=>Delete(_Record.ID *-1)"><i class="bi bi-trash-fill"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+</EditForm>
