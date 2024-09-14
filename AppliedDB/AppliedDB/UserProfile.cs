@@ -136,6 +136,6 @@ namespace AppliedDB
         public string ImagesFolder { get; set; } = string.Empty;
         public string SystemFolder { get; set; } = string.Empty;
         public string SessionFolder { get; set; } = string.Empty;
-        
+        public string TempDBFolder { get; set; } = string.Empty;
     }
 }

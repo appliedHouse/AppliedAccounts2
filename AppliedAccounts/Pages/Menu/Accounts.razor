@@ -29,56 +29,11 @@
         NavManager.NavigateTo("/DownLoad");
     }
 
-    public async void DownLoadMyFiles(InputFileChangeEventArgs e)
-    {
-        var _File = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelFiles", e.File.Name);
-
-
-        using (FileStream fs = new(_File, FileMode.Create))
-        { await e.File.OpenReadStream().CopyToAsync(fs); }
-        //fs.Flush();
-        //fs.Close();
-
-
-
-        await Task.Delay(1000);
-
-        DataSet _DataSet;
-
-        using (var stream = File.Open(_File, FileMode.Open, FileAccess.Read))
-        {
-            // Auto-detect format, supports:
-            //  - Binary Excel files (2.0-2003 format; *.xls)
-            //  - OpenXml Excel files (2007 format; *.xlsx, *.xlsb)
-            using (var reader = ExcelReaderFactory.CreateReader(stream))
-            {
-                // Choose one of either 1 or 2:
-
-                // 1. Use the reader methods
-                do
-                {
-                    while (reader.Read())
-                    {
-                        // reader.GetDouble(0);
-                    }
-                } while (reader.NextResult());
-
-                // 2. Use the AsDataSet extension method
-                _DataSet = reader.AsDataSet();
-
-                // The result of each spreadsheet is in result.Tables
-            }
-            SetDataSet(_DataSet);
-
-        }
-    }
 
 
     public void SetDataSet(DataSet? _DataSet)
     {
         int Count = _DataSet.Tables.Count;
-
-
     }
 }
 
@@ -104,14 +59,20 @@
         </div>
     </div>
 
-</div>
+     <div class="row">
+        <div class="col-4">
+            <MenuCard Message=@TypeText NavTo="/Accounts/COANotes" PicPath="./images/Cards/COANotes.jpg" />
+        </div>
+        <div class="col-4">
+            <MenuCard Message=@TypeText NavTo="/Accounts/CashBook" PicPath="./images/Cards/Cashbook&Pencil.jpg" />
+        </div>
+    </div>
 
-
-<div class="container">
     <div class="row">
-        <InputFile OnChange="DownLoadMyFiles" accept="Excel/*,.xlsx" Visible="true" runat="server"></InputFile>
-
-        <button id="btn-download" @onclick="LoadFiles">DownLoad File</button>
+        <div class="col-4">
+            <MenuCard Message=@TypeText NavTo="/ImportData/ImportSalesInvoice" PicPath="./images/Cards/Import&Export.png" />
+        </div>
+       
     </div>
 
 
@@ -120,25 +81,25 @@
 
 @if (MyDataset.Tables.Count > 0)
 {
-    <table>
-        <thead>
-            <tr>Col 1</tr>
-            <tr>Col 2</tr>
-            <tr>Col 4</tr>
-            <tr>Col 1</tr>
-        </thead>
-        <tbody>
+        <table>
+            <thead>
+                <tr>Col 1</tr>
+                <tr>Col 2</tr>
+                <tr>Col 4</tr>
+                <tr>Col 1</tr>
+            </thead>
+            <tbody>
             @foreach (DataRow row in MyDataset.Tables[0].Rows)
             {
-                <tr>
-                    <td>@row[row.Table.Columns[0].ColumnName]</td>
-                    <td>@row[row.Table.Columns[1].ColumnName]</td>
-                    <td>@row[row.Table.Columns[2].ColumnName]</td>
-                    <td>@row[row.Table.Columns[3].ColumnName]</td>
-                </tr>
+                        <tr>
+                            <td>@row[row.Table.Columns[0].ColumnName]</td>
+                            <td>@row[row.Table.Columns[1].ColumnName]</td>
+                            <td>@row[row.Table.Columns[2].ColumnName]</td>
+                            <td>@row[row.Table.Columns[3].ColumnName]</td>
+                        </tr>
             }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
 }
 
 

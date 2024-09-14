@@ -1,0 +1,28 @@
+﻿@page "/ImportData/ImportSalesInvoice"
+@using System.Data
+@using AppliedDB
+@attribute [Authorize];
+
+
+@inject AuthenticationStateProvider authStateProvider;
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+    }
+
+
+    // string _ImportTable = "August";
+    // string _ImportFileName = AppRegistry.GetText(AppUser.DataFile, "ExcelImport");
+    // string _ImportConnection = Path.Combine(Connections.GetTempDBPath(), _ImportFileName + ".db");
+    // DataTable _TempImportFile = DataSource.GetDataTable(_ImportFileName,_ImportTable);
+    
+}
+
+
+<InputFile OnChange="GetExcelFile">Select Excel File</InputFile>
+
+
+@MyMessage;

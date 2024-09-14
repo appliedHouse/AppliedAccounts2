@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Security.Cryptography;
 using Tables = AppliedDB.Enums.Tables;
 
 namespace AppliedAccounts.Data
@@ -230,9 +231,10 @@ namespace AppliedAccounts.Data
                 default:
                     break;
             }
+           
 
-            if (SQLAction == "Insert") { var cmd = AppliedDB.Commands.Insert(CurrentRow, DataFile); cmd.ExecuteNonQuery(); return true; }
-            if (SQLAction == "Update") { var cmd = AppliedDB.Commands.UpDate(CurrentRow, DataFile); cmd.ExecuteNonQuery(); return true; }
+            if (SQLAction == "Insert") { var cmd = AppliedDB.Commands.Insert(CurrentRow, DataFile); cmd.Connection.Open(); cmd.ExecuteNonQuery(); cmd.Connection.Close(); return true; }
+            if (SQLAction == "Update") { var cmd = AppliedDB.Commands.UpDate(CurrentRow, DataFile); cmd.Connection.Open();  cmd.ExecuteNonQuery(); cmd.Connection.Close(); return true; }
             return false;
         }
         public static int ExpDays(string DataFile)

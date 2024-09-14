@@ -23,6 +23,7 @@
     public string? SessionPath;
     public string? Session;
     public string? ClientDB;
+    public string? TempDBPath;
     public static AppliedDB.Connections? _Connections;
 
     private bool _true = true;
@@ -46,6 +47,7 @@
         SessionPath = UserModel.SessionFolder;
         Session = UserModel.Session;
         ClientDB = UserModel.DataFile;
+        TempDBPath = UserModel.TempDBFolder;
 
         _Connections = new(UserModel);
         _true = true;

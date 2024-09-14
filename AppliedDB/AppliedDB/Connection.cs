@@ -21,6 +21,7 @@ namespace AppliedDB
         public static string PDFPath { get; set; } = "";
         public static string SystemPath { get; set; } = "";
         public static string SessionPath { get; set; } = "";
+        public static string TempDBPath { get; set; } = GetTempDBPath();
 
 
         public static string DB_Users = "AppliedUsers2.db";
@@ -50,6 +51,7 @@ namespace AppliedDB
             PDFPath = AppUserProfile.PDFFolder;
             SystemPath = AppUserProfile.SystemFolder;
             SessionPath = AppUserProfile.SessionFolder;
+            TempDBPath = AppUserProfile.TempDBFolder;
 
             //UsersConnection = GetSQLiteConnection(Path.Combine(BasePath, RootPath, UsersPath, DB_Users));
             //ClientConnection = GetSQLiteConnection(Path.Combine(BasePath, RootPath, ClientPath, DB_Client));
@@ -90,6 +92,16 @@ namespace AppliedDB
             return GetSQLiteConnection(Path.Combine(BasePath, RootPath, ClientPath, DB_Session));
         }
 
+        public static string GetTempDBPath()
+        {
+            return Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SQLiteTemp");
+        }
+
+        public static string GetExcelPath()
+        {
+            return Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelFiles");
+        }
+
         #endregion
 
         #region Static Connection by default values.
@@ -125,23 +137,8 @@ namespace AppliedDB
         }
         public static SQLiteConnection? GetClientConnection(string _DBFile)
         {
-
             var DBFile = Path.Combine(BasePath, "wwwroot", "SQLiteDB", _DBFile);
             return GetSQLiteConnection(DBFile);
-            //if (File.Exists(DBFile))
-            //{
-            //    try
-            //    {
-            //        SQLiteConnection _Connection = new();
-            //        _Connection.ConnectionString = $"Data Source={DBFile}";
-            //        return _Connection;
-            //    }
-            //    catch (Exception)
-            //    {
-            //        // Error handling code type here....
-            //    }
-            //}
-            //return null;
         }
         public static SQLiteConnection? GetSQLiteConnection(string _UsersDBFile)
         {

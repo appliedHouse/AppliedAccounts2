@@ -54,6 +54,8 @@ namespace AppliedAccounts.Authentication
                                 new ("ImageFolder",userSession.ImageFolder.ToString()),
                                 new ("SystemFolder",userSession.SystemFolder.ToString()),
                                 new ("SessionFolder",userSession.SessionFolder.ToString()),
+                                new ("TempDBFolder",userSession.TempDBFolder.ToString()),
+
                             }, "AppliedAuth"));
 
                     var _Result = await Task.FromResult(new AuthenticationState(ClaimPrincipal));
@@ -100,6 +102,7 @@ namespace AppliedAccounts.Authentication
                                 new ("ImageFolder",userSession.ImageFolder.ToString()),
                                 new ("SystemFolder",userSession.SystemFolder.ToString()),
                                 new ("SessionFolder",userSession.SessionFolder.ToString()),
+                                new ("TempDBFolder",userSession.TempDBFolder.ToString()),
                             }, "AppliedAuth"));
             }
             else
@@ -141,6 +144,7 @@ namespace AppliedAccounts.Authentication
                 AppUser.ImagesFolder = claims?.FirstOrDefault(x => x.Type.Equals("ImageFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "Images";
                 AppUser.SystemFolder = claims?.FirstOrDefault(x => x.Type.Equals("SystemFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "System";
                 AppUser.SessionFolder = claims?.FirstOrDefault(x => x.Type.Equals("SessionFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "Sessions";
+                AppUser.TempDBFolder = claims?.FirstOrDefault(x => x.Type.Equals("TempDBFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "Sessions";
             };
 
 
