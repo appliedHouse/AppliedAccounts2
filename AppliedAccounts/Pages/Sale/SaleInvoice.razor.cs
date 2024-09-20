@@ -19,7 +19,6 @@ namespace AppliedAccounts.Pages.Sale
         }
         #endregion
 
-
         #region Submit & Digitis
         public void Submit()
         {

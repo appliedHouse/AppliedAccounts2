@@ -748,6 +748,19 @@ namespace AppliedDB
         }
 
         #endregion
+
+        #region Close Table
+        public DataTable CloseTable(Tables _Table)
+        {
+            return GetDataTable(DBFile, _Table).Clone();
+        }
+
+        public static DataTable CloneTable(string _DBFile, Tables _Table)
+        {
+            return GetDataTable(_DBFile, _Table).Clone();
+        }
+        #endregion
+
     }
     public class CodeTitle
     {

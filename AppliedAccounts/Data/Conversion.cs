@@ -83,5 +83,23 @@
             return string.Empty;
         }
 
+        public static DateTime ToDateTime(object _Value)
+        {
+            try
+            {
+                if (DateTime.TryParse(_Value.ToString(), out DateTime _DateTime))
+                {
+                    return _DateTime;
+                }
+                else
+                {
+                    return DateTime.Now;
+                }
+            }
+            catch (Exception)
+            {
+                return DateTime.Now;
+            }
+        }
     }
 }

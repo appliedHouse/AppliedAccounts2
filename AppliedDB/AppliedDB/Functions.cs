@@ -73,5 +73,29 @@ namespace AppliedDB
             }
             return "";
         }
+
+        public static int Code2Int(string DBFile, Tables _Table, string _Code)
+        {
+            var SQLQuery = $"SELECT [ID] FROM [{_Table}] WHERE [Code]='{_Code}'";
+            DataTable _DataTable = DataSource.GetDataTable(DBFile,SQLQuery,"Code");
+            if(_DataTable.Rows.Count > 0)
+            {
+                return (int)_DataTable.Rows[0][0];
+            }
+            return 0;
+
+        }
+
+        public static decimal Code2Rate(string DBFile, int _ID)
+        {
+            var SQLQuery = $"SELECT [Rate] FROM [{Tables.Taxes}] WHERE [ID]={_ID}";
+            DataTable _DataTable = DataSource.GetDataTable(DBFile, SQLQuery, "Tax");
+            if (_DataTable.Rows.Count > 0)
+            {
+                return (decimal)_DataTable.Rows[0][0];
+            }
+            return 0.00M;
+
+        }
     }
 }

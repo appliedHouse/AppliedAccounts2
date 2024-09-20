@@ -21,70 +21,34 @@ namespace AppliedAccounts.Models
         {
             AppUser = appUser;
             ExcelFile = excelFile;
-            GetImportedDataSet();
+            ImportDataAsync();
         }
 
 
-
-        public async void GetImportedDataSet()
-        {
-            var _ExcelFile = Path.Combine(Connections.GetExcelPath(), ExcelFile.Name);
-            if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
-
-            using (FileStream fs = new(_ExcelFile, FileMode.Create))
-            {
-                await ExcelFile.OpenReadStream().CopyToAsync(fs);
-            }
-            using var stream = File.Open(_ExcelFile, FileMode.Open, FileAccess.Read);
-            {
-                using var reader = ExcelReaderFactory.CreateReader(stream);
-                int _Rows = 0;
-                do
-                {
-                    while (reader.Read())
-                    {
-                        _Rows++;
-                        // reader.GetDouble(0);
-                    }
-                } while (reader.NextResult());
-
-                MyMessages = $"Total {_Rows} rows imported.";
-
-                ImportDataSet = reader.AsDataSet();
-
-                if (ImportDataSet is not null)
-                {
-                    SaveInTable(ImportDataSet);
-                    IsImported = true;
-                    if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
-
-
-                }
-            }
-        }
-
-        #region Import Data From Excel file into DataSet
-
-        //public async void ImportDataAsync()
+        #region Temp
+        //public DataSet GetImportedDataSet()
         //{
-        //    var _ExcelFile = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelFiles", ExcelFile.Name);
-
+        //    var _ExcelFile = Path.Combine(Connections.GetExcelPath(), ExcelFile.Name);
         //    if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
 
         //    using (FileStream fs = new(_ExcelFile, FileMode.Create))
-        //    { await ExcelFile.OpenReadStream().CopyToAsync(fs); }
-
-        //    using var stream = File.Open(_ExcelFile, FileMode.Open, FileAccess.Read);
-
-        //    using (var reader = ExcelReaderFactory.CreateReader(stream))
         //    {
+        //        ExcelFile.OpenReadStream().CopyTo(fs);
+        //    }
+        //    using var stream = File.Open(_ExcelFile, FileMode.Open, FileAccess.Read);
+        //    {
+        //        using var reader = ExcelReaderFactory.CreateReader(stream);
+        //        int _Rows = 0;
         //        do
         //        {
         //            while (reader.Read())
         //            {
+        //                _Rows++;
         //                // reader.GetDouble(0);
         //            }
         //        } while (reader.NextResult());
+
+        //        MyMessages = $"Total {_Rows} rows imported.";
 
         //        ImportDataSet = reader.AsDataSet();
 
@@ -92,11 +56,49 @@ namespace AppliedAccounts.Models
         //        {
         //            SaveInTable(ImportDataSet);
         //            IsImported = true;
+        //            if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
+
 
         //        }
         //    }
-        //    if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
+        //    return ImportDataSet;
         //}
+        #endregion
+
+        #region Import Data From Excel file into DataSet
+
+        public async void ImportDataAsync()
+        {
+            var _ExcelFile = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelFiles", ExcelFile.Name);
+
+            if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
+
+            using (FileStream fs = new(_ExcelFile, FileMode.Create))
+            { await ExcelFile.OpenReadStream().CopyToAsync(fs); }
+
+            using var stream = File.Open(_ExcelFile, FileMode.Open, FileAccess.Read);
+
+            using (var reader = ExcelReaderFactory.CreateReader(stream))
+            {
+                do
+                {
+                    while (reader.Read())
+                    {
+                        // reader.GetDouble(0);
+                    }
+                } while (reader.NextResult());
+
+                ImportDataSet = reader.AsDataSet();
+
+                if (ImportDataSet is not null)
+                {
+                    SaveInTable(ImportDataSet);
+                    IsImported = true;
+
+                }
+            }
+            if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
+        }
 
         #endregion
 

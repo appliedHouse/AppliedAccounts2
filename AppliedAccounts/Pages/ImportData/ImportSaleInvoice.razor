@@ -11,18 +11,124 @@
     protected override void OnInitialized()
     {
         AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        //Source = new(AppUser);          // Establish Data Base source Class...
+        Model = new();
     }
 
-
-    // string _ImportTable = "August";
-    // string _ImportFileName = AppRegistry.GetText(AppUser.DataFile, "ExcelImport");
-    // string _ImportConnection = Path.Combine(Connections.GetTempDBPath(), _ImportFileName + ".db");
-    // DataTable _TempImportFile = DataSource.GetDataTable(_ImportFileName,_ImportTable);
-    
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var aaa = ShowSpinner;
+        }
+        else
+        {
+            var aaa = ShowSpinner;
+        }
+    }
 }
 
 
-<InputFile OnChange="GetExcelFile">Select Excel File</InputFile>
+
+<EditForm Model="Model">
+    <div class="container">
+        <div class="row mt-2">
+            <div class="col-6">
+                <button id="btnShow" @onclick="Stop">Stop</button>
+            </div>
+            <div class="col-6">
+                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#ViewInvoice">
+                    View
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.ShowData)
+    {
+        <div class="container">
+            <div class="rowe">
+                <div class="col">
+                    <button class="btn btn-warrning" @onclick="PostInvocies">Post</button>
+                </div>
+            </div>
+        </div>
 
 
-@MyMessage;
+        if (SalesData.Rows.Count > 0)
+        {
+            <table style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Vou No</th>
+                        <th>Vou Date</th>
+                        <th>Company Name</th>
+                        <th>Amount</th>
+                        <th>...</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.SaleInvoiceList)
+                    {
+                        <tr>
+                            <td>@item["Vou_No"]</td>
+                            <td>@item["Vou_Date"]</td>
+                            <td>@item["Description"]</td>
+                            <td>@item["Amount"]</td>
+                            <td>
+                                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#ViewInvoice">
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
+    else
+    {
+        <div class="container">
+            <div class="row mt-2">
+                <div class="col-8">
+                    <InputFile id="inputFile" OnChange="GetExcelFile">Select Excel File</InputFile>
+                </div>
+
+                @if (IsExcelLoaded)
+                {
+                    <div class="col-2">
+                        <button id="btnShow" @onclick="(()=>GetImportedDataAsync())">Show Sales Invoices</button>
+                    </div>
+                }
+                @if (ShowSpinner)
+                {
+                    <div class="col-2">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                }
+
+            </div>
+
+
+            <div class="row">
+                <div class="col">
+                    <textarea style="width:100%; height:100vh">@MyMessage</textarea>
+
+                </div>
+
+            </div>
+        </div>
+    }
+
+
+
+</EditForm>
+
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#ViewInvoice">
+    View
+</button>
+

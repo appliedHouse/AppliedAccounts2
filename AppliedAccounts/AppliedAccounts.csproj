@@ -15,17 +15,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\ExcelFiles\**" />
     <Compile Remove="wwwroot\SQLiteDB\**" />
+    <Compile Remove="wwwroot\SQLiteTemp\**" />
+    <Content Remove="wwwroot\ExcelFiles\**" />
     <Content Remove="wwwroot\SQLiteDB\**" />
+    <Content Remove="wwwroot\SQLiteTemp\**" />
+    <EmbeddedResource Remove="wwwroot\ExcelFiles\**" />
     <EmbeddedResource Remove="wwwroot\SQLiteDB\**" />
+    <EmbeddedResource Remove="wwwroot\SQLiteTemp\**" />
+    <None Remove="wwwroot\ExcelFiles\**" />
     <None Remove="wwwroot\SQLiteDB\**" />
+    <None Remove="wwwroot\SQLiteTemp\**" />
+    <TypeScriptCompile Remove="wwwroot\ExcelFiles\**" />
+    <TypeScriptCompile Remove="wwwroot\SQLiteTemp\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\ExcelFiles\" />
     <Folder Include="wwwroot\Sessions\" />
     <Folder Include="wwwroot\System\" />
-    <Folder Include="wwwroot\SQLiteTemp\" />
     <Folder Include="wwwroot\PDFReports\" />
     <Folder Include="wwwroot\Reports\" />
   </ItemGroup>
