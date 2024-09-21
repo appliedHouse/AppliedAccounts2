@@ -2,8 +2,7 @@
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
-@* @using AppliedReports;
- *@
+
 @inject AuthenticationStateProvider authStateProvider;
 @inject NavigationManager NavManager;
 @inject IJSRuntime js
@@ -14,8 +13,8 @@
     {
         try
         {
-            var AppUserProfile = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
-            if (AppUserProfile != null) { Model = new(AppUserProfile); }
+            AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+            if (AppUser != null) { Model = new(AppUser); PrintClass = CreateReportModel(); }
             else { Model = new(); }
             IsDataLoad = true;
         }
@@ -23,8 +22,15 @@
         {
             IsDataLoad = false; ;
         }
+    }
 
+    private async Task DownloadFile()
+    {
+        // Specify the relative URL to the file in the wwwroot folder
+        var fileUrl = "/PDFReports/SaleInvoice.xlsx";
 
+        // Call the JavaScript function to download the file
+        await js.InvokeVoidAsync("downloadFile", fileUrl);
     }
 
     bool IsDataLoad = false;
@@ -71,7 +77,7 @@
                     <td>Amount</td>
                     <th class="td-btn">
                         <PageNavTo Title="Edit" NavTo=@NavToNew />
-                        @* <button id="btnAdd" class="btn-Add" @onclick="()=>Model.Add()"><i class="bi bi-plus-circle-fill"></i></button> *@
+                        <button id="btnAdd" class="btn-Add" @onclick="()=>Model.Add()"><i class="bi bi-plus-circle-fill"></i></button>
                     </th>
                 </tr>
             </thead>
@@ -91,10 +97,10 @@
                             <td>@_Record.City</td>
                             <td>@_Record.TitleSalesman</td>
                             <td>@_Record.Amount</td>
-                            <td class="td-btn">
-                                <PageNavTo Title="Edit" NavTo=@_NavTo />
-                                <DeleteButton />
-                                @* <PrintButton PrintingModel=@Model.Report /> *@
+                            <td >
+                                @*<PageNavTo Title="Edit" NavTo=@_NavTo />
+                                <DeleteButton /> *@
+                                <button class="btn" @onclick="(()=>Print(_Record.Id))"><i class="bi bi-printer-fill"></i></button>
                             </td>
                         </tr>
                     }

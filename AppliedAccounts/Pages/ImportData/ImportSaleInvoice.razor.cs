@@ -7,7 +7,7 @@ using AppliedAccounts.Data;
 using System.Diagnostics;
 using System.Text;
 using Microsoft.AspNetCore.Components;
-using AppliedAccounts.Libs;
+
 
 
 namespace AppliedAccounts.Pages.ImportData
@@ -208,10 +208,9 @@ namespace AppliedAccounts.Pages.ImportData
                 MyMessage.AppendLine($" # {Counter}");
 
                 GetInvoiceDetails(Row);
-
-
-
+                
             }
+            
             MyMessage.AppendLine($"{DateTime.Now} End Sales Invoice details process..");
         }
         #endregion
@@ -307,7 +306,7 @@ namespace AppliedAccounts.Pages.ImportData
 
         private void Stop(MouseEventArgs e)
         {
-            if (Model.SaleDetailsList.Count > 0) 
+            if (Model.SaleDetailsList.Count > 0)
             {
                 Model.ShowData = true;
             }
@@ -326,13 +325,75 @@ namespace AppliedAccounts.Pages.ImportData
 
 
         }
-        private void PostInvocies(MouseEventArgs e)
+        private void Save()
         {
             
+            MyMessage.Clear();
+            Source = new(AppUser);
+            var BillRec1 = Source.GetTable(Enums.Tables.BillReceivable);
+            var BillRec2 = Source.GetTable(Enums.Tables.BillReceivable2);
+            var master = BillRec1.NewRow();
+            var details = new List<DataRow>();
+            var Validated = true;
+
+            foreach (var Invoice in Model.SaleInvoiceList)
+            {
+                MyMessage.AppendLine($"{DateTime.Now} Invoice {master["Vou_No"]} is processing...");
+                master = Invoice;
+                details = Model.SaleDetailsList.Where(row => (int)row["TranID"] == (int)master["ID"]).ToList();
+
+                MyMessage.AppendLine($"{DateTime.Now} {details.Count} records found in invoice {master["Vou_No"]}");
+                Validated = Validation(master);
+                MyMessage.AppendLine($"{DateTime.Now} {master["Vou_No"]} is {Validated} validated");
+
+                foreach (var Row in details)
+                {
+
+                    Validated = Validation(Row); ;
+                    if (!Validated)
+                    {
+                        break;
+                    }
+                    MyMessage.AppendLine($"{DateTime.Now} {master["Vou_No"]} Serial # {Row["Sr_No"]}  is {Validated} validated");
+                }
+
+                if (Validated)
+                {
+                    MyMessage.AppendLine($"{DateTime.Now} {master["Vou_No"]} validated for post / save... ");
+                    master["ID"] = 0;           // Set a Datarow for insert command
+                    CommandClass _Commands = new(master, AppUser.DataFile);
+                    var IsSaved = _Commands.SaveChanges();
+                    MyMessage.AppendLine($"{DateTime.Now} {master["Vou_No"]} saved ---> {IsSaved} ");
+                    var _TranID = (int)master["ID"];        // Get ID after save row in SQLite Data Table.
+                    foreach(var Row in details)
+                    {
+                        Row["ID"] = 0;
+                        Row["TranID"] = _TranID;
+                        _Commands = new(Row, AppUser.DataFile);
+                        _Commands.SaveChanges();
+                        MyMessage.AppendLine($"{DateTime.Now} {master["Vou_No"]} Serial # {Row["Sr_No"]} is saved ---> {IsSaved} ");
+                    }
+                }
+                else
+                {
+                    MyMessage.AppendLine($"{DateTime.Now} ERROR : Sales Date is not valided to post...");
+                }
+            }
+           
+           
         }
+
+        private bool Validation(DataRow _Row)
+        {
+            return true;
+        }
+
     }
 
 
+
+
+    #region Model Class
     public class SaleInvoiceModel
     {
         public DataRow SaleMaster { get; set; }
@@ -342,6 +403,7 @@ namespace AppliedAccounts.Pages.ImportData
         public List<DataRow> SaleDetailsList { get; set; } = new();
 
         public bool ShowData { get; set; } = false;
+        public bool ShowMessages { get; set; } = false;
         public bool PostData { get; set; } = false;
 
         public SaleInvoiceModel()
@@ -356,9 +418,9 @@ namespace AppliedAccounts.Pages.ImportData
 
         public List<DataRow> GetDetail(int _ID)
         {
-            return SaleDetailsList.Where(a=> (int)a["ID"]  == _ID).ToList();
+            return SaleDetailsList.Where(a => (int)a["ID"] == _ID).ToList();
         }
 
     }
-
+    #endregion
 }

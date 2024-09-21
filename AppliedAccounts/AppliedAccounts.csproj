@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TypeScriptTarget>ES2021</TypeScriptTarget>
@@ -16,15 +16,19 @@
 
   <ItemGroup>
     <Compile Remove="wwwroot\ExcelFiles\**" />
+    <Compile Remove="wwwroot\OutputPath\**" />
     <Compile Remove="wwwroot\SQLiteDB\**" />
     <Compile Remove="wwwroot\SQLiteTemp\**" />
     <Content Remove="wwwroot\ExcelFiles\**" />
+    <Content Remove="wwwroot\OutputPath\**" />
     <Content Remove="wwwroot\SQLiteDB\**" />
     <Content Remove="wwwroot\SQLiteTemp\**" />
     <EmbeddedResource Remove="wwwroot\ExcelFiles\**" />
+    <EmbeddedResource Remove="wwwroot\OutputPath\**" />
     <EmbeddedResource Remove="wwwroot\SQLiteDB\**" />
     <EmbeddedResource Remove="wwwroot\SQLiteTemp\**" />
     <None Remove="wwwroot\ExcelFiles\**" />
+    <None Remove="wwwroot\OutputPath\**" />
     <None Remove="wwwroot\SQLiteDB\**" />
     <None Remove="wwwroot\SQLiteTemp\**" />
     <TypeScriptCompile Remove="wwwroot\ExcelFiles\**" />
@@ -32,18 +36,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\PDFReports\" />
     <Folder Include="wwwroot\Sessions\" />
     <Folder Include="wwwroot\System\" />
-    <Folder Include="wwwroot\PDFReports\" />
     <Folder Include="wwwroot\Reports\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BlazorJS" Version="2.1.6" />
-    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.5.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

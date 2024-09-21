@@ -16,6 +16,7 @@ namespace AppliedAccounts.Models
         public string SearchText { get; set; } = string.Empty;
         public AppMessages.AppMessages MyMessages { get; set; } = new();
         public decimal TotalAmount { get; set; } = 0.00M;
+        
 
         #region Constructor
         public SaleInvoiceListModel() { }

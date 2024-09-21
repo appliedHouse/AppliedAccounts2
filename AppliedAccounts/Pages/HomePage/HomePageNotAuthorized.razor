@@ -1,17 +1,19 @@
 ﻿@inject NavigationManager NavManager;
 
 @using AppliedLanguage;
-@using AppliedAccounts.Data
+@using AppliedAccounts.Data;
+@using AppliedAccounts.Models;
 @inject IConfiguration Config;
 
 @code {
-    public Globals? AppValues { get; set; }
+
+    public Globals AppValues { get; set; }
     public string? BusinessPic { get; set; }
 
     protected override void OnInitialized()
     {
         AppValues = new(Config);
-        BusinessPic = $".{AppValues.ImagesPath}/Accounts3.jpg";
+        BusinessPic = Path.Combine(AppValues.ImagesPath,"Accounts3.jpg");
     }
 
     string BasePath => AppValues.BasePath;

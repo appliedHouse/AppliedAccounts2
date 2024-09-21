@@ -1,7 +1,10 @@
-﻿namespace AppliedAccounts.Data
+﻿using Microsoft.AspNetCore.Components;
+
+namespace AppliedAccounts.Data
 {
     public class Globals : IGlobals
     {
+       
         public readonly IConfiguration Config;
 
         public string BasePath { get; set; } = string.Empty;
@@ -19,24 +22,35 @@
         public AuthorClass Author { get; set; } = new();
         public LanguageClass Language { get; set; } = new();
         public CurrencyClass Currency { get; set; } = new();
-       
+
         public Globals() { }
 
         public Globals(IConfiguration _Config)
         {
             Config = _Config;
             BasePath = Directory.GetCurrentDirectory();
-            RootPath = Config.GetValue<string>("Paths:RootPath");
-            SystemPath = Config.GetValue<string>("Paths:SystemPath");
-            ImagesPath = Config.GetValue<string>("Paths:ImagesPath");
-            ReportPath = Config.GetValue<string>("Paths:ReportPath");
-            LanguagesPath = Config.GetValue<string>("Paths:LanguagesPath");
-            MessagesPath = Config.GetValue<string>("Paths:MessagesPath");
-            PDFPath = Config.GetValue<string>("Paths:PDFPath");
-            ClientPath = Config.GetValue<string>("Paths:ClientPath");
-            UsersPath = Config.GetValue<string>("Paths:UsersPath");
-            DBTempPath = Config.GetValue<string>("Paths:DBTempPath");
-            SessionPath = Config.GetValue<string>("Paths:SessionPath");
+            RootPath = Config.GetValue<string>("Paths:RootPath") ?? "wwwroot";
+            SystemPath = Config.GetValue<string>("Paths:SystemPath") ?? "System";
+            ImagesPath = Config.GetValue<string>("Paths:ImagesPath") ?? "Images";
+            ReportPath = Config.GetValue<string>("Paths:ReportPath") ?? "Reports";
+            LanguagesPath = Config.GetValue<string>("Paths:LanguagesPath") ?? "Languages";
+            MessagesPath = Config.GetValue<string>("Paths:MessagesPath") ?? "Messages";
+            PDFPath = Config.GetValue<string>("Paths:PDFPath") ?? "PDFReports";
+            ClientPath = Config.GetValue<string>("Paths:ClientPath") ?? "SQLiteDB";
+            UsersPath = Config.GetValue<string>("Paths:UsersPath") ?? "SQLiteDB";
+            DBTempPath = Config.GetValue<string>("Paths:DBTempPath") ?? "SQLiteTemp";
+            SessionPath = Config.GetValue<string>("Paths:SessionPath") ?? "Sessions";
+
+            SystemPath = Path.Combine(BasePath, RootPath, SystemPath);
+            //ImagesPath = Path.Combine(BasePath, RootPath, ImagesPath);
+            ReportPath = Path.Combine(BasePath, RootPath, ReportPath);
+            LanguagesPath = Path.Combine(BasePath, RootPath, LanguagesPath);
+            MessagesPath = Path.Combine(BasePath, RootPath, MessagesPath);
+            PDFPath = Path.Combine(BasePath, RootPath, PDFPath);
+            UsersPath = Path.Combine(BasePath, RootPath, UsersPath);
+            DBTempPath = Path.Combine(BasePath, RootPath, DBTempPath);
+            SessionPath = Path.Combine(BasePath, RootPath, SessionPath);
+            ClientPath = Path.Combine(BasePath, RootPath, ClientPath);
 
             Author = new()
             {
@@ -65,7 +79,6 @@
                 Title = Config.GetValue<string>("Currency:Title"),
                 Format = Config.GetValue<string>("Currency:Format"),
             };
-
         }
     }
 
