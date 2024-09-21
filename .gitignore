@@ -362,3 +362,7 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /AppliedAccounts/wwwroot/SQLiteDB/CDC.db
+*.db
+/AppliedAccounts/wwwroot/SQLiteTemp/f37b44b2-e319-44d9-b4d5-31a5505e9545.db
+/AppliedAccounts/wwwroot/MyTypeScript.js.map
+/AppliedAccounts/wwwroot/MyTypeScript.js
