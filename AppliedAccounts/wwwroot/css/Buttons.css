@@ -3,21 +3,19 @@
     width:90px;
 }
 
-.td-btn{
-    padding:1px;
-    width:50px;
-    height:25px;
-    border:0px;
-    margin:0px;
-   
-}
-
 .btn-print {
-    content: "Print";
-    font-size: 2rem;
-    color: cornflowerblue;
+    
+    font-size: 1rem;
+    color: darkgreen;
+    background-color:transparent;
+    border:none;
 }
 
+. btn-Search {
+    content: "Search";
+    font-size: 2rem;
+    color:darkgreen;
+}
 
 .btn-Edit {
     color: royalblue;
@@ -67,12 +65,10 @@
 }
 
 .btn-Delete {
-    color: white;
-    background-color: red;
-    padding: 1px;
-    margin: 1px;
-    border: 0px;
-    width: 80px
+    font-size: 1rem;
+    color: red;
+    background-color: transparent;
+    border: none;
 }
 
 
@@ -106,14 +102,19 @@
     box-sizing: border-box;
     color: #fff;
     cursor: pointer;
-    font-family: Montserrat, sans-serif;
+    font-family: "Exo 2", sans-serif; /*Montserrat, sans-serif;*/
     font-size: .9em;
     margin: 5px;
-    padding: 10px 15px;
+    padding: 10px 5px;
     text-align: center;
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
+    min-width: 100px
 }
+
+    .btn-Menu:hover {
+        transform: rotate(5deg); /* Rotates the button by 15 degrees */
+    }
 
 

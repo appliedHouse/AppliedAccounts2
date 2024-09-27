@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net6.0-windows8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
@@ -17,28 +17,35 @@
   <ItemGroup>
     <Compile Remove="wwwroot\ExcelFiles\**" />
     <Compile Remove="wwwroot\OutputPath\**" />
+    <Compile Remove="wwwroot\PDFReports\**" />
+    <Compile Remove="wwwroot\Sessions\**" />
     <Compile Remove="wwwroot\SQLiteDB\**" />
     <Compile Remove="wwwroot\SQLiteTemp\**" />
+    <Compile Remove="wwwroot\System\**" />
     <Content Remove="wwwroot\ExcelFiles\**" />
     <Content Remove="wwwroot\OutputPath\**" />
+    <Content Remove="wwwroot\PDFReports\**" />
+    <Content Remove="wwwroot\Sessions\**" />
     <Content Remove="wwwroot\SQLiteDB\**" />
     <Content Remove="wwwroot\SQLiteTemp\**" />
+    <Content Remove="wwwroot\System\**" />
     <EmbeddedResource Remove="wwwroot\ExcelFiles\**" />
     <EmbeddedResource Remove="wwwroot\OutputPath\**" />
+    <EmbeddedResource Remove="wwwroot\PDFReports\**" />
+    <EmbeddedResource Remove="wwwroot\Sessions\**" />
     <EmbeddedResource Remove="wwwroot\SQLiteDB\**" />
     <EmbeddedResource Remove="wwwroot\SQLiteTemp\**" />
+    <EmbeddedResource Remove="wwwroot\System\**" />
     <None Remove="wwwroot\ExcelFiles\**" />
     <None Remove="wwwroot\OutputPath\**" />
+    <None Remove="wwwroot\PDFReports\**" />
+    <None Remove="wwwroot\Sessions\**" />
     <None Remove="wwwroot\SQLiteDB\**" />
     <None Remove="wwwroot\SQLiteTemp\**" />
-    <TypeScriptCompile Remove="wwwroot\ExcelFiles\**" />
-    <TypeScriptCompile Remove="wwwroot\SQLiteTemp\**" />
+    <None Remove="wwwroot\System\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\PDFReports\" />
-    <Folder Include="wwwroot\Sessions\" />
-    <Folder Include="wwwroot\System\" />
     <Folder Include="wwwroot\Reports\" />
   </ItemGroup>
 

@@ -2,11 +2,12 @@
     display: table;
     width: 100%;
     border: 2px solid black;
-    font-size:small;
+    font-size: small;
+    
 }
 
 .tb-head {
-   height:50px;
+    height: 50px;
 }
 
 .tb-head-row {
@@ -17,17 +18,15 @@
 
 .tb-body {
     border: solid double 1px;
-   
 }
 
 .tb-body-row {
     background-color: lightgoldenrodyellow;
     color: darkblue;
-   
     border-color: inherit;
     border-style: solid;
     border-width: 1px;
-   
+    font-size:small;
 }
 
 .tb-body-row-del {
@@ -40,12 +39,21 @@
 
 
 .tb-foot {
-   
 }
 
 .tb-foot-row {
     background-color: lightgreen;
-    font-weight:700;
+    font-weight: 700;
+}
+
+
+
+.tb-btn-add{
+    width:30px;
+    height:30px;
+    background-color:forestgreen;
+    color:white;
+    
 }
 
 
@@ -53,22 +61,21 @@
     display: table;
     width: 100%;
     border: 2px solid black;
-    
 }
 
 .table-list-head {
-    background-color:darkblue;
-    color:ghostwhite;
+    background-color: darkblue;
+    color: ghostwhite;
 }
 
 .table-list-body {
-    background-color:linen;
+    background-color: linen;
     color: darkslateblue;
 }
-.table-list-foot {
-    background-color:darkgoldenrod;
-    color: ghostwhite;
 
+.table-list-foot {
+    background-color: darkgoldenrod;
+    color: ghostwhite;
 }
 
 th-btn {
@@ -77,22 +84,34 @@ th-btn {
 }
 
 
-th-btn-new{
-    width:auto;
-
+th-btn-new {
+    width: auto;
 }
 
 
-.td-btn{
-    display:flex;
-    justify-content:center;
+.td-btn {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center; /* Center vertically as well */
 }
 
+th .btn {
+    margin: 0;
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+    th .btn:hover {
+        background-color: #218838; /* Darken on hover for better visibility */
+    }
 
 .amount {
     text-align: right;
-    padding-right:13px;
-    margin-right:5px;
+    padding-right: 13px;
+    margin-right: 5px;
 }
 
 .amount-red {
@@ -124,12 +143,13 @@ th-btn-new{
     width: 15%;
     text-align: right;
 }
+
 .right {
     text-align: right;
 }
 
-.chkbox-digit{
-    justify-content:center;
-    text-align:center;
-    align-content:center;
+.chkbox-digit {
+    justify-content: center;
+    text-align: center;
+    align-content: center;
 }

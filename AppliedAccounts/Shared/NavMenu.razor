@@ -1,21 +1,88 @@
 ﻿@using AppliedAccounts.Authentication;
 @inject NavigationManager NavManager;
 @inject AuthenticationStateProvider authStateProvider;
+@using AppliedDB;
+
+
+@code {
+
+    public AppUserModel? AppUser { get; set; }
+    public bool IsAdmin { get; set; } = false;
+
+    protected override void OnInitialized()
+    {
+        AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        if (AppUser.Role == "Administrator")
+        {
+            IsAdmin = true;
+        }
+    }
+
+    public async Task Logout()
+    {
+        var AppAuthState = (UserAuthonticationStateProvider)authStateProvider;
+        await AppAuthState.UpdateAuthonticateState(null);
+
+        NavManager.NavigateTo($"/", true);
+
+    }
+
+    public void Login() => NavManager.NavigateTo("/Users/Login");
+    public void LogOut() => Task.Run(() => Logout());
+
+    public void Home() { NavManager.NavigateTo($"/", true); }
+    public void Accounts() { NavManager.NavigateTo($"/Menu/Accounts", true); }
+    public void Inventory() { NavManager.NavigateTo($"/Menu/Stock", true); }
+    public void Production() { NavManager.NavigateTo($"/Menu/Production", true); }
+    public void Purchase() { NavManager.NavigateTo($"/Menu/Purchase", true); }
+    public void Payroll() { NavManager.NavigateTo($"/Menu/Payroll", true); }
+    public void Taxation() { NavManager.NavigateTo($"/Menu/Taxation", true); }
+    public void Admin() { NavManager.NavigateTo($"/Menu/Admin", true); }
+    public void Config() { NavManager.NavigateTo($"/Config", true); }
+
+    public void Sale() 
+    { 
+        if(AppUser.UserID=="CDC")
+        {
+            NavManager.NavigateTo("/Menu/SaleCDC", true);
+        }
+        else
+        {
+            NavManager.NavigateTo("/Menu/Sale", true);
+        }
+        
+    }
+
+}
 
 <div class="topnav bg-white">
     <button type="submit" id="btn-Home" class="btn-Menu" @onclick="Home">Home</button>
     <AuthorizeView>
         <Authorized>
-            <button type="submit" class="btn-Menu" id="btn-account" @onclick="Accounts">Accounts</button>
-            <button type="submit" class="btn-Menu" id="btn-Sale" @onclick="Sale">Sale</button>
-            <button type="submit" class="btn-Menu" id="btn-Purchase" @onclick="Purchase">Purchase</button>
-            <button type="submit" class="btn-Menu" id="btn-Stock" @onclick="Inventory">Stock</button>
-            <button type="submit" class="btn-Menu" id="btn-Production" @onclick="Production">Production</button>
-            <button type="submit" class="btn-Menu" id="btn-Payroll" @onclick="Payroll">Payroll</button>
-            <button type="submit" class="btn-Menu" id="btn-Taxation" @onclick="Taxation">Taxation</button>
-            <button type="submit" class="btn-Menu" id="btn-Admin" @onclick="Admin">Admin</button>
-            <button type="submit" class="btn-Menu" id="btn-logout" @onclick="LogOut">logout</button>
-            <button type="submit" class="btn-Menu" id="btn-logout" @onclick="Config">Config</button>
+
+            @if(AppUser.UserID=="CDC")
+            {
+                <button type="submit" class="btn-Menu" id="btn-account" @onclick="Accounts">Accounts</button>
+                <button type="submit" class="btn-Menu" id="btn-Sale" @onclick="Sale">Sale</button>
+            }
+            else
+            {
+                <button type="submit" class="btn-Menu" id="btn-account" @onclick="Accounts">Accounts</button>
+                <button type="submit" class="btn-Menu" id="btn-Sale" @onclick="Sale">Sale</button>
+                <button type="submit" class="btn-Menu" id="btn-Purchase" @onclick="Purchase">Purchase</button>
+                <button type="submit" class="btn-Menu" id="btn-Stock" @onclick="Inventory">Stock</button>
+                <button type="submit" class="btn-Menu" id="btn-Production" @onclick="Production">Production</button>
+                <button type="submit" class="btn-Menu" id="btn-Payroll" @onclick="Payroll">Payroll</button>
+                <button type="submit" class="btn-Menu" id="btn-Taxation" @onclick="Taxation">Taxation</button>
+                <button type="submit" class="btn-Menu" id="btn-Admin" @onclick="Admin">Admin</button>
+                <button type="submit" class="btn-Menu" id="btn-logout" @onclick="LogOut">logout</button>
+            }
+            
+            @if(IsAdmin)
+            {
+                <button type="submit" class="btn-Menu" id="btn-logout" @onclick="Config">Config</button>
+            }
+            
         </Authorized>
         <NotAuthorized>
             <button type="submit" id="byn-login" class="btn btn-menu btn-link" @onclick="Login">login</button>
@@ -25,39 +92,5 @@
         </Authorizing>
     </AuthorizeView>
 </div>
-
-@code {
-    public void Login() => NavManager.NavigateTo("/Users/Login");
-    public void LogOut() => Task.Run(() => Logout());
-   
-
-    protected override void OnInitialized()
-    {
-        
-    }
-
-
-    public async Task Logout()
-    {
-        var AppAuthState = (UserAuthonticationStateProvider)authStateProvider;
-        await AppAuthState.UpdateAuthonticateState(null);
-  
-        NavManager.NavigateTo($"/", true);
-
-    }
-
-    public void Home() { NavManager.NavigateTo($"/", true); }
-    public void Accounts() { NavManager.NavigateTo($"/Menu/Accounts", true); }
-    public void Inventory() { NavManager.NavigateTo($"/Menu/Stock", true); }
-    public void Sale() { NavManager.NavigateTo($"/Menu/Sale", true); }
-    public void Production() { NavManager.NavigateTo($"/Menu/Production", true); }
-    public void Purchase() { NavManager.NavigateTo($"/Menu/Purchase", true); }
-    public void Payroll() { NavManager.NavigateTo($"/Menu/Payroll", true); }
-    public void Taxation() { NavManager.NavigateTo($"/Menu/Taxation", true); }
-    public void Admin() { NavManager.NavigateTo($"/Menu/Admin", true); }
-    public void Config() { NavManager.NavigateTo($"/Config", true); }
-
-
-}
 
 

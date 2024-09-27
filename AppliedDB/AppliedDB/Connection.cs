@@ -4,12 +4,6 @@ namespace AppliedDB
 {
     public class Connections : IDisposable
     {
-        //public SQLiteConnection? UsersConnection { get; set; }
-        //public SQLiteConnection? ClientConnection => GetSQLiteClient();
-        //public SQLiteConnection? MessageConnection { get; set; }
-        //public SQLiteConnection? LanguageConnection { get; set; }
-        //public SQLiteConnection? SystemConnection { get; set; }
-        //public SQLiteConnection? SessionConnection { get; set; }
         public static string BasePath => Directory.GetCurrentDirectory();
         public static string RootPath { get; set; } = "";
         public static string UsersPath { get; set; } = "";
@@ -32,7 +26,7 @@ namespace AppliedDB
         public static string DB_Session { get; set; } = string.Empty;
 
         public static AppUserModel AppUserProfile { get; set; }
-        
+
 
         public Connections() { }
         public Connections(AppUserModel _UserProfile)
@@ -52,15 +46,12 @@ namespace AppliedDB
             SystemPath = AppUserProfile.SystemFolder;
             SessionPath = AppUserProfile.SessionFolder;
             TempDBPath = AppUserProfile.TempDBFolder;
-
-            //UsersConnection = GetSQLiteConnection(Path.Combine(BasePath, RootPath, UsersPath, DB_Users));
-            //ClientConnection = GetSQLiteConnection(Path.Combine(BasePath, RootPath, ClientPath, DB_Client));
-            //LanguageConnection = GetSQLiteConnection(Path.Combine(BasePath, RootPath, LanguagePath, DB_Language));
-            //MessageConnection = GetSQLiteConnection(Path.Combine(BasePath, RootPath, MessagePath, DB_Message));
-            //SystemConnection = GetSQLiteConnection(Path.Combine(BasePath, RootPath, SystemPath, DB_System));
-            //SessionConnection = GetSQLiteConnection(Path.Combine(BasePath, RootPath, SessionPath, DB_Session));
+                       
 
         }
+
+
+
         #region Connection non static
         public SQLiteConnection? GetSQLiteUsers()
         {

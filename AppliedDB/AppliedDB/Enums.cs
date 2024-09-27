@@ -112,6 +112,12 @@ namespace AppliedDB
             CashBook,
             BankBook,
 
+            Doner,
+            Donation,
+            DonationType,
+            PaymentMode,
+            Currency
+
         }
 
     }

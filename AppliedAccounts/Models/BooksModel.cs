@@ -100,7 +100,7 @@ namespace AppliedAccounts.Models
                     Employees = Source.GetEmployees();
                     Projects = Source.GetProjects();
                     Accounts = Source.GetAccounts();
-                    TitleBook = Source.GetTitle(Accounts, BookID);
+                    TitleBook = DataSource.GetTitle(Accounts, BookID);
 
                     return true;
                 }

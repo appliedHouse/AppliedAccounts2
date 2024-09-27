@@ -1,29 +1,47 @@
-﻿@using AppliedAccounts.Authentication;
-@using AppliedAccounts.Data;
+﻿@using AppliedAccounts.Data;
 @using System.Security.Claims;
 
-@code {
-    [CascadingParameter]
-    private Task<AuthenticationState> AppAuthState { get; set; }
-    private string _UserName { get; set; }
+@inject AuthenticationStateProvider authStateProvider;
 
-    public string UserName()
+@code {
+    private AppliedDB.AppUserModel AppUser { get; set; }
+    private string? AppUserName { get; set; }
+    private string? CompanyName;
+
+    protected override void OnInitialized()
     {
-        return AppAuthState.Result.User.Identity.Name;
+        AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        CompanyName = AppUser.Company;
+        AppUserName = AppUser.DisplayName;
     }
+
+    public string GetCompanyName() { return AppUser.Company; }
+    public string GetAppUserName() => AppUser.DisplayName;
+
+
+
 }
 
+<style>
+    .merienda-font {
+        font-family: "Merienda", cursive;
+        font-optical-sizing: auto;
+        font-weight: 900;
+        font-style: normal;
+    }
+</style>
 
 <div class="AppHeader">
-    <div class="AppTitle">
-        <h3>MODERN TECHNOLOGY SYSTEM</h3>
+
+    <div class="AppTitle merienda-font">
+        <h3>@GetCompanyName()</h3>
     </div>
 </div>
 
 <div class="SubHeading">
     <AuthorizeView>
         <Authorized>
-            <h5 class="SubHeading">Hello @UserName()</h5>
+            <h5 class="SubHeading">Hello @GetAppUserName()</h5>
         </Authorized>
         <NotAuthorized>
             <h5 class="SubHeading">Hello Guest!</h5>

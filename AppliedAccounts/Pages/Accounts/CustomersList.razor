@@ -35,7 +35,6 @@
             <div class="col-2">
                 <button style="margin-top:5px;" class="btn btn-primary btn-sm" @onclick="()=>Model.Search()">Search</button>
             </div>
-
         </div>
     </div>
 
@@ -43,14 +42,12 @@
         <table class="table-list">
             <thead class="tb-head">
                 <tr class="tb-head-row">
-                    <th>Code</th>
-                    <th>Name</th>
-                    <th>Address 1</th>
-                    <th>Address 2</th>
-                    <th>City</th>
-                    <th>Country</th>
-                    <th>
-                        <button id="btnAdd" @onclick="Add1" class="btn btn-success">Add</button>
+                    <th style="width:10%; margin-right:2px">Code</th>
+                    <th style="width:35%;">Name</th>
+                    <th style="width:30%">Address 1</th>
+                    <th style="width:20%">City</th>
+                    <th style="width:5%">
+                        <button id="btnadd" @onclick="Add1" class="tb-btn-add"><i class="bi bi-plus-circle-fill"></i></button>
                     </th>
 
                 </tr>
@@ -59,16 +56,33 @@
                 @foreach (var _Record in Model.Records)
                 {
                     <tr class="tb-body-row">
-                        <td>@_Record.Code</td>
-                        <td>@_Record.Title</td>
+                        <td rowspan="2">@_Record.Code</td>
+                        <td rowspan="2" style="font-size:larger">@_Record.Title</td>
+                       
                         <td>@_Record.Address1</td>
-                        <td>@_Record.Address2</td>
                         <td>@_Record.City</td>
+
+                        <td rowspan="2" class="td-btn">
+                            <div>
+                                <!-- Edit Button -->
+                                <button id="btnEdit" type="button" class="btn-Edit" aria-label="Edit Record" @onclick="() => Edit(_Record.ID)">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </button>
+
+                               
+
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="tb-body-row">
+                        <td>@_Record.Address2</td>
                         <td>@_Record.Country</td>
-                        <td class="td-btn">
-                            <button id="btnEdit" type="submit" class="btn-Edit" @onclick="()=>Edit(_Record.ID)"><i class="bi bi-pencil-fill"></i></button>
-                            <label style="padding-left:5px; padding-right:5px;"> | </label>
-                            <button id="btnDel" type="submit" class="btn-Del" @onclick="()=>Delete(_Record.ID *-1)"><i class="bi bi-trash-fill"></i></button>
+                        <td>
+                            <!-- Delete Button -->
+                            <button id="btnDel" type="button" class="btn-Del" aria-label="Delete Record" @onclick="() => Delete(_Record.ID * -1)">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
                         </td>
                     </tr>
                 }

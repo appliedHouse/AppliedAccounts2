@@ -25,12 +25,35 @@ namespace AppliedAccounts.Pages.Sale
                 PrintClass.OutputReport.ReportType = ReportType.PDF;
                 PrintClass.ReportData = GetReportData(ID);
                 PrintClass.ReportRender();
-                
-                await js.InvokeVoidAsync("downloadFile", PrintClass.OutputReport.FileLink);
 
+
+                await js.InvokeVoidAsync("displayPDF", PrintClass.OutputReport.FileLink);
+                //await js.InvokeVoidAsync("downloadFile", PrintClass.OutputReport.FileLink);
             }
 
         }
+
+        public async void PrintAll()
+        {
+            await Task.Delay(1000);
+
+        }
+
+        public async void Delete(int ID)
+        {
+
+            await Task.Delay(1000);
+            // Add code here to delete sales invocies.
+        }
+
+        public async void Edit(int ID)
+        {
+            await Task.Delay(1000);
+            // Add code here to delete sales invocies.
+        }
+
+
+
 
         private ReportData GetReportData(int ID)
         {

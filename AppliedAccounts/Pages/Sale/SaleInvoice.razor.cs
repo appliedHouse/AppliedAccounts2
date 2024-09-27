@@ -123,28 +123,28 @@ namespace AppliedAccounts.Pages.Sale
         public void CompanyChanged(int _NewValue)
         {
             Record.Company = _NewValue;
-            Record.TitleCompany = Model.Source.GetTitle(Model.Customers, _NewValue);
+            Record.TitleCompany = AppliedDB.DataSource.GetTitle(Model.Customers, _NewValue);
         }
         public void EmployeeChanged(int _NewValue)
         {
             Record.Employee = _NewValue;
-            Record.TitleEmployee = Model.Source.GetTitle(Model.Employees, _NewValue);
+            Record.TitleEmployee = AppliedDB.DataSource.GetTitle(Model.Employees, _NewValue);
         }
         public void InventoryChanged(int _NewValue)
         {
             Record.Inventory = _NewValue;
-            Record.TitleInventory = Model.Source.GetTitle(Model.Inventory, _NewValue);
+            Record.TitleInventory = AppliedDB.DataSource.GetTitle(Model.Inventory, _NewValue);
         }
         public void TaxChanged(int _NewValue)
         {
             Record.TaxID = _NewValue;
-            Record.TitleTaxID = Model.Source.GetTitle(Model.Taxes, _NewValue);
+            Record.TitleTaxID = AppliedDB.DataSource.GetTitle(Model.Taxes, _NewValue);
             Record.TaxRate = Model.Source.SeekTaxRate(Record.TaxID);
         }
         public void UnitChanged(int _NewValue)
         {
             Record.Unit = _NewValue;
-            Record.TitleUnit = Model.Source.GetTitle(Model.Units, _NewValue);
+            Record.TitleUnit = AppliedDB.DataSource.GetTitle(Model.Units, _NewValue);
         }
         #endregion
 

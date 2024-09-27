@@ -27,6 +27,17 @@ namespace AppliedDB
             }
 
         }
+
+
+        public DataSource(string _DBFile)
+        {
+
+            var _DBConnText = $"Data Source={_DBFile}";
+            var _Connection = new SQLiteConnection(_DBConnText);
+            MyConnection = _Connection;
+
+        }
+
         #endregion
 
         #region Get Table
@@ -79,7 +90,8 @@ namespace AppliedDB
                     var _Query = SQLQuery.GetQuery(_SQLQuery);
                     if (_Query.QueryText.Length > 0)
                     {
-                        MyConnection.Open();
+                        if (MyConnection.State != ConnectionState.Open)
+                        { MyConnection.Open(); }
                         var _Command = new SQLiteCommand(_Query.QueryText, MyConnection);
                         SQLiteDataAdapter _Adapter = new(_Command);
                         DataSet _DataSet = new();
@@ -105,7 +117,8 @@ namespace AppliedDB
             {
                 if (MyConnection is not null)
                 {
-                    MyConnection.Open();
+                    if (MyConnection.State != ConnectionState.Open)
+                    { MyConnection.Open(); }
                     var _Query = SQLQuery.GetQuery(_SQLQuery);
                     var _Command = new SQLiteCommand(_Query.QueryText, MyConnection);
                     _Command.Parameters.AddWithValue("@ID", _ID);
@@ -134,7 +147,8 @@ namespace AppliedDB
             {
                 if (_Command.Connection is not null)
                 {
-                    _Command.Connection.Open();
+                    if (_Command.Connection.State != ConnectionState.Open)
+                    { _Command.Connection.Open(); }
                     string TableName = _Table.ToString();
                     SQLiteDataAdapter _Adapter = new(_Command);
                     DataSet _DataSet = new();
@@ -156,6 +170,42 @@ namespace AppliedDB
             }
             return null;
         }
+
+        public static DataTable GetDataTable(Tables _Table, SQLiteConnection _Connection)
+        {
+            return GetDataTable(_Table.ToString(), _Connection);
+
+        }
+        public static DataTable GetDataTable(string _Table, SQLiteConnection _Connection)
+        {
+            try
+            {
+                if (_Connection is not null)
+                {
+                    if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
+                    string TableName = _Table.ToString();
+                    string CommText = $"SELECT * FROM [{_Table}]";
+                    SQLiteDataAdapter _Adapter = new(CommText, _Connection);
+                    DataSet _DataSet = new();
+                    _Adapter.Fill(_DataSet, TableName);
+                    _Connection.Close();
+
+                    if (_DataSet.Tables.Count == 1)
+                    {
+                        return _DataSet.Tables[0];
+                    }
+
+                }
+
+            }
+            catch (Exception)
+            {
+
+                return new DataTable();
+            }
+            return null;
+
+        }
         #endregion
 
         #region Get Messages Table
@@ -170,8 +220,8 @@ namespace AppliedDB
             var _Connection = Connections.GetMessagesConnection();
             if (_Connection is not null)
             {
-
-                _Connection.Open();
+                if (_Connection.State != ConnectionState.Open)
+                { _Connection.Open(); }
                 var _Command = new SQLiteCommand($"SELECT * FROM [Messages] WHERE Language={_Language}", _Connection);
                 var _Adapter = new SQLiteDataAdapter(_Command);
                 var _DataSet = new DataSet();
@@ -534,21 +584,64 @@ namespace AppliedDB
             return new();
 
         }
+
+        public static List<CodeTitle> GetCodeTitle(string _Table, SQLiteConnection DBConnection)
+        {
+            var _Sort = "Title";
+            var _DataTable = GetDataTable(_Table, DBConnection);
+            _DataTable.DefaultView.Sort = _Sort;
+            if (_Table is not null)
+            {
+                var _CodeTitle = new CodeTitle();
+                var _CodeTitleList = new List<CodeTitle>();
+
+                if (_DataTable.Rows.Count > 0)
+                {
+                    foreach (DataRow Row in _DataTable.DefaultView.ToTable().Rows)
+                    {
+                        if (Row["ID"] == null) { Row["ID"] = 0; }
+                        if (Row["Code"] == null) { Row["Code"] = string.Empty; }
+                        if (Row["Title"] == null) { Row["Title"] = string.Empty; }
+
+                        _CodeTitle = new();
+                        _CodeTitle.ID = (int)Row["ID"];
+                        _CodeTitle.Code = (string)Row["Code"];
+                        _CodeTitle.Title = (string)Row["Title"];
+
+                        _CodeTitleList.Add(_CodeTitle);
+                    }
+                }
+
+                _DataTable.Dispose(); _Table = null;
+                return _CodeTitleList;
+            }
+
+            return new();
+
+        }
         #endregion
 
         #region Get Title form Code Title List
-        public string GetTitle(List<CodeTitle> _List, int _ID)
+        public static string GetTitle(List<CodeTitle> _List, int _ID)
         {
-            foreach (CodeTitle Item in _List)
-            {
-                if (Item.ID.Equals(_ID))
-                {
-                    return Item.Title;
-                }
+            var _Title = _List.Where(l => l.ID == _ID).Select(l => l.Title).ToString();
 
-            }
-            return string.Empty;
+            if(_Title is null) { return string.Empty; }
+
+            //foreach (CodeTitle Item in _List)
+            //{
+            //    if (Item.ID.Equals(_ID))
+            //    {
+            //        return Item.Title;
+            //    }
+
+            //}
+            return _Title;
         }
+
+        
+
+
         #endregion
 
         #region Static DataTable Methods
@@ -686,9 +779,25 @@ namespace AppliedDB
                 return _List;
             }
         }
+
+        #endregion
+
+        #region Maximum ID of the Table
+
+
         public static int GetMaxID(string DBFile, string _Table)
         {
             DataTable _DataTable = GetDataTable(DBFile, _Table);
+            if (_DataTable.Rows.Count == 0) { return 1; }
+            int _MaxID = (int)_DataTable.Compute("MAX(ID)", "") + 1;
+            _DataTable.Dispose();
+            return _MaxID;
+
+        }
+
+        public static int GetMaxID(string _Table, SQLiteConnection DBConnection)
+        {
+            DataTable _DataTable = GetDataTable(_Table, DBConnection);
             if (_DataTable.Rows.Count == 0) { return 1; }
             int _MaxID = (int)_DataTable.Compute("MAX(ID)", "") + 1;
             _DataTable.Dispose();
@@ -762,6 +871,7 @@ namespace AppliedDB
         #endregion
 
     }
+
     public class CodeTitle
     {
         public int ID { get; set; }

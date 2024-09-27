@@ -6,3 +6,12 @@
     link.click();
     document.body.removeChild(link);
 }
+
+window.displayPDF = function (fileUrl) {
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.target = "_blank"
+    link.click();
+}
+
+

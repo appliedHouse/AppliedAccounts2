@@ -2,4 +2,4 @@ https://stackoverflow.com/questions/32521987/excelreaderfactory-reading-first-sh
 
 https://learn.microsoft.com/en-us/aspnet/core/blazor/file-uploads?view=aspnetcore-8.0   client site file render
 
-https://www.webdevtutor.net/blog/c-sharp-ibrowserfile-to-byte-array
+https://www.webdevtutor.net/blog/c-sharp-ibrowserfile-to-byte-array			IBroser File Stream

@@ -66,6 +66,7 @@ namespace AppliedDB
             _Text.Append("SELECT ");
             _Text.Append("[BR].[ID],");
             _Text.Append("[BR].[Vou_No],");
+            _Text.Append("[BR].[Ref_No],");
             _Text.Append("[BR].[Vou_Date],");
             _Text.Append("[BR].[Inv_Date],");
             _Text.Append("[BR].[Pay_Date],");

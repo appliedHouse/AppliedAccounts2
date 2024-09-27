@@ -73,6 +73,7 @@ namespace AppliedAccounts.Models
             {
                 _Record.Id = (int)_Row["ID"];
                 _Record.Vou_No = (string)_Row["Vou_No"];
+                _Record.Ref_No = (string)_Row["Ref_No"];
                 _Record.Vou_Date = (DateTime)_Row["Vou_Date"];
                 _Record.Inv_Date = (DateTime)_Row["Inv_Date"];
                 _Record.Pay_Date = (DateTime)_Row["Pay_Date"];
@@ -128,6 +129,7 @@ namespace AppliedAccounts.Models
     {
         public int Id { get; set; } = 0;
         public string Vou_No { get; set; } = string.Empty;
+        public string Ref_No { get; set; } = string.Empty;
         public DateTime Vou_Date { get; set; } = DateTime.Now;
         public DateTime Inv_Date { get; set; } = DateTime.Now;
         public DateTime Pay_Date { get; set; } = DateTime.Now;
@@ -137,6 +139,7 @@ namespace AppliedAccounts.Models
         public string Description { get; set; } = string.Empty;
         public decimal Amount { get; set; } = 0.00M;
         public ReportModel Report { get; set; } = new();
+        public bool IsSelected { get; set; } = false;       // Record is selected for bulk print.
 
     }
 

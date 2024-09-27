@@ -178,3 +178,14 @@ body {
     padding:3px;
 
 }
+
+/*
+// <uniquifier > : Use a unique and descriptive class name
+// <weight > : Use a value from 100 to 900*/
+
+.exo-font {
+    font-family: "Exo 2", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+}
