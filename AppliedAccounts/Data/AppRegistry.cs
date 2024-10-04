@@ -17,12 +17,12 @@ namespace AppliedAccounts.Data
 
         public static string GetFormatCurrency(string DataFile)
         {
-            if (DataFile == null || DataFile == string.Empty) { return string.Empty; }
+            if (string.IsNullOrEmpty(DataFile)) { return string.Empty; }
             return GetText(DataFile, "FMTCurrency");
         }
         public static string GetFormatDate(string DataFile)
         {
-            if (DataFile == null || DataFile == string.Empty) { return string.Empty; }
+            if (string.IsNullOrEmpty(DataFile)) { return string.Empty; }
             return GetText(DataFile, "FMTDate");
         }
         public static string Currency(string DataFile, object Amount)

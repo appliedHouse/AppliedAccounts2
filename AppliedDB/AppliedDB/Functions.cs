@@ -12,8 +12,21 @@ namespace AppliedDB
             var SQLQuery = $"SELECT [ID] FROM {CurrentRow.Table.TableName} WHERE [ID]={ID}";
             DataTable _Table = DataSource.GetDataTable(DBFile, SQLQuery, CurrentRow.Table.TableName);
             if (_Table != null) { return false; }
-            if (_Table.Rows.Count == 0) { return false; }
+            if (_Table?.Rows.Count == 0) { return false; }
             return true;
+        }
+        public static DataRow Seek(string _DBFile, Tables _Table, int ID)
+        {
+            string _Text = $"SELECT * FROM {_Table} WHERE ID={ID}";
+            DataTable _DataTable = DataSource.GetDataTable(_DBFile, _Text, _Table.ToString());
+            if (_DataTable.Rows.Count > 0)
+            {
+                return _DataTable.Rows[0];
+            }
+
+            return null;
+
+
         }
         public static DataRow RemoveNull(DataRow CurrentRow)
         {
@@ -77,8 +90,8 @@ namespace AppliedDB
         public static int Code2Int(string DBFile, Tables _Table, string _Code)
         {
             var SQLQuery = $"SELECT [ID] FROM [{_Table}] WHERE [Code]='{_Code}'";
-            DataTable _DataTable = DataSource.GetDataTable(DBFile,SQLQuery,"Code");
-            if(_DataTable.Rows.Count > 0)
+            DataTable _DataTable = DataSource.GetDataTable(DBFile, SQLQuery, "Code");
+            if (_DataTable.Rows.Count > 0)
             {
                 return (int)_DataTable.Rows[0][0];
             }
@@ -96,6 +109,16 @@ namespace AppliedDB
             }
             return 0.00M;
 
+        }
+
+        public static decimal GetTaxRate(string DBFile, int ID)
+        {
+            DataRow? _DataRow = Seek(DBFile, Tables.Taxes, ID);
+            if (_DataRow != null)
+            {
+                return (decimal)_DataRow["Rate"];
+            }
+            return 0.00M;
         }
     }
 }

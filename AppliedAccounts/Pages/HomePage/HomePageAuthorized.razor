@@ -9,7 +9,25 @@
     protected override void OnInitialized()
     {
         AppGlobals = new(Config);
-        BusinessPic = $".{AppGlobals.ImagesPath}/Accounts3.jpg";
+        BusinessPic = $"{AppGlobals.ImagesPath}/Accounts3.jpg";
     }
 }
+<div class="HomeDiv">
+   
 
+</div>
+
+
+<style>
+    .HomeDiv{
+        width:100%;
+        Height:100%;
+        background-image:@BusinessPic;
+    }
+
+    .HomePic{
+        object-fit:fill;
+
+    }
+
+</style>

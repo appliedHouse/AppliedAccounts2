@@ -3,7 +3,6 @@
     width: 100%;
     border: 2px solid black;
     font-size: small;
-    
 }
 
 .tb-head {
@@ -15,6 +14,21 @@
     color: blue;
 }
 
+.tb-col-left{
+    text-align:start;
+  padding-left:5px;
+  padding-right:5px;
+}
+
+.tb-col-center {
+    text-align: center;
+}
+
+.tb-col-right {
+    text-align: end;
+    padding-left: 5px;
+    padding-right: 5px;
+}
 
 .tb-body {
     border: solid double 1px;
@@ -26,7 +40,8 @@
     border-color: inherit;
     border-style: solid;
     border-width: 1px;
-    font-size:small;
+    font-size: small;
+    text-align: center;
 }
 
 .tb-body-row-del {
@@ -48,12 +63,11 @@
 
 
 
-.tb-btn-add{
-    width:30px;
-    height:30px;
-    background-color:forestgreen;
-    color:white;
-    
+.tb-btn-add {
+    width: 30px;
+    height: 30px;
+    background-color: forestgreen;
+    color: white;
 }
 
 
@@ -90,7 +104,6 @@ th-btn-new {
 
 
 .td-btn {
-    display: flex;
     height: 100%;
     width: 100%;
     justify-content: center;

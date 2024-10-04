@@ -22,6 +22,7 @@ namespace AppliedAccounts.Data
         public AuthorClass Author { get; set; } = new();
         public LanguageClass Language { get; set; } = new();
         public CurrencyClass Currency { get; set; } = new();
+        public Format AppFormat { get; set; } = new();
 
         public Globals() { }
 

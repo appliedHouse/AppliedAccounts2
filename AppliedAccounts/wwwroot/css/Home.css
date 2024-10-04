@@ -1,9 +1,13 @@
 /* -------- GLOBAL CSS--------  */
+
+
+
 body {
   padding: 0;
   margin: 0;
   font-family: "Montserrat", sans-serif;
 }
+
 .global-btn-bg {
   background-color: #1b00d4;
   padding: 10px 30px;

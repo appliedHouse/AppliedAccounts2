@@ -16,6 +16,7 @@ namespace AppliedAccounts.Models
         public string SearchText { get; set; } = string.Empty;
         public AppMessages.AppMessages MyMessages { get; set; } = new();
         public decimal TotalAmount { get; set; } = 0.00M;
+        public bool SelectAll { get; set; }
         
 
         #region Constructor
@@ -53,6 +54,7 @@ namespace AppliedAccounts.Models
                     if (_Row["Company"].ToString().Contains(SearchText)) { IsSearch = true; }
                     if (_Row["City"].ToString().Contains(SearchText)) { IsSearch = true; }
                     if (_Row["Salesman"].ToString().Contains(SearchText)) { IsSearch = true; }
+                    if (_Row["Ref_No"].ToString().Contains(SearchText)) { IsSearch = true; }
 
                     if (IsSearch)
                     {
@@ -74,6 +76,7 @@ namespace AppliedAccounts.Models
                 _Record.Id = (int)_Row["ID"];
                 _Record.Vou_No = (string)_Row["Vou_No"];
                 _Record.Ref_No = (string)_Row["Ref_No"];
+                //_Record.Batch = (string)_Row["Batch"];
                 _Record.Vou_Date = (DateTime)_Row["Vou_Date"];
                 _Record.Inv_Date = (DateTime)_Row["Inv_Date"];
                 _Record.Pay_Date = (DateTime)_Row["Pay_Date"];
@@ -142,5 +145,7 @@ namespace AppliedAccounts.Models
         public bool IsSelected { get; set; } = false;       // Record is selected for bulk print.
 
     }
+
+    
 
 }

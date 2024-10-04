@@ -14,4 +14,7 @@ window.displayPDF = function (fileUrl) {
     link.click();
 }
 
-
+function showModol(ModolID) {
+    var myModal = new bootstrap.Modal(document.getElementById(ModolID));
+    myModal.show();
+}

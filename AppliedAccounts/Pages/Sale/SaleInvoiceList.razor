@@ -66,27 +66,26 @@
     <div class="container">
         <table class="AppTable">
             <thead class="tb-head">
-                <tr class="tb-head-row">
-                    <td>Sr. No.</td>
-                    <td>Voucher</td>
-                    <td>Ref_No</td>
-                    <td>Vou Date</td>
-                    <td>Inv Date</td>
-                    <td>Pay Date</td>
-                    <td>Client</td>
-                    <td>City</td>
-                    <td>Salesman</td>
-                    <td>Amount</td>
-                    <th class="td-btn">
-                        <PageNavTo Title="Edit" NavTo=@NavToNew />
+                <tr class="tb-head-row" style="text-align:center">
+                    <th style="width:6%">Sr. No.</th>
+                    <th style="width:12%">Voucher</th>
+                    <th style="width:5%">Ref No</th>
+                    <th style="width:7%">Vou Date</th>
+                    <th style="width:7%">Inv Date</th>
+                    <th style="width:7%">Pay Date</th>
+                    <th style="width:25%">Client</th>
+                    <th style="width:9%">City</th>
+                    <th style="width:10%">Amount</th>
+                    <th style="width:8%" class="td-btn center-btn">
                         <button id="btnAdd" class="tb-btn-add" @onclick="()=>Model.Add()"><i class="bi bi-plus-circle-fill"></i></button>
                     </th>
-                    <th>All 
-                        <input type="checkbox" name="selectRow" value="1">
+                    <th style="width:4%; justify-items:center">
+                        All
+                        <input type="checkbox" name="selectRow" value="1" @onclick="SelectAll">
                     </th>
                 </tr>
             </thead>
-            
+
             <tbody class="tb-body" style="height:30px">
                 @if (Model.Records.Count > 0)
                 {
@@ -97,32 +96,33 @@
                         SRNO++;
 
                         <tr class="tb-body-row">
-                            <td class="text-center">@SRNO</td>
+                            <td>@SRNO</td>
                             <td>@_Record.Vou_No</td>
                             <td>@_Record.Ref_No</td>
                             <td>@AppFunctions.Date2Text(_Record.Vou_Date)</td>
                             <td>@AppFunctions.Date2Text(_Record.Inv_Date)</td>
                             <td>@AppFunctions.Date2Text(_Record.Pay_Date)</td>
-                            <td>@_Record.TitleCustomer</td>
-                            <td>@_Record.City</td>
-                            <td>@_Record.TitleSalesman</td>
+                            <td class="tb-col-left">@_Record.TitleCustomer</td>
+                            <td class="tb-col-left">@_Record.City</td>
                             <td class="amount">@_Record.Amount.ToString("###,###,##0.00")</td>
-                            <td >
-                                @*<PageNavTo Title="Edit" NavTo=@_NavTo />
-                                <DeleteButton /> *@
+                            <td>
                                 <button type="submit" class="btn-Edit" @onclick="()=>Edit(_Record.Id)"><i class="bi bi-pencil-fill"></i></button>
                                 <button type="submit" class="btn-Delete" @onclick="()=>Delete(_Record.Id)"><i class="bi bi-trash-fill"></i></button>
                                 <button type="submit" class="btn-print" @onclick="(()=>Print(_Record.Id))"><i class="bi bi-printer-fill"></i></button>
                             </td>
-                            
-                            <td><input type="checkbox" name="selectRow" value="1"></td>
-                            
+                            <td class="tb-col-center">
+                                <input type="checkbox" name="selectRow" @bind="_Record.IsSelected">
+                            </td>
+
                         </tr>
                     }
                 }
                 else
                 {
-                    @NoRecordFound
+                    <tr>
+                        <td>@NoRecordFound</td>
+                    </tr>
+                    
 
                 }
             </tbody>
@@ -136,8 +136,15 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td class="amount">@Model.TotalAmount.ToString("###,###,##0.00")</td>
-                    <td><button type="submit" class="btn-print" @onclick="(()=>PrintAll())"><i class="bi bi-printer-fill"></i></button></td>
+                    <td>@Model.TotalAmount.ToString("###,###,##0.00")</td>
+                    @if (Model.Records.Count > 0)
+                    {
+                        <td colspan="2" class="bg-light center-txt"><button type="submit" class="btn-print" @onclick="(()=>PrintAll())"><i class="bi bi-printer-fill"></i> All</button></td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
                 </tr>
             </tfoot>
         </table>
@@ -145,6 +152,6 @@
 }
 else
 {
-   @*  <p>@Model.Source.MyConnection.ConnectionString</p>
-    <h4>Data Load Error.....</h4> *@
+    <p>Data Not Load....</p>
 }
+

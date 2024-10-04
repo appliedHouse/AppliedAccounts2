@@ -18,26 +18,7 @@ namespace AppliedAccounts.Pages.Sale
         {
         }
 
-        public async void Print(int ID)
-        {
-            if (PrintClass is not null)
-            {
-                PrintClass.OutputReport.ReportType = ReportType.PDF;
-                PrintClass.ReportData = GetReportData(ID);
-                PrintClass.ReportRender();
 
-
-                await js.InvokeVoidAsync("displayPDF", PrintClass.OutputReport.FileLink);
-                //await js.InvokeVoidAsync("downloadFile", PrintClass.OutputReport.FileLink);
-            }
-
-        }
-
-        public async void PrintAll()
-        {
-            await Task.Delay(1000);
-
-        }
 
         public async void Delete(int ID)
         {
@@ -52,8 +33,69 @@ namespace AppliedAccounts.Pages.Sale
             // Add code here to delete sales invocies.
         }
 
+        #region Select All and Select One
+        public void SelectAll()
+        {
+            Model.SelectAll = !Model.SelectAll;
+            Model.Records?.ForEach(item => item.IsSelected = Model.SelectAll);
+            //StateHasChanged();
+        }
 
+        public void SelectOne(int _ID)
+        {
+            var item = Model.Records.Where(a => a.Id == _ID).First();
+            item.IsSelected = !item.IsSelected;
+            //foreach (var item in Model.Records)
+            //{
+            //    if(item.Id == _ID)
+            //    {
+            //        item.IsSelected = !item.IsSelected;
+            //    }
+            //}
+        }
+        #endregion
 
+        #region Sales Invoice report print -- Print -- Print All - 
+      
+        public async void PrintAll()
+        {
+            await Task.Run(() =>
+            {
+                foreach (var item in Model.Records)
+                {
+                    if (item.IsSelected)
+                    {
+                        Print(item.Id, downloadOption.downloadFile);
+                    }
+                }
+            });
+        }
+
+        public void Print(int ID)
+        {
+            Print(ID, downloadOption.displayPDF);
+        }
+
+        public async void Print(int ID, downloadOption Option)
+        {
+
+            if (PrintClass is not null)
+            {
+                PrintClass.OutputReport.ReportType = ReportType.PDF;
+                PrintClass.ReportData = GetReportData(ID);
+
+                if (PrintClass.ReportData.ReportTable.Rows.Count > 0)
+                {
+                    string _InvNo = PrintClass.ReportData.ReportTable.Rows[0]["Vou_No"].ToString() ?? ID.ToString("0000");
+                    string _RecNo = Model.Records.First().Ref_No;
+
+                    PrintClass.OutputReport.FileName = $"{_RecNo}INV-{_InvNo}";
+                    PrintClass.ReportRender();
+
+                    await js.InvokeVoidAsync(Option.ToString(), PrintClass.OutputReport.FileLink);
+                }
+            }
+        }
 
         private ReportData GetReportData(int ID)
         {
@@ -69,9 +111,7 @@ namespace AppliedAccounts.Pages.Sale
 
         }
 
-
-        #region Create a Class for print report
-        public ReportModel CreateReportModel()
+        private ReportModel CreateReportModel()
         {
             ReportModel _Reportmodel = new ReportModel();
             try
@@ -100,7 +140,7 @@ namespace AppliedAccounts.Pages.Sale
                 _Reportmodel.AddReportParameter("Heading2", _Heading2);
                 _Reportmodel.AddReportParameter("Footer", _ReportFooter);
 
-                var _SourceData = new DataTable();          // Inject a Data Table for perint.
+                var _SourceData = new DataTable();          // Inject a Data Table for print.
 
                 _Reportmodel.ReportData.DataSetName = "ds_SaleInvoice";
                 _Reportmodel.ReportData.ReportTable = _SourceData;

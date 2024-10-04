@@ -3,6 +3,17 @@
     width:90px;
 }
 
+
+.center-btn {
+    justify-content: center;
+   
+}
+
+.center-txt {
+    text-align: center
+
+}
+
 .btn-print {
     
     font-size: 1rem;

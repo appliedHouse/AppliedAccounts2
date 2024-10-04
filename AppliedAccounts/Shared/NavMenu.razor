@@ -31,7 +31,7 @@
     public void LogOut() => Task.Run(() => Logout());
 
     public void Home() { NavManager.NavigateTo($"/", true); }
-    public void Accounts() { NavManager.NavigateTo($"/Menu/Accounts", true); }
+
     public void Inventory() { NavManager.NavigateTo($"/Menu/Stock", true); }
     public void Production() { NavManager.NavigateTo($"/Menu/Production", true); }
     public void Purchase() { NavManager.NavigateTo($"/Menu/Purchase", true); }
@@ -40,19 +40,17 @@
     public void Admin() { NavManager.NavigateTo($"/Menu/Admin", true); }
     public void Config() { NavManager.NavigateTo($"/Config", true); }
 
-    public void Sale() 
-    { 
-        if(AppUser.UserID=="CDC")
-        {
-            NavManager.NavigateTo("/Menu/SaleCDC", true);
-        }
-        else
-        {
-            NavManager.NavigateTo("/Menu/Sale", true);
-        }
-        
+    public void Accounts()
+    {
+        if (AppUser?.UserID == "CDC") { NavManager.NavigateTo("/Accounts/COA1", true); }
+        else { NavManager.NavigateTo($"/Menu/Accounts", true); ; }
     }
 
+    public void Sale()
+    {
+        if (AppUser?.UserID == "CDC") { NavManager.NavigateTo("/Menu/SaleCDC", true); }
+        else { NavManager.NavigateTo("/Menu/Sale", true); }
+    }
 }
 
 <div class="topnav bg-white">
@@ -60,7 +58,7 @@
     <AuthorizeView>
         <Authorized>
 
-            @if(AppUser.UserID=="CDC")
+            @if (AppUser?.UserID == "CDC")
             {
                 <button type="submit" class="btn-Menu" id="btn-account" @onclick="Accounts">Accounts</button>
                 <button type="submit" class="btn-Menu" id="btn-Sale" @onclick="Sale">Sale</button>
@@ -77,12 +75,12 @@
                 <button type="submit" class="btn-Menu" id="btn-Admin" @onclick="Admin">Admin</button>
                 <button type="submit" class="btn-Menu" id="btn-logout" @onclick="LogOut">logout</button>
             }
-            
-            @if(IsAdmin)
+
+            @if (IsAdmin)
             {
                 <button type="submit" class="btn-Menu" id="btn-logout" @onclick="Config">Config</button>
             }
-            
+
         </Authorized>
         <NotAuthorized>
             <button type="submit" id="byn-login" class="btn btn-menu btn-link" @onclick="Login">login</button>
