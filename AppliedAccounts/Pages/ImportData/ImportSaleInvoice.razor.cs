@@ -19,6 +19,7 @@ namespace AppliedAccounts.Pages.ImportData
     {
         [Inject] public NavigationManager NavManager { set; get; } = default!;
 
+        #region Variables
         public SaleInvoiceModel Model { get; set; }
 
         public ImportExcelFile ImportExcel { get; set; }
@@ -31,8 +32,6 @@ namespace AppliedAccounts.Pages.ImportData
         public DataTable Sale2 { get; set; }
         public DataSource Source { get; set; }
 
-
-
         DateTime Inv_Date = DateTime.Now;
         DateTime Due_Date = DateTime.Now;
         string RefNo = string.Empty;
@@ -44,7 +43,6 @@ namespace AppliedAccounts.Pages.ImportData
         int Error = 0;
         int Skip = 0;
 
-
         public StringBuilder MyMessage { get; set; } = new();
 
         public bool IsExcelLoaded { get; set; } = false;
@@ -52,6 +50,7 @@ namespace AppliedAccounts.Pages.ImportData
         public bool ShowImportButton { get; set; } = true;
 
         public Stopwatch stopwatch { get; set; } = new();
+        #endregion
 
         #region Constructor
         public ImportSaleInvoice()
@@ -87,6 +86,7 @@ namespace AppliedAccounts.Pages.ImportData
         }
         #endregion
 
+        #region Import Data main method
         public async void GetImportedDataAsync()
         {
             if (IsExcelLoaded)
@@ -114,6 +114,7 @@ namespace AppliedAccounts.Pages.ImportData
             SalesSchema = _TempDB.GetTempTable("Schema");
             InvData = _TempDB.GetTempTable("Invoice Data");
         }
+        #endregion
 
         #region Get Data From SQLite Temp Data, 
         //Stored data from excel file to Temp

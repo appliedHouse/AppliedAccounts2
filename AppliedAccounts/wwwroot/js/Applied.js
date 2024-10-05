@@ -1,4 +1,5 @@
-﻿window.downloadFile = function (fileUrl) {
+﻿// Download Report File in Cleint 
+window.downloadFile = function (fileUrl) {
     const link = document.createElement('a');
     link.href = fileUrl;
     link.download = fileUrl.split('/').pop(); // Set download attribute to the filename
@@ -7,6 +8,8 @@
     document.body.removeChild(link);
 }
 
+
+// display a PDF File in Browser
 window.displayPDF = function (fileUrl) {
     const link = document.createElement('a');
     link.href = fileUrl;
@@ -14,6 +17,8 @@ window.displayPDF = function (fileUrl) {
     link.click();
 }
 
+
+// Show Bootstrap Modol Class.
 function showModol(ModolID) {
     var myModal = new bootstrap.Modal(document.getElementById(ModolID));
     myModal.show();

@@ -13,12 +13,16 @@ namespace AppliedAccounts.Pages.Sale
         public AppUserModel AppUser { get; set; }
         public Models.SaleInvoiceListModel Model { get; set; }
         public ReportModel PrintClass { get; set; }
+        private bool IsPrinted { get; set; } = false;
+        private bool IsPrinting { get; set; } = false;
+        private List<string> PrintedReports { get; set; } = new();
+        
 
         public SaleInvoiceList()
         {
         }
 
-
+        
 
         public async void Delete(int ID)
         {
@@ -56,9 +60,11 @@ namespace AppliedAccounts.Pages.Sale
         #endregion
 
         #region Sales Invoice report print -- Print -- Print All - 
-      
+
         public async void PrintAll()
         {
+            IsPrinting = true;
+            PrintedReports = new();
             await Task.Run(() =>
             {
                 foreach (var item in Model.Records)
@@ -66,9 +72,14 @@ namespace AppliedAccounts.Pages.Sale
                     if (item.IsSelected)
                     {
                         Print(item.Id, downloadOption.downloadFile);
+                        
                     }
+
                 }
             });
+            IsPrinting = false;
+            IsPrinted = true;
+            await InvokeAsync(() => StateHasChanged());
         }
 
         public void Print(int ID)
@@ -78,7 +89,7 @@ namespace AppliedAccounts.Pages.Sale
 
         public async void Print(int ID, downloadOption Option)
         {
-
+            IsPrinted = false;
             if (PrintClass is not null)
             {
                 PrintClass.OutputReport.ReportType = ReportType.PDF;
@@ -91,8 +102,11 @@ namespace AppliedAccounts.Pages.Sale
 
                     PrintClass.OutputReport.FileName = $"{_RecNo}INV-{_InvNo}";
                     PrintClass.ReportRender();
+                    PrintedReports.Add(PrintClass.OutputReport.FileFullName);
 
                     await js.InvokeVoidAsync(Option.ToString(), PrintClass.OutputReport.FileLink);
+                    
+                    
                 }
             }
         }
