@@ -46,10 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Reports\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Append.Blazor.Printing" Version="6.3.0" />
     <PackageReference Include="BlazorJS" Version="2.1.6" />
   </ItemGroup>
 

@@ -94,6 +94,7 @@ namespace AppliedAccounts.Pages.ImportData
                 ShowSpinner = true;
                 ShowImportButton = false;
                 stopwatch.Start();
+                await InvokeAsync(StateHasChanged);
                 GetExcelSheetData();
                 await GetDataTableAync();
                 stopwatch.Stop();
@@ -404,6 +405,13 @@ namespace AppliedAccounts.Pages.ImportData
         private bool Validation(DataRow _Row)
         {
             return true;
+        }
+        #endregion
+
+        #region show Invoices
+        private void ShowInvoices()
+        {
+            NavManager.NavigateTo("/Sale/SaleInvoiceList");
         }
         #endregion
     }
