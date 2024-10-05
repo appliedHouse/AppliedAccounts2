@@ -1,0 +1,13 @@
+﻿@inject NavigationManager NavManager;
+
+@code {
+    public void Accounts() { NavManager.NavigateTo("/Accounts/COA1", true); }
+    public void Clients() { NavManager.NavigateTo("/CustomerList", true); }
+    public void Services() { NavManager.NavigateTo("/CustomerList", true); }
+    public void Sale() { NavManager.NavigateTo("/Menu/SaleCDC", true); }
+}
+
+<button type="submit" class="btn-Menu" id="btn-account" @onclick="Accounts">Accounts</button>
+<button type="submit" class="btn-Menu" id="btn-account" @onclick="Clients">Clients</button>
+<button type="submit" class="btn-Menu" id="btn-Sale" @onclick="Services">Services</button>
+<button type="submit" class="btn-Menu" id="btn-Sale" @onclick="Sale">Sale</button>

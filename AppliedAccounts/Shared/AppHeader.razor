@@ -15,8 +15,20 @@
         AppUserName = AppUser.DisplayName;
     }
 
-    public string GetCompanyName() { return AppUser.Company; }
-    public string GetAppUserName() => AppUser.DisplayName;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Task.Run(() =>
+        {
+            AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+            CompanyName = AppUser.Company;
+            AppUserName = AppUser.DisplayName;
+            InvokeAsync(()=>StateHasChanged());
+        
+        });
+    }
+
+    public string GetCompanyName() { return AppUser.Company ?? ""; }
+    public string GetAppUserName() => AppUser.DisplayName ?? "";
 
 
 
@@ -24,17 +36,31 @@
 
 <style>
     .merienda-font {
-        font-family: "Merienda", cursive;
+        font-family: "Eczar", serif;
         font-optical-sizing: auto;
-        font-weight: 900;
+        font-weight:900;
         font-style: normal;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     }
+
+    .gradient-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 75px;
+        text-align: center;
+    }
+
+        .gradient-container h1 {
+            font-size: clamp(2rem, 5vw, 4rem); /* Responsive font size */
+        }
+
 </style>
 
 <div class="AppHeader">
 
     <div class="AppTitle merienda-font">
-        <h3>@GetCompanyName()</h3>
+        <a href="/"><h3 style="font-size:larger">@GetCompanyName()</h3></a>
     </div>
 </div>
 
