@@ -21,8 +21,8 @@
     {
         AppGlobals = _Global;
 
-        Model.UserID = "CDC";
-        Model.Password = "Home123*";
+        Model.UserID = "HFSSteel";
+        Model.Password = "Steelsa";
         Model.IsSaved = false;
         Model.DataFile = "";
         Model.Designation = "";
@@ -102,12 +102,12 @@
             var UsersDBFile = Path.Combine(AppGlobals.BasePath, AppGlobals.RootPath, AppGlobals.UsersPath, "AppliedUsers2.db");
 
             var _CommandText = $"SELECT * FROM [Users] WHERE [UserID] = '{_UserID}'";
-            var _Connection = Connections.GetSQLiteConnection(UsersDBFile); _Connection.Open();
+            var _Connection = Connections.GetSQLiteConnection(UsersDBFile); _Connection?.Open();
             SQLiteCommand _Command = new(_CommandText, _Connection);
             SQLiteDataAdapter _Adapter = new(_Command);
             DataSet _DataSet = new();
             _Adapter.Fill(_DataSet, "Users");
-            _Connection.Close();
+            _Connection?.Close();
 
             if (_DataSet.Tables.Count == 1)
             {

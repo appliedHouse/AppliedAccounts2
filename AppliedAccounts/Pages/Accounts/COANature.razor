@@ -63,9 +63,9 @@
         <table class="AppTable">
             <thead class="tb-head">
                 <tr class="tb-head-row">
-                    <th>Code</th>
-                    <th>Title</th>
-                    <th class="td-btn">
+                    <th style="width:20%">Code</th>
+                    <th style="width:60%">Title</th>
+                    <th style="width:20%" class="td-btn">
                         <button id="btnAdd" class="btn-Add" @onclick="()=>Model.Add()"><i class="bi bi-plus-circle-fill"></i></button>
                     </th>
                 </tr>
@@ -75,7 +75,7 @@
                 {
                     <tr class="tb-body-row">
                         <td>@_Record.Code</td>
-                        <td>@_Record.Title</td>
+                        <td class="tb-col-left">@_Record.Title</td>
 
                         <td class="td-btn">
                             <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(()=> Model.Edit((int)_Record.ID))"><i class="bi bi-pencil-fill"></i></button>

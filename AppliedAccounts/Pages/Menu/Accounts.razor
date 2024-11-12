@@ -12,11 +12,11 @@
     public MenuCardModel? CardMenuModel { get; set; }
     public string COAText = "A chart of accounts is a documents that list all the transactions.";
     public string ClassText = "Classification of accounts are groups of chart of accounts.";
-    public string TypeText = "Type of Accounts are gategory of charts of accounts";
+    public string CategoryText = "Category of Accounts are gategory of charts of accounts";
+    public string NotesText = "Notes to the financial Accounts.";
     public string ImportText = "Import an excel file and generate sales invoice";
     public string CashBookText = "Daily cash transactions.";
     public string BankBookText = "Daily bank transactions.";
-    public string NotesText = "Chart of accounts notes for financials.";
     public DataSet MyDataset = new();
 
 
@@ -44,66 +44,43 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-4">
+        <div class="col-md-4">
             <MenuCard Message=@COAText NavTo="/Accounts/COA1" PicPath="./Images/Cards/COA.jpg" />
+            <MenuCard Message=@ImportText NavTo="/ImportData/ImportSalesInvoice" PicPath="./Images/Cards/ImportExport.png" />
         </div>
-        <div class="col-4">
-            <MenuCard Message=@ClassText NavTo="/Accounts/COAClass" PicPath="./Images/Cards/COAClass.jpg" />
+        <div class="col-md-4">
+            <MenuCard Message=@ClassText NavTo="/Accounts/COAClass" PicPath="./Images/Cards/COANature.png" />
+            <MenuCard Message=@CategoryText NavTo="/Accounts/COANature" PicPath="./Images/Cards/COACategory.png" />
+            <MenuCard Message=@NotesText NavTo="/Accounts/COANotes" PicPath="./Images/Cards/COANotes.png" />
         </div>
-        <div class="col-4">
-            <MenuCard Message=@TypeText NavTo="/Accounts/COANature" PicPath="./Images/Cards/COANature.jpg" />
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-4">
-            <MenuCard Message=@TypeText NavTo="/Accounts/COANotes" PicPath="./Images/Cards/COANotes.jpg" />
-        </div>
-        <div class="col-4">
+        <div class="col-md-4">
             <MenuCard Message=@CashBookText NavTo="/Accounts/CashBook" PicPath="./Images/Cards/CashbookPencil.jpg" />
         </div>
     </div>
-
-     <div class="row">
-        <div class="col-4">
-            <MenuCard Message=@NotesText NavTo="/Accounts/COANotes" PicPath="./Images/Cards/COANotes.jpg" />
-        </div>
-        <div class="col-4">
-            <MenuCard Message=@TypeText NavTo="/Accounts/CashBook" PicPath="./Images/Cards/CashbookPencil.jpg" />
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-4">
-            <MenuCard Message=@ImportText NavTo="/ImportData/ImportSalesInvoice" PicPath="./Images/Cards/ImportExport.png" />
-        </div>
-       
-    </div>
-
-
 </div>
 
 
 @if (MyDataset.Tables.Count > 0)
 {
-        <table>
-            <thead>
-                <tr>Col 1</tr>
-                <tr>Col 2</tr>
-                <tr>Col 4</tr>
-                <tr>Col 1</tr>
-            </thead>
-            <tbody>
+    <table>
+        <thead>
+            <tr>Col 1</tr>
+            <tr>Col 2</tr>
+            <tr>Col 4</tr>
+            <tr>Col 1</tr>
+        </thead>
+        <tbody>
             @foreach (DataRow row in MyDataset.Tables[0].Rows)
             {
-                        <tr>
-                            <td>@row[row.Table.Columns[0].ColumnName]</td>
-                            <td>@row[row.Table.Columns[1].ColumnName]</td>
-                            <td>@row[row.Table.Columns[2].ColumnName]</td>
-                            <td>@row[row.Table.Columns[3].ColumnName]</td>
-                        </tr>
+                <tr>
+                    <td>@row[row.Table.Columns[0].ColumnName]</td>
+                    <td>@row[row.Table.Columns[1].ColumnName]</td>
+                    <td>@row[row.Table.Columns[2].ColumnName]</td>
+                    <td>@row[row.Table.Columns[3].ColumnName]</td>
+                </tr>
             }
-            </tbody>
-        </table>
+        </tbody>
+    </table>
 }
 
 
