@@ -23,7 +23,7 @@ namespace AppliedAccounts.Pages.Accounts
 
         public COA1()
         {
-            GetLangPack(LangID, Section);
+            //GetLangPack(LangID, Section);
 
 
         }
@@ -50,6 +50,9 @@ namespace AppliedAccounts.Pages.Accounts
             LangPack = new();
 
             LangPack.Search = _Language.GetValue("Search");
+            LangPack.Save = _Language.GetValue("Save");
+
+            bool stop = true;
 
         }
 
@@ -59,6 +62,7 @@ namespace AppliedAccounts.Pages.Accounts
         {
             public LanguagePack() { }
             public string Search { get; set; } = string.Empty;
+            public string Save { get; set; } = string.Empty;
 
 
 
