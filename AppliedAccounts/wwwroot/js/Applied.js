@@ -1,4 +1,10 @@
-﻿// Download Report File in Cleint 
+﻿// Download Report File in Cleint
+
+
+const screenHeight = screen.height;
+document.documentElement.style.setProperty('--hight-screen', `${screenHeight}px`)
+
+
 window.downloadFile = function (fileUrl) {
     const link = document.createElement('a');
     link.href = fileUrl;

@@ -1,6 +1,7 @@
 ﻿using AppliedAccounts.Data;
 using AppliedDB;
 using System.Data;
+using static AppliedAccounts.Pages.Accounts.COA1;
 using static AppliedDB.Enums;
 using static AppMessages.Enums;
 
@@ -28,7 +29,7 @@ namespace AppliedAccounts.Models
         public string SelectedNotes { get; set; } = "Select..";
         public string SearchText { get; set; } = string.Empty;
         public AppMessages.AppMessages MyMessages { get; set; } = new();
-
+       
         #endregion
 
         #region Constructor
