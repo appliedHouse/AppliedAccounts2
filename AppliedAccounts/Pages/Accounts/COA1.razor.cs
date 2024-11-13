@@ -16,7 +16,7 @@ namespace AppliedAccounts.Pages.Accounts
         public string ErrorMessage { get; set; } = string.Empty;
         public LanguagePack LangPack { get; set; }
 
-        public int LangID = 1;
+        public int LangID = 2;
         public string Section = "COA";
 
 
@@ -42,9 +42,12 @@ namespace AppliedAccounts.Pages.Accounts
 
         public void GetLangPack(int _LangID, string _Section)
         {
+            if (_Section == null) { return; }
+
             AppLanguages.Language _Language = new(_LangID, _Section);
 
-              _Language.GetValue("Search");
+            _Language.GetValue("Search");
+            LangPack = new();
 
             LangPack.Search = _Language.GetValue("Search");
 
@@ -54,8 +57,9 @@ namespace AppliedAccounts.Pages.Accounts
 
         public class LanguagePack
         {
-            public string Search { get; set; } = string.Empty ;
-           
+            public LanguagePack() { }
+            public string Search { get; set; } = string.Empty;
+
 
 
         }

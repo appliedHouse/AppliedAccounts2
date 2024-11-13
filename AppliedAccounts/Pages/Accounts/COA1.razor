@@ -12,7 +12,11 @@
     protected override void OnInitialized()
     {
         var AppUserProfile = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
-        if (AppUserProfile != null) { Model = new(AppUserProfile); IsPageValid = GetPageIsValid(); }
+        if (AppUserProfile != null) 
+        { 
+            Model = new(AppUserProfile); IsPageValid = GetPageIsValid();
+            GetLangPack(LangID, Section);
+        }
         else { Model = new(); }
     }
 
