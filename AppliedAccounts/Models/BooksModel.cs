@@ -430,7 +430,6 @@ namespace AppliedAccounts.Models
 
             if (_Language != null)
             {
-
                 VouNo = _Language.GetValue("VouNo");
                 VouDate = _Language.GetValue("VouDate");
                 RefNo = _Language.GetValue("RefNo");
