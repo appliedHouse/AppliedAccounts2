@@ -23,3 +23,16 @@ function showModol(ModolID) {
     var myModal = new bootstrap.Modal(document.getElementById(ModolID));
     myModal.show();
 }
+
+
+function showAcordion() {
+    var collapseElementList = [].slice.call(document.querySelectorAll('.collapse'));
+    collapseElementList.forEach(function (collapseEl) {
+        var collapseInstance = bootstrap.Collapse.getInstance(collapseEl);
+        if (!collapseInstance) {
+            new bootstrap.Collapse(collapseEl);
+        } else if (!collapseEl.classList.contains('show')) {
+            collapseInstance.show();
+        }
+    });
+}

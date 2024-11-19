@@ -124,6 +124,12 @@ namespace AppliedAccounts.Models
         {
             Records = GetFilterRecords();
         }
+
+        public void ClearText()
+        {
+            SearchText = string.Empty;
+            Records = GetFilterRecords();
+        }
         #endregion
 
     }

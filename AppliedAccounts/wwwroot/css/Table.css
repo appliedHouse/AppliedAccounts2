@@ -1,6 +1,13 @@
-﻿.AppTable {
+﻿.root{
+    --applied-pageheight:100vh
+
+}
+
+.AppTable {
     display: table;
+    table-layout: auto;
     width: 100%;
+    height: var(--applied-pageheight - 20px);
     border: 2px solid black;
     font-size: small;
 }

@@ -88,9 +88,7 @@ namespace AppliedAccounts.Pages.Sale
             //PrintingService.Print("docs/sample.pdf")
 
             Print(ID, downloadOption.displayPDF);
-
-
-            
+                        
         }
 
         public async void Print(int ID, downloadOption Option)

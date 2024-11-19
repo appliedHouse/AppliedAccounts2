@@ -87,17 +87,43 @@
         }
 
         <EditForm Model=@Model>
+
             <div class="container mb-2">
-                <div class="row mt-2" style="height:50px; background-color:lightblue; padding-top:5px">
+                <div class="row row-filter">
                     <div class="col-4">
                         <InputText @bind-Value="@Model.SearchText" class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
                     </div>
                     <div class="col-2">
+                        <button type="button" class="btn btn-primary btn-sm" @onclick="()=>Model.Search()">Search</button>
 
-                        <button style="margin-top:5px;" class="btn btn-Search" @onclick="()=>Model.Search()">Search</button>
                     </div>
+                    <div class="col-2 justify-content-end">
+                        @if (Model.SearchText.Length > 0)
+                        {
+                            <button type="button" style="margin-top:5px; margin-left:5px" class="btn btn-primary btn-sm" @onclick="()=>Model.ClearText()">Clear</button>
+                        }
+                    </div>
+
                 </div>
             </div>
+
+            @* <div class="container mb-2">
+                <div class="row row-filter">
+                    <div class="col-4">
+                        <InputText @bind-Value="@Model.SearchText" class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
+                    </div>
+                    <div class="col-2">
+                        <button type="button" class="btn btn-primary btn-sm" @onclick="()=>Model.Search()">Search</button>
+
+                    </div>
+                    <div class="col-2 justify-content-end">
+                        @if (Model.SearchText.Length > 0)
+                        {
+                            <button type="button" style="margin-top:5px; margin-left:5px" class="btn btn-primary btn-sm" @onclick="()=>Model.ClearText()">Clear</button>
+                        }
+                    </div>
+                </div>
+            </div> *@
         </EditForm>
 
         <div class="container">

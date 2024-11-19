@@ -39,7 +39,7 @@ namespace AppliedAccounts.Models
             DBFile = AppUser.DataFile;
             Source = new(AppUser);
             Data = Source.GetList(Query.COAList);
-            Records = GetFilterRecords(string.Empty);
+            Records = GetFilterRecords();
 
             if (Count > 0) { Record = Records.First(); } else { Record = new COARecord(); }
 
@@ -115,7 +115,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Filter List
-        private List<COARecord> GetFilterRecords(string _Filter)
+        private List<COARecord> GetFilterRecords()
         {
             List<COARecord> _FilterRecords = new List<COARecord>();
             foreach (DataRow _Row in Data)
@@ -126,6 +126,7 @@ namespace AppliedAccounts.Models
                 }
                 else
                 {
+                    if (_Row["Code"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
                     if (_Row["Title"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
                     if (_Row["TitleClass"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
                     if (_Row["TitleNature"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
@@ -190,9 +191,18 @@ namespace AppliedAccounts.Models
         #region Search
         public void Search()
         {
-            Records = GetFilterRecords(SearchText);
+            Records = GetFilterRecords();
+        }
+
+        public void ClearText()
+        {
+            SearchText = string.Empty;
+            Records = GetFilterRecords();
         }
         #endregion
+
+
+
 
         #region Validate
         private bool Validate(DataRow _Row)
