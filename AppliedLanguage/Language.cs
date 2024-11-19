@@ -34,26 +34,8 @@ namespace AppLanguages
 
         public string GetValue(string _Key)
         {
-            
-            return LanguageText.Where(Row => (string)Row["Title"] == _Key.Trim()).Select(Row => (string)Row["Title"]).FirstOrDefault() ?? "No Value.";
-
-
-            //if (LanguageDataTable is not null)
-            //{
-            //    LanguageDataTable.DefaultView.RowFilter = $"Key='{_Key}'";
-            //    if (LanguageDataTable.DefaultView.Count >= 1)
-            //    {
-            //        return LanguageDataTable.DefaultView[0].Row["TextValue"].ToString() ?? "No Text.";
-            //    }
-            //}
-            //return "No Value.";
+            return LanguageText.Where(Row => (string)Row["Key"] == _Key.Trim()).Select(Row => (string)Row["TextValue"]).FirstOrDefault() ?? "No Value.";
         }
-
     }
-
-
-
-
-
 }
 
