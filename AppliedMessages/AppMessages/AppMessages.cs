@@ -36,6 +36,13 @@ namespace AppMessages
             MyMessages.Add(GetMessage(_Code));
         }
 
+        public void Add(string _Text)
+        {
+            MyMessages.Add(GetMessage(_Text));
+        }
+
+        
+
         #endregion
 
         #region Get Single message or error
@@ -61,6 +68,17 @@ namespace AppMessages
             }
             _Message.MessageText += " " + _Code.ToString();
             return _Message; ;
+        }
+
+        private Message GetMessage(string _Text)
+        {
+            return new Message()
+            {
+                MessageID = -1,
+                MessageClass = Class.Error,
+                MessageDate = DateTime.Now,
+                MessageText = _Text
+            };
         }
         #endregion
     }
