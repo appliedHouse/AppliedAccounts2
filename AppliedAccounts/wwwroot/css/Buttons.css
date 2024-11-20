@@ -71,14 +71,14 @@
 
 .btn-Save {
     color: white;
-    background-color: royalblue;
+    background-color: forestgreen;
     width: 80px
 }
 
 .btn-Delete {
     font-size: 1rem;
-    color: red;
-    background-color: transparent;
+    color: ghostwhite;
+    background-color: red;
     border: none;
 }
 

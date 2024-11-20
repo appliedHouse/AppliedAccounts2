@@ -262,7 +262,6 @@ namespace AppliedDB
         }
         #endregion
 
-
         #region View Sale Invoice
         public static string ViewSaleInvoice()
         {
@@ -301,6 +300,38 @@ namespace AppliedDB
 
 
         }
+        #endregion
+
+        #region Cash or Bank Book from Ledger
+
+        public static string BookLedger(int BookID)
+        {
+            if (BookID > 1)
+            {
+                var _Text = new StringBuilder();
+                _Text.AppendLine("SELECT ");
+                _Text.AppendLine("[BookID],[Vou_Type],[Vou_Date],[Vou_No],[Description],");
+                _Text.AppendLine("[DR],[CR]");
+                _Text.AppendLine("0.00 AS [BAL]");
+                _Text.AppendLine("[Customer]");
+                _Text.AppendLine("[Customers].[Title] AS [CustomerTitle],");
+                _Text.AppendLine("[Project],");
+                _Text.AppendLine("[Project].[Title] As [ProjectTitle],");
+                _Text.AppendLine("'' AS [Status]");
+                _Text.AppendLine("FROM [Ledger]");
+                _Text.AppendLine("LEFT JOIN [Customers] ON [Ledger].[Customer] = [Customers].[ID]");
+                _Text.AppendLine("LEFT JOIN [Project]   ON [Ledger].[Project]  = [Project].[ID];");
+                _Text.AppendLine($"WHERE [Ledger].[BookID] = {BookID}");
+
+                return _Text.ToString();
+            }
+            return string.Empty;
+        }
+
+        public static string CashBook() { return string.Empty; }
+        public static string BankBook() { return string.Empty; }
+
+
         #endregion
 
         public static QueryClass GetQuery(Query _SQLQuery)

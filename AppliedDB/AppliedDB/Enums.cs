@@ -109,6 +109,7 @@ namespace AppliedDB
             COANatureList,
             COANotesList,
 
+            Book,
             CashBook,
             BankBook,
 

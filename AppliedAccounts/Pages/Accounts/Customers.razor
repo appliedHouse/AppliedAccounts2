@@ -42,16 +42,15 @@
 
 <PageHeading Text="Customer / Client Detail" />
 
-@* Page Errors Show *@
+@* Show Messages if any *@
 @if (Model.MyMessages.Count > 0)
 {
-    <PageErrors Messages="@Model.MyMessages"></PageErrors>
+    <ShowMessages Messages="@Model.MyMessages"></ShowMessages>
 }
 
 @if (!Model.RecordNotFound)
 {
-
-    <EditForm Model="@Model">
+        <EditForm Model="@Model">
         <div class="container">
             <InputNumber @bind-Value="@Model.Record.ID" placeholder="ID" id="ID" hidden></InputNumber>
             <div class="row">

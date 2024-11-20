@@ -5,6 +5,8 @@ using AppLanguages;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using MESSAGE = AppMessages.Enums.Messages;
+using Tables = AppliedDB.Enums.Tables;
+
 
 
 namespace AppliedAccounts.Models
@@ -15,18 +17,20 @@ namespace AppliedAccounts.Models
     {
         #region Variables
 
-        [Inject] public NavigationManager NavManager { set; get; } = default!;
+        public NavigationManager? NavManager { set; get; }
+        public AppUserModel? UserProfile { get; set; }
+        public virtual LangPack LangClass { get; set; }
+
         [Inject] public Globals AppGlobals { get; set; } = default!;
         [Inject] public IConfiguration Appconfig { get; set; } = default!;
 
         public string? Vou_No { get; set; }
+        public int RecordID { get; set; }
         public int BookID { get; set; }
         public string? TitleBook { get; set; }
 
-        public AppUserModel? UserProfile { get; set; }
-        public CashRecord? Record { get; set; }
+        public CashRecord Record { get; set; }
         public List<CashRecord>? Records { get; set; }
-
         public List<CodeTitle> Companies { get; set; }
         public List<CodeTitle> Employees { get; set; }
         public List<CodeTitle> Projects { get; set; }
@@ -35,41 +39,36 @@ namespace AppliedAccounts.Models
         public DataTable? TB_Book { get; set; }
         public DataRow? CurrentRow { get; set; }
         public DataSource? Source { get; set; }
-        public AppMessages.AppMessages MyMessages { get; set; } = MessageClass.Messages;
+        public AppMessages.AppMessages MyMessages { get; set; }
 
         //public virtual decimal Amount => DR - CR;
         public virtual bool FoundRow { get; set; } = false;
         public virtual bool IsModelValid { get; set; }
-        public virtual LangPack LangClass { get; set; }
-
-
-
+        public bool IsBankBook { get; set; } = false;
+        public bool IsCashBook { get; set; } = false;
 
         #endregion
 
         #region Constructor
 
+        public BooksModel() { }             // Null Constructor
 
-        public BooksModel()
+        public BooksModel(ClassParameters _Parameters)
         {
-            NavManager.NavigateTo("/");
+            MyMessages = MessageClass.Messages;
 
+            LangClass = new(_Parameters.LangID, "Book");
+            Source = new(_Parameters.UserModel);
+            NavManager = _Parameters.NavManager;
+            UserProfile = _Parameters.UserModel;
+            IsBankBook = _Parameters.IsBankBook;
+            IsCashBook = _Parameters.IsCashBook;
+            RecordID = _Parameters.RecordID;
+            Vou_No = _Parameters.Vou_No;
 
-        }
-
-        public BooksModel(AppUserModel _UserProfile, int _BookID, string _Vou_No, int _LangID)
-        {
-
-            _LangID = 1;
-
-            UserProfile = _UserProfile;
-            Vou_No = _Vou_No;
-            BookID = _BookID;
-            Source = new(UserProfile);
-            LangClass = new(_LangID, "Book");
             LoadData();
-
         }
+
         #endregion
 
         #region Load Data
@@ -79,6 +78,19 @@ namespace AppliedAccounts.Models
             {
                 try
                 {
+                    var _CashBook = Tables.CashBook.ToString();
+                    var _BankBook = Tables.BankBook.ToString();
+                    var _Book = string.Empty;
+
+                    if (IsCashBook && IsBankBook)
+                    {
+                        IsCashBook = true;
+                        IsBankBook = false;
+                    }
+
+                    if (IsCashBook) { _Book = _CashBook; }
+                    if (IsBankBook) { _Book = _BankBook; }
+
                     var DBFile = UserProfile.DataFile.ToString();
                     if (string.IsNullOrEmpty(Vou_No)) { Vou_No = "New"; }
 
@@ -90,23 +102,31 @@ namespace AppliedAccounts.Models
                     }
                     else
                     {
-                        var _Query = $"SELECT * FROM [CashBook] WHERE [Vou_No] = '{Vou_No}'";
+                        var _Query = $"SELECT * FROM [{_Book}] WHERE [Vou_No] = '{Vou_No}'";
                         TB_Book = DataSource.GetDataTable(DBFile, _Query, "Voucher");
-                        Row2Rec(0);
+                        Row2Rec(-1);
 
                     }
 
-                    Companies = Source.GetCustomers();
-                    Employees = Source.GetEmployees();
-                    Projects = Source.GetProjects();
-                    Accounts = Source.GetAccounts();
-                    TitleBook = DataSource.GetTitle(Accounts, BookID);
+                    if (Source is not null)
+                    {
+                        Companies = Source.GetCustomers();
+                        Employees = Source.GetEmployees();
+                        Projects = Source.GetProjects();
+                        Accounts = Source.GetAccounts();
+                        TitleBook = DataSource.GetTitle(Accounts, BookID);
+                    }
+                    else
+                    {
+                        MyMessages.Add(MESSAGE.DataSourceIsNull);
+                    }
 
                     return true;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     MyMessages.Add(MESSAGE.DataNotLoaded);
+                    MyMessages.Add(ex.Message);
                     return false;
                 }
 
@@ -142,6 +162,7 @@ namespace AppliedAccounts.Models
 
             return _CurrentRow;
         }
+
         private DataRow GetRowIndex(int _Index)
         {
             FoundRow = false;
@@ -171,60 +192,83 @@ namespace AppliedAccounts.Models
         #region Record -> Row --> Record
         public void Rec2Row()
         {
-            if (TB_Book is not null)
+            if (Source is not null)
             {
-                CurrentRow = TB_Book.NewRow();
+                if (TB_Book is not null)
+                {
+                    CurrentRow = TB_Book.NewRow();
+                }
+                else
+                {
+                    CurrentRow = Source.GetNewRow(Tables.CashBook);
+                }
+
+                CurrentRow["ID"] = Record.ID;
+                CurrentRow["Vou_No"] = Record.Vou_No;
+                CurrentRow["Vou_Date"] = Record.Vou_Date;
+                CurrentRow["BookID"] = Record.BookID;
+                CurrentRow["COA"] = Record.COA;
+                CurrentRow["Ref_No"] = Record.Ref_No;
+                CurrentRow["Sheet_No"] = Record.Sheet_No;
+                CurrentRow["DR"] = Record.DR;
+                CurrentRow["CR"] = Record.CR;
+                CurrentRow["Customer"] = Record.Company;
+                CurrentRow["Employee"] = Record.Employee;
+                CurrentRow["Project"] = Record.Project;
+                CurrentRow["Description"] = Record.Description;
+                CurrentRow["Comments"] = Record.Comments;
+                CurrentRow["Status"] = Record.Status;
             }
             else
             {
-                CurrentRow = Source.GetNewRow(Enums.Tables.CashBook);
+                MyMessages.Add(MESSAGE.DataSourceIsNull);
             }
-
-
-            CurrentRow["ID"] = Record.ID;
-            CurrentRow["Vou_No"] = Record.Vou_No;
-            CurrentRow["Vou_Date"] = Record.Vou_Date;
-            CurrentRow["BookID"] = Record.BookID;
-            CurrentRow["COA"] = Record.COA;
-            CurrentRow["Ref_No"] = Record.Ref_No;
-            CurrentRow["Sheet_No"] = Record.Sheet_No;
-            CurrentRow["DR"] = Record.DR;
-            CurrentRow["CR"] = Record.CR;
-            CurrentRow["Customer"] = Record.Company;
-            CurrentRow["Employee"] = Record.Employee;
-            CurrentRow["Project"] = Record.Project;
-            CurrentRow["Description"] = Record.Description;
-            CurrentRow["Comments"] = Record.Comments;
-            CurrentRow["Status"] = Record.Status;
-
         }
         public void Row2Rec(int _ID)
         {
-            CurrentRow = GetDataRow(_ID);
-            if (FoundRow)
+            
+            if (TB_Book is not null)
             {
-                Record = new();
+                CurrentRow = TB_Book.NewRow();
+                if (_ID == -1)                      // Take First record if value is -1
                 {
-                    Record.ID = (int)CurrentRow["ID"];
-                    Record.Vou_No = (string)CurrentRow["Vou_No"];
-                    Record.Vou_Date = (DateTime)CurrentRow["Vou_Date"];
-                    Record.BookID = (int)CurrentRow["BookID"];
-                    Record.COA = (int)CurrentRow["COA"];
-                    Record.Ref_No = (string)CurrentRow["Ref_No"];
-                    Record.Sheet_No = (string)CurrentRow["Sheet_No"];
-                    Record.DR = (decimal)CurrentRow["DR"];
-                    Record.CR = (decimal)CurrentRow["CR"];
-                    Record.Company = (int)CurrentRow["Customer"];
-                    Record.Project = (int)CurrentRow["Project"];
-                    Record.Employee = (int)CurrentRow["Employee"];
-                    Record.Description = (string)CurrentRow["Description"];
-                    Record.Comments = (string)CurrentRow["Comments"];
-                    Record.Status = (string)CurrentRow["Status"];
+                    if (TB_Book.Rows.Count > 0)
+                    {
+                        CurrentRow = TB_Book.Rows[0];
+                        FoundRow = true;
+                    }
                 }
-            }
-            else
-            {
-                Record = NewRecord();
+                else
+                {
+                    CurrentRow = GetDataRow(_ID);
+                    
+                }
+                if (FoundRow)
+                {
+                    CurrentRow = Functions.RemoveNull(CurrentRow);
+                    Record = new();
+                    {
+                        Record.ID = (int)CurrentRow["ID"];
+                        Record.Vou_No = (string)CurrentRow["Vou_No"];
+                        Record.Vou_Date = (DateTime)CurrentRow["Vou_Date"];
+                        Record.BookID = (int)CurrentRow["BookID"];
+                        Record.COA = (int)CurrentRow["COA"];
+                        Record.Ref_No = (string)CurrentRow["Ref_No"];
+                        Record.Sheet_No = (string)CurrentRow["Sheet_No"];
+                        Record.DR = (decimal)CurrentRow["DR"];
+                        Record.CR = (decimal)CurrentRow["CR"];
+                        Record.Company = (int)CurrentRow["Customer"];
+                        Record.Project = (int)CurrentRow["Project"];
+                        Record.Employee = (int)CurrentRow["Employee"];
+                        Record.Description = (string)CurrentRow["Description"];
+                        Record.Comments = (string)CurrentRow["Comments"];
+                        Record.Status = (string)CurrentRow["Status"];
+                    }
+                }
+                else
+                {
+                    Record = NewRecord();
+                }
             }
         }
         #endregion
@@ -348,6 +392,24 @@ namespace AppliedAccounts.Models
         #endregion
 
 
+        #region Dropdown Change Events
+        public void CompanyChanged(int _NewValue)
+        {
+            Record.Company = _NewValue;
+            Record.TitleCompany = DataSource.GetTitle(Companies, _NewValue);
+        }
+        public void EmployeeChanged(int _NewValue)
+        {
+            Record.Employee = _NewValue;
+            Record.TitleEmployee = DataSource.GetTitle(Employees, _NewValue);
+        }
+        public void ProjectChanged(int _NewValue)
+        {
+            Record.Employee = _NewValue;
+            Record.TitleEmployee = DataSource.GetTitle(Projects, _NewValue);
+        }
+        #endregion
+
     }
 
     #region Record & Language Class 
@@ -420,8 +482,6 @@ namespace AppliedAccounts.Models
             GetLangPack();
         }
 
-        //public Dictionary<int, string> LangList => LanguageListClass.GetLanguageList();
-
         public void GetLangPack()
         {
             LangSection ??= "Common";
@@ -456,4 +516,20 @@ namespace AppliedAccounts.Models
 
     }
     #endregion
+
+    public class ClassParameters
+    {
+        public NavigationManager NavManager { get; set; }
+        public AppUserModel UserModel { get; set; }
+
+        public int BookID { get; set; }
+        public int RecordID { get; set; }
+        public string Vou_No { get; set; }
+        public int LangID { get; set; }
+        public DateTime Date1 { get; set; }
+        public DateTime Date2 { get; set; }
+        public bool IsCashBook { get; set; }
+        public bool IsBankBook { get; set; }
+
+    }
 }

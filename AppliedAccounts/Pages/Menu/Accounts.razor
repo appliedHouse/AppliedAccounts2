@@ -22,10 +22,8 @@
 
     protected override void OnInitialized()
     {
-
         AppValues = _Global;
         CardMenuModel = new() { TextMsg = "", NavTo = "", PicPath = "" };
-
     }
 
     public void LoadFiles()
@@ -33,11 +31,13 @@
         NavManager.NavigateTo("/DownLoad");
     }
 
-
-
     public void SetDataSet(DataSet? _DataSet)
     {
-        int Count = _DataSet.Tables.Count;
+        int Count = 0;
+        if (_DataSet is not null)
+        {
+            Count = _DataSet.Tables.Count;
+        }
     }
 }
 
@@ -54,7 +54,7 @@
             <MenuCard Message=@NotesText NavTo="/Accounts/COANotes" PicPath="./Images/Cards/COANotes.png" />
         </div>
         <div class="col-md-4">
-            <MenuCard Message=@CashBookText NavTo="/Accounts/CashBook" PicPath="./Images/Cards/CashbookPencil.jpg" />
+            <MenuCard Message=@CashBookText NavTo="/Accounts/CashBankBook" PicPath="./Images/Cards/CashbookPencil.jpg" />
         </div>
     </div>
 </div>

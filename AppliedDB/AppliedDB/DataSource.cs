@@ -3,6 +3,9 @@ using System.Data.SQLite;
 using System.Text;
 using Tables = AppliedDB.Enums.Tables;
 using Query = AppliedDB.Enums.Query;
+using System.Data.Entity.Infrastructure;
+using System.Security.Cryptography;
+using Microsoft.VisualBasic;
 
 namespace AppliedDB
 {
@@ -12,8 +15,7 @@ namespace AppliedDB
         public SQLiteConnection? MyConnection { get; set; }
         public SQLiteCommand? MyCommand { get; set; }
         public string DBFile => GetDataFile();
-
-
+        
         #region Constructor
         public DataSource(AppUserModel _UserProfile)
         {
@@ -125,6 +127,34 @@ namespace AppliedDB
                     SQLiteDataAdapter _Adapter = new(_Command);
                     DataSet _DataSet = new();
                     _Adapter.Fill(_DataSet, _Query.TableName);
+                    MyConnection.Close();
+                    if (_DataSet.Tables.Count == 1)
+                    {
+                        return _DataSet.Tables[0];
+                    }
+
+                }
+                return null;
+            }
+            catch (Exception)
+            {
+
+                return new DataTable();
+            }
+        }
+        public DataTable GetTable(string _SQLQuery)
+        {
+            try
+            {
+                if (MyConnection is not null)
+                {
+                    if (MyConnection.State != ConnectionState.Open)
+                    { MyConnection.Open(); }
+                    //var _Query = SQLQuery.GetQuery(_SQLQuery);
+                    var _Command = new SQLiteCommand(_SQLQuery, MyConnection);
+                    SQLiteDataAdapter _Adapter = new(_Command);
+                    DataSet _DataSet = new();
+                    _Adapter.Fill(_DataSet, (new Guid()).ToString());
                     MyConnection.Close();
                     if (_DataSet.Tables.Count == 1)
                     {
@@ -344,6 +374,13 @@ namespace AppliedDB
 
                 if (_Table.Rows.Count > 0)
                 {
+                    _CodeTitleList.Add(new CodeTitle()
+                    {
+                        ID = 0,
+                        Code = "Top",
+                        Title = "Select...."
+                    });
+
                     foreach (DataRow Row in _Table.Rows)
                     {
                         if (Row["ID"] == null) { Row["ID"] = 0; }
@@ -380,6 +417,13 @@ namespace AppliedDB
 
                 if (_Table.Rows.Count > 0)
                 {
+                    _CodeTitleList.Add(new CodeTitle()
+                    {
+                        ID = 0,
+                        Code = "Top",
+                        Title = "Select...."
+                    });
+
                     foreach (DataRow Row in _Table.Rows)
                     {
                         if (Row["ID"] == null) { Row["ID"] = 0; }
@@ -415,6 +459,13 @@ namespace AppliedDB
 
                 if (_Table.Rows.Count > 0)
                 {
+                    _CodeTitleList.Add(new CodeTitle()
+                    {
+                        ID = 0,
+                        Code = "Top",
+                        Title = "Select...."
+                    });
+
                     foreach (DataRow Row in _Table.Rows)
                     {
                         if (Row["ID"] == null) { Row["ID"] = 0; }
@@ -452,6 +503,13 @@ namespace AppliedDB
 
                 if (_Table.Rows.Count > 0)
                 {
+                    _CodeTitleList.Add(new CodeTitle()
+                    {
+                        ID = 0,
+                        Code = "Top",
+                        Title = "Select...."
+                    });
+
                     foreach (DataRow Row in _Table.Rows)
                     {
                         if (Row["ID"] == null) { Row["ID"] = 0; }
@@ -489,6 +547,13 @@ namespace AppliedDB
 
                 if (_Table.Rows.Count > 0)
                 {
+                    _CodeTitleList.Add(new CodeTitle()
+                    {
+                        ID = 0,
+                        Code = "Top",
+                        Title = "Select...."
+                    });
+
                     foreach (DataRow Row in _Table.Rows)
                     {
                         if (Row["ID"] == null) { Row["ID"] = 0; }
@@ -526,6 +591,13 @@ namespace AppliedDB
 
                 if (_Table.Rows.Count > 0)
                 {
+                    _CodeTitleList.Add(new CodeTitle()
+                    {
+                        ID = 0,
+                        Code = "Top",
+                        Title = "Select...."
+                    });
+
                     foreach (DataRow Row in _Table.Rows)
                     {
                         if (Row["ID"] == null) { Row["ID"] = 0; }
@@ -562,6 +634,13 @@ namespace AppliedDB
 
                 if (_Table.Rows.Count > 0)
                 {
+                    _CodeTitleList.Add(new CodeTitle()
+                    {
+                        ID = 0,
+                        Code = "Top",
+                        Title = "Select...."
+                    });
+
                     foreach (DataRow Row in _Table.Rows)
                     {
                         if (Row["ID"] == null) { Row["ID"] = 0; }
@@ -597,6 +676,13 @@ namespace AppliedDB
 
                 if (_DataTable.Rows.Count > 0)
                 {
+                    _CodeTitleList.Add(new CodeTitle()
+                    {
+                        ID = 0,
+                        Code = "Top",
+                        Title = "Select...."
+                    });
+
                     foreach (DataRow Row in _DataTable.DefaultView.ToTable().Rows)
                     {
                         if (Row["ID"] == null) { Row["ID"] = 0; }
@@ -868,6 +954,23 @@ namespace AppliedDB
         {
             return GetDataTable(_DBFile, _Table).Clone();
         }
+        #endregion
+
+        #region Get Cash or Bank Book
+        public DataTable GetBook(int BookID)
+        {
+            DataTable _Table = new DataTable();
+            if (UserProfile is not null)
+            {
+                var _Query = SQLQuery.BookLedger(BookID);
+
+                DataSource _Source = new(UserProfile);
+                _Table = _Source  .GetTable(_Query);
+            }
+            return _Table;
+        }
+
+       
         #endregion
 
     }
