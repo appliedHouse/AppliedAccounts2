@@ -25,7 +25,6 @@ namespace AppLanguages
 
             if (_Table.Rows.Count > 0)
             {
-
                 foreach (DataRow _Row in _Table.Rows)
                 {
                     _List.Add(_Row);
