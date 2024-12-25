@@ -427,9 +427,9 @@ namespace AppliedAccounts.Models
         public string Ref_No { get; set; } = string.Empty;
         public string Sheet_No { get; set; } = string.Empty;
 
-        [Range(1, Int32.MaxValue)]
+        [Range(1, 999999999)]
         public decimal DR { get; set; }
-        [Range(1, Int32.MaxValue)]
+        [Range(1, 999999999)]
         public decimal CR { get; set; }
         public int Company { get; set; }
         public int Employee { get; set; }

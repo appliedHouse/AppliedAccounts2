@@ -3,9 +3,6 @@ using System.Data.SQLite;
 using System.Text;
 using Tables = AppliedDB.Enums.Tables;
 using Query = AppliedDB.Enums.Query;
-using System.Data.Entity.Infrastructure;
-using System.Security.Cryptography;
-using Microsoft.VisualBasic;
 
 namespace AppliedDB
 {
