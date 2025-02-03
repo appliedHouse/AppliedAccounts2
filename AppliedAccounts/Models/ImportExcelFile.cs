@@ -23,47 +23,7 @@ namespace AppliedAccounts.Models
             ExcelFile = excelFile;
             ImportDataAsync();
         }
-
-
-        #region Temp
-        //public DataSet GetImportedDataSet()
-        //{
-        //    var _ExcelFile = Path.Combine(Connections.GetExcelPath(), ExcelFile.Name);
-        //    if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
-
-        //    using (FileStream fs = new(_ExcelFile, FileMode.Create))
-        //    {
-        //        ExcelFile.OpenReadStream().CopyTo(fs);
-        //    }
-        //    using var stream = File.Open(_ExcelFile, FileMode.Open, FileAccess.Read);
-        //    {
-        //        using var reader = ExcelReaderFactory.CreateReader(stream);
-        //        int _Rows = 0;
-        //        do
-        //        {
-        //            while (reader.Read())
-        //            {
-        //                _Rows++;
-        //                // reader.GetDouble(0);
-        //            }
-        //        } while (reader.NextResult());
-
-        //        MyMessages = $"Total {_Rows} rows imported.";
-
-        //        ImportDataSet = reader.AsDataSet();
-
-        //        if (ImportDataSet is not null)
-        //        {
-        //            SaveInTable(ImportDataSet);
-        //            IsImported = true;
-        //            if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
-
-
-        //        }
-        //    }
-        //    return ImportDataSet;
-        //}
-        #endregion
+             
 
         #region Import Data From Excel file into DataSet
 
