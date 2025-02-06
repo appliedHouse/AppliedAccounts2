@@ -219,6 +219,10 @@ namespace AppliedAccounts.Pages.ImportData
 
                     GetInvoiceDetails(Row);                 // Generates detail record of sale invocies.
                 }
+                else
+                {
+                    Model.RejectedList.Add(Row);
+                }
             }
 
             MyMessage.AppendLine($"{DateTime.Now} End Sales Invoice details process..");
@@ -267,7 +271,8 @@ namespace AppliedAccounts.Pages.ImportData
                         _Row2["Tax"] = _TaxID;
                         _Row2["Tax_Rate"] = Functions.Code2Rate(AppUser.DataFile, (int)_Row2["Tax"]);
                         _Row2["Description"] = Row[(string)Scheme["Remarks Code"]];
-                        _Row2["Project"] = Row["Project"];
+                        int.TryParse(Row["Project"].ToString(), out int _projectID);
+                        _Row2["Project"] = _projectID;
 
                         Sale2.Rows.Add(_Row2);
                         Model.SaleDetailsList.Add(_Row2);
@@ -424,6 +429,7 @@ namespace AppliedAccounts.Pages.ImportData
         public string DBFile { get; set; }
 
         public List<DataRow> SaleInvoiceList { get; set; } = new();
+        public List<DataRow> RejectedList { get; set; } = new();
         public List<DataRow> SaleDetailsList { get; set; } = new();
         public List<SelectedSaleInvoice> SelectedSale { get; set; } = new();
 
