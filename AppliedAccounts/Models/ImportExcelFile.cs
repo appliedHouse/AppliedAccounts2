@@ -29,7 +29,11 @@ namespace AppliedAccounts.Models
 
         public async void ImportDataAsync()
         {
-            var _ExcelFile = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelFiles", ExcelFile.Name);
+
+            var _Directory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelFiles");
+            if(!Directory.Exists(_Directory)) { Directory.CreateDirectory(_Directory); }
+
+            var _ExcelFile = Path.Combine(_Directory, ExcelFile.Name);
 
             if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
 
