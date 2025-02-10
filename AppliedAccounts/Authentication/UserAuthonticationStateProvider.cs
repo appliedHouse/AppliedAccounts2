@@ -150,6 +150,13 @@ namespace AppliedAccounts.Authentication
 
         }
 
+        public enum UserRolls
+        {
+            Administrator = 1,
+            Manager = 2,
+            User = 3,
+            Viewer = 4,
+        }
 
     }
 }

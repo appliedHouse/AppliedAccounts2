@@ -1,6 +1,5 @@
-﻿.root{
-    --applied-pageheight:100vh
-
+﻿.root {
+    --applied-pageheight: 100vh
 }
 
 .AppTable {
@@ -12,18 +11,60 @@
     font-size: small;
 }
 
-.tb-head {
-    height: 50px;
+
+.table-list {
+    display: table;
+    width: 100%;
+    border: 2px solid black;
 }
 
-.tb-head-row {
-    background-color: lightblue;
-    color: blue;
-    text-align:center;
-}
+    .table-list tb-head {
+        height: 150px;
+    }
 
-.tb-row-center{
-    text-align:center
+        .table-list thead tr {
+            background-color: blueviolet;
+        }
+
+            .table-list thead tr th {
+                background-color: lightblue;
+                color: blue;
+                text-align: center;
+            }
+
+
+    .table-list tbody {
+        background-color: lightgoldenrodyellow;
+        color: darkblue;
+        border-color: inherit;
+        border-style: solid;
+        border-width: 1px;
+        font-size: small;
+        text-align: center;
+    }
+
+        .table-list tbody tr td {
+            background-color: antiquewhite;
+        }
+
+    .table-list tfoot {
+        background-color:brown;
+        height: 25px;
+            
+    }
+        .table-list tfoot tr{
+            background-color:antiquewhite;
+        }
+
+    .table-list tfoot tr td {
+        background-color:burlywood
+    }
+
+
+
+
+.tb-row-center {
+    text-align: center
 }
 
 
@@ -43,18 +84,8 @@
     padding-right: 5px;
 }
 
-.tb-body {
-    border: solid double 1px;
-}
-
+.
 .tb-body-row {
-    background-color: lightgoldenrodyellow;
-    color: darkblue;
-    border-color: inherit;
-    border-style: solid;
-    border-width: 1px;
-    font-size: small;
-    text-align: center;
 }
 
 .tb-body-row-del {
@@ -84,11 +115,6 @@
 }
 
 
-.table-list {
-    display: table;
-    width: 100%;
-    border: 2px solid black;
-}
 
 .table-list-head {
     background-color: darkblue;

@@ -66,7 +66,14 @@ namespace AppliedAccounts.Models
             RecordID = _Parameters.RecordID;
             Vou_No = _Parameters.Vou_No;
 
-            LoadData();
+            var IsLoaded = LoadData();
+            if(IsLoaded)
+            {
+                Records = new()
+                {
+                    Record!
+                };
+            }
         }
 
         #endregion

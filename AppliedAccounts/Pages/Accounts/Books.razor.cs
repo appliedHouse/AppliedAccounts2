@@ -1,14 +1,21 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.Data;
 
 namespace AppliedAccounts.Pages.Accounts
 {
     public partial class Books
     {
+        
         public Books()
         { }
+        
+
         public void Save(string Vou_No) { }
         public void Add(int ID) { }
+        public void Edit(int ID) { }
         public void Delete(int ID) { }
+        public void Print(int ID) { }
+        public void Post(int ID) { }
         public void Back() { NavManager.NavigateTo("/Menu/Accounts"); }
 
         protected void CRFocusOut()
