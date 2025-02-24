@@ -3,6 +3,7 @@ using System.Data.SQLite;
 using System.Text;
 using Tables = AppliedDB.Enums.Tables;
 using Query = AppliedDB.Enums.Query;
+using System.Data.Entity.Infrastructure;
 
 namespace AppliedDB
 {
@@ -233,6 +234,34 @@ namespace AppliedDB
             return null;
 
         }
+        public static DataTable GetQueryTable(string _SQLQuery, SQLiteConnection _Connection)
+        {
+            try
+            {
+                if (_Connection is not null)
+                {
+                    if (_Connection.State != ConnectionState.Open)
+                    { _Connection.Open(); }
+                    //var _Query = SQLQuery.GetQuery(_SQLQuery);
+                    var _Command = new SQLiteCommand(_SQLQuery, _Connection);
+                    SQLiteDataAdapter _Adapter = new(_Command);
+                    DataSet _DataSet = new();
+                    _Adapter.Fill(_DataSet, (new Guid()).ToString());
+                    _Connection.Close();
+                    if (_DataSet.Tables.Count == 1)
+                    {
+                        return _DataSet.Tables[0];
+                    }
+
+                }
+                return null;
+            }
+            catch (Exception)
+            {
+
+                return new DataTable();
+            }
+        }
         #endregion
 
         #region Get Messages Table
@@ -271,7 +300,7 @@ namespace AppliedDB
         }
         public static List<DataRow> GetList(string DBFile, Query Query)
         {
-            QueryClass _QueryClass = SQLQuery.GetQuery(Query);
+            var _QueryClass = SQLQuery.GetQuery(Query);
             var Table = GetDataTable(DBFile, _QueryClass.QueryText, _QueryClass.TableName);
             if (Table is not null)
             {
@@ -284,7 +313,7 @@ namespace AppliedDB
         {
             if (UserProfile is not null)
             {
-                QueryClass _QueryClass = SQLQuery.GetQuery(Query);
+                var _QueryClass = SQLQuery.GetQuery(Query);
                 var Table = GetDataTable(UserProfile.DataFile, _QueryClass.QueryText, _QueryClass.TableName);
                 if (Table is not null)
                 {

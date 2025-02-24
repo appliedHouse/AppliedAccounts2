@@ -34,6 +34,9 @@ namespace AppliedDB
             BankBook = 121,
             RevSheet = 122,
             view_BillPayable = 123,
+            Receipts = 124,
+            Book = 125,
+            Book2 = 126,
 
             Customers = 201,
             City = 202,
@@ -59,6 +62,8 @@ namespace AppliedDB
             Production = 316,
             Production2 = 317,
             view_Production = 318,
+            StockCategory = 319,
+            StockInHand=320,
 
             Ledger = 401,
             view_Ledger = 402,
@@ -83,7 +88,7 @@ namespace AppliedDB
             Chk_BillReceivable2 = 702,
 
             TempLedger = 9999,
-
+            
         }
         public enum SQLType
         {
@@ -117,8 +122,16 @@ namespace AppliedDB
             Donation,
             DonationType,
             PaymentMode,
-            Currency
-
+            Currency,
+            View_Production,
+            View_Sold,
+            View_Purchased,
+            Chk_BillReceivable2,
+            Chk_BillReceivable1,
+            StockPosition,
+            StockPositionData,
+            StockPositionSUM,
+            Book2
         }
 
     }

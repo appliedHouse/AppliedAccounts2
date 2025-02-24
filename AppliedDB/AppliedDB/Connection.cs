@@ -162,13 +162,4 @@ namespace AppliedDB
         }
     }
 
-    //public interface IConnections
-    //{
-    //    public SQLiteConnection? UsersConnection { get; set; }
-    //    public SQLiteConnection? ClientConnection { get; set; }
-    //    public SQLiteConnection? MessageConnection { get; set; }
-    //    public SQLiteConnection? LanguageConnection { get; set; }
-    //    public SQLiteConnection? SystemConnection { get; set; }
-    //    public SQLiteConnection? SessionConnection { get; set; }
-    //}
 }

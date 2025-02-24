@@ -3,6 +3,7 @@ using AppliedDB;
 using System.Data.SQLite;
 using System.Data;
 using AppliedAccounts.Data;
+using System.Data.Entity;
 
 namespace AppliedAccounts.Pages.Users
 {
@@ -17,6 +18,7 @@ namespace AppliedAccounts.Pages.Users
         public async void Submit()
         {
             UserProfile AppUser = GetUserProfile(Model);
+
 
             bool IsUser = AppUser.Profile.UserID.Equals(Model.UserID);
             bool IsPSW = AppUser.Profile.Password.Equals(Model.Password);
@@ -60,7 +62,9 @@ namespace AppliedAccounts.Pages.Users
 
                 // END.
 
+
                 NavManager.NavigateTo("/", true);
+
             }
             else
             {
