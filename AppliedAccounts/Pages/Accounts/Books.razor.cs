@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using AppliedAccounts.Models;
+using Microsoft.AspNetCore.Components;
 using System.Data;
 
 namespace AppliedAccounts.Pages.Accounts
@@ -6,10 +7,13 @@ namespace AppliedAccounts.Pages.Accounts
     public partial class Books
     {
         
-        public Books()
-        { }
-        
+        public BooksModel Model { get; set; } = new BooksModel();   
 
+        public Books()
+        { 
+        
+        }
+        
         public void Save(string Vou_No) { }
         public void Add(int ID) { }
         public void Edit(int ID) { }

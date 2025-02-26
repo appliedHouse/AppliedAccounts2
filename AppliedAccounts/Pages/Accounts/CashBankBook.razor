@@ -1,7 +1,8 @@
-﻿@page "/Accounts/CBBooks"
-@attribute [Authorize];
-@using AppliedAccounts.Libs;
+﻿@page "/Accounts/CashBankBook";
 @using AppliedAccounts.Models;
+@using AppliedAccounts.Data;
+@using AppliedDB
+@using System.Data
 
 @inject AuthenticationStateProvider authStateProvider;
 @inject NavigationManager NavManager;
@@ -9,11 +10,242 @@
 
 
 @code {
+
+    public Models.BooksModel Model { get; set; }
+    private string UserRoll;
+    private string DateFormat = Format.DDMMYY;
+    private string CurrFormat = Format.Currency;
+    private decimal Tot_DR = 0.0M; 
+    private decimal Tot_CR = 0.0M; 
+
     protected override void OnInitialized()
     {
-        
-    }
+        var AppUserProfile = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        var _Parameters = new ClassParameters(); ;
+        _Parameters.NavManager = NavManager;
+        _Parameters.UserModel = AppUserProfile;
+        _Parameters.LangID = 1;
+        _Parameters.BookID = 1;
+        _Parameters.RecordID = 0;
+        _Parameters.Date1 = DateTime.Now;
+        _Parameters.Date2 = DateTime.Now;
+        _Parameters.IsCashBook = true;
+        _Parameters.IsBankBook = false;
+        _Parameters.Vou_No = "CB-000014";
 
+        Model = new(_Parameters);
+        UserRoll = AppUserProfile.Role;
+    }
 }
 
 
+<PageHeading Text="Cash / Bank Book" />
+
+@* Page Errors Show *@
+@if (Model.MyMessages.Count > 0)
+{
+    <PageErrors Messages="@Model.MyMessages"></PageErrors>
+}
+
+<EditForm Model="@Model">
+    <InputNumber @bind-Value="@Model.Record.ID" placeholder="ID" id="id" hidden></InputNumber>
+    <InputText @bind-Value="@Model.Record.Status" placeholder="Status" id="status" hidden></InputText>
+
+    <div class="container">
+        <div class="accordion accordion-flush" id="accordionRecordDisplay">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="flush-RecordDetail">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                        Record Title - Details
+                    </button>
+                </h2>
+                <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                    <div class="container mt-2 mb-2">
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3 txt">
+                                    <InputText @bind-Value="Model.Record.Vou_No" class="form-control" id="txtVouNo" placeholder="Voucher No" />
+                                    <label for="txtVouNo">Voucher No</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3 txt">
+                                    <InputDate @bind-Value="Model.Record.Vou_Date" class="form-control" id="txtDate" placeholder="Voucher No" />
+                                    <label for="txtDate">Voucher Date</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3 txt">
+                                    <InputText @bind-Value="Model.Record.Ref_No" class="form-control" id="txtRefNo" placeholder="Voucher No" />
+                                    <label for="txtRefNo">Reference No.</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3 txt">
+                                    <InputText @bind-Value="Model.Record.Sheet_No" class="form-control" id="txtSheetNo" placeholder="Voucher No" />
+                                    <label for="txtSheetNo">Sheet No.</label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <InputSelect id="ddAccount" class="form-select" TValue="int" title="Account"
+                                    Value="@Model.Record.COA"
+                                    ValueExpression="@(() => Model.Record.COA)"
+                                    ValueChanged="@((e) => Model.CompanyChanged(e))">
+                                        @foreach (CodeTitle _CodeTitle in Model.Accounts)
+                                        {
+                                            <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                        }
+                                    </InputSelect>
+                                    <label for="ddAccount">Account</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <InputSelect id="ddcompany" class="form-select" TValue="int" title="Company"
+                                    Value="@Model.Record.Company"
+                                    ValueExpression="@(() => Model.Record.Company)"
+                                    ValueChanged="@((e) => Model.CompanyChanged(e))">
+                                        @foreach (CodeTitle _CodeTitle in Model.Companies)
+                                        {
+                                            <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                        }
+                                    </InputSelect>
+                                    <label for="ddCompany">Company</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <InputSelect id="ddEmployee" class="form-select" TValue="int" title="Employee"
+                                    Value="@Model.Record.Employee"
+                                    ValueExpression="@(() => Model.Record.Employee)"
+                                    ValueChanged="@((e) => Model.EmployeeChanged(e))">
+                                        @foreach (CodeTitle _CodeTitle in Model.Employees)
+                                        {
+                                            <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                        }
+                                    </InputSelect>
+                                    <label for="ddEmployee">Employee</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3 txt">
+                                    <InputNumber @bind-Value="Model.Record.DR" class="form-control" id="txtDR" placeholder="Paid Amount" style="text-align: right;"
+                                    ParsingErrorMessage="Enter a valid amount"
+                                    @onfocusout="DRFocusOut" />
+                                    <label for="txtDR">Paid (DR)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3 txt">
+                                    <InputNumber @bind-Value="@Model.Record.CR" class="form-control" id="txtCR" placeholder="Received Amount" style="text-align: right;"
+                                    ParsingErrorMessage="Enter a valid amount"
+                                    @onfocusout="CRFocusOut" />
+                                    <label for="txtCR">Received (CR)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3 txt">
+                                    <InputText @bind-Value="Model.Record.Description" class="form-control" id="txtDescription" placeholder="Description / Remarks" />
+                                    <label for="txtDescription">Description / Remarks</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3 txt">
+                                    <InputText @bind-Value="Model.Record.Comments" class="form-control" id="txtComments" placeholder="Comments" />
+                                    <label for="txtComments">Comments</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-4">
+                                <button type="button" class="btn btn-Save" @onclick="(()=>Save(Model.Record.Vou_No))">Save</button>
+                                <button type="button" class="btn btn-New" @onclick="(()=>Add(Model.Record.ID))">New</button>
+                                <button type="button" class="btn btn-Delete" @onclick="(()=>Delete(Model.Record.ID))">Delete</button>
+                                <button type="button" class="btn btn-Back" @onclick="Back">Back</button>
+
+                            </div>
+                            <div class="col-2">
+                                <PrintButton />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="continer">
+        <table class="table-list">
+            <thead>
+
+                <tr>
+                    <th style="width:8%">Voucher</th>
+                    <th style="width:7%">Date</th>
+                    <th style="width:15%">Account</th>
+                    <th style="width:10%">Paid</th>
+                    <th style="width:10%">Received</th>
+                    <th style="width:40%">Description</th>
+                    <th style="width:10%">
+                        <button class="btn btn-link"><i class="bi bi-pencil-fill"></i></button>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    @if (Model.Records != null)
+                    {
+                        @foreach (CashRecord Record in Model.Records!)
+                        {
+                            string _Date = Record.Vou_Date.ToString(DateFormat);
+                            string _DR = Record.DR.ToString(CurrFormat);
+                            string _CR = Record.CR.ToString(CurrFormat);
+                            Tot_DR += Record.DR; Tot_CR += Record.CR; 
+
+                            <td>@Record.Vou_No</td>
+                            <td class="center-txt">@_Date</td>
+                            <td>@Record.TitleAccount</td>
+                            <td class="amount">@Record.DR</td>
+                            <td class="amount">@Record.CR</td>
+                            <td>@Record.Description</td>
+                            <td>
+                                <button class="btn-pencil" @onclick="()=>Edit(Record.ID)"><i class="bi bi-pencil-fill"></i></button>
+                                <button class="btn-trash" @onclick="()=>Edit(Record.ID)"><i class="bi bi-trash-fill"></i></button>
+                                <button class="btn-print" @onclick="()=>Edit(Record.ID)"><i class="bi bi-printer-fill"></i></button>
+                                @if (UserRoll == "Administrator"){
+                                   
+                                    <button class="btn-post" @onclick="()=>Post(Record.ID)"><i class="bi bi-box-fill"></i></button>
+                                } 
+                                
+                          </td>
+                        }
+                    }
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>TOTAL</td>
+                    <td class="amount">@Tot_DR.ToString(CurrFormat)</td>
+                    <td class="amount">@Tot_CR.ToString(CurrFormat)</td>
+                    <td></td>
+                    <td></td>
+                    
+                </tr>
+            </tfoot>
+
+        </table>
+    </div>
+
+
+</EditForm>

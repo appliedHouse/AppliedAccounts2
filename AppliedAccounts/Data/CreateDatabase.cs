@@ -1,12 +1,8 @@
 ﻿using System.Data;
-using System.Data.Entity;
 using System.Data.SQLite;
-using System.Security.Claims;
 using System.Text;
 using AppliedDB;
-using static System.Net.Mime.MediaTypeNames;
 using static AppliedDB.Enums;
-using static AppMessages.Enums;
 
 namespace AppliedAccounts.Data
 {
@@ -14,7 +10,7 @@ namespace AppliedAccounts.Data
     {
         public Connections ConnectionClass { get; set; }
         public SQLiteConnection MyConnection { get; set; }
-        public Array TableList { get; set; }
+        public List<DataRow> TableList { get; set; }
         public UserProfile AppUser { get; set; }
         public AppUserModel UserModel { get; set; }
         private string TableName { get; set; }
@@ -26,36 +22,23 @@ namespace AppliedAccounts.Data
         {
             UserModel = _UserModel;
             MyMessages = new List<string>();
-        }
+            ConnectionClass = new(UserModel);
 
-
-        public CreateDatabase(UserProfile _AppUser)
-        {
-            AppUser = _AppUser;
-            DBFile = Path.Combine(Directory.GetCurrentDirectory(),
-                AppUser.Profile.RootFolder,
-                AppUser.Profile.DataPath,
-                AppUser.Profile.DataFile);
-            MyConnection = new($"Data Source={DBFile}");
+            MyConnection = ConnectionClass.GetSQLiteUsers() ?? new();
             GetTableNames();
+            CreateTables();
         }
+
+
 
 
         public void GetTableNames()
         {
             var tableNames = new List<string>();
-
             if (MyConnection.State != System.Data.ConnectionState.Open) { MyConnection.Open(); }
-
             var CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';";
             var _Table = AppliedDB.DataSource.GetQueryTable(CommandText, MyConnection);
-            var _List = _Table.AsEnumerable().ToList();
-
-
-            //D:\AppliedAccounts2\AppliedAccounts2App\AppliedAccounts\wwwroot\SQLiteDB\HFSSteel.db 
-
-
-            //DataTablesList = tableNames;
+            TableList = _Table.AsEnumerable().ToList();
         }
 
         #region Create Tables
@@ -65,31 +48,15 @@ namespace AppliedAccounts.Data
         {
             var _SQLQuery = $"SELECT name FROM sqlite_master WHERE type in('table', 'view') ORDER BY 1";
             var _TableView = DataSource.GetDataTable(DBFile, _SQLQuery).AsDataView();
+            var _TablesList = Enum.GetValues(typeof(Tables)).Cast<Tables>().ToList();
 
-            TableList = Enum.GetValues(typeof(Tables));
-
-            foreach (Tables EnumTable in TableList)
+            foreach (Tables _Table in _TablesList)
             {
-                if ((int)EnumTable > 8999) { continue; }                      // Skip on Temporary Table Names. 
-
-                bool IsTableFound;
-                var _TargetTable = EnumTable;
-                var _TableName = EnumTable.ToString();
-
-                _TableView.RowFilter = $"Name='{_TableName}'";
-                if (_TableView.Count == 0) { IsTableFound = false; } else { IsTableFound = true; }
-
-                if (!IsTableFound)
-                {
-                    MyMessages.Append($"Crerated Table {_TargetTable}");
-                    CreateTable(_TargetTable);
-
-                }
+                if (_Table.ToString().StartsWith("tmp")) { continue; }
+                MyMessages.Append($"Crerated Table {_Table}");
+                CreateTable(_Table);
             }
         }
-
-
-
         #endregion
 
 
@@ -102,12 +69,10 @@ namespace AppliedAccounts.Data
             var _TableName = _Table.ToString();
             var _CommandText = $"SELECT count(name) FROM sqlite_master WHERE type in('table', 'view') AND name ='{_TableName}'";
             var _Command = new SQLiteCommand(_CommandText, MyConnection);
+            if (!MyConnection.State.Equals(ConnectionState.Open)) { MyConnection.Open(); }
             long TableExist = (long)_Command.ExecuteScalar();
             if (TableExist > 0) { return; }
             #endregion
-
-
-             
 
             switch (_Table)
             {
@@ -123,7 +88,7 @@ namespace AppliedAccounts.Data
                     break;
                 case Tables.CashBook:
                     break;
-                
+
                 case Tables.BankBook:
                     _CommandText = BankBook();
                     //BankBook(UserName);
@@ -264,6 +229,29 @@ namespace AppliedAccounts.Data
                 default:
                     break;
             }
+
+
+            try
+            {
+                if (!MyConnection.State.Equals(ConnectionState.Open)) { MyConnection.Open(); }
+
+                _Command = new(_CommandText, MyConnection);
+                var rowsAffected = _Command.ExecuteNonQuery();
+                if (rowsAffected > 0)
+                {
+                    MyMessages.Add($"Table {_TableName} created successfully.");
+                }
+                else
+                {
+                    MyMessages.Add($"Table {_TableName} NOT created (Failed).");
+                }
+
+            }
+            catch (Exception e)
+            {
+                MyMessages.Add($"Error: {e.Message}");
+            }
+
         }
 
 
@@ -354,7 +342,7 @@ namespace AppliedAccounts.Data
         }
 
         #endregion
-     
+
 
         #region Stock Position Data
         public string StockPositionData()
@@ -564,7 +552,7 @@ namespace AppliedAccounts.Data
             return _Text.ToString();
         }
         #endregion
-               
+
 
     }
 }
