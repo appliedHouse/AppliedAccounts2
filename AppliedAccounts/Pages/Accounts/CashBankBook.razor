@@ -11,7 +11,7 @@
 
 @code {
 
-    public Models.BooksModel Model { get; set; }
+    public Models.xBooksModel Model { get; set; }
     private string UserRoll;
     private string DateFormat = Format.DDMMYY;
     private string CurrFormat = Format.Currency;
@@ -95,7 +95,7 @@
                                     <InputSelect id="ddAccount" class="form-select" TValue="int" title="Account"
                                     Value="@Model.Record.COA"
                                     ValueExpression="@(() => Model.Record.COA)"
-                                    ValueChanged="@((e) => Model.CompanyChanged(e))">
+                                                 ValueChanged="@((e) => Model.CompanyChanged(e))">
                                         @foreach (CodeTitle _CodeTitle in Model.Accounts)
                                         {
                                             <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>

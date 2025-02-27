@@ -1,45 +1,34 @@
 ﻿using AppliedAccounts.Models;
-using Microsoft.AspNetCore.Components;
-using System.Data;
+using AppliedDB;
+using System.Linq.Expressions;
 
 namespace AppliedAccounts.Pages.Accounts
 {
     public partial class Books
     {
-        
-        public BooksModel Model { get; set; } = new BooksModel();   
+
+        public AppUserModel userProfile { get; set; }
+        public BookModel MyModel { get; set; } = new();
+        public List<CodeTitle> BookList { get; set; }
+        public int BookNature { get; set; }
+
+
 
         public Books()
-        { 
-        
+        {
+            MyModel = new(0, userProfile ?? new());
         }
-        
-        public void Save(string Vou_No) { }
-        public void Add(int ID) { }
-        public void Edit(int ID) { }
-        public void Delete(int ID) { }
-        public void Print(int ID) { }
-        public void Post(int ID) { }
+
+
         public void Back() { NavManager.NavigateTo("/Menu/Accounts"); }
 
-        protected void CRFocusOut()
+        public void GetBookList(int _BookNature)
         {
-            if (Model.Record.CR > 0)
-            {
-                Model.Record.DR = 0.00M;
-            }
-
-        }
-        protected void DRFocusOut()
-        {
-            if (Model.Record.DR > 0)
-            {
-                Model.Record.CR = 0.00M;
-            }
+            MyModel.Source = new(userProfile);
+            BookList = MyModel.Source.GetBookAccounts(_BookNature);
 
         }
 
-        
 
         #region Debit and Credit Amount format
         //protected string FormatDR
@@ -66,5 +55,11 @@ namespace AppliedAccounts.Pages.Accounts
         //    }
         //}
         #endregion
+    }
+
+    public enum ChooseBook
+    {
+        Cash = 1,
+        Bank = 2
     }
 }

@@ -44,11 +44,11 @@
             {
                 var authState = AppAuthState;
                 UserName = AppAuthState.Result.User.Identity?.Name ?? "";
-                if (UserName.Length > 0)
-                {
-                    string MyMessage = $"WelCome {UserName} in Applied Accounts Application";
-                    js.DInvokeVoidAsync((window, c) => window.alert(c), MyMessage);
-                }
+                // if (UserName.Length > 0)
+                // {
+                //     string MyMessage = $"WelCome {UserName} in Applied Accounts Application";
+                //     js.DInvokeVoidAsync((window, c) => window.alert(c), MyMessage);
+                // }
 
             });
 

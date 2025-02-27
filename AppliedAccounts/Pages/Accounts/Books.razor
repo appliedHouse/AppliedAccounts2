@@ -1,4 +1,5 @@
-﻿@page "/Accounts/Books"
+﻿@layout PageLayout;
+@page "/Accounts/Books"
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
@@ -6,31 +7,60 @@
 @using AppliedDB
 @using System.Data
 
-@inject AuthenticationStateProvider authStateProvider;
+@inject AuthenticationStateProvider authorized;
 @inject NavigationManager NavManager;
 @inject IJSRuntime js
 
 
 @code {
     private string BookTitle = "Book Title";
+    private string NatureTitle = "Book Title";
+
     private string UserRoll;
     private string DateFormat = Format.DDMMYY;
     private string CurrFormat = Format.Currency;
-    private decimal Tot_DR = 0.0M; 
-    private decimal Tot_CR = 0.0M; 
+    private decimal Tot_DR = 0.0M;
+    private decimal Tot_CR = 0.0M;
 
     protected override void OnInitialized()
     {
-        
+        userProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
+    }
+
+    private void OnBookNatureChanged(int _Value)
+    {
+        //Console.WriteLine($"Selected: {SelectedBookNature}"); // For debugging
+
+        GetBookList(_Value);
+        NatureTitle = GetTitle(BookList, _Value);
+
+    }
+
+    private string GetTitle(List<CodeTitle> _List, int _Value)
+    {
+        if (_List.Count == 0) { return string.Empty; }
+        if (_List is null) { return string.Empty; }
+        return _List.Where(x => x.ID == _Value).Select(x => x.Title).First();
     }
 }
 
 <div class="PageHeading">
-    <h3>@BookTitle</h3>
+    <h2>@BookTitle</h2>
 </div>
 
-<div class="row-Filter">
-    <div class="col">
-        <input type="text" class="form-control" placeholder="Search" />
+<EditForm Model="@MyModel">
+    <div class="filter">
+        <div class="col-md-1">
+            <div class="form-floating bookNature">
+                <InputSelect id="ddBookNature" class="form-select-sm" TValue="int" title="Book Nature"
+                             Value="@MyModel.BookNature"
+                             ValueExpression="@(() => MyModel.BookNature)"
+                             ValueChanged="((e) => OnBookNatureChanged(e))">
+                    <option value="1">Cash</option>
+                    <option value="2">Bank</option>
+                </InputSelect>
+            </div>
+        </div>
     </div>
-</div>
+
+</EditForm>

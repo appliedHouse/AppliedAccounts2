@@ -328,27 +328,48 @@ namespace AppliedDB
         #region Seek
         public DataRow Seek(Tables _Table, int ID)
         {
+            var _DataTable = GetTable(_Table).AsEnumerable().ToList();
+            var _DataRow = _DataTable.Where(rows => rows.Field<int>("ID") == ID).First();
+            return _DataRow; 
 
-            var _DataTable = GetTable(_Table);
-            if (_DataTable is not null)
-            {
-                var _DataRow = _DataTable.NewRow();
-                _DataTable.DefaultView.RowFilter = $"ID={ID}";
-                if (_DataTable.DefaultView.Count == 1)
-                {
-                    _DataRow = _DataTable.DefaultView[0].Row;
-                }
-                else
-                {
-                    _DataRow = _DataTable.NewRow();
-                }
+            //var _DataTable = GetTable(_Table);
+            //if (_DataTable is not null)
+            //{
+            //    var _DataRow = _DataTable.NewRow();
+            //    _DataTable.DefaultView.RowFilter = $"ID={ID}";
+            //    if (_DataTable.DefaultView.Count == 1)
+            //    {
+            //        _DataRow = _DataTable.DefaultView[0].Row;
+            //    }
+            //    else
+            //    {
+            //        _DataRow = _DataTable.NewRow();
+            //    }
 
-                _DataTable.Dispose();
-                return _DataRow;
-            }
-            return null;
+            //    _DataTable=null;
+            //    return _DataRow;
+            //}
+            //return null;
         }
 
+        public List<DataRow> List(Tables _Table, int ID)
+        {
+            var _DataTable = GetTable(_Table).AsEnumerable().ToList();
+            var _DataRow = _DataTable.Where(rows => rows.Field<int>("ID") == ID).ToList();
+            return _DataRow;
+        }
+
+        public object? SeekValue(Tables _Table, int _ID, string _column)
+        {
+            // _Table  => Table Enums.table
+            // _ID     => ID primary key for search record
+            // _column => Column Name for search value
+
+            return GetTable(_Table).AsEnumerable().ToList().
+                    Where(rows => rows.Field<int>("ID") == _ID).
+                    Select(col=> col.Field<object>(_column));
+            
+        }
 
         public string SeekTitle(Tables _Table, int ID)
         {
@@ -377,7 +398,7 @@ namespace AppliedDB
             {
                 _TaxRate = (decimal)_DataRow["Rate"];
             }
-            _DataRow = null;
+            
 
             return _TaxRate;
 
@@ -391,8 +412,9 @@ namespace AppliedDB
         }
         public List<CodeTitle> GetCustomers(string? _Sort)
         {
+
             _Sort ??= "Title";
-            var _Table = GetTable(Tables.Customers, "", "Title");
+            var _Table = GetTable(Tables.Customers, "", _Sort);
             if (_Table is not null)
             {
                 var _CodeTitle = new CodeTitle();
@@ -971,7 +993,7 @@ namespace AppliedDB
         #endregion
 
         #region Close Table
-        public DataTable CloseTable(Tables _Table)
+        public DataTable CloneTable(Tables _Table)
         {
             return GetDataTable(DBFile, _Table).Clone();
         }
@@ -996,7 +1018,18 @@ namespace AppliedDB
             return _Table;
         }
 
-       
+        public List<CodeTitle>GetBookAccounts(int NatureID)
+        {
+            return GetTable(Tables.COA, $"Nature={NatureID}", "Title").AsEnumerable().ToList().
+                Select(rows => new CodeTitle {
+                    ID = rows.Field<int>("ID"),
+                    Code = rows.Field<string>("Code") ?? "", 
+                    Title = rows.Field<string>("Title") ?? ""
+                } ).ToList();
+            ;
+        }
+
+
         #endregion
 
     }
