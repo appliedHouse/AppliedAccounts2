@@ -12,7 +12,33 @@
     display: flex;
     align-items: center;
 }
+    .item-height{
+        height:25px
+    }
 
-.filter bookNature{
-    width: 65px;
-}
+    .filter txt-control {
+        height: 25px
+    }
+
+    .filter btn-filter {
+        height: 25px
+    }
+
+    .filter w1{
+        width: 50px;
+    }
+
+    .filter w2 {
+        width: 100px;
+    }
+
+    .filter w3 {
+        width: 150px;
+    }
+
+    .filter dropdown1 {
+        width:
+    }
+
+    .filter dropdown2 {
+    }
