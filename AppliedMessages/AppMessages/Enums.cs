@@ -100,6 +100,8 @@ namespace AppMessages
             UserProfileIsNull,
             VouNoNotDefine,
             BookIDIsZero,
+            BookNatureIsZero,
+            BookNatureIsNull,
             ConnectionsIsNull,
             RecordIsNull,
             RecordsAreNull,

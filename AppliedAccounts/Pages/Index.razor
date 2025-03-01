@@ -3,28 +3,71 @@
 @using AppliedDB;
 @attribute [AllowAnonymous];
 @inject IJSRuntime js;
+@inject AuthenticationStateProvider authStateProvider;
+
 
 <PageTitle>Index</PageTitle>
 
 @code {
     [CascadingParameter]
     private Task<AuthenticationState>? AppAuthState { get; set; }
-    private Task<AppUserModel>? UserProfile { get; set; } 
+    private Task<AppUserModel>? UserProfile { get; set; }
+    private AppUserModel? UserModel { get; set; }
     private string _Message = string.Empty;
-    private AppliedDB.Connections _Conn = new(); 
+    private AppliedDB.Connections _Conn = new();
     public string UserName { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(AppAuthState.Result.User.Identity.IsAuthenticated)
+        {
+            UserModel = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            
+            await Create_Update_Database();
+            await DisplayGreetingMessage();
+        }
+    }
 
     private async Task DisplayGreetingMessage()
     {
 
         if (AppAuthState != null)
         {
-            var authState = await AppAuthState;
-            UserName = authState.User.Identity.Name ?? "";
-            string MyMessage = $"Hello {UserName}";
-            await js.DInvokeVoidAsync((window, c) => window.alert(c), MyMessage);
+            await Task.Run(() =>
+            {
+                var authState = AppAuthState;
+                UserName = AppAuthState.Result.User.Identity?.Name ?? "";
+                // if (UserName.Length > 0)
+                // {
+                //     string MyMessage = $"WelCome {UserName} in Applied Accounts Application";
+                //     js.DInvokeVoidAsync((window, c) => window.alert(c), MyMessage);
+                // }
+
+            });
+
+
         }
     }
+
+    //Create or Update DataBase Tables.
+    private async Task Create_Update_Database()
+    {
+        if (UserModel != null)
+        {
+            await Task.Run(() =>
+            {
+                _ = new CreateDatabase(UserModel);         
+            });
+        }
+    }
+
 }
 
 <AuthorizeView>
@@ -32,15 +75,13 @@
         <header>
             <AppHeader />
         </header>
-        <NavMenu/>
-        <AppliedAccounts.Pages.HomePage.HomePageAuthorized/>
+        <NavMenu />
+        <AppliedAccounts.Pages.HomePage.HomePageAuthorized />
     </Authorized>
     <NotAuthorized>
-        <AppliedAccounts.Pages.HomePage.HomePageNotAuthorized/>
+        <AppliedAccounts.Pages.HomePage.HomePageNotAuthorized />
     </NotAuthorized>
     <Authorizing>
         <h3>Wait......</h3>
     </Authorizing>
 </AuthorizeView>
-
-

@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows8.0</TargetFramework>
+    <TargetFramework>net9.0-windows10.0.17763.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
@@ -46,9 +46,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Append.Blazor.Printing" Version="6.3.0" />
-    <PackageReference Include="BlazorJS" Version="2.1.6" />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>

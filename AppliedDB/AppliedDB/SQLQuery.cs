@@ -334,6 +334,257 @@ namespace AppliedDB
 
         #endregion
 
+        #region Production View
+        public static string View_Production()
+        {
+            var Text = new StringBuilder();
+            Text.Append("SELECT ");
+            Text.Append("[P1].[ID] AS ID1,[P1].[Vou_no],[P1].[Vou_Date],[P1].[Batch],[P1].[Remarks],[P1].[Comments], ");
+            Text.Append("[P2].[ID] AS ID2,[P2].[TranID],[P2].[Flow],[P2].[Stock],[P2].[Qty],[P2].[Rate],");
+            Text.Append("([P2].[Qty] * [P2].[Rate]) AS [Amount],");
+            Text.Append("[P2].[Remarks] AS [Remarks2], ");
+            Text.Append("[I].[Title] AS [StockTitle], ");
+            Text.Append("[U].[Code] As [UnitTag], [U].[Title] As [UnitTitle], ");
+            Text.Append("IIF (LENGTH ([L].[Vou_No]) > 0, 'Posted', 'Submitted') AS [Status] ");
+            Text.Append("FROM [Production2] [P2]");
+            Text.Append("LEFT JOIN [Production] [P1] ON [P2].[TranID] = [P1].[ID] ");
+            Text.Append("LEFT JOIN [Inventory]  [I]  ON [I].[ID]      = [P2].[Stock] ");
+            Text.Append("LEFT JOIN [Inv_UOM]    [U]  ON [U].[ID]      = [I].[UOM] ");
+            Text.Append("LEFT JOIN [Ledger]     [L]  ON [L].[Vou_No]  = [P1].[Vou_No] ");
+
+            return Text.ToString();
+        }
+        #endregion
+
+        #region View Sold
+        public static string view_Sold()
+        {
+            var Text = new StringBuilder();
+
+            Text.Append("SELECT [B1].[Vou_No], ");
+            Text.Append("[B1].[Vou_Date], ");
+            Text.Append("[B2].[Inventory], ");
+            Text.Append("[I].[Title] AS [StockTitle],");
+            Text.Append("[B2].[Qty] * -1 AS [Qty], ");
+            Text.Append("[B2].[Rate] * -1 AS [Rate], ");
+            Text.Append("[B2].[Qty] *[B2].[Rate] * -1 AS [Amount], ");
+            Text.Append("[T].[Rate] *-1 AS [TaxRate], ");
+            Text.Append("CAST(([B2].[Qty] *[B2].[Rate]*-1) * ([T].[Rate]*-1) AS Float) AS [TaxAmount] ");
+            Text.Append("FROM [BillReceivable] [B1] ");
+            Text.Append("LEFT JOIN [BillReceivable2] [B2] ON [B2].[TranID] = [B1].[ID] ");
+            Text.Append("LEFT JOIN [Taxes] [T] ON [T].[ID] = [B2].[Tax]; ");
+            Text.Append("LEFT JOIN [Inventory] [I] ON [I].[ID] = [B2].[Inventory]; ");
+
+            return Text.ToString();
+        }
+        #endregion
+
+        #region Bill Payable Combine (Purchased) View
+        public static string view_Purchased()
+        {
+            var Text = new StringBuilder();
+
+            Text.Append("SELECT [B1].[Vou_No], [B1].[Vou_Date], ");
+            Text.Append("[B2].[Inventory], [B2].[Qty], [B2].[Rate], [B2].[Qty] *[B2].[Rate] AS [Amount], ");
+            Text.Append("[T].[Rate] AS [TaxRate], ");
+            Text.Append("CAST(([B2].[Qty] *[B2].[Rate]) * [T].[Rate] AS Float) AS [TaxAmount] ");
+            Text.Append("FROM [BillPayable] [B1] ");
+            Text.Append("LEFT JOIN [BillPayable2] [B2] ON [B2].[TranID] = [B1].[ID] ");
+            Text.Append("LEFT JOIN [Taxes] [T] ON [T].[ID] = [B2].[Tax]; ");
+
+            return Text.ToString();
+        }
+        #endregion
+
+        #region  Check Bill Receivable
+        public static string Chk_BillReceivable1()
+        {
+            // Query show record which has BillReceivable record by not any records in BillReceivable2
+            var Text = new StringBuilder();
+            Text.Append("SELECT* FROM (");
+            Text.Append("SELECT ");
+            Text.Append("[B1].[ID] AS[ID1],");
+            Text.Append("[B2].[ID] AS[ID2],");
+            Text.Append("[B2].[TranID],");
+            Text.Append("[B1].[Vou_No],");
+            Text.Append("[B1].[Vou_Date] ");
+            Text.Append("FROM (SELECT* FROM [BillReceivable] WHERE [Status]= 'Posted') AS [B1]");
+            Text.Append(" LEFT JOIN [BillReceivable2] [B2] ON [B2].[TranID] = [B1].[ID]");
+            Text.Append(") ");
+            Text.Append(" WHERE[ID2] IS NULL");
+
+
+            return Text.ToString();
+        }
+
+        public static string Chk_BillReceivable2()
+        {
+            var Text = new StringBuilder();
+            Text.Append("SELECT");
+            Text.Append("[B].[Vou_No][Bill_VNo],");
+            Text.Append("[B].[Vou_Date],");
+            Text.Append("[B].[Company],");
+            Text.Append("[B].[Ref_No],");
+            Text.Append("[B].[Amount],");
+            Text.Append("[B].[Status],");
+            Text.Append("[L].[Vou_No][Led_VNo],");
+            Text.Append("[L].[DR],");
+            Text.Append("[L].[CR]");
+
+            Text.Append("FROM[BillReceivable][B]");
+            Text.Append("LEFT JOIN(SELECT* FROM [Ledger] WHERE Vou_Type = 'Receivable') [L] ON[L].[TranID] = [B].[ID]");
+            Text.Append("WHERE[L].[TRanID] IS NULL and[B].[Status] = 'Posted'");
+
+            return Text.ToString();
+        }
+        #endregion
+
+        #region Stock Position Data (In Hand)
+        public static string StockPosition(string Filter)
+        {
+            var Text = new StringBuilder();
+            Text.Append("SELECT * FROM ");
+            Text.Append($"({StockPositionData(Filter)})");
+            return Text.ToString();
+        }
+        public static string StockPositionData(string Filter)
+        {
+            var Text = new StringBuilder();
+            Text.Append("SELECT * FROM (");
+            Text.Append("SELECT * FROM ( SELECT ");
+            Text.Append("'PURCHASED' AS [TRAN],");
+            Text.Append("[B1].[Vou_No],");
+            Text.Append("[B1].[Vou_Date],");
+            Text.Append("[B2].[Inventory],");
+            Text.Append("[B2].[Qty],");
+            Text.Append("[B2].[Rate],");
+            Text.Append("[B2].[Qty] * [B2].[Rate] AS [Amount],");
+            Text.Append("[T].[Rate] AS [TaxRate],");
+            Text.Append("([B2].[Qty] * [B2].[Rate]) * [T].[Rate] AS [TaxAmount],");
+            Text.Append("([B2].[Qty] * [B2].[Rate]) + (([B2].[Qty] * [B2].[Rate]) * [T].[Rate]) AS [NetAmount] ");
+            Text.Append("FROM [BillPayable] [B1] ");
+            Text.Append("LEFT JOIN [BillPayable2] [B2] ON [B1].[ID] = [B2].[TranID] ");
+            Text.Append("LEFT JOIN Taxes [T] On [T].[ID] = [B2].[Tax] ");
+            Text.Append(") AS [Purchased] ");
+            Text.Append(" UNION ");
+            Text.Append("SELECT * FROM ");
+            Text.Append("(SELECT ");
+            Text.Append("'SOLD' AS [TRAN], ");
+            Text.Append("[B1].[Vou_No], ");
+            Text.Append("[B1].[Vou_Date], ");
+            Text.Append("[B2].[Inventory], ");
+            Text.Append("[B2].[Qty], ");
+            Text.Append("[B2].[Rate], ");
+            Text.Append("[B2].[Qty] * [B2].[Rate] AS [Amount], ");
+            Text.Append("[T].[Rate] AS [TaxRate], ");
+            Text.Append("([B2].[Qty] * [B2].[Rate]) * [T].[Rate] AS [TaxAmount], ");
+            Text.Append("([B2].[Qty] * [B2].[Rate]) + (([B2].[Qty] * [B2].[Rate]) * [T].[Rate]) AS [NetAmount] ");
+            Text.Append("FROM [BillReceivable2] [B2] ");
+            Text.Append("LEFT JOIN [BillReceivable] [B1] ON [B1].[ID] = [B2].[TranID] ");
+            Text.Append("LEFT JOIN Taxes [T] On [T].[ID] = [B2].[Tax] ");
+            Text.Append(") AS [Sold] ");
+            Text.Append("UNION ");
+            Text.Append("SELECT * FROM ");
+            Text.Append("(SELECT ");
+            Text.Append("'SRETURN' AS [TRAN], ");
+            Text.Append("[SR].[Vou_No], ");
+            Text.Append("[SR].[Vou_Date], ");
+            Text.Append("[B2].[Inventory], ");
+            Text.Append("[SR].[Qty], ");
+            Text.Append("[B2].[Rate], ");
+            Text.Append("[B2].[Qty] * [B2].[Rate] AS [Amount], ");
+            Text.Append("[T].[Rate] AS [TaxRate], ");
+            Text.Append("([B2].[Qty] * [B2].[Rate]) * [T].[Rate] AS [TaxAmount], ");
+            Text.Append("([B2].[Qty] * [B2].[Rate]) + (([B2].[Qty] * [B2].[Rate]) * [T].[Rate]) AS [NetAmount] ");
+            Text.Append("FROM [SaleReturn] [SR] ");
+            Text.Append("LEFT JOIN BillReceivable2 [B2] ON [B2].[ID] = [SR].[TranID] ");
+            Text.Append("LEFT JOIN BillReceivable   [B1] ON [B1].[ID] = [B2].[TranID] ");
+            Text.Append("LEFT JOIN Taxes                 [T]   ON [T].[ID]   = [B2].[Tax] ");
+            Text.Append(") AS [SRETURN] ) ");
+            if (Filter.Length > 0) { Text.Append($" WHERE {Filter}"); }
+            return Text.ToString();
+
+
+        }
+        public static string StockPositionSUM(string Filter)
+        {
+            var Text = new StringBuilder();
+            Text.Append("SELECT * FROM(");
+            Text.Append("SELECT ");
+            Text.Append("[Inventory],");
+            Text.Append("SUM(QTY) AS [PQty],");
+            Text.Append("SUM(Amount) AS [PAmount],");
+            Text.Append("SUM(TaxAmount) AS [PTaxAmount],");
+            Text.Append("SUM(TaxAmount) AS [PNetAmount],");
+            Text.Append("0.00 AS [SQty],");
+            Text.Append("0.00 AS [SAmount],");
+            Text.Append("0.00 AS [STaxAmount],");
+            Text.Append("0.00 AS [SNetAmount],");
+            Text.Append("0.00 AS [SRQty],");
+            Text.Append("0.00 AS [SRAmount],");
+            Text.Append("0.00 AS [SRTaxAmount],");
+            Text.Append("0.00 AS [SRNetAmount]");
+            Text.Append($"FROM ({StockPositionData(Filter)}) WHERE [Tran] = 'PURCHASED'");
+            Text.Append("GROUP BY [Inventory]");
+            Text.Append(") AS [P] ");
+            Text.Append("UNION ");
+            Text.Append("SELECT * FROM(");
+            Text.Append("SELECT ");
+            Text.Append("[Inventory],");
+            Text.Append("0.00 AS [PQty],");
+            Text.Append("0.00 AS [PAmount],");
+            Text.Append("0.00 AS [PTaxAmount],");
+            Text.Append("0.00 AS [PNetAmount],");
+            Text.Append("SUM(QTY) AS [SQty],");
+            Text.Append("SUM(Amount) AS [SAmount],");
+            Text.Append("SUM(TaxAmount) AS [STaxAmount],");
+            Text.Append("SUM(TaxAmount) AS [SNetAmount],");
+            Text.Append("0.00 AS [SRQty],");
+            Text.Append("0.00 AS [SRAmount],");
+            Text.Append("0.00 AS [SRTaxAmount],");
+            Text.Append("0.00 AS [SRNetAmount]");
+            Text.Append($"FROM ({StockPositionData(Filter)}) WHERE [Tran] = 'SOLD'");
+            Text.Append("GROUP BY [Inventory]");
+            Text.Append(") AS [S] ");
+            Text.Append("UNION ");
+            Text.Append("SELECT * FROM (");
+            Text.Append("SELECT ");
+            Text.Append("[Inventory],");
+            Text.Append("0.00 AS [PQty],");
+            Text.Append("0.00 AS [PAmount],");
+            Text.Append("0.00 AS [PTaxAmount],");
+            Text.Append("0.00 AS [PNetAmount],");
+            Text.Append("0.00 AS [SQty],");
+            Text.Append("0.00 AS [SAmount],");
+            Text.Append("0.00 AS [STaxAmount],");
+            Text.Append("0.00 AS [SNetAmount],");
+            Text.Append("SUM(QTY) AS [SRRQty],");
+            Text.Append("SUM(Amount) AS [SRAmount],");
+            Text.Append("SUM(TaxAmount) AS [SRTaxAmount],");
+            Text.Append("SUM(NetAmount) AS [SRNetAmount]");
+            Text.Append($"FROM ({StockPositionData(Filter)}) WHERE [Tran] = 'SRETURN'");
+            Text.Append("GROUP BY [Inventory]");
+            Text.Append(") AS [SR]");
+            return Text.ToString();
+            //ok
+
+        }
+
+        #endregion
+
+        #region Book (Cash * Bank)
+        public static string Book()
+        {
+            return "";
+        }
+
+        private static string Book2()
+        {
+            return "";
+        }
+        #endregion
+
+
         public static QueryClass GetQuery(Query _SQLQuery)
         {
             if (_SQLQuery.Equals(Query.SaleInvoice)) { return new QueryClass { QueryText = SaleInvoice(), TableName = "SaleInvoice" }; }
@@ -348,15 +599,31 @@ namespace AppliedDB
             if (_SQLQuery.Equals(Query.COAClassList)) { return new QueryClass { QueryText = COAClassList(), TableName = Tables.COA_Class.ToString() }; }
             if (_SQLQuery.Equals(Query.COANatureList)) { return new QueryClass { QueryText = COANatureList(), TableName = Tables.COA_Nature.ToString() }; }
             if (_SQLQuery.Equals(Query.COANotesList)) { return new QueryClass { QueryText = COANotesList(), TableName = Tables.COA_Notes.ToString() }; }
+            if (_SQLQuery.Equals(Query.View_Production)) { return new QueryClass { QueryText = View_Production(), TableName = Tables.view_Production.ToString() }; }
+            if (_SQLQuery.Equals(Query.View_Sold)) { return new QueryClass { QueryText = view_Sold(), TableName = Tables.view_Sold.ToString() }; }
+            if (_SQLQuery.Equals(Query.Chk_BillReceivable1)) { return new QueryClass { QueryText = Chk_BillReceivable1(), TableName = Tables.Chk_BillReceivable1.ToString() }; }
+            if (_SQLQuery.Equals(Query.Chk_BillReceivable2)) { return new QueryClass { QueryText = Chk_BillReceivable2(), TableName = Tables.Chk_BillReceivable2.ToString() }; }
+            if (_SQLQuery.Equals(Query.Book)) { return new QueryClass { QueryText = Book(), TableName = Tables.Book.ToString() }; }
+            if (_SQLQuery.Equals(Query.Book2)) { return new QueryClass { QueryText = Book2(), TableName = Tables.Book2.ToString() }; }
 
             return new QueryClass();
         }
 
-    }
-    public class QueryClass
-    {
-        public string QueryText { get; set; } = string.Empty;
-        public string TableName { get; set; } = string.Empty;
-    }
+        public static QueryClass GetQuery1(Query _SQLQuery, string Filter)
+        {
+            if (_SQLQuery.Equals(Query.StockPosition)) { return new QueryClass { QueryText = StockPosition(Filter), TableName = Tables.StockPosition.ToString() }; }
+            if (_SQLQuery.Equals(Query.StockPositionData)) { return new QueryClass { QueryText = StockPosition(Filter), TableName = Tables.StockPosition.ToString() }; }
+            if (_SQLQuery.Equals(Query.StockPositionSUM)) { return new QueryClass { QueryText = StockPositionSUM(Filter), TableName = Tables.StockPositionSUM.ToString() }; }
+            return new QueryClass();
+        }
 
+
+
+        public class QueryClass
+        {
+            public string QueryText { get; set; } = string.Empty;
+            public string TableName { get; set; } = string.Empty;
+        }
+
+    }
 }

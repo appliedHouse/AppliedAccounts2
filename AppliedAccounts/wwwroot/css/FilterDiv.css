@@ -1,0 +1,44 @@
+﻿
+
+.filter {
+    background-color: antiquewhite;
+    margin-left: 5px;
+    margin-right: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+    .item-height{
+        height:25px
+    }
+
+    .filter txt-control {
+        height: 25px
+    }
+
+    .filter btn-filter {
+        height: 25px
+    }
+
+    .filter w1{
+        width: 50px;
+    }
+
+    .filter w2 {
+        width: 100px;
+    }
+
+    .filter w3 {
+        width: 150px;
+    }
+
+    .filter dropdown1 {
+        width:
+    }
+
+    .filter dropdown2 {
+    }

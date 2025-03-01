@@ -13,7 +13,7 @@ namespace AppliedAccounts.Models
 {
 
 
-    public class BooksModel
+    public class xBooksModel
     {
         #region Variables
 
@@ -51,9 +51,9 @@ namespace AppliedAccounts.Models
 
         #region Constructor
 
-        public BooksModel() { }             // Null Constructor
+        public xBooksModel() { }             // Null Constructor
 
-        public BooksModel(ClassParameters _Parameters)
+        public xBooksModel(ClassParameters _Parameters)
         {
             MyMessages = MessageClass.Messages;
 
@@ -66,7 +66,14 @@ namespace AppliedAccounts.Models
             RecordID = _Parameters.RecordID;
             Vou_No = _Parameters.Vou_No;
 
-            LoadData();
+            var IsLoaded = LoadData();
+            if(IsLoaded)
+            {
+                Records = new()
+                {
+                    Record!
+                };
+            }
         }
 
         #endregion
@@ -449,6 +456,7 @@ namespace AppliedAccounts.Models
 
 
     }
+
 
     public class LangPack
     {

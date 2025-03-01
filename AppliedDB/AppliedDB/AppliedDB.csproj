@@ -1,20 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net9.0-windows10.0.17763.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="ExcelDataReader.DataSet" Version="3.7.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.33" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
-    <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Append.Blazor.Printing" Version="6.3.0" />
+		<PackageReference Include="BlazorJS" Version="2.2.0" />
+		<PackageReference Include="ExcelDataReader.DataSet" Version="3.7.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Version="9.0.2" />
+		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.2" />
+		<PackageReference Include="SQLite" Version="3.13.0" />
+		<PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.0-preview.1.25080.5" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
+		<PackageReference Include="System.Data.SQLite" Version="1.0.119" />
+		<PackageReference Include="System.Formats.Asn1" Version="8.0.2" />
+		<PackageReference Include="Microsoft.NETCore.Platforms" Version="1.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.0" />
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\AppliedMessages\AppMessages\AppMessages.csproj" />
-  </ItemGroup>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\AppliedMessages\AppMessages\AppMessages.csproj" />
+	</ItemGroup>
 
 </Project>

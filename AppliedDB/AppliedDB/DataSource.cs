@@ -3,6 +3,8 @@ using System.Data.SQLite;
 using System.Text;
 using Tables = AppliedDB.Enums.Tables;
 using Query = AppliedDB.Enums.Query;
+using System.Data.Entity.Infrastructure;
+using static AppliedDB.Enums;
 
 namespace AppliedDB
 {
@@ -12,7 +14,7 @@ namespace AppliedDB
         public SQLiteConnection? MyConnection { get; set; }
         public SQLiteCommand? MyCommand { get; set; }
         public string DBFile => GetDataFile();
-        
+
         #region Constructor
         public DataSource(AppUserModel _UserProfile)
         {
@@ -168,7 +170,7 @@ namespace AppliedDB
             }
         }
 
-        private DataTable GetDataTable(Tables _Table, SQLiteCommand _Command)
+        private static DataTable GetDataTable(Tables _Table, SQLiteCommand _Command)
         {
             try
             {
@@ -233,6 +235,34 @@ namespace AppliedDB
             return null;
 
         }
+        public static DataTable GetQueryTable(string _SQLQuery, SQLiteConnection _Connection)
+        {
+            try
+            {
+                if (_Connection is not null)
+                {
+                    if (_Connection.State != ConnectionState.Open)
+                    { _Connection.Open(); }
+                    //var _Query = SQLQuery.GetQuery(_SQLQuery);
+                    var _Command = new SQLiteCommand(_SQLQuery, _Connection);
+                    SQLiteDataAdapter _Adapter = new(_Command);
+                    DataSet _DataSet = new();
+                    _Adapter.Fill(_DataSet, (new Guid()).ToString());
+                    _Connection.Close();
+                    if (_DataSet.Tables.Count == 1)
+                    {
+                        return _DataSet.Tables[0];
+                    }
+
+                }
+                return null;
+            }
+            catch (Exception)
+            {
+
+                return new DataTable();
+            }
+        }
         #endregion
 
         #region Get Messages Table
@@ -271,7 +301,7 @@ namespace AppliedDB
         }
         public static List<DataRow> GetList(string DBFile, Query Query)
         {
-            QueryClass _QueryClass = SQLQuery.GetQuery(Query);
+            var _QueryClass = SQLQuery.GetQuery(Query);
             var Table = GetDataTable(DBFile, _QueryClass.QueryText, _QueryClass.TableName);
             if (Table is not null)
             {
@@ -284,7 +314,7 @@ namespace AppliedDB
         {
             if (UserProfile is not null)
             {
-                QueryClass _QueryClass = SQLQuery.GetQuery(Query);
+                var _QueryClass = SQLQuery.GetQuery(Query);
                 var Table = GetDataTable(UserProfile.DataFile, _QueryClass.QueryText, _QueryClass.TableName);
                 if (Table is not null)
                 {
@@ -299,44 +329,52 @@ namespace AppliedDB
         #region Seek
         public DataRow Seek(Tables _Table, int ID)
         {
+            var _DataTable = GetTable(_Table).AsEnumerable().ToList();
+            var _DataRow = _DataTable.Where(rows => rows.Field<int>("ID") == ID).First();
+            return _DataRow;
 
-            var _DataTable = GetTable(_Table);
-            if (_DataTable is not null)
-            {
-                var _DataRow = _DataTable.NewRow();
-                _DataTable.DefaultView.RowFilter = $"ID={ID}";
-                if (_DataTable.DefaultView.Count == 1)
-                {
-                    _DataRow = _DataTable.DefaultView[0].Row;
-                }
-                else
-                {
-                    _DataRow = _DataTable.NewRow();
-                }
-
-                _DataTable.Dispose();
-                return _DataRow;
-            }
-            return null;
         }
 
+        public List<DataRow> List(Tables _Table, int ID)
+        {
+            var _DataTable = GetTable(_Table).AsEnumerable().ToList();
+            var _DataRow = _DataTable.Where(rows => rows.Field<int>("ID") == ID).ToList();
+            return _DataRow;
+        }
+
+        public object? SeekValue(Tables _Table, int _ID, string _column)
+        {
+            // _Table  => Table Enums.table
+            // _ID     => ID primary key for search record
+            // _column => Column Name for search value
+
+            return GetTable(_Table).AsEnumerable().ToList().
+                    Where(rows => rows.Field<int>("ID") == _ID).
+                    Select(col => col.Field<object>(_column));
+
+        }
 
         public string SeekTitle(Tables _Table, int ID)
         {
-            var _DataTable = GetTable(_Table);
-            if (_DataTable is not null)
+            DataTable _DataTable = GetTable(_Table);
+
+            if (_DataTable is null)
+                return string.Empty;
+
+            try
             {
-                var _Title = string.Empty;
-                _DataTable.DefaultView.RowFilter = $"ID={ID}";
-                if (_DataTable.DefaultView.Count == 1)
-                {
-                    _Title = _DataTable.DefaultView[0]["Title"].ToString();
-                }
-                _DataTable.Dispose();
-                if (_Title is null) { return string.Empty; }
+                var _Title = _DataTable.AsEnumerable()
+                       .Where(row => row.Field<int>("ID") == ID)
+                       .Select(row => row.Field<string>("Title"))
+                       .First() ?? string.Empty;
+
                 return _Title;
             }
-            return "";
+            finally
+            {
+                _DataTable.Dispose();
+            }
+
         }
 
         public decimal SeekTaxRate(int ID)
@@ -348,7 +386,7 @@ namespace AppliedDB
             {
                 _TaxRate = (decimal)_DataRow["Rate"];
             }
-            _DataRow = null;
+
 
             return _TaxRate;
 
@@ -362,43 +400,52 @@ namespace AppliedDB
         }
         public List<CodeTitle> GetCustomers(string? _Sort)
         {
-            _Sort ??= "Title";
-            var _Table = GetTable(Tables.Customers, "", "Title");
-            if (_Table is not null)
+            var _Table = GetTable(Tables.Customers, "", _Sort ?? "");
+            var _CodeTitleList = new List<CodeTitle>();
+
+            try
             {
-                var _CodeTitle = new CodeTitle();
-                var _CodeTitleList = new List<CodeTitle>();
-
-                if (_Table.Rows.Count > 0)
+                if (_Table is not null)
                 {
-                    _CodeTitleList.Add(new CodeTitle()
+
+
+                    if (_Table.Rows.Count > 0)
                     {
-                        ID = 0,
-                        Code = "Top",
-                        Title = "Select...."
-                    });
+                        _CodeTitleList.Add(new CodeTitle()
+                        {
+                            ID = 0,
+                            Code = "Top",
+                            Title = "Select...."
+                        });
 
-                    foreach (DataRow Row in _Table.Rows)
-                    {
-                        if (Row["ID"] == null) { Row["ID"] = 0; }
-                        if (Row["Code"] == null) { Row["Code"] = string.Empty; }
-                        if (Row["Title"] == null) { Row["Title"] = string.Empty; }
+                        foreach (DataRow Row in _Table.Rows)
+                        {
+                            if (Row["ID"] == null) { Row["ID"] = 0; }
+                            if (Row["Code"] == null) { Row["Code"] = string.Empty; }
+                            if (Row["Title"] == null) { Row["Title"] = string.Empty; }
 
-                        _CodeTitle = new();
-                        _CodeTitle.ID = (int)Row["ID"];
-                        _CodeTitle.Code = (string)Row["Code"];
-                        _CodeTitle.Title = (string)Row["Title"];
+                            var _CodeTitle = new CodeTitle()
+                            {
+                                ID = (int)Row["ID"],
+                                Code = (string)Row["Code"],
+                                Title = (string)Row["Title"],
+                            };
 
-                        _CodeTitleList.Add(_CodeTitle);
+                            _CodeTitleList.Add(_CodeTitle);
+                            return _CodeTitleList;
+                        }
                     }
                 }
-
-                _Table.Dispose(); _Table = null;
-                return _CodeTitleList;
             }
-
+            catch { }
+            finally
+            {
+                _Table.Dispose();
+            }
             return new();
         }
+
+        
         public List<CodeTitle> GetEmployees()
         {
             return GetEmployees("Title");
@@ -709,7 +756,7 @@ namespace AppliedDB
         {
             var _Title = _List.Where(l => l.ID == _ID).Select(l => l.Title).ToString();
 
-            if(_Title is null) { return string.Empty; }
+            if (_Title is null) { return string.Empty; }
 
             //foreach (CodeTitle Item in _List)
             //{
@@ -721,8 +768,6 @@ namespace AppliedDB
             //}
             return _Title;
         }
-
-        
 
 
         #endregion
@@ -942,7 +987,7 @@ namespace AppliedDB
         #endregion
 
         #region Close Table
-        public DataTable CloseTable(Tables _Table)
+        public DataTable CloneTable(Tables _Table)
         {
             return GetDataTable(DBFile, _Table).Clone();
         }
@@ -962,20 +1007,36 @@ namespace AppliedDB
                 var _Query = SQLQuery.BookLedger(BookID);
 
                 DataSource _Source = new(UserProfile);
-                _Table = _Source  .GetTable(_Query);
+                _Table = _Source.GetTable(_Query);
             }
             return _Table;
         }
 
-       
+        public List<CodeTitle> GetBookAccounts(int NatureID)
+        {
+            if (NatureID > 0)
+            {
+                return GetTable(Tables.COA, $"Nature={NatureID}", "Title").AsEnumerable().ToList().
+                    Select(rows => new CodeTitle
+                    {
+                        ID = rows.Field<int>("ID"),
+                        Code = rows.Field<string>("Code") ?? "",
+                        Title = rows.Field<string>("Title") ?? ""
+                    }).ToList();
+            }
+            List<CodeTitle> EmptyList = new();
+            EmptyList.Add(new CodeTitle { ID = 0, Code = "", Title = "No Records" });
+            return EmptyList;
+
+        }
         #endregion
 
     }
 
     public class CodeTitle
-    {
-        public int ID { get; set; }
-        public string Code { get; set; } = string.Empty;
-        public string Title { get; set; } = string.Empty;
-    }
+{
+    public int ID { get; set; }
+    public string Code { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+}
 }
