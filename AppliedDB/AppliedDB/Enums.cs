@@ -37,6 +37,7 @@ namespace AppliedDB
             Receipts = 124,
             Book = 125,
             Book2 = 126,
+            view_Book = 127,
 
             Customers = 201,
             City = 202,

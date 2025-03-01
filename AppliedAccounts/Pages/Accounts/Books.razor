@@ -42,28 +42,17 @@
         { 2, "Bank" },
     };
 
-    private void BookNatureChanged(ChangeEventArgs e)
+   
+    private void BookNatureChanged(int _NatureID)
     {
-        if (e.Value != null && int.TryParse(e.Value.ToString(), out int result))
-        {
-            BookNatureId = result;
-        }
-        else
-        {
-            Console.WriteLine("Invalid selection.");
-        }
+        BookNatureId = _NatureID;
     }
 
-    private void BookListChanged(ChangeEventArgs e)
+    private void BookListChanged(int _BookID)
     {
-        if (e.Value != null && int.TryParse(e.Value.ToString(), out int result))
-        {
-            BookId = result;
-        }
-        else
-        {
-            Console.WriteLine("Invalid selection.");
-        }
+        BookId = _BookID; //result;
+        BookRecords = LoadBookRecords(BookId);
+
     }
 
 
@@ -74,23 +63,32 @@
 </div>
 
 <EditForm Model="@MyModel">
-    <div class="container">
+    <div class="container d-flex flex-column">
         <div class="row filter">
             <div class="col-md-1">
                 <div class="form-floating w1 ">
-                    <InputSelect @bind-Value="BookNatureId" @onchange="BookNatureChanged" class="item-height">
-                        <option value="0">Select..</option>
+                    <InputSelect id="ddBook" class="item-height"
+                                 TValue="int"
+                                 Value="@BookNatureId"
+                                 ValueExpression="@(() => BookNatureId)"
+                                 ValueChanged="@((e) => BookNatureChanged(e))">
+
                         @foreach (var item in items)
                         {
                             <option value="@item.Key">@item.Value</option>
                         }
+
                     </InputSelect>
 
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="form-floating">
-                    <InputSelect @bind-Value="@BookID" @onchange="BookListChanged" class="item-height">
+                    <InputSelect id="ddBook" class="item-height"
+                                 TValue="int"
+                                 Value="@BookID"
+                                 ValueExpression="@(()=> BookId)"
+                                 ValueChanged="@((e)=>BookListChanged(e))">
 
                         @foreach (var item in MyModel.Source.GetBookAccounts(BookNatureId))
                         {
@@ -110,19 +108,21 @@
                 </InputDate>
             </div>
 
-            @*  <div class="col-md-1">
-                <label for="floatingInput"> <i class="bi bi-search"></i> </label>
-            </div> *@
-
-
+            <div class="col-md-1">
+                <label for="floatingInput">  </label>
+            </div>
             <div class="col-md-2">
                 <div class="form-floating mb-3">
-                    <label for="floatingInput"> <i class="bi bi-search"></i> </label>
-                    <InputText @bind-Value="SearchText" id="txtSearch" class="item-height" placeholder="Filter list">
-
-                    </InputText>
-
+                    <p>
+                        <i class="bi bi-search"></i>
+                        <InputText @bind-Value="SearchText" id="txtSearch" class="item-height" placeholder="Filter list">
+                        </InputText>
+                    </p>
                 </div>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" style="width:24px; height:24px" class="btn btn-sm btn-primary" onclick="Refresh"><i class="bi bi-arrow-repeat"></i></button>
+
             </div>
         </div>
 
@@ -132,34 +132,34 @@
         @if (BookRecords != null)
         {
 
-        <table class="Table-list">
-            <thead>
-                <tr>
-                    <th>Voucher</th>
-                    <th>Date</th>
-                    <th>Description</th>
-                    <th>Received</th>
-                    <th>Paid</th>
-                    <th>Balance</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach(BookRec Record in BookRecords)
-                {
+            <table class="Table-list">
+                <thead>
                     <tr>
-                        <td>@Record.Vou_No</td>
-                        <td>@Record.Vou_Date</td>
-                        <td>@Record.Description</td>
-                        <td>@Record.Recevied</td>
-                        <td>@Record.Paid</td>
-                        <td>@Record.Balance</td>
+                        <th>Voucher</th>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Received</th>
+                        <th>Paid</th>
+                        <th>Balance</th>
                     </tr>
-                }
+                </thead>
+                <tbody>
+                    @foreach (BookRec Record in LoadBookRecords(BookID))
+                    {
+                        <tr>
+                            <td>@Record.Vou_No</td>
+                            <td>@Record.Vou_Date</td>
+                            <td>@Record.Description</td>
+                            <td class="amount">@Record.txtRecevied</td>
+                            <td>@Record.txtPaid</td>
+                            <td>@Record.txtBalance</td>
+                        </tr>
+                    }
 
 
-               
-            </tbody>
-        </table>
+
+                </tbody>
+            </table>
         }
         else
         {

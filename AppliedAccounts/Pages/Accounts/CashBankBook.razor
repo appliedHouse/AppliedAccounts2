@@ -15,8 +15,8 @@
     private string UserRoll;
     private string DateFormat = Format.DDMMYY;
     private string CurrFormat = Format.Currency;
-    private decimal Tot_DR = 0.0M; 
-    private decimal Tot_CR = 0.0M; 
+    private decimal Tot_DR = 0.0M;
+    private decimal Tot_CR = 0.0M;
 
     protected override void OnInitialized()
     {
@@ -92,9 +92,10 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-floating mb-3">
-                                    <InputSelect id="ddAccount" class="form-select" TValue="int" title="Account"
-                                    Value="@Model.Record.COA"
-                                    ValueExpression="@(() => Model.Record.COA)"
+                                    <InputSelect id="ddAccount" class="form-select" title="Account"
+                                                 TValue="int"
+                                                 Value="@Model.Record.COA"
+                                                 ValueExpression="@(() => Model.Record.COA)"
                                                  ValueChanged="@((e) => Model.CompanyChanged(e))">
                                         @foreach (CodeTitle _CodeTitle in Model.Accounts)
                                         {
@@ -107,9 +108,9 @@
                             <div class="col-md-3">
                                 <div class="form-floating mb-3">
                                     <InputSelect id="ddcompany" class="form-select" TValue="int" title="Company"
-                                    Value="@Model.Record.Company"
-                                    ValueExpression="@(() => Model.Record.Company)"
-                                    ValueChanged="@((e) => Model.CompanyChanged(e))">
+                                                 Value="@Model.Record.Company"
+                                                 ValueExpression="@(() => Model.Record.Company)"
+                                                 ValueChanged="@((e) => Model.CompanyChanged(e))">
                                         @foreach (CodeTitle _CodeTitle in Model.Companies)
                                         {
                                             <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
@@ -121,9 +122,9 @@
                             <div class="col-md-3">
                                 <div class="form-floating mb-3">
                                     <InputSelect id="ddEmployee" class="form-select" TValue="int" title="Employee"
-                                    Value="@Model.Record.Employee"
-                                    ValueExpression="@(() => Model.Record.Employee)"
-                                    ValueChanged="@((e) => Model.EmployeeChanged(e))">
+                                                 Value="@Model.Record.Employee"
+                                                 ValueExpression="@(() => Model.Record.Employee)"
+                                                 ValueChanged="@((e) => Model.EmployeeChanged(e))">
                                         @foreach (CodeTitle _CodeTitle in Model.Employees)
                                         {
                                             <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
@@ -138,16 +139,16 @@
                             <div class="col-md-3">
                                 <div class="form-floating mb-3 txt">
                                     <InputNumber @bind-Value="Model.Record.DR" class="form-control" id="txtDR" placeholder="Paid Amount" style="text-align: right;"
-                                    ParsingErrorMessage="Enter a valid amount"
-                                    @onfocusout="DRFocusOut" />
+                                                 ParsingErrorMessage="Enter a valid amount"
+                                                 @onfocusout="DRFocusOut" />
                                     <label for="txtDR">Paid (DR)</label>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-floating mb-3 txt">
                                     <InputNumber @bind-Value="@Model.Record.CR" class="form-control" id="txtCR" placeholder="Received Amount" style="text-align: right;"
-                                    ParsingErrorMessage="Enter a valid amount"
-                                    @onfocusout="CRFocusOut" />
+                                                 ParsingErrorMessage="Enter a valid amount"
+                                                 @onfocusout="CRFocusOut" />
                                     <label for="txtCR">Received (CR)</label>
                                 </div>
                             </div>
@@ -209,7 +210,7 @@
                             string _Date = Record.Vou_Date.ToString(DateFormat);
                             string _DR = Record.DR.ToString(CurrFormat);
                             string _CR = Record.CR.ToString(CurrFormat);
-                            Tot_DR += Record.DR; Tot_CR += Record.CR; 
+                            Tot_DR += Record.DR; Tot_CR += Record.CR;
 
                             <td>@Record.Vou_No</td>
                             <td class="center-txt">@_Date</td>
@@ -221,12 +222,13 @@
                                 <button class="btn-pencil" @onclick="()=>Edit(Record.ID)"><i class="bi bi-pencil-fill"></i></button>
                                 <button class="btn-trash" @onclick="()=>Edit(Record.ID)"><i class="bi bi-trash-fill"></i></button>
                                 <button class="btn-print" @onclick="()=>Edit(Record.ID)"><i class="bi bi-printer-fill"></i></button>
-                                @if (UserRoll == "Administrator"){
-                                   
+                                @if (UserRoll == "Administrator")
+                                {
+
                                     <button class="btn-post" @onclick="()=>Post(Record.ID)"><i class="bi bi-box-fill"></i></button>
-                                } 
-                                
-                          </td>
+                                }
+
+                            </td>
                         }
                     }
                 </tr>
@@ -240,7 +242,7 @@
                     <td class="amount">@Tot_CR.ToString(CurrFormat)</td>
                     <td></td>
                     <td></td>
-                    
+
                 </tr>
             </tfoot>
 
