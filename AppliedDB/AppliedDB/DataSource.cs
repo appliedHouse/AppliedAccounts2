@@ -3,8 +3,6 @@ using System.Data.SQLite;
 using System.Text;
 using Tables = AppliedDB.Enums.Tables;
 using Query = AppliedDB.Enums.Query;
-using System.Data.Entity.Infrastructure;
-using static AppliedDB.Enums;
 
 namespace AppliedDB
 {
@@ -49,7 +47,7 @@ namespace AppliedDB
                 MyCommand.CommandText = $"SELECT * FROM [{_Table}]";
                 return GetDataTable(_Table, MyCommand);
             }
-            return null;
+            return new DataTable();
         }
         public DataTable GetTable(Tables _Table, string _Filter)
         {
@@ -62,7 +60,7 @@ namespace AppliedDB
                 MyCommand.CommandText = _Text.ToString(); ;
                 return GetDataTable(_Table, MyCommand);
             }
-            return null;
+            return new DataTable();
         }
         public DataTable GetTable(Tables _Table, string _Filter, string _Sort)
         {
@@ -77,7 +75,7 @@ namespace AppliedDB
                 MyCommand.CommandText = _Text.ToString();
                 return GetDataTable(_Table, MyCommand);
             }
-            return null;
+            return new DataTable();
         }
         public DataTable GetTable(Query _SQLQuery)
         {
@@ -195,7 +193,7 @@ namespace AppliedDB
 
                 return new DataTable();
             }
-            return null;
+            return new DataTable(); ;
         }
 
         public static DataTable GetDataTable(Tables _Table, SQLiteConnection _Connection)
@@ -997,6 +995,19 @@ namespace AppliedDB
         #endregion
 
         #region Get Cash or Bank Book
+        public DataTable GetBookVoucher(int ID)
+        {
+            DataTable _Table = new DataTable();
+            if (UserProfile is not null)
+            {
+                //DataSource _Source = new(UserProfile);
+                var _Query = SQLQuery.BookVoucher(ID);          // Get Records from Book and Book2 table.
+                _Table = GetTable(_Query);
+            }
+            return _Table;
+        }
+
+
         public DataTable GetBook(int BookID)
         {
             DataTable _Table = new DataTable();
@@ -1011,6 +1022,7 @@ namespace AppliedDB
 
         public List<CodeTitle> GetBookAccounts(int NatureID)
         {
+            // Get Book Account list from COA.
             if (NatureID > 0)
             {
                 return GetTable(Tables.COA, $"Nature={NatureID}", "Title").AsEnumerable().ToList().

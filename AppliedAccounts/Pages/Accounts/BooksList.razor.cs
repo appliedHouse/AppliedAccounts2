@@ -75,9 +75,9 @@ namespace AppliedAccounts.Pages.Accounts
 
         public void New()
         {
-            NavManager.NavigateTo("/Accounts/Books");
+            NavManager.NavigateTo($"/Accounts/Books/{0}");
         }
-        
+
 
         public void Refresh()
         {

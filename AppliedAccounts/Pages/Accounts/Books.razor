@@ -1,5 +1,6 @@
 ﻿@layout PageLayout;
 @page "/Accounts/Books";
+@page "/Accounts/Books/{ID:int}"
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
@@ -13,7 +14,7 @@
 
 
 @code {
-    //private int BookID = 0;
+    [Parameter] public int ID { get; set; }
     private string BookTitle = "Book Title";
     private string NatureTitle = "Book Title";
 
@@ -28,5 +29,58 @@
     {
         UserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
         MyModel.Source = new(UserProfile);
+
+        Start();
     }
 }
+
+
+@MyVoucher.Master.ID1
+<br />
+@MyVoucher.Master.Vou_No
+<br />
+@MyVoucher.Master.Vou_Date
+<br />
+@MyVoucher.Master.BookID
+<br />
+@MyVoucher.Master.Amount
+<br />
+@MyVoucher.Master.Ref_No
+<br />
+@MyVoucher.Master.SheetNo
+<br />
+@MyVoucher.Master.Remarks
+<br />
+@MyVoucher.Master.Status
+<br />
+
+<EditForm @Model="@MyVoucher">
+    <div class="container flex-md-row">
+        <div class="row g-2">
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputText class="form-control" id="txtVouNo" placeholder="Voucher No"
+                        @bind-Value="MyVoucher.Master.Vou_No">
+                    </InputText>
+                    <label for="txtVouNo">Voucher Number</label>
+                </div>
+
+
+                
+            </div>
+            <div class="col-md-3"></div>
+            <div class="col-md-3"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-3"></div>
+            <div class="col-md-3"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-3"></div>
+            <div class="col-md-3"></div>
+        </div>
+
+    </div>
+</EditForm>

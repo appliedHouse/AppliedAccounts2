@@ -131,6 +131,7 @@ namespace AppMessages
             AccountIDIsZero,
             CustomerIDIsZero,
             VouNoIsNull,
+            NoRecordFound,
         }
 
         public enum Class

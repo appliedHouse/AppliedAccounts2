@@ -306,6 +306,7 @@ namespace AppliedDB
 
         public static string BookLedger(int _BookID)
         {
+            // Cash or Bank record from ledger table.
             if (_BookID > 0)
             {
                 //CashBook / BankBook Books Data from Ledger
@@ -321,6 +322,7 @@ namespace AppliedDB
 
         public static string BookRecords(int BookID)
         {
+            // Cash and Bank record from Data table  view view_Book
             if (BookID > 0)
             {
                 var _Text = new StringBuilder();
@@ -330,6 +332,16 @@ namespace AppliedDB
             return string.Empty;
         }
 
+        public static string BookVoucher(int _ID)
+        {
+            if (_ID > 0)
+            {
+                var _Text = new StringBuilder();
+                _Text.AppendLine($"TranID = {_ID}");
+                return View_Book(_Text.ToString()); //   _Text.ToString();
+            }
+            return string.Empty;
+        }
 
         #endregion
 

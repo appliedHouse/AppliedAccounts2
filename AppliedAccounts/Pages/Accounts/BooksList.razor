@@ -1,5 +1,5 @@
 ﻿@layout PageLayout;
-@page "/Accounts/BooksList"
+@page "/Accounts/BooksList"; 
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
@@ -65,6 +65,11 @@
 <div class="PageHeading">
     <h2>@BookTitle</h2>
 </div>
+
+@* 
+ValueChanged="@((e) => BookNatureChanged(e))"
+ValueChanged="@((e) => BookListChanged(e))"
+ *@
 
 <EditForm Model="@MyModel">
     <div class="d-flex flex-row mb-3 filter">
