@@ -132,7 +132,8 @@ namespace AppliedDB
             StockPosition,
             StockPositionData,
             StockPositionSUM,
-            Book2
+            Book2,
+            View_Book
         }
 
     }

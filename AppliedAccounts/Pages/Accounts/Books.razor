@@ -1,5 +1,5 @@
 ﻿@layout PageLayout;
-@page "/Accounts/Books"
+@page "/Accounts/Books";
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
@@ -13,7 +13,7 @@
 
 
 @code {
-    private int BookID = 0;
+    //private int BookID = 0;
     private string BookTitle = "Book Title";
     private string NatureTitle = "Book Title";
 
@@ -28,148 +28,5 @@
     {
         UserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
         MyModel.Source = new(UserProfile);
-        if (BookList == null || BookList.Count == 0) { BookList = MyModel.Source.GetBookAccounts(1); }
-
-
     }
-
-    private int BookNatureId = 1;
-    private int BookId = 0;
-
-    private Dictionary<int, string> items = new()
-    {
-        { 1, "Cash" },
-        { 2, "Bank" },
-    };
-
-   
-    private void BookNatureChanged(int _NatureID)
-    {
-        BookNatureId = _NatureID;
-    }
-
-    private void BookListChanged(int _BookID)
-    {
-        BookId = _BookID; //result;
-        BookRecords = LoadBookRecords(BookId);
-
-    }
-
-
 }
-
-<div class="PageHeading">
-    <h2>@BookTitle</h2>
-</div>
-
-<EditForm Model="@MyModel">
-    <div class="container d-flex flex-column">
-        <div class="row filter">
-            <div class="col-md-1">
-                <div class="form-floating w1 ">
-                    <InputSelect id="ddBook" class="item-height"
-                                 TValue="int"
-                                 Value="@BookNatureId"
-                                 ValueExpression="@(() => BookNatureId)"
-                                 ValueChanged="@((e) => BookNatureChanged(e))">
-
-                        @foreach (var item in items)
-                        {
-                            <option value="@item.Key">@item.Value</option>
-                        }
-
-                    </InputSelect>
-
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="form-floating">
-                    <InputSelect id="ddBook" class="item-height"
-                                 TValue="int"
-                                 Value="@BookID"
-                                 ValueExpression="@(()=> BookId)"
-                                 ValueChanged="@((e)=>BookListChanged(e))">
-
-                        @foreach (var item in MyModel.Source.GetBookAccounts(BookNatureId))
-                        {
-                            <option value="@item.ID">@item.Title</option>
-                        }
-                    </InputSelect>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <InputDate id="dateStat" class="item-height" @bind-Value="DT_Start">
-
-                </InputDate>
-            </div>
-            <div class="col-md-2">
-                <InputDate id="dateEnd" class="item-height" @bind-Value="DT_End">
-
-                </InputDate>
-            </div>
-
-            <div class="col-md-1">
-                <label for="floatingInput">  </label>
-            </div>
-            <div class="col-md-2">
-                <div class="form-floating mb-3">
-                    <p>
-                        <i class="bi bi-search"></i>
-                        <InputText @bind-Value="SearchText" id="txtSearch" class="item-height" placeholder="Filter list">
-                        </InputText>
-                    </p>
-                </div>
-            </div>
-            <div class="col-md-1">
-                <button type="submit" style="width:24px; height:24px" class="btn btn-sm btn-primary" onclick="Refresh"><i class="bi bi-arrow-repeat"></i></button>
-
-            </div>
-        </div>
-
-    </div>
-
-    <div class="container">
-        @if (BookRecords != null)
-        {
-
-            <table class="Table-list">
-                <thead>
-                    <tr>
-                        <th>Voucher</th>
-                        <th>Date</th>
-                        <th>Description</th>
-                        <th>Received</th>
-                        <th>Paid</th>
-                        <th>Balance</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (BookRec Record in LoadBookRecords(BookID))
-                    {
-                        <tr>
-                            <td>@Record.Vou_No</td>
-                            <td>@Record.Vou_Date</td>
-                            <td>@Record.Description</td>
-                            <td class="amount">@Record.txtRecevied</td>
-                            <td>@Record.txtPaid</td>
-                            <td>@Record.txtBalance</td>
-                        </tr>
-                    }
-
-
-
-                </tbody>
-            </table>
-        }
-        else
-        {
-            <div class="alert alert-warning" role="alert">
-                No records found
-            </div>
-        }
-    </div>
-
-
-
-
-</EditForm>

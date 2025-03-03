@@ -13,5 +13,10 @@ namespace AppliedAccounts.Data
             var _Messages = new AppMessages.AppMessages(DataSource.Messages());
             return _Messages.GetMessage(Code);
         }
+
+        public List<Message> MyMessages { get; set; }
+
+
+        
     }
 }

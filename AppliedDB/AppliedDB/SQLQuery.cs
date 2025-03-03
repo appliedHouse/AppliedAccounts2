@@ -304,32 +304,31 @@ namespace AppliedDB
 
         #region Cash or Bank Book from Ledger
 
-        public static string BookLedger(int BookID)
+        public static string BookLedger(int _BookID)
         {
-            if (BookID > 1)
+            if (_BookID > 0)
             {
-                var _Text = new StringBuilder();
-                _Text.AppendLine("SELECT ");
-                _Text.AppendLine("[BookID],[Vou_Type],[Vou_Date],[Vou_No],[Description],");
-                _Text.AppendLine("[DR],[CR]");
-                _Text.AppendLine("0.00 AS [BAL]");
-                _Text.AppendLine("[Customer]");
-                _Text.AppendLine("[Customers].[Title] AS [CustomerTitle],");
-                _Text.AppendLine("[Project],");
-                _Text.AppendLine("[Project].[Title] As [ProjectTitle],");
-                _Text.AppendLine("'' AS [Status]");
-                _Text.AppendLine("FROM [Ledger]");
-                _Text.AppendLine("LEFT JOIN [Customers] ON [Ledger].[Customer] = [Customers].[ID]");
-                _Text.AppendLine("LEFT JOIN [Project]   ON [Ledger].[Project]  = [Project].[ID];");
-                _Text.AppendLine($"WHERE [Ledger].[BookID] = {BookID}");
+                //CashBook / BankBook Books Data from Ledger
+                // Select * from [LEDGER] WHERE bookID = _BookID
 
-                return _Text.ToString();
+
+                //var _Text = new StringBuilder();
+                //_Text.AppendLine($"BookID = {BookID}");
+                //return View_Book(_Text.ToString()); //   _Text.ToString();
             }
             return string.Empty;
         }
 
-        public static string CashBook() { return string.Empty; }
-        public static string BankBook() { return string.Empty; }
+        public static string BookRecords(int BookID)
+        {
+            if (BookID > 0)
+            {
+                var _Text = new StringBuilder();
+                _Text.AppendLine($"BookID = {BookID}");
+                return View_Book(_Text.ToString()); //   _Text.ToString();
+            }
+            return string.Empty;
+        }
 
 
         #endregion
@@ -575,12 +574,24 @@ namespace AppliedDB
         #region Book (Cash * Bank)
         public static string Book()
         {
-            return "";
+            return "SELECT * FROM [Book]";
         }
 
         private static string Book2()
         {
-            return "";
+            return "SELECT * FROM [Book2]";
+        }
+
+        private static string View_Book(string _Filter)
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("SELECT * FROM [View_Book]");
+            if(string.IsNullOrEmpty(_Filter))
+            {
+                _Text.AppendLine($" WHERE {_Filter}");
+            }
+
+            return _Text.ToString();
         }
         #endregion
 
@@ -605,6 +616,7 @@ namespace AppliedDB
             if (_SQLQuery.Equals(Query.Chk_BillReceivable2)) { return new QueryClass { QueryText = Chk_BillReceivable2(), TableName = Tables.Chk_BillReceivable2.ToString() }; }
             if (_SQLQuery.Equals(Query.Book)) { return new QueryClass { QueryText = Book(), TableName = Tables.Book.ToString() }; }
             if (_SQLQuery.Equals(Query.Book2)) { return new QueryClass { QueryText = Book2(), TableName = Tables.Book2.ToString() }; }
+            
 
             return new QueryClass();
         }
@@ -614,6 +626,7 @@ namespace AppliedDB
             if (_SQLQuery.Equals(Query.StockPosition)) { return new QueryClass { QueryText = StockPosition(Filter), TableName = Tables.StockPosition.ToString() }; }
             if (_SQLQuery.Equals(Query.StockPositionData)) { return new QueryClass { QueryText = StockPosition(Filter), TableName = Tables.StockPosition.ToString() }; }
             if (_SQLQuery.Equals(Query.StockPositionSUM)) { return new QueryClass { QueryText = StockPositionSUM(Filter), TableName = Tables.StockPositionSUM.ToString() }; }
+            if (_SQLQuery.Equals(Query.View_Book)) { return new QueryClass { QueryText = View_Book(Filter), TableName = Tables.view_Book.ToString() }; }
             return new QueryClass();
         }
 

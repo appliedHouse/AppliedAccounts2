@@ -82,30 +82,30 @@ namespace AppliedDB
         public DataTable GetTable(Query _SQLQuery)
         {
 
-
             try
             {
                 if (MyConnection is not null)
                 {
-
                     var _Query = SQLQuery.GetQuery(_SQLQuery);
-                    if (_Query.QueryText.Length > 0)
+                    if (!string.IsNullOrWhiteSpace(_Query.QueryText))
                     {
-                        if (MyConnection.State != ConnectionState.Open)
-                        { MyConnection.Open(); }
-                        var _Command = new SQLiteCommand(_Query.QueryText, MyConnection);
-                        SQLiteDataAdapter _Adapter = new(_Command);
-                        DataSet _DataSet = new();
+                        if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
+                        using var _Command = new SQLiteCommand(_Query.QueryText, MyConnection);
+                        using var _Adapter = new SQLiteDataAdapter(_Command);
+                        using var _DataSet = new DataSet();
+
                         _Adapter.Fill(_DataSet, _Query.TableName);
-                        MyConnection.Close();
+                        if (MyConnection.State == ConnectionState.Open) { MyConnection.Close(); }
 
                         if (_DataSet.Tables.Count == 1)
                         {
+                            _Adapter.Dispose();
+                            _Command.Dispose();
                             return _DataSet.Tables[0];
                         }
                     }
                 }
-                return null;
+                return new DataTable();
             }
             catch (Exception)
             {
@@ -118,22 +118,21 @@ namespace AppliedDB
             {
                 if (MyConnection is not null)
                 {
-                    if (MyConnection.State != ConnectionState.Open)
-                    { MyConnection.Open(); }
+                    if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
                     var _Query = SQLQuery.GetQuery(_SQLQuery);
-                    var _Command = new SQLiteCommand(_Query.QueryText, MyConnection);
+                    using var _Command = new SQLiteCommand(_Query.QueryText, MyConnection);
                     _Command.Parameters.AddWithValue("@ID", _ID);
-                    SQLiteDataAdapter _Adapter = new(_Command);
-                    DataSet _DataSet = new();
+                    using var _Adapter = new SQLiteDataAdapter(_Command);
+                    using var _DataSet = new DataSet();
                     _Adapter.Fill(_DataSet, _Query.TableName);
-                    MyConnection.Close();
+                    if (MyConnection.State == ConnectionState.Open) { MyConnection.Close(); }
                     if (_DataSet.Tables.Count == 1)
                     {
                         return _DataSet.Tables[0];
                     }
 
                 }
-                return null;
+                return new DataTable();
             }
             catch (Exception)
             {
@@ -145,23 +144,23 @@ namespace AppliedDB
         {
             try
             {
-                if (MyConnection is not null)
-                {
-                    if (MyConnection.State != ConnectionState.Open)
-                    { MyConnection.Open(); }
-                    //var _Query = SQLQuery.GetQuery(_SQLQuery);
-                    var _Command = new SQLiteCommand(_SQLQuery, MyConnection);
-                    SQLiteDataAdapter _Adapter = new(_Command);
-                    DataSet _DataSet = new();
-                    _Adapter.Fill(_DataSet, (new Guid()).ToString());
-                    MyConnection.Close();
-                    if (_DataSet.Tables.Count == 1)
-                    {
-                        return _DataSet.Tables[0];
-                    }
+                if (string.IsNullOrEmpty(_SQLQuery))
 
-                }
-                return null;
+                    if (MyConnection is not null)
+                    {
+                        if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
+                        var _Command = new SQLiteCommand(_SQLQuery, MyConnection);
+                        using var _Adapter = new SQLiteDataAdapter(_Command);
+                        using var _DataSet = new DataSet();
+                        _Adapter.Fill(_DataSet, (new Guid()).ToString());
+                        if (MyConnection.State == ConnectionState.Open) { MyConnection.Close(); }
+                        if (_DataSet.Tables.Count == 1)
+                        {
+                            return _DataSet.Tables[0];
+                        }
+
+                    }
+                return new DataTable();
             }
             catch (Exception)
             {
@@ -176,13 +175,12 @@ namespace AppliedDB
             {
                 if (_Command.Connection is not null)
                 {
-                    if (_Command.Connection.State != ConnectionState.Open)
-                    { _Command.Connection.Open(); }
+                    if (_Command.Connection.State != ConnectionState.Open) { _Command.Connection.Open(); }
                     string TableName = _Table.ToString();
-                    SQLiteDataAdapter _Adapter = new(_Command);
-                    DataSet _DataSet = new();
+                    using var _Adapter = new SQLiteDataAdapter(_Command);
+                    using var _DataSet = new DataSet();
                     _Adapter.Fill(_DataSet, TableName);
-                    _Command.Connection.Close();
+                    if (_Command.Connection.State == ConnectionState.Open) { _Command.Connection.Close(); }
 
                     if (_DataSet.Tables.Count == 1)
                     {
@@ -214,10 +212,10 @@ namespace AppliedDB
                     if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
                     string TableName = _Table.ToString();
                     string CommText = $"SELECT * FROM [{_Table}]";
-                    SQLiteDataAdapter _Adapter = new(CommText, _Connection);
-                    DataSet _DataSet = new();
+                    using var _Adapter = new SQLiteDataAdapter(CommText, _Connection);
+                    using var _DataSet = new DataSet();
                     _Adapter.Fill(_DataSet, TableName);
-                    _Connection.Close();
+                    if (_Connection.State == ConnectionState.Open) { _Connection.Close(); }
 
                     if (_DataSet.Tables.Count == 1)
                     {
@@ -232,7 +230,7 @@ namespace AppliedDB
 
                 return new DataTable();
             }
-            return null;
+            return new DataTable();
 
         }
         public static DataTable GetQueryTable(string _SQLQuery, SQLiteConnection _Connection)
@@ -241,21 +239,23 @@ namespace AppliedDB
             {
                 if (_Connection is not null)
                 {
-                    if (_Connection.State != ConnectionState.Open)
-                    { _Connection.Open(); }
-                    //var _Query = SQLQuery.GetQuery(_SQLQuery);
-                    var _Command = new SQLiteCommand(_SQLQuery, _Connection);
-                    SQLiteDataAdapter _Adapter = new(_Command);
-                    DataSet _DataSet = new();
-                    _Adapter.Fill(_DataSet, (new Guid()).ToString());
-                    _Connection.Close();
-                    if (_DataSet.Tables.Count == 1)
+                    if (string.IsNullOrEmpty(_SQLQuery))
                     {
-                        return _DataSet.Tables[0];
-                    }
 
+                        if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
+                        //var _Query = SQLQuery.GetQuery(_SQLQuery);
+                        var _Command = new SQLiteCommand(_SQLQuery, _Connection);
+                        using var _Adapter = new SQLiteDataAdapter(_Command);
+                        using var _DataSet = new DataSet();
+                        _Adapter.Fill(_DataSet, (new Guid()).ToString());
+                        if (_Connection.State == ConnectionState.Open) { _Connection.Open(); }
+                        if (_DataSet.Tables.Count == 1)
+                        {
+                            return _DataSet.Tables[0];
+                        }
+                    }
                 }
-                return null;
+                return new DataTable();
             }
             catch (Exception)
             {
@@ -273,23 +273,21 @@ namespace AppliedDB
         }
         public static DataTable Messages(int _Language)
         {
-
             var _Connection = Connections.GetMessagesConnection();
             if (_Connection is not null)
             {
-                if (_Connection.State != ConnectionState.Open)
-                { _Connection.Open(); }
-                var _Command = new SQLiteCommand($"SELECT * FROM [Messages] WHERE Language={_Language}", _Connection);
-                var _Adapter = new SQLiteDataAdapter(_Command);
-                var _DataSet = new DataSet();
+                if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
+                using var _Command = new SQLiteCommand($"SELECT * FROM [Messages] WHERE Language={_Language}", _Connection);
+                using var _Adapter = new SQLiteDataAdapter(_Command);
+                using var _DataSet = new DataSet();
                 _Adapter.Fill(_DataSet, "Messages");
-                _Connection.Close();
+                if (_Connection.State == ConnectionState.Open) { _Connection.Close(); }
                 if (_DataSet.Tables.Count > 0)
                 {
                     return _DataSet.Tables[0];
                 }
             }
-            return null;
+            return new DataTable();
         }
         #endregion
 
@@ -445,7 +443,7 @@ namespace AppliedDB
             return new();
         }
 
-        
+
         public List<CodeTitle> GetEmployees()
         {
             return GetEmployees("Title");
@@ -1004,10 +1002,9 @@ namespace AppliedDB
             DataTable _Table = new DataTable();
             if (UserProfile is not null)
             {
-                var _Query = SQLQuery.BookLedger(BookID);
-
-                DataSource _Source = new(UserProfile);
-                _Table = _Source.GetTable(_Query);
+                //DataSource _Source = new(UserProfile);
+                var _Query = SQLQuery.BookRecords(BookID);          // Get Records from Book and Book2 table.
+                _Table = GetTable(_Query);
             }
             return _Table;
         }
@@ -1034,9 +1031,9 @@ namespace AppliedDB
     }
 
     public class CodeTitle
-{
-    public int ID { get; set; }
-    public string Code { get; set; } = string.Empty;
-    public string Title { get; set; } = string.Empty;
-}
+    {
+        public int ID { get; set; }
+        public string Code { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+    }
 }
