@@ -1,6 +1,5 @@
 ﻿using AppliedAccounts.Models;
 using AppliedDB;
-using Microsoft.AspNetCore.Components;
 using System.Data;
 
 namespace AppliedAccounts.Pages.Accounts
@@ -9,16 +8,9 @@ namespace AppliedAccounts.Pages.Accounts
     {
 
         public AppUserModel UserProfile { get; set; }
-        public BookModel MyModel { get; set; } = new();
-        public List<CodeTitle> BookList { get; set; } = new();
-        public int BookNature { get; set; }
-        public DateTime DT_Start { get; set; }
-        public DateTime DT_End { get; set; }
-        public string SearchText { get; set; }
-
+        public BookListModel MyModel { get; set; } = new();
         public BookView BookRecord { get; set; }
         public List<BookView> BookRecords { get; set; }
-
         
 
         public BooksList()
@@ -28,7 +20,7 @@ namespace AppliedAccounts.Pages.Accounts
 
         }
 
-        List<BookView> LoadBookRecords(int _BookID)
+        List<BookView> LoadBookRecords(int _BookID)     // Load Lost of Cash / Bank Book record in Table
         {
             var _List = new List<BookView>();
             var _Data = MyModel.Source.GetBook(_BookID);
@@ -75,7 +67,7 @@ namespace AppliedAccounts.Pages.Accounts
 
         public void New()
         {
-            NavManager.NavigateTo($"/Accounts/Books/{0}");
+            NavManager.NavigateTo($"/Accounts/Books/{MyModel.SelectedVoucherID}/{MyModel.BookNatureID}");
         }
 
 

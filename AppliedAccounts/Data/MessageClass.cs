@@ -1,7 +1,6 @@
 ﻿using AppliedDB;
 using AppMessages;
 
-
 namespace AppliedAccounts.Data
 {
     public class MessageClass
@@ -16,7 +15,14 @@ namespace AppliedAccounts.Data
 
         public List<Message> MyMessages { get; set; }
 
+        public void Add(Message _Message)
+        {
+            MyMessages.Add(_Message);
+        }
 
-        
+        internal void Add(AppMessages.Enums.Messages accClassZero)
+        {
+            
+        }
     }
 }

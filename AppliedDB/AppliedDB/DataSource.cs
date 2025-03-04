@@ -1000,7 +1000,6 @@ namespace AppliedDB
             DataTable _Table = new DataTable();
             if (UserProfile is not null)
             {
-                //DataSource _Source = new(UserProfile);
                 var _Query = SQLQuery.BookVoucher(ID);          // Get Records from Book and Book2 table.
                 _Table = GetTable(_Query);
             }

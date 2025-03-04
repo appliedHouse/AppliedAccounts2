@@ -1,6 +1,6 @@
 ﻿@layout PageLayout;
 @page "/Accounts/Books";
-@page "/Accounts/Books/{ID:int}"
+@page "/Accounts/Books/{ID:int}/{NatureID:int}"
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
@@ -14,9 +14,9 @@
 
 
 @code {
-    [Parameter] public int ID { get; set; }
+
     private string BookTitle = "Book Title";
-    private string NatureTitle = "Book Title";
+    private string NatureTitle = "Title Title";
 
     private string UserRoll;
     private string DateFormat = Format.DDMMYY;
@@ -25,62 +25,102 @@
     private decimal Tot_CR = 0.0M;
 
 
+
     protected override void OnInitialized()
     {
         UserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
-        MyModel.Source = new(UserProfile);
+        //MyModel = new(ID,UserProfile);
 
         Start();
     }
+
+    private void BookIDChanged(int _BookID)
+    {
+        MyModel.Voucher.Master.BookID = _BookID;
+    }
+
 }
 
 
-@MyVoucher.Master.ID1
-<br />
-@MyVoucher.Master.Vou_No
-<br />
-@MyVoucher.Master.Vou_Date
-<br />
-@MyVoucher.Master.BookID
-<br />
-@MyVoucher.Master.Amount
-<br />
-@MyVoucher.Master.Ref_No
-<br />
-@MyVoucher.Master.SheetNo
-<br />
-@MyVoucher.Master.Remarks
-<br />
-@MyVoucher.Master.Status
-<br />
-
-<EditForm @Model="@MyVoucher">
+<EditForm Model="@MyModel">
     <div class="container flex-md-row">
-        <div class="row g-2">
+        <div class="row g-md-2 mb-2">
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputSelect id="ddBook" class="form-control item-height"
+                                 TValue="int"
+                                 Value="@MyModel.Voucher.Master.BookID"
+                                 ValueExpression="@(() => @MyModel.Voucher.Master.BookID)"
+                                 ValueChanged="@((e) => BookIDChanged(e))">
+                        @if (MyModel.BookList != null)
+                        {
+                            @foreach (var item in MyModel.BookList)
+                            {
+                                <option value="@item.ID">@item.Title</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="0">No Records</option>
+                        }
+
+                    </InputSelect>
+                </div>
+            </div>
             <div class="col-md-3">
                 <div class="form-floating">
                     <InputText class="form-control" id="txtVouNo" placeholder="Voucher No"
-                        @bind-Value="MyVoucher.Master.Vou_No">
+                               @bind-Value="MyModel.Voucher.Master.Vou_No">
                     </InputText>
                     <label for="txtVouNo">Voucher Number</label>
                 </div>
-
-
-                
             </div>
-            <div class="col-md-3"></div>
-            <div class="col-md-3"></div>
-        </div>
-        <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-3"></div>
-            <div class="col-md-3"></div>
-        </div>
-        <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-3"></div>
-            <div class="col-md-3"></div>
-        </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputDate class="form-control" id="dtVouDate" placeholder="Voucher No"
+                               @bind-Value="MyModel.Voucher.Master.Vou_Date">
+                    </InputDate>
+                    <label for="dtVouDate">Voucher Number</label>
+                </div>
+            </div>
 
+        </div>
+        <div class="row g-md-2  mb-2">
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputText class="form-control" id="txtRefNo" placeholder="Reference number"
+                               @bind-Value="MyModel.Voucher.Master.Ref_No">
+                    </InputText>
+                    <label for="txtRefNo">Reference Number</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputText class="form-control" id="txtSheetNo" placeholder="Petty cash sheet number"
+                               @bind-Value="MyModel.Voucher.Master.SheetNo">
+                    </InputText>
+                    <label for="txtSheetNo">Petty Cash Sheet No.</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputText class="form-control" id="txtRemarks" placeholder="Remarks"
+                               @bind-Value="MyModel.Voucher.Master.Remarks">
+                    </InputText>
+                    <label for="txtRemarks">Remarks</label>
+                </div>
+            </div>
+        </div>
+        <div class="row  g-md-2 mb-2">
+
+            <div class="col-md-3"></div>
+            <div class="col-md-3"></div>
+        </div>
+        <hr class="divder-line" />
+        <div class="row ">
+            <div class="col-md-3">A</div>
+            <div class="col-md-3">B</div>
+            <div class="col-md-3">C</div>
+        </div>
     </div>
 </EditForm>

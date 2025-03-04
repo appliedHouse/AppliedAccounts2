@@ -1,5 +1,5 @@
 ﻿@layout PageLayout;
-@page "/Accounts/BooksList"; 
+@page "/Accounts/BooksList";
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
@@ -14,12 +14,6 @@
 
 @code {
 
-    private int BookId = 0;
-    private int BookNatureId = 1;
-
-    private string BookTitle = "Book Title";
-    private string NatureTitle = "Book Title";
-
     private string UserRoll;
     private string DateFormat = Format.DDMMYY;
     private string CurrFormat = Format.Currency;
@@ -30,32 +24,21 @@
     protected override void OnInitialized()
     {
         UserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
+        MyModel = new(0, UserProfile);   // BookID and UserProfile.
         MyModel.Source = new(UserProfile);
-        BookId = MyModel.Source.GetBookAccounts(BookNatureId).First()?.ID ?? 0;
-        //if (BookList == null || BookList.Count == 0) { BookList = MyModel.Source.GetBookAccounts(1); }
-
-      
-
     }
-
-
-    private Dictionary<int, string> items = new()
-    {
-        { 1, "Cash" },
-        { 2, "Bank" },
-    };
 
 
     private void BookNatureChanged(int _NatureID)
     {
-        BookNatureId = _NatureID;
-        BookId = MyModel.Source.GetBookAccounts(BookNatureId).First()?.ID ?? 0;
+        MyModel.BookNatureID = _NatureID;
+        MyModel.BookID = MyModel.Source.GetBookAccounts(MyModel.BookNatureID).First()?.ID ?? 0;
     }
 
     private void BookListChanged(int _BookID)
     {
-        BookId = _BookID; //result;
-        BookRecords = LoadBookRecords(BookId);
+        MyModel.BookID = _BookID; //result;
+        BookRecords = LoadBookRecords(MyModel.BookID);
 
     }
 
@@ -63,7 +46,7 @@
 }
 
 <div class="PageHeading">
-    <h2>@BookTitle</h2>
+    <h2>@MyModel.BookTitle</h2>
 </div>
 
 @* 
@@ -76,13 +59,13 @@ ValueChanged="@((e) => BookListChanged(e))"
         <div class="p-2">
             <InputSelect id="ddBook" class="item-height"
                          TValue="int"
-                         Value="@BookNatureId"
-                         ValueExpression="@(() => BookNatureId)"
+                         Value="@MyModel.BookNatureID"
+                         ValueExpression="@(() => MyModel.BookNatureID)"
                          ValueChanged="@((e) => BookNatureChanged(e))">
 
-                @foreach (var item in items)
+                @foreach (var item in MyModel.NatureAccountsList)
                 {
-                    <option value="@item.Key">@item.Value</option>
+                    <option value="@item.ID">@item.Title</option>
                 }
 
             </InputSelect>
@@ -90,30 +73,30 @@ ValueChanged="@((e) => BookListChanged(e))"
         <div class="p-2">
             <InputSelect id="ddBook" class="item-height"
                          TValue="int"
-                         Value="@BookId"
-                         ValueExpression="@(()=> BookId)"
+                         Value="@MyModel.BookID"
+                         ValueExpression="@(()=> MyModel.BookID)"
                          ValueChanged="@((e)=>BookListChanged(e))">
 
-                @foreach (var item in MyModel.Source.GetBookAccounts(BookNatureId))
+                @foreach (var item in MyModel.Source.GetBookAccounts(MyModel.BookNatureID))
                 {
                     <option value="@item.ID">@item.Title</option>
                 }
             </InputSelect>
         </div>
         <div class="p-2">
-            <InputDate id="dateStat" class="item-height" @bind-Value="DT_Start">
+            <InputDate id="dateStat" class="item-height" @bind-Value="MyModel.DT_Start">
 
             </InputDate>
         </div>
         <div class="p-2">
-            <InputDate id="dateStat" class="item-height" @bind-Value="DT_End">
+            <InputDate id="dateStat" class="item-height" @bind-Value="MyModel.DT_End">
 
             </InputDate>
         </div>
         <div class="p-2 search-btn">
             <label for="floatingInput">
                 <InputText id="txtSearch" class="item-height" placeholder="Filter list"
-                           @bind-Value="SearchText"
+                           @bind-Value="MyModel.SearchText"
                            @onclick="Refresh">
                 </InputText>
             </label>
@@ -127,6 +110,7 @@ ValueChanged="@((e) => BookListChanged(e))"
     </div>
 
     <div class="container">
+
         @if (BookRecords != null)
         {
 
@@ -142,7 +126,7 @@ ValueChanged="@((e) => BookListChanged(e))"
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (BookView Record in LoadBookRecords(BookId))
+                    @foreach (BookView Record in LoadBookRecords(MyModel.BookID))
                     {
                         <tr>
                             <td>@Record.Vou_No</td>
@@ -161,7 +145,6 @@ ValueChanged="@((e) => BookListChanged(e))"
         }
         else
         {
-
             <div class="container">
                 <div class="row">
                     <div class="alert alert-warning" role="alert">
@@ -173,8 +156,6 @@ ValueChanged="@((e) => BookListChanged(e))"
                     <button type="submit" class="btn btn-primary" @onclick="New"></button>
                 </div>
             </div>
-
-
         }
     </div>
 
