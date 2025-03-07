@@ -1,6 +1,5 @@
 ﻿using AppliedAccounts.Data;
 using AppliedDB;
-using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using MESSAGE = AppMessages.Enums.Messages;
@@ -15,10 +14,9 @@ namespace AppliedAccounts.Models
         public int VoucherID { get; set; }
         public int BookID { get; set; }
         public int BookNature { get; set; }
-        public string BookName { get; set; }
-        public string DBFile { get; set; }
+        public string BookNatureTitle { get; set; }
 
-        public Voucher Voucher { get; set; }
+        public Voucher MyVoucher { get; set; }
 
         public List<CodeTitle> Companies { get; set; }
         public List<CodeTitle> Employees { get; set; }
@@ -28,9 +26,8 @@ namespace AppliedAccounts.Models
 
         public AppUserModel? UserProfile { get; set; }
         public DataSource Source { get; set; }
-        public bool IsDataLoaded { get; set; }
         public MessageClass MsgClass { get; set; }
-        public bool PageIsValid = false;
+        public bool PageIsValid { get; set; } = false;
         public DateTime LastVoucherDate { get; set; }
 
         #endregion
@@ -49,19 +46,26 @@ namespace AppliedAccounts.Models
 
                 if (UserProfile != null)
                 {
-                    //IsDataLoaded = LoadData(Source);
                     Source = new(UserProfile);
+                    LastVoucherDate = AppRegistry.GetDate(Source.DBFile, "LastBKDate");
 
-                    if (VoucherID == 0) { Voucher = NewVoucher(); }   // Create a new voucher;
+                    if (VoucherID == 0) { MyVoucher = NewVoucher(); }   // Create a new voucher;
                     if (VoucherID > 0)
                     {
                         LoadData();
                     }
+
+                    BookList = Source.GetBookAccounts(BookNature);
+                    Companies = Source.GetCustomers();
+                    Employees = Source.GetEmployees();
+                    Projects = Source.GetProjects();
+                    Accounts = Source.GetAccounts();
                 }
                 else
                 {
                     MsgClass.Add(MESSAGE.UserProfileIsNull);
                 }
+
                 PageIsValid = true;
             }
             catch (Exception)
@@ -88,21 +92,22 @@ namespace AppliedAccounts.Models
                         if (VoucherData.Count > 0)
                         {
                             BookID = VoucherData.Select(row => row.Field<int>("BookID")).First();
+                            BookNatureTitle = GetNatureTitle(BookID);
 
-                            Voucher.Master = VoucherData!.Select(first => new Master()
+                            MyVoucher.Master = VoucherData!.Select(first => new Master()
                             {
                                 ID1 = first.Field<int>("ID1"),
                                 Vou_No = first.Field<string>("Vou_No") ?? "",
-                                Vou_Date = first.Field<DateTime>("Vou_Date"),  
+                                Vou_Date = first.Field<DateTime>("Vou_Date"),
                                 BookID = first.Field<int>("BookID"),
-                                Amount = first.Field<decimal>("Amount"),  
-                                Ref_No = first.Field<string>("Ref_No") ?? "",   
+                                Amount = first.Field<decimal>("Amount"),
+                                Ref_No = first.Field<string>("Ref_No") ?? "",
                                 SheetNo = first.Field<string>("SheetNo") ?? "",
                                 Remarks = first.Field<string>("Remarks") ?? "",
                                 Status = first.Field<string>("Status") ?? ""
-                            }).First() ?? new();  
+                            }).First() ?? new();
 
-                            Voucher.Detail = [.. VoucherData.Select(row => new Details()
+                            MyVoucher.Details = [.. VoucherData.Select(row => new Detail()
                             {
                                 ID2 = row.Field<int>("ID2"),
                                 TranID = row.Field<int>("TranID"),
@@ -114,40 +119,19 @@ namespace AppliedAccounts.Models
                                 DR = row.Field<decimal>("DR"),
                                 CR = row.Field<decimal>("CR"),
                                 Description = row.Field<string>("Description") ?? "",
-                                Comments = row.Field<string>("Comments") ?? ""
+                                Comments = row.Field<string>("Comments") ?? "",
+                                action = "get",
+
+                                TitleAccount = Accounts.Where(e=> e.ID == row.Field<int>("COA")).Select(e=> e.Title).First() ?? "",
+                                TitleCompany = Companies.Where(e=> e.ID == row.Field<int>("Company")).Select(e=> e.Title).First() ?? "",
+                                TitleProject = Projects.Where(e => e.ID == row.Field < int >("Project")).Select(e => e.Title).First() ?? "",
+                                TitleEmployee = Employees.Where(e => e.ID == row.Field < int >("Employee")).Select(e => e.Title).First() ?? "",
                             })];
-
-                            //foreach (var row in VoucherData)
-                            //{
-                            //    Voucher.Detail.Add(new Details()
-                            //    {
-                            //        ID2 = row.Field<int>("ID2"),
-                            //        TranID = row.Field<int>("TranID"),
-                            //        Sr_No = row.Field<int>("SR_NO"),
-                            //        COA = row.Field<int>("COA"),
-                            //        Company = row.Field<int>("Company"),
-                            //        Employee = row.Field<int>("Employee"),
-                            //        Project = row.Field<int>("Project"),
-                            //        DR = row.Field<decimal>("DR"),
-                            //        CR = row.Field<decimal>("CR"),
-                            //        Description = row.Field<string>("Description") ?? "",
-                            //        Comments = row.Field<string>("Description") ?? "",
-                            //    });
-                            //}
-
-
                         }
                     }
-
-                    BookList = Source.GetBookAccounts(BookNature);
-                    Companies = Source.GetCustomers();
-                    Employees = Source.GetEmployees();
-                    Projects = Source.GetProjects();
-                    Accounts = Source.GetAccounts();
                 }
                 catch (Exception)
                 {
-
                     PageIsValid = false;
                 }
             }
@@ -156,8 +140,9 @@ namespace AppliedAccounts.Models
 
         private Voucher NewVoucher()
         {
-            Voucher _NewVoucher = new() { Master = new(), Detail = [] };
+            BookNatureTitle = GetNatureTitle(BookID);
 
+            Voucher _NewVoucher = new();
             _NewVoucher.Master.ID1 = 0;
             _NewVoucher.Master.Vou_No = "New";
             _NewVoucher.Master.Vou_Date = LastVoucherDate;
@@ -168,7 +153,7 @@ namespace AppliedAccounts.Models
             _NewVoucher.Master.Remarks = "";
             _NewVoucher.Master.Status = "Submitted";
 
-            _NewVoucher.Detail.Add(new Details
+            _NewVoucher.Details.Add(new Detail
             {
                 ID2 = 0,
                 TranID = 0,
@@ -180,12 +165,36 @@ namespace AppliedAccounts.Models
                 DR = 0.00M,
                 CR = 0.00M,
                 Description = "",
-                Comments = ""
+                Comments = "",
+                action = "new",
+
+                TitleAccount = string.Empty,
+                TitleCompany = string.Empty,
+                TitleProject = string.Empty,
+                TitleEmployee = string.Empty,
+
+
+
             });
 
             return _NewVoucher;
         }
 
+
+        private string GetNatureTitle(int _BookID)
+        {
+
+            var _Title = "Unknown Book"; // Default title
+            var _Nature = Source.SeekValue(Tables.COA, _BookID, "Nature");
+
+            if (_Nature != null && int.TryParse(_Nature.ToString(), out int natureValue) && natureValue > 0)
+            {
+                _Title = Source.SeekTitle(Tables.COA_Nature, natureValue);
+            }
+
+            return _Title;
+
+        }
     }
 
 
@@ -193,8 +202,17 @@ namespace AppliedAccounts.Models
 
     public class Voucher
     {
+
+        public Voucher()
+        {
+            Master = new();
+            Detail = new();
+            Details = [];
+        }
+
         public Master Master { get; set; }
-        public List<Details> Detail { get; set; }
+        public Detail Detail { get; set; }
+        public List<Detail> Details { get; set; }
     }
 
 
@@ -212,9 +230,9 @@ namespace AppliedAccounts.Models
         public string Status { get; set; }
     }
 
-    public class Details
+    public class Detail
     {
-        public Details() { }
+        public Detail() { }
         public int ID2 { get; set; }
         public int TranID { get; set; }
         public int Sr_No { get; set; }
@@ -226,6 +244,13 @@ namespace AppliedAccounts.Models
         public decimal CR { get; set; }
         public string Description { get; set; }
         public string Comments { get; set; }
+        public string action { get; set; }
+
+        public string TitleAccount { get; set; }
+        public string TitleCompany { get; set; }
+        public string TitleProject { get; set; }
+        public string TitleEmployee { get; set; }
+
     }
     #endregion
 }

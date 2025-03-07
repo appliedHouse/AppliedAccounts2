@@ -36,23 +36,57 @@
 
     private void BookIDChanged(int _BookID)
     {
-        MyModel.Voucher.Master.BookID = _BookID;
+        MyModel.MyVoucher.Master.BookID = _BookID;
     }
 
+    private void AccountIDChanged(int _ID)
+    {
+        MyModel.MyVoucher.Detail.COA = _ID;
+    }
+
+    private void CompanyIDChanged(int _ID)
+    {
+        MyModel.MyVoucher.Detail.Company = _ID;
+    }
+    private void ProjectIDChanged(int _ID)
+    {
+        MyModel.MyVoucher.Detail.Project = _ID;
+    }
+    private void EmployeeIDChanged(int _ID)
+    {
+        MyModel.MyVoucher.Detail.Employee = _ID;
+    }
 }
+
+<style>
+    .myContainer .row {
+        display: flex;
+        justify-content: center; /* Centers horizontally */
+        gap: 10px; /* Optional: Adds spacing between columns */
+    }
+</style>
+
+<div class="AppHeader">
+    <h3>CASH OR BANK VOUCHER</h3>
+</div>
 
 
 <EditForm Model="@MyModel">
-    <div class="container flex-md-row">
+    <div class="container myContainer flex-md-row">
+        <input @bind-value="MyModel.MyVoucher.Master.ID1" hidden />
+        <input @bind-value="MyModel.MyVoucher.Master.Status" hidden />
+        <input @bind-value="MyModel.MyVoucher.Detail.ID2" hidden />
+        <input @bind-value="MyModel.MyVoucher.Detail.action" hidden />
+
         <div class="row g-md-2 mb-2">
             <div class="col-md-3">
                 <div class="form-floating">
                     <InputSelect id="ddBook" class="form-control item-height"
                                  TValue="int"
-                                 Value="@MyModel.Voucher.Master.BookID"
-                                 ValueExpression="@(() => @MyModel.Voucher.Master.BookID)"
+                                 Value="@MyModel.MyVoucher.Master.BookID"
+                                 ValueExpression="@(() => @MyModel.MyVoucher.Master.BookID)"
                                  ValueChanged="@((e) => BookIDChanged(e))">
-                        @if (MyModel.BookList != null)
+                        @if (MyModel.BookList.Any())
                         {
                             @foreach (var item in MyModel.BookList)
                             {
@@ -65,22 +99,23 @@
                         }
 
                     </InputSelect>
+                    <label for="ddBook">@MyModel.BookNatureTitle</label>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-floating">
                     <InputText class="form-control" id="txtVouNo" placeholder="Voucher No"
-                               @bind-Value="MyModel.Voucher.Master.Vou_No">
+                               @bind-Value="MyModel.MyVoucher.Master.Vou_No">
                     </InputText>
                     <label for="txtVouNo">Voucher Number</label>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-floating">
-                    <InputDate class="form-control" id="dtVouDate" placeholder="Voucher No"
-                               @bind-Value="MyModel.Voucher.Master.Vou_Date">
+                    <InputDate class="form-control" id="dtVouDate" placeholder="Voucher Date"
+                               @bind-Value="MyModel.MyVoucher.Master.Vou_Date">
                     </InputDate>
-                    <label for="dtVouDate">Voucher Number</label>
+                    <label for="dtVouDate">Voucher Date</label>
                 </div>
             </div>
 
@@ -89,7 +124,7 @@
             <div class="col-md-3">
                 <div class="form-floating">
                     <InputText class="form-control" id="txtRefNo" placeholder="Reference number"
-                               @bind-Value="MyModel.Voucher.Master.Ref_No">
+                               @bind-Value="MyModel.MyVoucher.Master.Ref_No">
                     </InputText>
                     <label for="txtRefNo">Reference Number</label>
                 </div>
@@ -97,7 +132,7 @@
             <div class="col-md-3">
                 <div class="form-floating">
                     <InputText class="form-control" id="txtSheetNo" placeholder="Petty cash sheet number"
-                               @bind-Value="MyModel.Voucher.Master.SheetNo">
+                               @bind-Value="MyModel.MyVoucher.Master.SheetNo">
                     </InputText>
                     <label for="txtSheetNo">Petty Cash Sheet No.</label>
                 </div>
@@ -105,22 +140,199 @@
             <div class="col-md-3">
                 <div class="form-floating">
                     <InputText class="form-control" id="txtRemarks" placeholder="Remarks"
-                               @bind-Value="MyModel.Voucher.Master.Remarks">
+                               @bind-Value="MyModel.MyVoucher.Master.Remarks">
                     </InputText>
                     <label for="txtRemarks">Remarks</label>
                 </div>
             </div>
         </div>
+        <hr class="divder-line" />
         <div class="row  g-md-2 mb-2">
 
-            <div class="col-md-3"></div>
-            <div class="col-md-3"></div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputNumber class="form-control" id="txtSRNO" placeholder="Serail No"
+                                 @bind-Value="MyModel.MyVoucher.Detail.Sr_No">
+                    </InputNumber>
+                    <label for="txtSRNO">Serial No</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputSelect id="ddAccounts" class="form-control item-height"
+                                 TValue="int"
+                                 Value="@MyModel.MyVoucher.Detail.COA"
+                                 ValueExpression="@(() => @MyModel.MyVoucher.Detail.COA)"
+                                 ValueChanged="@((e) => AccountIDChanged(e))">
+                        @if (MyModel.Accounts.Any())
+                        {
+                            @foreach (var item in MyModel.Accounts)
+                            {
+                                <option value="@item.ID">@item.Title</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="0">No Records - Accounts</option>
+                        }
+
+                    </InputSelect>
+                    <label for="ddAccounts">Account</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputSelect id="ddCompany" class="form-control item-height"
+                                 TValue="int"
+                                 Value="@MyModel.MyVoucher.Detail.Company"
+                                 ValueExpression="@(() => @MyModel.MyVoucher.Detail.Company)"
+                                 ValueChanged="@((e) => CompanyIDChanged(e))">
+                        @if (MyModel.Companies.Any())
+                        {
+                            @foreach (var item in MyModel.Companies)
+                            {
+                                <option value="@item.ID">@item.Title</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="0">No Records -  Company</option>
+                        }
+
+                    </InputSelect>
+                    <label for="ddCompany">Company / Customer / Sub Account</label>
+                </div>
+            </div>
+
         </div>
-        <hr class="divder-line" />
-        <div class="row ">
-            <div class="col-md-3">A</div>
-            <div class="col-md-3">B</div>
-            <div class="col-md-3">C</div>
+
+        <div class="row g-md-2 mb-2">
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputSelect id="ddEmployee" class="form-control item-height"
+                                 TValue="int"
+                                 Value="@MyModel.MyVoucher.Detail.Employee"
+                                 ValueExpression="@(() => @MyModel.MyVoucher.Detail.Employee)"
+                                 ValueChanged="@((e) => EmployeeIDChanged(e))">
+                        @if (MyModel.Employees.Any())
+                        {
+                            @foreach (var item in MyModel.Employees)
+                            {
+                                <option value="@item.ID">@item.Title</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="0">No Records - Employee</option>
+                        }
+
+                    </InputSelect>
+                    <label for="ddEmployee">Employee</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputSelect id="ddProject" class="form-control item-height"
+                                 TValue="int"
+                                 Value="@MyModel.MyVoucher.Detail.Project"
+                                 ValueExpression="@(() => @MyModel.MyVoucher.Detail.Project)"
+                                 ValueChanged="@((e) => ProjectIDChanged(e))">
+                        @if (MyModel.Employees.Any())
+                        {
+                            @foreach (var item in MyModel.Projects)
+                            {
+                                <option value="@item.ID">@item.Title</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="0">No Records - Project</option>
+                        }
+
+                    </InputSelect>
+                    <label for="ddProject">Project</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputText class="form-control" id="txtComments" placeholder="Comments (if any)"
+                               @bind-Value="MyModel.MyVoucher.Detail.Comments">
+                    </InputText>
+                    <label for="txtComments">Comments</label>
+                </div>
+            </div>
+        </div>
+        <div class="row g-md-2 mb-2">
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputNumber class="form-control" id="txtPaid" placeholder="Amount Paid"
+                                 @bind-Value="MyModel.MyVoucher.Detail.DR">
+                    </InputNumber>
+                    <label for="txtPaid">Paid</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputNumber class="form-control" id="txtReceived" placeholder="Amount Received"
+                                 @bind-Value="MyModel.MyVoucher.Detail.CR">
+                    </InputNumber>
+                    <label for="txtReceived">Received</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputText class="form-control" id="txtDescription" placeholder="Description"
+                               @bind-Value="MyModel.MyVoucher.Detail.Description">
+                    </InputText>
+                    <label for="txtDescription">Description</label>
+                </div>
+            </div>
+
         </div>
     </div>
+
+    <div class="container">
+        <table class="AppTable">
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Company</th>
+                    <th>Description</th>
+                    <th>Paid</th>
+                    <th>Received</th>
+                    <th>
+                        <button class="btn btn-Add"><i class="bg-info bi-database-fill-add"></i></button>
+                    </th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in MyModel.MyVoucher.Details)
+                {
+                    <tr>
+                        <td>@item.TitleAccount</td>
+                        <td>@item.TitleCompany</td>
+                        <td>@item.Description</td>
+                        <td>@item.DR</td>
+                        <td>@item.CR</td>
+                        <th>
+                            <button class="btn btn-Edit"><i class="bi bi-pencil-fill"></i></button>
+                            <button class="btn btn-Del"><i class="bi bi-pencil-fill"></i></button>
+                        </th>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>TOTAL</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
 </EditForm>

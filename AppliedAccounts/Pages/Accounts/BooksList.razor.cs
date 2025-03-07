@@ -11,13 +11,10 @@ namespace AppliedAccounts.Pages.Accounts
         public BookListModel MyModel { get; set; } = new();
         public BookView BookRecord { get; set; }
         public List<BookView> BookRecords { get; set; }
-        
 
         public BooksList()
         {
             MyModel = new(0, UserProfile ?? new());
-
-
         }
 
         List<BookView> LoadBookRecords(int _BookID)     // Load Lost of Cash / Bank Book record in Table
@@ -62,14 +59,12 @@ namespace AppliedAccounts.Pages.Accounts
             MyModel.Source = new(UserProfile);
             var _BookList = MyModel.Source.GetBookAccounts(_BookNature) ?? new();
             return _BookList;
-
         }
 
         public void New()
         {
             NavManager.NavigateTo($"/Accounts/Books/{MyModel.SelectedVoucherID}/{MyModel.BookNatureID}");
         }
-
 
         public void Refresh()
         {
