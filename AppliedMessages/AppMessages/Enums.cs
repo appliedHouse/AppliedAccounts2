@@ -133,6 +133,9 @@ namespace AppMessages
             VouNoIsNull,
             NoRecordFound,
             PageIsNotValid,
+            VouDateLess,
+            VouDateMore,
+            Row_NoStatus,
         }
 
         public enum Class

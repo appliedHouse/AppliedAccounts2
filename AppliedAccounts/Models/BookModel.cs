@@ -27,8 +27,10 @@ namespace AppliedAccounts.Models
         public AppUserModel? UserProfile { get; set; }
         public DataSource Source { get; set; }
         public MessageClass MsgClass { get; set; }
-        public bool PageIsValid { get; set; } = false;
+        
         public DateTime LastVoucherDate { get; set; }
+        public DateTime MinVouDate = AppRegistry.MinDate;
+        public DateTime MaxVouDate { get; set; }
 
         #endregion
         #region Constructor
@@ -39,6 +41,8 @@ namespace AppliedAccounts.Models
         public BookModel(int _VoucherID, AppUserModel _AppUserProfile)
         {
             MsgClass = new();
+            MyVoucher = new();
+
             try
             {
                 VoucherID = _VoucherID;
@@ -66,11 +70,11 @@ namespace AppliedAccounts.Models
                     MsgClass.Add(MESSAGE.UserProfileIsNull);
                 }
 
-                PageIsValid = true;
+                
             }
             catch (Exception)
             {
-
+                MsgClass.Add(MESSAGE.Default);
 
 
             }
@@ -78,9 +82,10 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
+        #region Load Data
         private bool LoadData()
         {
-            PageIsValid = true;
+           
             if (Source != null)
             {
                 try
@@ -127,17 +132,21 @@ namespace AppliedAccounts.Models
                                 TitleProject = Projects.Where(e => e.ID == row.Field < int >("Project")).Select(e => e.Title).First() ?? "",
                                 TitleEmployee = Employees.Where(e => e.ID == row.Field < int >("Employee")).Select(e => e.Title).First() ?? "",
                             })];
+
+                            return true;
                         }
                     }
                 }
                 catch (Exception)
                 {
-                    PageIsValid = false;
+                    
                 }
             }
-            return PageIsValid;
+            return false; 
         }
+        #endregion
 
+        #region New Voucher
         private Voucher NewVoucher()
         {
             BookNatureTitle = GetNatureTitle(BookID);
@@ -153,34 +162,47 @@ namespace AppliedAccounts.Models
             _NewVoucher.Master.Remarks = "";
             _NewVoucher.Master.Status = "Submitted";
 
-            _NewVoucher.Details.Add(new Detail
-            {
-                ID2 = 0,
-                TranID = 0,
-                Sr_No = 1,
-                COA = 0,
-                Company = 0,
-                Employee = 0,
-                Project = 0,
-                DR = 0.00M,
-                CR = 0.00M,
-                Description = "",
-                Comments = "",
-                action = "new",
+            _NewVoucher.Detail = NewDetail();
+            
 
-                TitleAccount = string.Empty,
-                TitleCompany = string.Empty,
-                TitleProject = string.Empty,
-                TitleEmployee = string.Empty,
-
-
-
-            });
+            
 
             return _NewVoucher;
         }
+        
+
+        private Detail NewDetail()
+        {
+            int _MaxSrNo = 1;
+            if(MyVoucher.Details.Count > 0) { _MaxSrNo = MyVoucher.Details.Max(e => e.Sr_No) + 1; }
 
 
+            var _Detail = new Detail();
+            {
+                _Detail.ID2 = 0;
+                _Detail.TranID = 0;
+                _Detail.Sr_No = _MaxSrNo;
+                _Detail.COA = 0;
+                _Detail.Company = 0;
+                _Detail.Employee = 0;
+                _Detail.Project = 0;
+                _Detail.DR = 0.00M;
+                _Detail.CR = 0.00M;
+                _Detail.Description = "";
+                _Detail.Comments = "";
+                _Detail.action = "new";
+
+                _Detail.TitleAccount = string.Empty;
+                _Detail.TitleCompany = string.Empty;
+                _Detail.TitleProject = string.Empty;
+                _Detail.TitleEmployee = string.Empty;
+            };
+
+            return _Detail;
+        }
+        #endregion
+
+        #region Get Nature title 
         private string GetNatureTitle(int _BookID)
         {
 
@@ -195,6 +217,65 @@ namespace AppliedAccounts.Models
             return _Title;
 
         }
+        #endregion
+
+        #region Add, Save, Delete buttons
+        public void New()
+        {
+            MyVoucher.Detail = NewDetail();
+        }
+
+        public void Edit(int _SrNo)
+        {
+            var _Detail = MyVoucher.Detail;
+            MyVoucher.Detail = MyVoucher.Details.Where(e => e.Sr_No == _SrNo).First() ?? _Detail;
+
+        }
+        public void Save()
+        {
+            if (IsVoucherValidated())
+            {
+                var IsSrNo = MyVoucher.Details.Where(e => e.Sr_No == MyVoucher.Detail.Sr_No).Any();
+                if (!IsSrNo)
+                {
+                    MyVoucher.Detail.action = "save";
+                    MyVoucher.Details.Add(MyVoucher.Detail);
+                }
+            }
+        }
+
+        public void SaveAll()
+        {
+
+        }
+        public void Remove(int _SrNo)
+        {
+
+        }
+
+        private bool IsVoucherValidated()
+        {
+            bool IsValid = true;
+
+
+            MsgClass = new(0);
+            if(MyVoucher.Master.BookID==0) { MsgClass.Add(MESSAGE.IDIsZero); }
+            if(MyVoucher.Master.Vou_No.Length==0) { MsgClass.Add(MESSAGE.VouNoNotDefine); }
+            if(MyVoucher.Master.Vou_No.Length==11) { MsgClass.Add(MESSAGE.VouNoNotDefine); }
+            if(MyVoucher.Master.Vou_Date< AppRegistry.MinVouDate) { MsgClass.Add(MESSAGE.VouDateLess); }
+            if(MyVoucher.Master.Vou_Date> AppRegistry.MaxVouDate) { MsgClass.Add(MESSAGE.VouDateMore); }
+            if(MyVoucher.Master.Remarks.Length==0) { MsgClass.Add(MESSAGE.Row_NoRemarks); }
+            if(MyVoucher.Master.Status.Length==0) { MsgClass.Add(MESSAGE.Row_NoStatus); }
+
+            if(MyVoucher.Detail.COA==0) { MsgClass.Add(MESSAGE.Row_CompanyIDZero); }
+            if(MyVoucher.Detail.DR>0 && MyVoucher.Detail.CR>0) { MsgClass.Add(MESSAGE.DRnCRHaveValue); }
+            if(MyVoucher.Detail.DR==0&& MyVoucher.Detail.CR==0) { MsgClass.Add(MESSAGE.DRnCRAreZero); }
+            if(MyVoucher.Detail.Description.Length==0) { MsgClass.Add(MESSAGE.DescriptionIsNothing); }
+            return IsValid;
+
+        }
+
+        #endregion
     }
 
 

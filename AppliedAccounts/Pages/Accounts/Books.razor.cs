@@ -3,8 +3,6 @@ using AppliedAccounts.Models;
 using AppliedDB;
 using Microsoft.AspNetCore.Components;
 
-
-
 namespace AppliedAccounts.Pages.Accounts
 {
     public partial class Books
@@ -14,13 +12,10 @@ namespace AppliedAccounts.Pages.Accounts
 
         public AppUserModel UserProfile { get; set; }
         public BookModel MyModel { get; set; } = new();
-
         public int BookID { get; set; }
-        //public Voucher MyVoucher { get; set; }
-        //public DataSource Source { get; set; }
         public MessageClass MsgClass { get; set; }
 
-
+        public bool IsPageValid { get; set; } = true;
 
         public Books() { }
 
@@ -28,52 +23,55 @@ namespace AppliedAccounts.Pages.Accounts
         {
             MsgClass = new();
             MyModel = new(ID,UserProfile);
+            
+
+            if (MyModel == null) { IsPageValid = false; ErrorMessage = "Model is null"; return; }
+            if (MyModel?.MyVoucher == null) { IsPageValid = false; ErrorMessage = "Voucher is null"; return; }
+            if (MyModel?.MyVoucher.Master == null) { IsPageValid = false; ErrorMessage = "Voucher master data is null"; return; }
+            if (MyModel?.MyVoucher.Detail == null) { IsPageValid = false; ErrorMessage = "Voucher detail data is null"; return; }
         }
 
-        #region Load Data 
-        //public bool LoadData(int _ID)
-        //{
-        //    var _Voucher = Source.GetBookVoucher(_ID).AsEnumerable().ToList();
-        //    if (_Voucher.Count > 0)
-        //    {
-        //        MyVoucher.Master = _Voucher.Select(row => new Record()
-        //        {
-        //            ID1 = row.Field<int>("ID1"),
-        //            Vou_No = row.Field<string>("Vou_No") ?? "",
-        //            Vou_Date = row.Field<DateTime>("Vou_Date"),
-        //            BookID = row.Field<int>("BookID"),
-        //            Amount = row.Field<decimal>("BookID"),
-        //            Ref_No = row.Field<string>("Ref_No") ?? "",
-        //            SheetNo = row.Field<string>("SheetNo") ?? "",
-        //            Remarks = row.Field<string>("Remarks") ?? "",
-        //            Status = row.Field<string>("Status") ?? "Submitted",
-        //        }).First();
+        #region Drop Down Value changed events
+        private void BookIDChanged(int _BookID)
+        {
+            MyModel.MyVoucher.Master.BookID = _BookID;
+            
+        }
 
-        //        MyVoucher.Detail = [.. _Voucher.Select(row => new Records()
-        //        {
-        //            ID2 = row.Field<int>("ID2"),
-        //            TranID = row.Field<int>("TranID"),
-        //            Sr_No = row.Field<int>("SR_NO"),
-        //            COA = row.Field<int>("COA"),
-        //            Company = row.Field<int>("Company"),
-        //            Employee = row.Field<int>("Employee"),
-        //            Project = row.Field<int>("Project"),
-        //            DR = row.Field<decimal>("DR"),
-        //            CR = row.Field<decimal>("CR"),
-        //            Description = row.Field<string>("Description") ?? "",
-        //            Comments = row.Field<string>("Comments") ?? ""
-        //        })];
+        private void AccountIDChanged(int _ID)
+        {
+            MyModel.MyVoucher.Detail.COA = _ID;
+            MyModel.MyVoucher.Detail.TitleAccount = MyModel.Accounts
+                .Where(e => e.ID == MyModel.MyVoucher.Detail.COA)
+                .Select(e => e.Title)
+                .First() ?? "";
+        }
 
-        //        BookID = MyVoucher.Master.BookID;           // Assigned a book ID from voucher data.
-        //    }
-        //    else
-        //    {
-        //        MyModel.MyMessages.Add(Messages.NoRecordFound);
-        //        return false;
-        //    }
+        private void CompanyIDChanged(int _ID)
+        {
+            MyModel.MyVoucher.Detail.Company = _ID;
+            MyModel.MyVoucher.Detail.TitleCompany = MyModel.Companies
+                .Where(e => e.ID == MyModel.MyVoucher.Detail.Company)
+                .Select(e => e.Title)
+                .First() ?? "";
+        }
+        private void ProjectIDChanged(int _ID)
+        {
+            MyModel.MyVoucher.Detail.Project = _ID;
+            MyModel.MyVoucher.Detail.TitleProject = MyModel.Projects
+                .Where(e => e.ID == MyModel.MyVoucher.Detail.Project)
+                .Select(e => e.Title)
+                .First() ?? "";
 
-        //    return true;
-        //}
+        }
+        private void EmployeeIDChanged(int _ID)
+        {
+            MyModel.MyVoucher.Detail.Employee = _ID;
+            MyModel.MyVoucher.Detail.TitleEmployee = MyModel.Employees
+                .Where(e => e.ID == MyModel.MyVoucher.Detail.Employee)
+                .Select(e => e.Title)
+                .First() ?? "";
+        }
         #endregion
 
     }
