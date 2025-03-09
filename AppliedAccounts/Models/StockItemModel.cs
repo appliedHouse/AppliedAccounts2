@@ -27,7 +27,7 @@ namespace AppliedAccounts.Models
 
         public virtual int StockID { get; set; }
         public virtual string DataFile { get; set; } = string.Empty;
-        public virtual AppMessages.AppMessages AppMessages { get; set; } = new();
+        public virtual AppMessages.MessageClass MsgClass { get; set; } = new();
 
         #region Constructor
         public StockItemModel() { CurrentRow = TB_Stock.NewRow(); }
@@ -97,7 +97,7 @@ namespace AppliedAccounts.Models
         #region Save
         public void Save()
         {
-            AppMessages.ClearMessages();
+            MsgClass.ClearMessages();
 
             CurrentRow["ID"] = ID;
             CurrentRow["Code"] = Code;
@@ -107,7 +107,8 @@ namespace AppliedAccounts.Models
             CurrentRow["UOM"] = UOM;
             CurrentRow["SubCategory"] = StockCategory;
             CurrentRow["Notes"] = Description;
-            AppMessages.MyMessages.Add(AppFunctions.Save(DataFile, TB_Stock, CurrentRow));
+            AppFunctions.Save(DataFile, TB_Stock, CurrentRow);
+            MsgClass.Add(string.Concat([Code, ",", Title, " : Add Record"]));
 
 
 

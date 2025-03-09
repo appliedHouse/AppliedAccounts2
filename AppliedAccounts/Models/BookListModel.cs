@@ -9,7 +9,7 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> NatureAccountsList { get; set; }
         public DataSource Source { get; set; }
         public AppUserModel? UserProfile { get; set; }
-        public MessageClass MsgClass { get; set; }
+        public AppMessages.MessageClass MsgClass { get; set; }
 
         public int BookID { get; set; }
         public int BookNatureID { get; set; }

@@ -13,7 +13,7 @@ namespace AppliedAccounts.Pages.Accounts
         public AppUserModel UserProfile { get; set; }
         public BookModel MyModel { get; set; } = new();
         public int BookID { get; set; }
-        public MessageClass MsgClass { get; set; }
+        public AppMessages.MessageClass MsgClass { get; set; }
 
         public bool IsPageValid { get; set; } = true;
 
@@ -25,10 +25,10 @@ namespace AppliedAccounts.Pages.Accounts
             MyModel = new(ID,UserProfile);
             
 
-            if (MyModel == null) { IsPageValid = false; ErrorMessage = "Model is null"; return; }
-            if (MyModel?.MyVoucher == null) { IsPageValid = false; ErrorMessage = "Voucher is null"; return; }
-            if (MyModel?.MyVoucher.Master == null) { IsPageValid = false; ErrorMessage = "Voucher master data is null"; return; }
-            if (MyModel?.MyVoucher.Detail == null) { IsPageValid = false; ErrorMessage = "Voucher detail data is null"; return; }
+            if (MyModel == null) { IsPageValid = false; MsgClass.Add("Model is null"); return; }
+            if (MyModel?.MyVoucher == null) { IsPageValid = false; MsgClass.Add("Voucher is null"); return; }
+            if (MyModel?.MyVoucher.Master == null) { IsPageValid = false; MsgClass.Add("Voucher master data is null"); return; }
+            if (MyModel?.MyVoucher.Detail == null) { IsPageValid = false; MsgClass.Add("Voucher detail data is null"); return; }
         }
 
         #region Drop Down Value changed events

@@ -2,6 +2,7 @@
 using AppliedDB;
 using System.Data;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
+using AppMessages;
 using MESSAGE = AppMessages.Enums.Messages;
 using Tables = AppliedDB.Enums.Tables;
 
@@ -27,10 +28,11 @@ namespace AppliedAccounts.Models
         public AppUserModel? UserProfile { get; set; }
         public DataSource Source { get; set; }
         public MessageClass MsgClass { get; set; }
-        
+
         public DateTime LastVoucherDate { get; set; }
         public DateTime MinVouDate = AppRegistry.MinDate;
         public DateTime MaxVouDate { get; set; }
+        public bool Processing { get; set; } = false;
 
         #endregion
         #region Constructor
@@ -42,6 +44,7 @@ namespace AppliedAccounts.Models
         {
             MsgClass = new();
             MyVoucher = new();
+
 
             try
             {
@@ -70,7 +73,7 @@ namespace AppliedAccounts.Models
                     MsgClass.Add(MESSAGE.UserProfileIsNull);
                 }
 
-                
+
             }
             catch (Exception)
             {
@@ -85,7 +88,7 @@ namespace AppliedAccounts.Models
         #region Load Data
         private bool LoadData()
         {
-           
+
             if (Source != null)
             {
                 try
@@ -139,10 +142,10 @@ namespace AppliedAccounts.Models
                 }
                 catch (Exception)
                 {
-                    
+
                 }
             }
-            return false; 
+            return false;
         }
         #endregion
 
@@ -163,18 +166,18 @@ namespace AppliedAccounts.Models
             _NewVoucher.Master.Status = "Submitted";
 
             _NewVoucher.Detail = NewDetail();
-            
 
-            
+
+
 
             return _NewVoucher;
         }
-        
+
 
         private Detail NewDetail()
         {
             int _MaxSrNo = 1;
-            if(MyVoucher.Details.Count > 0) { _MaxSrNo = MyVoucher.Details.Max(e => e.Sr_No) + 1; }
+            if (MyVoucher.Details.Count > 0) { _MaxSrNo = MyVoucher.Details.Max(e => e.Sr_No) + 1; }
 
 
             var _Detail = new Detail();
@@ -196,7 +199,8 @@ namespace AppliedAccounts.Models
                 _Detail.TitleCompany = string.Empty;
                 _Detail.TitleProject = string.Empty;
                 _Detail.TitleEmployee = string.Empty;
-            };
+            }
+            ;
 
             return _Detail;
         }
@@ -240,42 +244,100 @@ namespace AppliedAccounts.Models
                 {
                     MyVoucher.Detail.action = "save";
                     MyVoucher.Details.Add(MyVoucher.Detail);
+
                 }
             }
         }
 
-        public void SaveAll()
+        public async Task SaveAllAsync()
         {
+            Processing = true;
+            await Task.Delay(1000);
+
+            var Row1 = Source.GetNewRow(Tables.Book);
+            var Row2 = Source.GetNewRow(Tables.Book2);
+
+            Row1["ID"] = MyVoucher.Master.ID1;
+
+
+            Processing = false;
 
         }
         public void Remove(int _SrNo)
         {
 
         }
+        #endregion
 
+        #region Validation
         private bool IsVoucherValidated()
         {
             bool IsValid = true;
 
 
-            MsgClass = new(0);
-            if(MyVoucher.Master.BookID==0) { MsgClass.Add(MESSAGE.IDIsZero); }
-            if(MyVoucher.Master.Vou_No.Length==0) { MsgClass.Add(MESSAGE.VouNoNotDefine); }
-            if(MyVoucher.Master.Vou_No.Length==11) { MsgClass.Add(MESSAGE.VouNoNotDefine); }
-            if(MyVoucher.Master.Vou_Date< AppRegistry.MinVouDate) { MsgClass.Add(MESSAGE.VouDateLess); }
-            if(MyVoucher.Master.Vou_Date> AppRegistry.MaxVouDate) { MsgClass.Add(MESSAGE.VouDateMore); }
-            if(MyVoucher.Master.Remarks.Length==0) { MsgClass.Add(MESSAGE.Row_NoRemarks); }
-            if(MyVoucher.Master.Status.Length==0) { MsgClass.Add(MESSAGE.Row_NoStatus); }
+            MsgClass = new();
+            if (MyVoucher.Master.BookID == 0) { MsgClass.Add(MESSAGE.BookIDIsZero); }
+            if (MyVoucher.Master.Vou_No.Length == 0) { MsgClass.Add(MESSAGE.VouNoNotDefine); }
+            if (!MyVoucher.Master.Vou_No.ToLower().Equals("new"))
+            {
+                if (MyVoucher.Master.Vou_No.Length != 11) { MsgClass.Add(MESSAGE.VouNoNotDefineProperly); }
+            }
+            if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgClass.Add(MESSAGE.VouDateLess); }
+            if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgClass.Add(MESSAGE.VouDateMore); }
+            if (MyVoucher.Master.Remarks.Length == 0) { MsgClass.Add(MESSAGE.Row_NoRemarks); }
+            if (MyVoucher.Master.Status.Length == 0) { MsgClass.Add(MESSAGE.Row_NoStatus); }
+            if (MyVoucher.Detail.Sr_No == 0) { MsgClass.Add(MESSAGE.SerialNoIsZero); }
+            if (MyVoucher.Detail.COA == 0) { MsgClass.Add(MESSAGE.Row_COAIsZero); }
+            if (MyVoucher.Detail.DR > 0 && MyVoucher.Detail.CR > 0) { MsgClass.Add(MESSAGE.DRnCRHaveValue); }
+            if (MyVoucher.Detail.DR == 0 && MyVoucher.Detail.CR == 0) { MsgClass.Add(MESSAGE.DRnCRAreZero); }
+            if (MyVoucher.Detail.Description.Length == 0) { MsgClass.Add(MESSAGE.DescriptionIsNothing); }
+            if (MsgClass.Count == 0) { IsValid = false; }
 
-            if(MyVoucher.Detail.COA==0) { MsgClass.Add(MESSAGE.Row_CompanyIDZero); }
-            if(MyVoucher.Detail.DR>0 && MyVoucher.Detail.CR>0) { MsgClass.Add(MESSAGE.DRnCRHaveValue); }
-            if(MyVoucher.Detail.DR==0&& MyVoucher.Detail.CR==0) { MsgClass.Add(MESSAGE.DRnCRAreZero); }
-            if(MyVoucher.Detail.Description.Length==0) { MsgClass.Add(MESSAGE.DescriptionIsNothing); }
             return IsValid;
 
         }
-
         #endregion
+
+        #region Navigation
+
+        private int _Index = 0;
+        public void Top()
+        {
+
+            _Index = 1;
+            if (MyVoucher.Details.Count > 0)
+            { MyVoucher.Detail = MyVoucher.Details.First(); }
+
+        }
+        public void Next()
+        {
+
+            if (MyVoucher.Details.Count > 0)
+            {
+                _Index = MyVoucher.Details.IndexOf(MyVoucher.Detail) + 1;
+                var Counter = MyVoucher.Details.Count - 1;
+                if (_Index > Counter) { _Index = Counter; }
+                MyVoucher.Detail = MyVoucher.Details[_Index];
+            }
+        }
+        public void Back()
+        {
+
+            if (MyVoucher.Details.Count > 0)
+            {
+                _Index = MyVoucher.Details.IndexOf(MyVoucher.Detail) - 1;
+                if (_Index < 0) { _Index = 0; }
+                MyVoucher.Detail = MyVoucher.Details[_Index];
+            }
+        }
+        public void Last()
+        {
+            _Index = MyVoucher.Details.Count - 1;
+            if (MyVoucher.Details.Count > 0)
+            { MyVoucher.Detail = MyVoucher.Details.Last(); }
+        }
+        #endregion
+
     }
 
 

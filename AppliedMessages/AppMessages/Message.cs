@@ -9,6 +9,7 @@ namespace AppMessages
         {
             Code = _Code;
         }
+
         public Message(string _Code, string _WebPage, string _Method, string _User)
         {
             Code = _Code;

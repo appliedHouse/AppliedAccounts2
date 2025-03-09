@@ -148,7 +148,7 @@ namespace AppliedDB
         public string Action { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
         public int Effected { get; set; } = 0;
-        public AppMessages.AppMessages MyMessages { get; set; } = new();
+        public MessageClass MyMessages { get; set; } = new();
 
         #region Constructors
         public CommandClass()
@@ -181,29 +181,29 @@ namespace AppliedDB
         }
 
 
-        public CommandClass(DataRow _Row, string DBFile, AppMessages.AppMessages _Messages)
-        {
-            Row = _Row;
-            MyMessages = _Messages;
+        //public CommandClass(DataRow _Row, string DBFile, MessageClass _Messages)
+        //{
+        //    Row = _Row;
+        //    MyMessages = _Messages;
 
-            if ((int)Row["ID"] == 0) { Action = "Insert"; } else { Action = "Update"; }
+        //    if ((int)Row["ID"] == 0) { Action = "Insert"; } else { Action = "Update"; }
 
-            try
-            {
-                CommandInsert = Commands.Insert(Row, DBFile);
-                CommandUpdate = Commands.UpDate(Row, DBFile);
-                CommandDelete = Commands.Delete(Row, DBFile);
-                //MyMessages = _Messages;
+        //    try
+        //    {
+        //        CommandInsert = Commands.Insert(Row, DBFile);
+        //        CommandUpdate = Commands.UpDate(Row, DBFile);
+        //        CommandDelete = Commands.Delete(Row, DBFile);
+        //        //MyMessages = _Messages;
 
-            }
-            catch (Exception)
-            {
-                MyMessages.Add(Messages.CommendError);
-            }
+        //    }
+        //    catch (Exception)
+        //    {
+        //        MyMessages.Add(Messages.CommendError);
+        //    }
 
 
 
-        }
+        //}
         #endregion
 
         // Insert and Update the Row

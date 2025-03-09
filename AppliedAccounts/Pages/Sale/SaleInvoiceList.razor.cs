@@ -178,7 +178,7 @@ namespace AppliedAccounts.Pages.Sale
             }
             catch (Exception)
             {
-                Model.MyMessages.Add(MESSAGE.Default);
+                Model.MsgClass.Add(MESSAGE.Default);
             }
 
             return _Reportmodel;

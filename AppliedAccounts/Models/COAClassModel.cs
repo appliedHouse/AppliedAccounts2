@@ -18,7 +18,7 @@ namespace AppliedAccounts.Models
 
         public int CountRecord => Records.Count;
         public int Count => Data.Count;
-        public AppMessages.AppMessages MyMessages { get; set; } = new();
+        public AppMessages.MessageClass MsgClass { get; set; } = new();
         public string SearchText { get; set; } = string.Empty;
         public bool IsDeleted { get; set; } = false;
 
@@ -28,7 +28,7 @@ namespace AppliedAccounts.Models
         public COAClassModel(AppUserModel _UserProfile)
         {
             AppUser = _UserProfile;
-            MyMessages = MessageClass.Messages;
+            //MyMessages = MessageClass.Messages;
             DBFile = AppUser.DataFile;
             Source = new(AppUser);
             Data = Source.GetList(Query.COAClassList);
@@ -134,7 +134,7 @@ namespace AppliedAccounts.Models
         {
             GetRecord(_ID);
             IsDeleted = false;
-            MyMessages = MessageClass.Messages;
+            //MyMessages = MessageClass.Messages;
             var _DeleteRow = DataSource.GetNewRow(DBFile, Tables.COA_Class);
 
             if (_DeleteRow is not null)
@@ -165,7 +165,7 @@ namespace AppliedAccounts.Models
             var _NewRow = GetDataRow(Record);
             if (Validate(_NewRow))
             {
-                var _Commands = new CommandClass(_NewRow, DBFile, MyMessages);
+                var _Commands = new CommandClass(_NewRow, DBFile);
                 if (_Commands.CommandInsert is not null || _Commands.CommandUpdate is not null)
                 {
                     var _result = _Commands.SaveChanges();
@@ -178,7 +178,7 @@ namespace AppliedAccounts.Models
                 }
                 else
                 {
-                    MyMessages.Add(Messages.SQLQueryIsNull);
+                    MsgClass.Add(Messages.SQLQueryIsNull);
                 }
             }
 
@@ -190,12 +190,12 @@ namespace AppliedAccounts.Models
         private bool Validate(DataRow _Row)
         {
             var _Validated = true;
-            if (_Row["ID"] is null) { _Validated = false; MyMessages.Add(Messages.IDIsNull); }
-            if (_Row["Code"] is null) { _Validated = false; MyMessages.Add(Messages.CodeIsNull); }
-            if (_Row["Title"] is null) { _Validated = false; MyMessages.Add(Messages.ColumnIsNull); }
+            if (_Row["ID"] is null) { _Validated = false; MsgClass.Add(Messages.IDIsNull); }
+            if (_Row["Code"] is null) { _Validated = false; MsgClass.Add(Messages.CodeIsNull); }
+            if (_Row["Title"] is null) { _Validated = false; MsgClass.Add(Messages.ColumnIsNull); }
 
-            if (_Row["Code"].ToString().Length == 0) { _Validated = false; MyMessages.Add(Messages.CodeIsZero); }
-            if (_Row["Title"].ToString().Length == 0) { _Validated = false; MyMessages.Add(Messages.TitleIsZero); }
+            if (_Row["Code"].ToString()!.Length == 0) { _Validated = false; MsgClass.Add(Messages.CodeIsZero); }
+            if (_Row["Title"].ToString()!.Length == 0) { _Validated = false; MsgClass.Add(Messages.TitleIsZero); }
             return _Validated;
         }
         #endregion
