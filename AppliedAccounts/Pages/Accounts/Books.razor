@@ -1,6 +1,6 @@
 ﻿@layout PageLayout;
 @page "/Accounts/Books";
-@page "/Accounts/Books/{ID:int}/{NatureID:int}"
+@page "/Accounts/Books/{ID:int}/{BookID:int}"
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
@@ -89,7 +89,8 @@
 
             <div class="row g-md-2 mb-2 my-2">
                 <div class="col-md-4">
-                    <div class="form-floating">
+                    
+                     <div class="form-floating">
                         <InputSelect id="ddBook" class="form-control item-height"
                                      TValue="int"
                                      Value="@MyModel.MyVoucher.Master.BookID"
@@ -109,7 +110,7 @@
 
                         </InputSelect>
                         <label for="ddBook">@MyModel.BookNatureTitle</label>
-                    </div>
+                    </div> 
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating">
@@ -308,7 +309,7 @@
                     <button type="button" class="btn btn-sm w1 btn-primary" title="Save" @onclick="MyModel.Save"><i class="fa-solid fa-arrow-down"></i></button>
                 </div>
                 <div class="p-2">
-                    <button type="submit" class="btn btn-sm w1 btn-primary" title="Save All" @onclick="MyModel.SaveAll"><i class="fas fa-save"></i></button>
+                    <button type="submit" class="btn btn-sm w1 btn-primary" title="Save All" @onclick="MyModel.SaveAllAsync"><i class="fas fa-save"></i></button>
                 </div>
 
                 @if (MyModel.MyVoucher != null && MyModel.MyVoucher.Details.Count > 0)

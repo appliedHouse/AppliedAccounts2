@@ -8,7 +8,7 @@ using Tables = AppliedDB.Enums.Tables;
 
 namespace AppliedAccounts.Models
 {
-    public class BookModel
+    public class BookModel : IVoucher
     {
 
         #region Variables
@@ -19,11 +19,11 @@ namespace AppliedAccounts.Models
 
         public Voucher MyVoucher { get; set; }
 
-        public List<CodeTitle> Companies { get; set; }
-        public List<CodeTitle> Employees { get; set; }
-        public List<CodeTitle> Projects { get; set; }
-        public List<CodeTitle> Accounts { get; set; }
-        public List<CodeTitle> BookList { get; set; }
+        public List<CodeTitle> Companies { get; set; } = [];
+        public List<CodeTitle> Employees { get; set; } = [];
+        public List<CodeTitle> Projects { get; set; } = [];
+        public List<CodeTitle> Accounts { get; set; } = [];
+        public List<CodeTitle> BookList { get; set; } = [];
 
         public AppUserModel? UserProfile { get; set; }
         public DataSource Source { get; set; }
@@ -32,7 +32,12 @@ namespace AppliedAccounts.Models
         public DateTime LastVoucherDate { get; set; }
         public DateTime MinVouDate = AppRegistry.MinDate;
         public DateTime MaxVouDate { get; set; }
+
+        public string DataFile { get; set; } 
         public bool Processing { get; set; } = false;
+        private int CashNatureID = 0;
+        private int BankNatureID = 0;
+
 
         #endregion
         #region Constructor
@@ -40,16 +45,22 @@ namespace AppliedAccounts.Models
         {
 
         }
-        public BookModel(int _VoucherID, AppUserModel _AppUserProfile)
+        public BookModel(int _VoucherID, int _BookID, AppUserModel _AppUserProfile)
         {
             MsgClass = new();
             MyVoucher = new();
 
-
             try
             {
+                BookID = _BookID;
                 VoucherID = _VoucherID;
                 UserProfile = _AppUserProfile;
+                DataFile = _AppUserProfile.DataFile;
+
+                CashNatureID = AppRegistry.GetNumber(DataFile, "CashBKNature");
+                BankNatureID = AppRegistry.GetNumber(DataFile, "BankBKNature");
+                
+             
 
                 if (UserProfile != null)
                 {
@@ -62,11 +73,20 @@ namespace AppliedAccounts.Models
                         LoadData();
                     }
 
-                    BookList = Source.GetBookAccounts(BookNature);
+
                     Companies = Source.GetCustomers();
                     Employees = Source.GetEmployees();
                     Projects = Source.GetProjects();
                     Accounts = Source.GetAccounts();
+
+                    var result = Source.SeekValue(Tables.COA, BookID, "Nature") ?? 0;
+                    BookNature = (int)result;
+                    if (BookNature > 0)
+                    { BookList = Source.GetBookAccounts(BookNature); }
+
+                    if (BookNature == CashNatureID) { BookNatureTitle = "Cash Book"; }
+                    if (BookNature == BankNatureID) { BookNatureTitle = "Bank Book"; }
+
                 }
                 else
                 {
@@ -86,7 +106,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Load Data
-        private bool LoadData()
+        public bool LoadData()
         {
 
             if (Source != null)
@@ -100,7 +120,6 @@ namespace AppliedAccounts.Models
                         if (VoucherData.Count > 0)
                         {
                             BookID = VoucherData.Select(row => row.Field<int>("BookID")).First();
-                            BookNatureTitle = GetNatureTitle(BookID);
 
                             MyVoucher.Master = VoucherData!.Select(first => new Master()
                             {
@@ -152,7 +171,7 @@ namespace AppliedAccounts.Models
         #region New Voucher
         private Voucher NewVoucher()
         {
-            BookNatureTitle = GetNatureTitle(BookID);
+            
 
             Voucher _NewVoucher = new();
             _NewVoucher.Master.ID1 = 0;
@@ -251,17 +270,68 @@ namespace AppliedAccounts.Models
 
         public async Task SaveAllAsync()
         {
-            Processing = true;
-            await Task.Delay(1000);
+            if (!Processing)
+            {
+                await Task.Run(() =>
+                {
+                    Processing = true;
 
-            var Row1 = Source.GetNewRow(Tables.Book);
-            var Row2 = Source.GetNewRow(Tables.Book2);
+                    if (MyVoucher.Master.Vou_No.ToUpper().Equals("NEW"))
+                    {
+                        if(BookNature == CashNatureID)         // Cash Book Nature
+                        {
+                            MyVoucher.Master.Vou_No = NewVoucherNo.GetCashVoucher(UserProfile!.DataFile, MyVoucher.Master.Vou_Date);
+                        }
 
-            Row1["ID"] = MyVoucher.Master.ID1;
+                        if (BookNature == BankNatureID)         // Bank Book Nature
+                        {
+                            MyVoucher.Master.Vou_No = NewVoucherNo.GetCashVoucher(UserProfile!.DataFile, MyVoucher.Master.Vou_Date);
+                        }
+                    }
 
 
-            Processing = false;
+                    var Row1 = Source.GetNewRow(Tables.Book);
 
+                    Row1["ID"] = MyVoucher.Master.ID1;
+                    Row1["Vou_No"] = MyVoucher.Master.Vou_No;
+                    Row1["Vou_Date"] = MyVoucher.Master.Vou_Date;
+                    Row1["BookID"] = MyVoucher.Master.BookID;
+                    Row1["Ref_No"] = MyVoucher.Master.Vou_Date;
+                    Row1["SheetNo"] = MyVoucher.Master.SheetNo;
+                    Row1["Remarks"] = MyVoucher.Master.Remarks;
+                    Row1["Status"] = MyVoucher.Master.Status;
+                    Row1["Amount"] = MyVoucher.Details.Sum(e => e.DR) - MyVoucher.Details.Sum(e => e.CR);
+
+                    CommandClass cmdClass1 = new(Row1, Source.MyConnection);
+                    cmdClass1.SaveChanges();
+
+                    Row1["ID"] = cmdClass1.KeyID;                // Get a new Id of record after save / insert.
+
+
+                    foreach (var item in MyVoucher.Details)
+                    {
+                        var Row2 = Source.GetNewRow(Tables.Book2);
+
+                        Row2["ID"] = MyVoucher.Detail.ID2;
+                        Row2["TranID"] = Row1["ID"];
+                        Row2["SR_NO"] = MyVoucher.Detail.Sr_No;
+                        Row2["COA"] = MyVoucher.Detail.COA;
+                        Row2["Company"] = MyVoucher.Detail.Company;
+                        Row2["Employee"] = MyVoucher.Detail.Employee;
+                        Row2["Project"] = MyVoucher.Detail.Project;
+                        Row2["DR"] = MyVoucher.Detail.DR;
+                        Row2["CR"] = MyVoucher.Detail.CR;
+                        Row2["Description"] = MyVoucher.Detail.Description;
+                        Row2["Comments"] = MyVoucher.Detail.Comments;
+
+                        CommandClass cmdClass2 = new(Row2, Source.MyConnection);
+                        cmdClass2.SaveChanges();
+                    }
+
+                    Processing = false;
+                });
+
+            }
         }
         public void Remove(int _SrNo)
         {
@@ -270,7 +340,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Validation
-        private bool IsVoucherValidated()
+        public bool IsVoucherValidated()
         {
             bool IsValid = true;
 
@@ -291,7 +361,7 @@ namespace AppliedAccounts.Models
             if (MyVoucher.Detail.DR > 0 && MyVoucher.Detail.CR > 0) { MsgClass.Add(MESSAGE.DRnCRHaveValue); }
             if (MyVoucher.Detail.DR == 0 && MyVoucher.Detail.CR == 0) { MsgClass.Add(MESSAGE.DRnCRAreZero); }
             if (MyVoucher.Detail.Description.Length == 0) { MsgClass.Add(MESSAGE.DescriptionIsNothing); }
-            if (MsgClass.Count == 0) { IsValid = false; }
+            if (MsgClass.Count > 0) { IsValid = false; }
 
             return IsValid;
 
@@ -371,6 +441,8 @@ namespace AppliedAccounts.Models
         public string SheetNo { get; set; }
         public string Remarks { get; set; }
         public string Status { get; set; }
+
+
     }
 
     public class Detail

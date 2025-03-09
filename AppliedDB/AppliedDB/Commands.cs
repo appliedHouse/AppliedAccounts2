@@ -141,13 +141,14 @@ namespace AppliedDB
     }
     public class CommandClass
     {
-        public SQLiteCommand? CommandInsert { get; set; }
-        public SQLiteCommand? CommandUpdate { get; set; }
-        public SQLiteCommand? CommandDelete { get; set; }
-        public DataRow? Row { get; set; }
+        public SQLiteCommand CommandInsert { get; set; }
+        public SQLiteCommand CommandUpdate { get; set; }
+        public SQLiteCommand CommandDelete { get; set; }
+        public DataRow Row { get; set; }
         public string Action { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
         public int Effected { get; set; } = 0;
+        public int KeyID { get; set; } = 0;
         public MessageClass MyMessages { get; set; } = new();
 
         #region Constructors
@@ -174,41 +175,18 @@ namespace AppliedDB
 
             if ((int)Row["ID"] == 0) { Action = "Insert"; } else { Action = "Update"; }
 
-            CommandInsert = Commands.Insert(Row, DBConnection);
+            CommandInsert = Commands.Insert(Row, DBConnection); 
             CommandUpdate = Commands.UpDate(Row, DBConnection);
             CommandDelete = Commands.Delete(Row, DBConnection);
 
         }
 
-
-        //public CommandClass(DataRow _Row, string DBFile, MessageClass _Messages)
-        //{
-        //    Row = _Row;
-        //    MyMessages = _Messages;
-
-        //    if ((int)Row["ID"] == 0) { Action = "Insert"; } else { Action = "Update"; }
-
-        //    try
-        //    {
-        //        CommandInsert = Commands.Insert(Row, DBFile);
-        //        CommandUpdate = Commands.UpDate(Row, DBFile);
-        //        CommandDelete = Commands.Delete(Row, DBFile);
-        //        //MyMessages = _Messages;
-
-        //    }
-        //    catch (Exception)
-        //    {
-        //        MyMessages.Add(Messages.CommendError);
-        //    }
-
-
-
-        //}
         #endregion
 
         // Insert and Update the Row
         public bool SaveChanges()
         {
+            bool result = false;
             if (Row is null) { MyMessages.Add(Messages.RowValueNull); return false; }
 
             if (Action == "Update")
@@ -237,19 +215,19 @@ namespace AppliedDB
                         CommandInsert.Connection.Open();
                         Effected = CommandInsert.ExecuteNonQuery();
                         CommandInsert.Connection.Close();
-                    }
+                                            }
                     catch (Exception)
                     {
-                        MyMessages.Add(Messages.RowNotDeleted); return false;
+                        MyMessages.Add(Messages.RowNotDeleted); result= false;
                     }
 
                 }
             }
 
-            if (Effected == 0) { MyMessages.Add(Messages.NotSave); return false; }
-            if (Effected > 0) { MyMessages.Add(Messages.Save); return true; }
+            if (Effected == 0) { MyMessages.Add(Messages.NotSave); result= false; }
+            if (Effected > 0) { MyMessages.Add(Messages.Save); KeyID = (int)Row["ID"];  result= true; }
 
-            return false;
+            return result;
         }
 
         // Delete the row

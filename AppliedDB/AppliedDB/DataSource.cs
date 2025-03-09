@@ -8,9 +8,9 @@ namespace AppliedDB
 {
     public class DataSource
     {
-        public AppUserModel? UserProfile { get; set; }
-        public SQLiteConnection? MyConnection { get; set; }
-        public SQLiteCommand? MyCommand { get; set; }
+        public AppUserModel UserProfile { get; set; }
+        public SQLiteConnection MyConnection { get; set; }
+        public SQLiteCommand MyCommand { get; set; }
         public string DBFile => GetDataFile();
 
         #region Constructor
@@ -344,9 +344,15 @@ namespace AppliedDB
             // _ID     => ID primary key for search record
             // _column => Column Name for search value
 
-            return GetTable(_Table).AsEnumerable().ToList().
-                    Where(rows => rows.Field<int>("ID") == _ID).
-                    Select(col => col.Field<object>(_column));
+            var TableList = GetTable(_Table).AsEnumerable().ToList().Where(rows => rows.Field<int>("ID") == _ID).SingleOrDefault();
+
+            if(TableList != null)
+            {
+                return TableList[_column];
+
+            }
+
+            return null;
 
         }
 

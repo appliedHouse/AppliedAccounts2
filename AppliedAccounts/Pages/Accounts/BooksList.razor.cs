@@ -63,7 +63,10 @@ namespace AppliedAccounts.Pages.Accounts
 
         public void New()
         {
-            NavManager.NavigateTo($"/Accounts/Books/{MyModel.SelectedVoucherID}/{MyModel.BookNatureID}");
+            if (MyModel.BookID > 0)
+            {
+                NavManager.NavigateTo($"/Accounts/Books/{MyModel.SelectedVoucherID}/{MyModel.BookID}");
+            }
         }
 
         public void Refresh()

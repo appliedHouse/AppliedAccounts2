@@ -1,6 +1,6 @@
-﻿using AppliedAccounts.Data;
-using AppliedAccounts.Models;
+﻿using AppliedAccounts.Models;
 using AppliedDB;
+using AppMessages;
 using Microsoft.AspNetCore.Components;
 
 namespace AppliedAccounts.Pages.Accounts
@@ -8,12 +8,12 @@ namespace AppliedAccounts.Pages.Accounts
     public partial class Books
     {
         [Parameter] public int ID { get; set; }
-        [Parameter] public int NatureID { get; set; }
+        //[Parameter] public int NatureID { get; set; }
+        [Parameter] public int BookID { get; set; }
 
         public AppUserModel UserProfile { get; set; }
         public BookModel MyModel { get; set; } = new();
-        public int BookID { get; set; }
-        public AppMessages.MessageClass MsgClass { get; set; }
+        public MessageClass MsgClass { get; set; }
 
         public bool IsPageValid { get; set; } = true;
 
@@ -22,8 +22,7 @@ namespace AppliedAccounts.Pages.Accounts
         public void Start()
         {
             MsgClass = new();
-            MyModel = new(ID,UserProfile);
-            
+            MyModel = new(ID,BookID, UserProfile);
 
             if (MyModel == null) { IsPageValid = false; MsgClass.Add("Model is null"); return; }
             if (MyModel?.MyVoucher == null) { IsPageValid = false; MsgClass.Add("Voucher is null"); return; }
@@ -34,8 +33,8 @@ namespace AppliedAccounts.Pages.Accounts
         #region Drop Down Value changed events
         private void BookIDChanged(int _BookID)
         {
-            MyModel.MyVoucher.Master.BookID = _BookID;
-            
+            BookID = _BookID;
+            MyModel.MyVoucher.Master.BookID = BookID;
         }
 
         private void AccountIDChanged(int _ID)

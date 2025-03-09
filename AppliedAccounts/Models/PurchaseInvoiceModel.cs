@@ -260,9 +260,9 @@ namespace AppliedAccounts.Models
                     // Bill Payable Master Record 
 
 
-                    if ((string)Row1["Vou_No"] == "New")
+                    if (Row1.Field<string>("Vou_No")!.ToUpper().Equals("NEW"))
                     {
-                        Row1["Vou_No"] = NewVoucherNo.GetPurchaseVouNo(UserProfile.DataFile);
+                        Row1["Vou_No"] = NewVoucherNo.GetPurchaseVoucher(UserProfile.DataFile, Row1.Field<DateTime>("Vou_Date"));
                     }
 
                     string DBFile = UserProfile.DataFile;
