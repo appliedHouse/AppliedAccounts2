@@ -307,22 +307,21 @@ namespace AppliedAccounts.Models
 
                     Row1["ID"] = cmdClass1.KeyID;                // Get a new Id of record after save / insert.
 
+                    var Row2 = Source.GetNewRow(Tables.Book2);
 
                     foreach (var item in MyVoucher.Details)
                     {
-                        var Row2 = Source.GetNewRow(Tables.Book2);
-
-                        Row2["ID"] = MyVoucher.Detail.ID2;
+                        Row2["ID"] = item.ID2;
                         Row2["TranID"] = Row1["ID"];
-                        Row2["SR_NO"] = MyVoucher.Detail.Sr_No;
-                        Row2["COA"] = MyVoucher.Detail.COA;
-                        Row2["Company"] = MyVoucher.Detail.Company;
-                        Row2["Employee"] = MyVoucher.Detail.Employee;
-                        Row2["Project"] = MyVoucher.Detail.Project;
-                        Row2["DR"] = MyVoucher.Detail.DR;
-                        Row2["CR"] = MyVoucher.Detail.CR;
-                        Row2["Description"] = MyVoucher.Detail.Description;
-                        Row2["Comments"] = MyVoucher.Detail.Comments;
+                        Row2["SR_NO"] = item.Sr_No;
+                        Row2["COA"] = item.COA;
+                        Row2["Company"] = item.Company;
+                        Row2["Employee"] = item.Employee;
+                        Row2["Project"] = item.Project;
+                        Row2["DR"] = item.DR;
+                        Row2["CR"] = item.CR;
+                        Row2["Description"] = item.Description;
+                        Row2["Comments"] = item.Comments;
 
                         CommandClass cmdClass2 = new(Row2, Source.MyConnection);
                         cmdClass2.SaveChanges();
