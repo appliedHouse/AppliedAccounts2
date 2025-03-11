@@ -2,21 +2,20 @@
 @page "/Accounts/Books";
 @page "/Accounts/Books/{ID:int}/{BookID:int}"
 @attribute [Authorize];
+
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
 @using AppliedAccounts.Data;
+@using AppliedAccounts.Services
 @using AppliedDB
 @using System.Data
 
 @inject AuthenticationStateProvider authorized;
 @inject NavigationManager NavManager;
 @inject IJSRuntime js
-
+@inject ToastService ToastService
 
 @code {
-
-    private string BookTitle = "Book Title";
-    private string NatureTitle = "Title Title";
 
     private string UserRoll;
     private string DateFormat = Format.DDMMYY;
@@ -25,38 +24,82 @@
     private decimal Tot_CR = 0.0M;
     private string ErrorMessage = string.Empty;
 
+    private bool IsVisible { get; set; }
+    private string? Message { get; set; }
+    private string ToastCssClass { get; set; } = string.Empty;
+
     protected override void OnInitialized()
     {
+        ToastService.OnShowToast += ShowToast;
         UserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
-
         Start();
-
+        toast = new();
 
     }
 
+    public ToastClass toast { get; set; }
 
+    public static ToastClass SaveToast = new()
+        {
+            Message = "Save",
+            Level = ToastClass.ToastLevel.Success,
+            Position = ToastClass.ToastPosition.Top,
+            ShowToast = true
 
-    #region Temp
-    // private string searchText { get; set; }
-    // private List<CodeTitle> FilteredAccountsList = new();
+        };
+    public static ToastClass DeleteToast = new()
+        {
+            Message = "Delete",
+            Level = ToastClass.ToastLevel.Error,
+            Position = ToastClass.ToastPosition.Bottom,
+            ShowToast = true,
+        };
 
-    // private void FilterAccountList(ChangeEventArgs e)
-    // {
-    //     searchText = e.Value?.ToString() ?? "";
-    //     if (string.IsNullOrWhiteSpace(searchText))
-    //     {
-    //         FilteredAccountsList = MyModel.Accounts;
-    //     }
-    //     else
-    //     {
-    //         FilteredAccountsList = MyModel.Accounts
-    //             .Where(book => book.Title.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-    //             .ToList();
-    //     }
-    // }
-    #endregion
+    private void ShowToast(ToastClass _toast)
+    {
+        toast = _toast;
+        ShowToast(_toast.Message, _toast.CssClass);
+    }
+   
+    private void ShowToast(string message, string cssClass)
+    {
+        toast.Message = message;
+        toast.CssClass = cssClass;
+        toast.ShowToast = true;
+        StateHasChanged();
 
+        // Hide toast after 3 seconds
+        Task.Delay(5000).ContinueWith(_ =>
+        {
+            toast.ShowToast = false;
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    private void HideToast()
+    {
+        toast.ShowToast = false;
+    }
 }
+
+
+
+<ShowToastMessage toastClass="@MyToastClass"></ShowToastMessage>
+
+<div class="toast-container position-fixed @toast.GetPosition()">
+    @if (toast.ShowToast)
+    {
+        <div class="toast show @toast.GetLevel()" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @toast.Message
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" @onclick="HideToast"></button>
+            </div>
+        </div>
+    }
+</div>
+
 
 <style>
     .myContainer .row {
@@ -81,7 +124,7 @@
 
     <EditForm Model="@MyModel">
         <div class="container myContainer flex-md-row ">
-          
+
             <input @bind-value="MyModel.MyVoucher.Master.ID1" hidden />
             <input @bind-value="MyModel.MyVoucher.Master.Status" hidden />
             <input @bind-value="MyModel.MyVoucher.Detail.ID2" hidden />
@@ -89,8 +132,8 @@
 
             <div class="row g-md-2 mb-2 my-2">
                 <div class="col-md-4">
-                    
-                     <div class="form-floating">
+
+                    <div class="form-floating">
                         <InputSelect id="ddBook" class="form-control item-height"
                                      TValue="int"
                                      Value="@MyModel.MyVoucher.Master.BookID"
@@ -110,7 +153,7 @@
 
                         </InputSelect>
                         <label for="ddBook">@MyModel.BookNatureTitle</label>
-                    </div> 
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating">
@@ -309,7 +352,7 @@
                     <button type="button" class="btn btn-sm w1 btn-primary" title="Save" @onclick="MyModel.Save"><i class="fa-solid fa-arrow-down"></i></button>
                 </div>
                 <div class="p-2">
-                    <button type="submit" class="btn btn-sm w1 btn-primary" title="Save All" @onclick="MyModel.SaveAllAsync"><i class="fas fa-save"></i></button>
+                    <button type="button" class="btn btn-sm w1 btn-success" data-bs-toggle="modal" data-bs-target="#SaveVoucher"><i class="fas fa-save"></i></button>
                 </div>
 
                 @if (MyModel.MyVoucher != null && MyModel.MyVoucher.Details.Count > 0)
@@ -388,7 +431,71 @@
                 </div>
             }
         }
+
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="SaveVoucher" tabindex="-1" aria-labelledby="SaveVoucherLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="SaveVoucherLabel">SAVE @MyModel.BookNatureTitle</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @if (MyModel.MyVoucher?.Details.Count > 0)
+                        {
+                            <p>Save Voucher No @MyModel.MyVoucher?.Master.Vou_No</p>
+                        }
+                        else
+                        {
+                            <p>No transactions found to save</p>
+                        }
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                        @if (MyModel.MyVoucher?.Details.Count > 0)
+                        {
+                            <button type="submit" class="btn btn-success btn-sm" title="Save All" @onclick="SaveAll"> Save</button>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
     </EditForm>
+
+    <!-- Toast -->
+
+
+    <div class="toast-container" style="position: fixed; top: 1rem; right: 1rem;">
+        @if (IsVisible)
+        {
+            <div class="toast @ToastCssClass" role="alert">
+                <div class="toast-body">
+                    @Message
+                </div>
+            </div>
+        }
+    </div>
+
+
+    @code {
+
+
+
+}
+
+
+
 }
 else
 {
@@ -396,3 +503,9 @@ else
         @ErrorMessage
     </div>
 }
+
+
+
+<button class="btn btn-primary" @onclick="(()=>ShowToast(SaveToast))">Save</button>
+<button class="btn btn-primary" @onclick="(()=>ShowToast(DeleteToast))">Delete</button>
+

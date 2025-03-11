@@ -1,7 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedDB;
 using System.Data;
-using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using AppMessages;
 using MESSAGE = AppMessages.Enums.Messages;
 using Tables = AppliedDB.Enums.Tables;
@@ -270,6 +269,8 @@ namespace AppliedAccounts.Models
 
         public async Task SaveAllAsync()
         {
+            
+
             if (!Processing)
             {
                 await Task.Run(() =>
@@ -285,7 +286,7 @@ namespace AppliedAccounts.Models
 
                         if (BookNature == BankNatureID)         // Bank Book Nature
                         {
-                            MyVoucher.Master.Vou_No = NewVoucherNo.GetCashVoucher(UserProfile!.DataFile, MyVoucher.Master.Vou_Date);
+                            MyVoucher.Master.Vou_No = NewVoucherNo.GetBankVoucher(UserProfile!.DataFile, MyVoucher.Master.Vou_Date);
                         }
                     }
 
@@ -305,7 +306,7 @@ namespace AppliedAccounts.Models
                     CommandClass cmdClass1 = new(Row1, Source.MyConnection);
                     cmdClass1.SaveChanges();
 
-                    Row1["ID"] = cmdClass1.KeyID;                // Get a new Id of record after save / insert.
+                    Row1["ID"] = cmdClass1.PrimaryKeyID;                // Get a new Id of record after save / insert.
 
                     var Row2 = Source.GetNewRow(Tables.Book2);
 
@@ -325,6 +326,8 @@ namespace AppliedAccounts.Models
 
                         CommandClass cmdClass2 = new(Row2, Source.MyConnection);
                         cmdClass2.SaveChanges();
+
+
                     }
 
                     Processing = false;

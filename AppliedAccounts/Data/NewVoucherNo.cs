@@ -49,23 +49,23 @@ namespace AppliedAccounts.Data
 
         public static string GetCashVoucher(string _DBFile, DateTime _VouDate)
         {
-            return GetNewVoucherNo(_DBFile, Tables.BillReceivable, "CV", _VouDate);
+            return GetNewVoucherNo(_DBFile, Tables.Book, "CV", _VouDate);
         }
 
         public static string GetBankVoucher(string _DBFile, DateTime _VouDate)
         {
-            return GetNewVoucherNo(_DBFile, Tables.BillReceivable, "BV", _VouDate);
+            return GetNewVoucherNo(_DBFile, Tables.Book, "BV", _VouDate);
         }
 
         public static string GetReceiptVoucher(string _DBFile, DateTime _VouDate)
         {
-            return GetNewVoucherNo(_DBFile, Tables.BillReceivable, "RV", _VouDate);
+            return GetNewVoucherNo(_DBFile, Tables.Receipts, "RV", _VouDate);
         }
 
-        public static string GetJournalVoucher(string _DBFile, DateTime _VouDate)
-        {
-            return GetNewVoucherNo(_DBFile, Tables.BillReceivable, "JV", _VouDate);
-        }
+        //public static string GetJournalVoucher(string _DBFile, DateTime _VouDate)
+        //{
+        //    return GetNewVoucherNo(_DBFile, Tables.JVList, "JV", _VouDate);
+        //}
 
     }
 

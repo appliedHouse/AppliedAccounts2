@@ -8,11 +8,11 @@ namespace AppliedDB
 {
     public class Commands
     {
+        
         public static SQLiteCommand? Insert(DataRow CurrentRow, SQLiteConnection DBConnection)
         {
             if ((int)CurrentRow["ID"] == 0)
             {
-
                 DataColumnCollection _Columns = CurrentRow.Table.Columns;
                 SQLiteCommand _Command = new(DBConnection);
 
@@ -43,7 +43,7 @@ namespace AppliedDB
                     _ParameterName = string.Concat('@', _Column.ColumnName.Replace(" ", ""));
                     _Command.Parameters.AddWithValue(_ParameterName, CurrentRow[_Column.ColumnName]);
                 }
-
+                
                 CurrentRow["ID"] = DataSource.GetMaxID(_TableName,DBConnection);
                 _Command.Parameters["@ID"].Value = CurrentRow["ID"];
                 return _Command;
@@ -148,7 +148,7 @@ namespace AppliedDB
         public string Action { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
         public int Effected { get; set; } = 0;
-        public int KeyID { get; set; } = 0;
+        public int PrimaryKeyID { get; set; } = 0;
         public MessageClass MyMessages { get; set; } = new();
 
         #region Constructors
@@ -215,6 +215,7 @@ namespace AppliedDB
                         CommandInsert.Connection.Open();
                         Effected = CommandInsert.ExecuteNonQuery();
                         CommandInsert.Connection.Close();
+                        PrimaryKeyID = (int)CommandInsert.Parameters["@ID"].Value;
                                             }
                     catch (Exception)
                     {
@@ -225,7 +226,7 @@ namespace AppliedDB
             }
 
             if (Effected == 0) { MyMessages.Add(Messages.NotSave); result= false; }
-            if (Effected > 0) { MyMessages.Add(Messages.Save); KeyID = (int)Row["ID"];  result= true; }
+            if (Effected > 0) { MyMessages.Add(Messages.Save); result= true; }
 
             return result;
         }

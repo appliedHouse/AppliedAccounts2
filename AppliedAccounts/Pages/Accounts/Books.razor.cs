@@ -1,7 +1,10 @@
 ﻿using AppliedAccounts.Models;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+
 
 namespace AppliedAccounts.Pages.Accounts
 {
@@ -16,12 +19,14 @@ namespace AppliedAccounts.Pages.Accounts
         public MessageClass MsgClass { get; set; }
 
         public bool IsPageValid { get; set; } = true;
+        public ToastClass MyToastClass { get; set; }
 
         public Books() { }
 
         public void Start()
         {
             MsgClass = new();
+            MyToastClass = new();
             MyModel = new(ID,BookID, UserProfile);
 
             if (MyModel == null) { IsPageValid = false; MsgClass.Add("Model is null"); return; }
@@ -73,8 +78,21 @@ namespace AppliedAccounts.Pages.Accounts
         }
         #endregion
 
+        public async Task SaveAll()
+        {
+            await MyModel.SaveAllAsync(); // Ensure save operation completes successfully
+            await js.InvokeVoidAsync("closeModal", "SaveVoucher"); // Pass the ID as a string
+
+            var toastMessage = MyModel.MyVoucher.Master.Vou_No + " has been save successfully.";
+
+            ToastService.ShowToast(SaveToast);
+
+        }
+
+       
+
     }
 
-
+    
 
 }
