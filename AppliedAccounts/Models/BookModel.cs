@@ -39,6 +39,7 @@ namespace AppliedAccounts.Models
 
 
         #endregion
+
         #region Constructor
         public BookModel()
         {
@@ -411,7 +412,6 @@ namespace AppliedAccounts.Models
         #endregion
 
     }
-
 
     #region Models
 

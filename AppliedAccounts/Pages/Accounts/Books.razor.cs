@@ -21,7 +21,14 @@ namespace AppliedAccounts.Pages.Accounts
         public bool IsPageValid { get; set; } = true;
         public ToastClass MyToastClass { get; set; }
 
+        public ToastClass Toast { get; set; }
         public Books() { }
+
+        public void ShowToast(ToastClass _toast)
+        {
+            Toast = _toast;
+            ToastService.ShowToast(Toast);
+        }
 
         public void Start()
         {
@@ -82,14 +89,14 @@ namespace AppliedAccounts.Pages.Accounts
         {
             await MyModel.SaveAllAsync(); // Ensure save operation completes successfully
             await js.InvokeVoidAsync("closeModal", "SaveVoucher"); // Pass the ID as a string
-
-            var toastMessage = MyModel.MyVoucher.Master.Vou_No + " has been save successfully.";
-
-            ToastService.ShowToast(SaveToast);
+            ToastService.ShowToast(ToastClass.SaveToast);
 
         }
 
+        
+
        
+
 
     }
 

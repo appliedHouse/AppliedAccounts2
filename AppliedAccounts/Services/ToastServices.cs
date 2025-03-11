@@ -7,7 +7,7 @@
 
         public void ShowToast(ToastClass _Toast)
         {
-            OnShowToast?.Invoke(_Toast.Message, _Toast.CssClass);
+            OnShowToast?.Invoke(_Toast.Message, _Toast.GetLevel());
         }
     }
 
@@ -16,16 +16,15 @@
         public string Message { get; set; }
         public string CssClass { get; set; }
         public bool ShowToast { get; set; }
+        public int delayTime { get; set; }
         public ToastPosition Position { get; set; }
         public ToastLevel Level { get; set; }
 
         public ToastClass()
         {
+            delayTime = 3000;
             Position = ToastPosition.Top;
-
-            //CssClass = GetLevel();
-            
-
+            Level = ToastLevel.Info;
         }
 
         public string GetLevel()
@@ -66,5 +65,21 @@
             Top,
             Bottom,
         }
+
+        public static ToastClass SaveToast { get; set; } = new()
+        {
+            Message = "Save",
+            Level = ToastClass.ToastLevel.Success,
+            Position = ToastClass.ToastPosition.Top,
+            ShowToast = true
+
+        };
+        public static ToastClass DeleteToast { get; set; } = new()
+        {
+            Message = "Delete",
+            Level = ToastClass.ToastLevel.Error,
+            Position = ToastClass.ToastPosition.Bottom,
+            ShowToast = true,
+        };
     }
 }

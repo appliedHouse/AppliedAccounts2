@@ -30,76 +30,13 @@
 
     protected override void OnInitialized()
     {
-        ToastService.OnShowToast += ShowToast;
         UserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
         Start();
-        toast = new();
-
+        Toast = new();
     }
 
-    public ToastClass toast { get; set; }
-
-    public static ToastClass SaveToast = new()
-        {
-            Message = "Save",
-            Level = ToastClass.ToastLevel.Success,
-            Position = ToastClass.ToastPosition.Top,
-            ShowToast = true
-
-        };
-    public static ToastClass DeleteToast = new()
-        {
-            Message = "Delete",
-            Level = ToastClass.ToastLevel.Error,
-            Position = ToastClass.ToastPosition.Bottom,
-            ShowToast = true,
-        };
-
-    private void ShowToast(ToastClass _toast)
-    {
-        toast = _toast;
-        ShowToast(_toast.Message, _toast.CssClass);
-    }
-   
-    private void ShowToast(string message, string cssClass)
-    {
-        toast.Message = message;
-        toast.CssClass = cssClass;
-        toast.ShowToast = true;
-        StateHasChanged();
-
-        // Hide toast after 3 seconds
-        Task.Delay(5000).ContinueWith(_ =>
-        {
-            toast.ShowToast = false;
-            InvokeAsync(StateHasChanged);
-        });
-    }
-
-    private void HideToast()
-    {
-        toast.ShowToast = false;
-    }
+    
 }
-
-
-
-<ShowToastMessage toastClass="@MyToastClass"></ShowToastMessage>
-
-<div class="toast-container position-fixed @toast.GetPosition()">
-    @if (toast.ShowToast)
-    {
-        <div class="toast show @toast.GetLevel()" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    @toast.Message
-                </div>
-                <button type="button" class="btn-close me-2 m-auto" @onclick="HideToast"></button>
-            </div>
-        </div>
-    }
-</div>
-
 
 <style>
     .myContainer .row {
@@ -112,16 +49,15 @@
 
 @if (IsPageValid)
 {
-
+    <!-- Error Message -->
     <PageErrors Messages="@MyModel.MsgClass.MessageList">
 
     </PageErrors>
-
+    <!-- Page Headinh -->
     <div class="AppHeader">
         <h3>CASH OR BANK VOUCHER</h3>
     </div>
-
-
+    <!-- Form Control -->
     <EditForm Model="@MyModel">
         <div class="container myContainer flex-md-row ">
 
@@ -474,27 +410,12 @@
     </EditForm>
 
     <!-- Toast -->
-
-
-    <div class="toast-container" style="position: fixed; top: 1rem; right: 1rem;">
-        @if (IsVisible)
+    <div class="toast-container position-fixed @toast.GetPosition()">
+        @if (toast.ShowToast)
         {
-            <div class="toast @ToastCssClass" role="alert">
-                <div class="toast-body">
-                    @Message
-                </div>
-            </div>
+            <ShowToastMessage toastClass="@toast"></ShowToastMessage>
         }
     </div>
-
-
-    @code {
-
-
-
-}
-
-
 
 }
 else
@@ -504,8 +425,6 @@ else
     </div>
 }
 
-
-
-<button class="btn btn-primary" @onclick="(()=>ShowToast(SaveToast))">Save</button>
-<button class="btn btn-primary" @onclick="(()=>ShowToast(DeleteToast))">Delete</button>
+<button class="btn btn-primary" @onclick="(()=>ShowToast(ToastClass.SaveToast))">Save</button>
+<button class="btn btn-primary" @onclick="(()=>ShowToast(ToastClass.DeleteToast))">Delete</button>
 
