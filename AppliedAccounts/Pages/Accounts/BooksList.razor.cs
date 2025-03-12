@@ -1,4 +1,5 @@
-﻿using AppliedAccounts.Models;
+﻿using AppliedAccounts.Data;
+using AppliedAccounts.Models;
 using AppliedDB;
 using System.Data;
 
@@ -20,11 +21,14 @@ namespace AppliedAccounts.Pages.Accounts
         List<BookView> LoadBookRecords(int _BookID)     // Load Lost of Cash / Bank Book record in Table
         {
             var _List = new List<BookView>();
-            var _Data = MyModel.Source.GetBook(_BookID);
+            var _Data = MyModel.Source.GetBookList(_BookID);
 
             if (_Data != null)
             {
-                decimal _Bal = 0.00M, _DR = 0.00M, _CR = 0.00M;
+                decimal _Bal = 0.00M;
+                decimal _DR = 0.00M;
+                decimal _CR = 0.00M;
+
                 foreach (DataRow Row in _Data.Rows)
                 {
                     _DR = Row.Field<decimal>("DR");
@@ -33,16 +37,17 @@ namespace AppliedAccounts.Pages.Accounts
 
                     var _Record = new BookView()
                     {
-                        ID = Row.Field<int>("ID"),
+                        ID = Row.Field<int>("ID1"),
                         Vou_No = Row.Field<string>("Vou_No") ?? "---",
-                        Vou_Date = Row.Field<DateTime>("Vou_No"),
+                        Vou_Date = Row.Field<DateTime>("Vou_Date"),
                         Recevied = _CR,
                         Paid = _DR,
                         Balance = _Bal,
                         Description = Row.Field<string>("Description") ?? "",
-                        txtRecevied = _CR.ToString("###,###,###.##"),
-                        txtPaid = _CR.ToString("###,###,###.##"),
-                        txtBalance = _Bal.ToString("###,###,###.##")
+                     
+                        TReceived = _CR.ToString(Format.Digit),
+                        TPaid = _DR.ToString(Format.Digit),
+                        TBalance = _Bal.ToString(Format.Digit)
                     };
 
                     _List.Add(_Record);
@@ -56,7 +61,7 @@ namespace AppliedAccounts.Pages.Accounts
 
         public List<CodeTitle> GetBookList(int _BookNature)
         {
-            MyModel.Source = new(UserProfile);
+            //MyModel.Source = new(UserProfile);
             var _BookList = MyModel.Source.GetBookAccounts(_BookNature) ?? new();
             return _BookList;
         }
@@ -118,9 +123,9 @@ namespace AppliedAccounts.Pages.Accounts
         public decimal Recevied { get; set; }
         public decimal Paid { get; set; }
         public decimal Balance { get; set; }
-        public string txtRecevied { get; set; }
-        public string txtPaid { get; set; }
-        public string txtBalance { get; set; }
+        public string TReceived { get; set; }
+        public string TPaid { get; set; }
+        public string TBalance { get; set; }
 
     }
 

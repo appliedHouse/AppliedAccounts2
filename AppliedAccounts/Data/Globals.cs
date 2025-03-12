@@ -55,15 +55,15 @@ namespace AppliedAccounts.Data
 
             Author = new()
             {
-                Company = Config.GetValue<string>("Author:Company"),
-                Address1 = Config.GetValue<string>("Author:Address1"),
-                Address2 = Config.GetValue<string>("Author:Address2"),
-                City = Config.GetValue<string>("Author:City"),
-                Country = Config.GetValue<string>("Author:Country"),
-                Contact = Config.GetValue<string>("Author:Contact"),
-                Email = Config.GetValue<string>("Author:Email"),
-                Url = Config.GetValue<string>("Author:Url"),
-                Url2 = Config.GetValue<string>("Author:Url2"),
+                Company = Config.GetValue<string>("Author:Company") ?? "",
+                Address1 = Config.GetValue<string>("Author:Address1") ?? "",
+                Address2 = Config.GetValue<string>("Author:Address2") ?? "",
+                City = Config.GetValue<string>("Author:City") ?? "",
+                Country = Config.GetValue<string>("Author:Country") ?? "",
+                Contact = Config.GetValue<string>("Author:Contact") ?? "",
+                Email = Config.GetValue<string>("Author:Email") ?? "",
+                Url = Config.GetValue<string>("Author:Url") ?? "",
+                Url2 = Config.GetValue<string>("Author:Url2") ?? "",
             };
 
             Language = new()

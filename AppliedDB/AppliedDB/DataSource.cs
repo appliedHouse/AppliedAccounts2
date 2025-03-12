@@ -3,6 +3,7 @@ using System.Data.SQLite;
 using System.Text;
 using Tables = AppliedDB.Enums.Tables;
 using Query = AppliedDB.Enums.Query;
+using System.Net;
 
 namespace AppliedDB
 {
@@ -142,7 +143,7 @@ namespace AppliedDB
         {
             try
             {
-                if (string.IsNullOrEmpty(_SQLQuery))
+                if (!string.IsNullOrEmpty(_SQLQuery))
 
                     if (MyConnection is not null)
                     {
@@ -237,7 +238,7 @@ namespace AppliedDB
             {
                 if (_Connection is not null)
                 {
-                    if (string.IsNullOrEmpty(_SQLQuery))
+                    if (!string.IsNullOrEmpty(_SQLQuery))
                     {
 
                         if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
@@ -1006,20 +1007,20 @@ namespace AppliedDB
             DataTable _Table = new DataTable();
             if (UserProfile is not null)
             {
-                var _Query = SQLQuery.BookVoucher(ID);          // Get Records from Book and Book2 table.
+                var _filter = $"ID1 = {ID}";
+                var _Query = SQLQuery.View_Book(_filter);         // Get Records from Book and Book2 table.
                 _Table = GetTable(_Query);
             }
             return _Table;
         }
 
 
-        public DataTable GetBook(int BookID)
+        public DataTable GetBookList(int BookID)
         {
             DataTable _Table = new DataTable();
             if (UserProfile is not null)
             {
-                //DataSource _Source = new(UserProfile);
-                var _Query = SQLQuery.BookRecords(BookID);          // Get Records from Book and Book2 table.
+                var _Query = SQLQuery.View_Book($"BookID = {BookID}");
                 _Table = GetTable(_Query);
             }
             return _Table;

@@ -302,7 +302,7 @@
                 }
                 <!-- Float Back Button to the Right -->
                 <div class="p-2 ms-auto">
-                    <button type="button" class="btn btn-sm w1 btn-warning" title="Back"><i class="bi bi-arrow-left-circle"></i></button>
+                    <button type="button" class="btn btn-sm w1 btn-warning" title="Back" @onclick="BackPage"><i class="bi bi-arrow-left-circle"></i></button>
                 </div>
             </div>
         </div>
@@ -410,10 +410,10 @@
     </EditForm>
 
     <!-- Toast -->
-    <div class="toast-container position-fixed @toast.GetPosition()">
-        @if (toast.ShowToast)
+    <div class="toast-container position-fixed @Toast.GetPosition()">
+        @if (Toast.ShowToast)
         {
-            <ShowToastMessage toastClass="@toast"></ShowToastMessage>
+            <ShowToastMessage toastClass="@Toast"></ShowToastMessage>
         }
     </div>
 
@@ -425,6 +425,6 @@ else
     </div>
 }
 
-<button class="btn btn-primary" @onclick="(()=>ShowToast(ToastClass.SaveToast))">Save</button>
-<button class="btn btn-primary" @onclick="(()=>ShowToast(ToastClass.DeleteToast))">Delete</button>
+@* <button class="btn btn-primary" @onclick="(()=>ShowToast(ToastClass.SaveToast))">Save</button>
+<button class="btn btn-primary" @onclick="(()=>ShowToast(ToastClass.DeleteToast))">Delete</button> *@
 

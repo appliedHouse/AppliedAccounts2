@@ -114,7 +114,7 @@ ValueChanged="@((e) => BookListChanged(e))"
         @if (BookRecords != null)
         {
 
-            <table class="AppTable">
+            <table class="table-list">
                 <thead>
                     <tr>
                         <th>Voucher</th>
@@ -130,16 +130,13 @@ ValueChanged="@((e) => BookListChanged(e))"
                     {
                         <tr>
                             <td>@Record.Vou_No</td>
-                            <td>@Record.Vou_Date</td>
+                            <td>@Record.Vou_Date.ToString(Format.DDMMMYY)</td>
                             <td>@Record.Description</td>
-                            <td class="amount">@Record.txtRecevied</td>
-                            <td class="amount">@Record.txtPaid</td>
-                            <td class="amount">@Record.txtBalance</td>
+                            <td class="amount">@Record.TReceived</td>
+                            <td class="amount">@Record.TPaid</td>
+                            <td class="amount">@Record.TBalance</td>
                         </tr>
                     }
-
-
-
                 </tbody>
             </table>
         }

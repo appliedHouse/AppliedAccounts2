@@ -350,7 +350,7 @@ namespace AppliedAccounts.Data
             _Text.AppendLine("[Employee] INT REFERENCES[Employees]([ID]),");
             _Text.AppendLine("[Project] INT REFERENCES[Project]([ID]),");
             _Text.AppendLine("[DR] DECIMAL NOT NULL DEFAULT(0.00),");
-            _Text.AppendLine("[CR] DEC NOT NULL DEFAULT(0.00),");
+            _Text.AppendLine("[CR] DECIMAL NOT NULL DEFAULT(0.00),");
             _Text.AppendLine("[Description] NVARCHAR NOT NULL,");
             _Text.AppendLine("[Comments] NVARCHAR);");
             return _Text.ToString();

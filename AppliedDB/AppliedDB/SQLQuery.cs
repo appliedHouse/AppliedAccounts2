@@ -320,28 +320,29 @@ namespace AppliedDB
             return string.Empty;
         }
 
-        public static string BookRecords(int BookID)
+        public static string BookView(int BookID)
         {
             // Cash and Bank record from Data table  view view_Book
             if (BookID > 0)
             {
                 var _Text = new StringBuilder();
-                _Text.AppendLine($"BookID = {BookID}");
-                return View_Book(_Text.ToString()); //   _Text.ToString();
+                _Text.AppendLine("SELECT * FROM [view_Book] ");
+                _Text.AppendLine($"WHERE BookID = {BookID}");
+                return _Text.ToString(); //   _Text.ToString();
             }
             return string.Empty;
         }
 
-        public static string BookVoucher(int _ID)
-        {
-            if (_ID > 0)
-            {
-                var _Text = new StringBuilder();
-                _Text.AppendLine($"TranID = {_ID}");
-                return View_Book(_Text.ToString()); //   _Text.ToString();
-            }
-            return string.Empty;
-        }
+        //public static string BookVoucher(int _ID)
+        //{
+        //    if (_ID > 0)
+        //    {
+        //        var _Text = new StringBuilder();
+        //        _Text.AppendLine($"TranID = {_ID}");
+        //        //return View_Book(_Text.ToString()); //   _Text.ToString();
+        //    }
+        //    return string.Empty;
+        //}
 
         #endregion
 
@@ -594,11 +595,11 @@ namespace AppliedDB
             return "SELECT * FROM [Book2]";
         }
 
-        private static string View_Book(string _Filter)
+        public static string View_Book(string _Filter)
         {
             var _Text = new StringBuilder();
             _Text.AppendLine("SELECT * FROM [View_Book]");
-            if(string.IsNullOrEmpty(_Filter))
+            if(!string.IsNullOrEmpty(_Filter))
             {
                 _Text.AppendLine($" WHERE {_Filter}");
             }

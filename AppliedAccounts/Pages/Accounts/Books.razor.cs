@@ -93,6 +93,7 @@ namespace AppliedAccounts.Pages.Accounts
 
         }
 
+        public void BackPage() { NavManager.NavigateTo("/Accounts/BooksList");} 
         
 
        
