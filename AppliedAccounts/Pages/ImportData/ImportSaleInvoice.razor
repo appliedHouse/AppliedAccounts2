@@ -22,13 +22,18 @@
         AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
 
     }
+
+    private async Task TriggerFileInput()
+    {
+        await js.InvokeVoidAsync("triggerFileUpload");
+    }
 }
 
 <EditForm Model="Model">
     @if (Model.ShowData)
     {
         <div class="container mt-1 mb-1">
-            <div class="rowe">
+            <div class="row">
                 <div class="col">
                     <button id="btnPost" disabled="@ShowSpinner" class="btn btn-warning" @onclick="(()=>Post())">Post</button>
                 </div>
@@ -36,7 +41,7 @@
                 {
                     <div class="row justify-content-center">
                         <div class="col-4">
-                            <p>Wait..... Bulk Sales invoices are being posting in General Ledgers..!!!</p>
+                            <p>@SpinnerMessage</p>
                         </div>
                         <div class="col-1 center-txt">
                             <div class="spinner-border text-warning" role="status">
@@ -92,14 +97,39 @@
     else
     {
         <div class="container">
+            <div class="d-flex flex-row mb-3">
+                <div class="p-2">
+
+                    <button class="btn btn-primary w-100" disabled="@ShowSpinner" title="Upload Excel file" @onclick="TriggerFileInput">Upload Excel file</button>
+                    <InputFile id="inputFile" class="d-none" OnChange="GetExcelFile" />
+                </div>
+                <div class="p-2">
+                    <label>@ExcelFileName</label>
+                </div>
+            </div>
+        </div>
+
+        @if (IsExcelLoaded)
+        {
+            <div class="container">
+                <div class="d-flex flex-row mb-3">
+                    <div class="p-2">
+                        <button class="btn btn-primary w-100" id="btnImport" disabled="@ShowSpinner" @onclick="(()=>GetImportedDataAsync())">Generate Invoices</button>
+                    </div>
+
+                </div>
+            </div>
+        }
+
+        <div class="container">
             <div class="row mt-2">
-                @if (!IsExcelLoaded)
+                @* @if (!IsExcelLoaded)
                 {
                     <div class="col-8">
-                        <InputFile id="inputFile" OnChange="GetExcelFile">Select Excel File</InputFile>
+                        <InputFile id="inputFile" title="Upload Excel File" OnChange="GetExcelFile">Select Excel File</InputFile>
                     </div>
-                }
-                @if (IsExcelLoaded)
+                } *@
+                @*  @if (IsExcelLoaded)
                 {
                     @if (!Model.ShowMessages)
                     {
@@ -107,12 +137,12 @@
                             <button id="btnImport" disabled="@ShowSpinner" @onclick="(()=>GetImportedDataAsync())">Generate Invoices</button>
                         </div>
                     }
-                }
+                } *@
                 @if (ShowSpinner)
                 {
                     <div class="row justify-content-center">
                         <div class="col-6">
-                            <p>Wait..... Bulk Sales invoices are being generated..!!!</p>
+                            <p>@SpinnerMessage</p>
                             <p class="text-danger">This process may take some time, so please be patient.</p>
                         </div>
                         <div class="col-1 center-txt">

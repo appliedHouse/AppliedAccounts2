@@ -20,6 +20,7 @@ namespace AppliedAccounts.Pages.ImportData
         public AppUserModel AppUser { get; set; }
         public ImportSaleInvoiceModel Model { get; set; }
         public ImportExcelFile ImportExcel { get; set; }
+        public StringBuilder MyMessage { get; set; }
         public DataSet? ExcelDataSet { get; set; }
         public DataTable? SalesData { get; set; }
         public DataTable? SalesSchema { get; set; }
@@ -27,6 +28,16 @@ namespace AppliedAccounts.Pages.ImportData
         public DataTable Sale1 { get; set; }
         public DataTable Sale2 { get; set; }
         public DataSource Source { get; set; }
+        public Stopwatch stopwatch { get; set; } = new();
+
+
+        public bool IsExcelLoaded { get; set; } = false;
+        public bool ShowSpinner { get; set; } = false;
+        public bool ShowImportButton { get; set; } = true;
+        public string ExcelFileName { get; set; } = "";
+        public string SpinnerMessage { get; set; } = "";
+
+
 
         DateTime Inv_Date = DateTime.Now;
         DateTime Due_Date = DateTime.Now;
@@ -39,13 +50,7 @@ namespace AppliedAccounts.Pages.ImportData
         int Error = 0;
         int Skip = 0;
 
-        public StringBuilder MyMessage { get; set; } = new();
 
-        public bool IsExcelLoaded { get; set; } = false;
-        public bool ShowSpinner { get; set; } = false;
-        public bool ShowImportButton { get; set; } = true;
-
-        public Stopwatch stopwatch { get; set; } = new();
         #endregion
 
         #region Constructor
@@ -53,7 +58,11 @@ namespace AppliedAccounts.Pages.ImportData
 
         public ImportSaleInvoice(AppUserModel _AppUser)
         {
-            AppUser = _AppUser; stopwatch.Start();
+            AppUser = _AppUser;
+            stopwatch.Start();
+            MyMessage = new();
+            Model = new();
+
         }
         #endregion
 
@@ -61,11 +70,18 @@ namespace AppliedAccounts.Pages.ImportData
         // The Excel File save on server and
         // open from Server
         // Create a Temp Database Table and move all data to this temp SQLite Database File.
-        public void GetExcelFile(InputFileChangeEventArgs e)
+        public async Task GetExcelFile(InputFileChangeEventArgs e)
         {
             try
             {
+                SpinnerMessage = "Excel file is being loaded.  Wait for some while";
+                ShowSpinner = true;
+                ExcelFileName = e.File.Name;
+                StateHasChanged();
+
+
                 ImportExcel = new(e.File, AppUser);
+                await ImportExcel.ImportDataAsync();
                 IsExcelLoaded = true;
                 MyMessage.AppendLine($"{DateTime.Now} Excel File loaded.... OK");
             }
@@ -74,48 +90,68 @@ namespace AppliedAccounts.Pages.ImportData
 
                 MyMessage.AppendLine($"{DateTime.Now} ERROR: Excel file not loaded.... ");
             }
+            finally
+            {
+                ShowSpinner = false;
+                StateHasChanged();
+            }
+
         }
         #endregion
 
         #region Import Data main method
-        public async void GetImportedDataAsync()
+
+        public async Task GetImportedDataAsync()
         {
             if (IsExcelLoaded)
             {
+                SpinnerMessage = "Sales invoice data is being Process...";
+
                 ShowSpinner = true;
                 ShowImportButton = false;
-                stopwatch.Start();
-                await InvokeAsync(StateHasChanged);
-                GetExcelSheetData();
-                await GetDataTableAync();
-                stopwatch.Stop();
-                var ts = stopwatch.Elapsed;
-                MyMessage.AppendLine($"{DateTime.Now} Total time spend in process {ts.TotalSeconds}");
-                ShowSpinner = false;
-                Model.ShowData = true;
+                stopwatch.Restart(); // Restart instead of Start to reset time
+
                 await InvokeAsync(StateHasChanged);
 
+                try
+                {
+                    await GetExcelSheetDataAsync(); // Ensure this is awaited if async
+                    await GetDataTableAsync(); // Fixed method name
+                }
+                finally
+                {
+                    stopwatch.Stop();
+                    var ts = stopwatch.Elapsed;
+                    MyMessage.AppendLine($"{DateTime.Now} Total time spent in process: {ts.TotalSeconds} seconds");
+
+                    ShowSpinner = false;
+                    Model.ShowData = true;
+
+                    await InvokeAsync(StateHasChanged);
+                }
             }
         }
 
-        private void GetExcelSheetData()
+
+        private async Task GetExcelSheetDataAsync()
         {
+            SpinnerMessage = "Sales invoice data is being Process... Gathering Data sheets";
             string _TempGUID = AppRegistry.GetText(AppUser.DataFile, "ExcelImport");
             TempDB _TempDB = new(_TempGUID + ".db");
-            SalesData = _TempDB.GetTempTable("Data");
-            SalesSchema = _TempDB.GetTempTable("Schema");
-            InvData = _TempDB.GetTempTable("Invoice Data");
+            SalesData = await _TempDB.GetTempTableAsync("Data");
+            SalesSchema = await _TempDB.GetTempTableAsync("Schema");
+            InvData = await _TempDB.GetTempTableAsync("Invoice Data");
         }
         #endregion
 
         #region Get Data From SQLite Temp Data, 
         //Stored data from excel file to Temp
         // and here this data will call in a app as Data tables.
-        public async Task GetDataTableAync()
+        public async Task GetDataTableAsync()
         {
             if (SalesData != null && SalesSchema != null && InvData != null)
             {
-                ImportSaleInvoiceModel _Result = await Task.Run(() => GetDataTables());
+                ImportSaleInvoiceModel _Result = await GetDataTablesAsync();
                 Model = _Result;
             }
         }
@@ -123,23 +159,31 @@ namespace AppliedAccounts.Pages.ImportData
 
 
 
-        public ImportSaleInvoiceModel GetDataTables()
+        public async Task<ImportSaleInvoiceModel> GetDataTablesAsync()
         {
+            SpinnerMessage = "Sales invoice data is being Process... Gatting Data table";
             ImportSaleInvoiceModel _Result = new();
             _Result.DBFile = AppUser.DataFile;
-            GenerateInvoice();
+            await GenerateInvoice();
             MyMessage.AppendLine($"{DateTime.Now} Task Completed.");
 
             Model.ShowData = true;
 
-            foreach (DataRow Row in Sale1.Rows)
+            if (Sale1 != null)
             {
-                _Result.SaleInvoiceList.Add(Row);
-            }
+                foreach (DataRow Row in Sale1.Rows)
+                {
+                    _Result.SaleInvoiceList.Add(Row);
+                }
 
-            foreach (DataRow Row in Sale2.Rows)
-            {
-                _Result.SaleDetailsList.Add(Row);
+                if (Sale2 != null)
+                {
+                    foreach (DataRow Row in Sale2.Rows)
+                    {
+                        _Result.SaleDetailsList.Add(Row);
+                    }
+                }
+
             }
             return _Result;
 
@@ -148,74 +192,76 @@ namespace AppliedAccounts.Pages.ImportData
         #endregion
 
         #region Generate Invoice Master Table
-        public void GenerateInvoice()
+        public async Task GenerateInvoice()
         {
-
-            MyMessage.AppendLine($"{DateTime.Now} Start Process for Generate Invoice");
-            #region Error Message
-            if (InvData is null || SalesData is null || SalesSchema is null)
+            await Task.Run(() =>
             {
-                MyMessage.AppendLine($"{DateTime.Now} Date is not available to proceed...");
-                return;
-            }
-            #endregion
-
-            Sale1 = DataSource.CloneTable(AppUser.DataFile, Enums.Tables.BillReceivable);
-            Sale2 = DataSource.CloneTable(AppUser.DataFile, Enums.Tables.BillReceivable2);
-
-            TotalRec = SalesData.Rows.Count;
-
-            GetInvoiceData();          // Gather data from excel sheet schema for creating voucher Data parameters.
-            MyMessage.Append("");
-
-
-            Model.ShowData = true;
-            CommandClass _CommandClass = new CommandClass();
-            foreach (DataRow Row in SalesData.Rows)                 // Loop main sale invocies records. per record per invoice.
-            {
-
-                Counter++;
-
-                if (string.IsNullOrEmpty(Row["Code"].ToString())) { Error++; continue; }
-                if ((string)Row["Active"] != "1") { Skip++; continue; }
-                if (Counter == 1) { continue; }     // Skip record of Heading in Excel File. 
-
-
-                DataRow _Row1 = Sale1.NewRow();
-                int _CompanyID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Customers, (string)Row["Code"]);
-                int _EmployeeID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Employees, (string)Row["Employee"]);
-                decimal _Total = Conversion.ToDecimal(Row["Total"]);
-
-                if (_Total > 0)     // if Invoice amount is zero, skip this...
+                SpinnerMessage = "Sales invoice data is being Process... Generating Invoices !!";
+                MyMessage.AppendLine($"{DateTime.Now} Start Process for Generate Invoice");
+                #region Error Message
+                if (InvData is null || SalesData is null || SalesSchema is null)
                 {
-                    _Row1["ID"] = Counter;
-                    _Row1["Vou_No"] = string.Concat(Batch, Counter.ToString("0000"));
-                    _Row1["Vou_Date"] = Inv_Date;
-                    _Row1["Company"] = _CompanyID;
-                    _Row1["Employee"] = _EmployeeID;
-                    _Row1["Ref_No"] = RefNo;
-                    _Row1["Inv_No"] = string.Concat(Inv_No, Counter.ToString("0000")); ;
-                    _Row1["Inv_Date"] = Inv_Date;
-                    _Row1["Pay_Date"] = Due_Date;
-                    _Row1["Amount"] = _Total;
-                    _Row1["Description"] = Row["CompanyName"];
-                    _Row1["Comments"] = $"Sale Invoice : {Row["CompanyName"]} for amount {_Total}"; ;
-                    _Row1["Status"] = "Submitted";
-
-                    Sale1.Rows.Add(_Row1);
-                    Model.SaleInvoiceList.Add(_Row1);
-                    Model.ShowData = false;
-
-                    MyMessage.AppendLine($" # {Counter}");
-
-                    GetInvoiceDetails(Row);                 // Generates detail record of sale invocies.
+                    MyMessage.AppendLine($"{DateTime.Now} Date is not available to proceed...");
+                    return;
                 }
-                else
+                #endregion
+
+                Sale1 = DataSource.CloneTable(AppUser.DataFile, Enums.Tables.BillReceivable);
+                Sale2 = DataSource.CloneTable(AppUser.DataFile, Enums.Tables.BillReceivable2);
+
+                TotalRec = SalesData.Rows.Count;
+
+                GetInvoiceData();          // Gather data from excel sheet schema for creating voucher Data parameters.
+                MyMessage.Append("");
+
+
+                Model.ShowData = true;
+                CommandClass _CommandClass = new CommandClass();
+                foreach (DataRow Row in SalesData.Rows)                 // Loop main sale invocies records. per record per invoice.
                 {
-                    Model.RejectedList.Add(Row);
-                }
-            }
+                    SpinnerMessage = $"Sales invoice data is being Process... Generating Invoices {Counter}";
+                    Counter++;
 
+                    if (string.IsNullOrEmpty(Row["Code"].ToString())) { Error++; continue; }
+                    if ((string)Row["Active"] != "1") { Skip++; continue; }
+                    if (Counter == 1) { continue; }     // Skip record of Heading in Excel File. 
+
+
+                    DataRow _Row1 = Sale1.NewRow();
+                    int _CompanyID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Customers, (string)Row["Code"]);
+                    int _EmployeeID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Employees, (string)Row["Employee"]);
+                    decimal _Total = Conversion.ToDecimal(Row["Total"]);
+
+                    if (_Total > 0)     // if Invoice amount is zero, skip this...
+                    {
+                        _Row1["ID"] = Counter;
+                        _Row1["Vou_No"] = string.Concat(Batch, Counter.ToString("0000"));
+                        _Row1["Vou_Date"] = Inv_Date;
+                        _Row1["Company"] = _CompanyID;
+                        _Row1["Employee"] = _EmployeeID;
+                        _Row1["Ref_No"] = RefNo;
+                        _Row1["Inv_No"] = string.Concat(Inv_No, Counter.ToString("0000")); ;
+                        _Row1["Inv_Date"] = Inv_Date;
+                        _Row1["Pay_Date"] = Due_Date;
+                        _Row1["Amount"] = _Total;
+                        _Row1["Description"] = Row["CompanyName"];
+                        _Row1["Comments"] = $"Sale Invoice : {Row["CompanyName"]} for amount {_Total}"; ;
+                        _Row1["Status"] = "Submitted";
+
+                        Sale1.Rows.Add(_Row1);
+                        Model.SaleInvoiceList.Add(_Row1);
+                        Model.ShowData = false;
+
+                        MyMessage.AppendLine($" # {Counter}");
+
+                        GetInvoiceDetails(Row);                 // Generates detail record of sale invocies.
+                    }
+                    else
+                    {
+                        Model.RejectedList.Add(Row);
+                    }
+                }
+            });
             MyMessage.AppendLine($"{DateTime.Now} End Sales Invoice details process..");
         }
         #endregion

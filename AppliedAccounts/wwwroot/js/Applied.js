@@ -71,3 +71,8 @@ window.showBlazorToast = () => {
     var toast = new bootstrap.Toast(toastEl, { delay: 5000 }); // Auto-hide after 5 seconds
     toast.show();
 };
+
+// Trigger for click of Upload Excel file in Import Sale Data
+window.triggerFileUpload = function () {
+    document.getElementById("inputFile").click();
+};

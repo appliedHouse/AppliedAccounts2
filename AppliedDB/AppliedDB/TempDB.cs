@@ -16,29 +16,33 @@ namespace AppliedDB
         public string TableName { get; set; }
         public DataTable TempTable { get; set; }
 
-        public TempDB(string _TempDBFile) 
+        public TempDB(string _TempDBFile)
         {
             TempDBFile = _TempDBFile;
             string _DBPath = Path.Combine(Connections.GetTempDBPath(), TempDBFile);
             MyConnection = new(new SQLiteConnection($"Data Source={_DBPath}"));
         }
 
-        public DataTable GetTempTable(string _DataName)
+        public async Task<DataTable> GetTempTableAsync(string _DataName)
         {
-            TableName = _DataName;
-            if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); } 
-
-            SQLiteCommand _Command = new(MyConnection);
-            _Command.CommandText = $"SELECT * FROM [{TableName}]";
-            DataSet _DataSet = new DataSet();
-            SQLiteDataAdapter _Adapter = new(_Command);
-            _Adapter.Fill(_DataSet, "SaleData");
-            if (_DataSet.Tables.Count > 0)
+            TempTable = new DataTable();
+            await Task.Run(() =>
             {
-                TempTable = _DataSet.Tables[0];
-                return _DataSet.Tables[0];
-            }
-            return null;
+                TableName = _DataName;
+                if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
+
+                SQLiteCommand _Command = new(MyConnection);
+                _Command.CommandText = $"SELECT * FROM [{TableName}]";
+                DataSet _DataSet = new DataSet();
+                SQLiteDataAdapter _Adapter = new(_Command);
+                _Adapter.Fill(_DataSet, "SaleData");
+                if (_DataSet.Tables.Count > 0)
+                {
+                    TempTable = _DataSet.Tables[0];
+                }
+            });
+            return TempTable;
         }
+
     }
 }

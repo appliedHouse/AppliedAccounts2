@@ -17,21 +17,21 @@ namespace AppliedAccounts.Models
         public bool IsImported { get; set; } = false;
         public string MyMessages { get; set; }
 
+
         public ImportExcelFile(IBrowserFile excelFile, AppUserModel appUser)
         {
             AppUser = appUser;
             ExcelFile = excelFile;
-            ImportDataAsync();
         }
-             
+
 
         #region Import Data From Excel file into DataSet
 
-        public async void ImportDataAsync()
+        public async Task ImportDataAsync()
         {
 
             var _Directory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelFiles");
-            if(!Directory.Exists(_Directory)) { Directory.CreateDirectory(_Directory); }
+            if (!Directory.Exists(_Directory)) { Directory.CreateDirectory(_Directory); }
 
             var _ExcelFile = Path.Combine(_Directory, ExcelFile.Name);
 
@@ -40,27 +40,19 @@ namespace AppliedAccounts.Models
             using (FileStream fs = new(_ExcelFile, FileMode.Create))
             { await ExcelFile.OpenReadStream().CopyToAsync(fs); }
 
-            using var stream = File.Open(_ExcelFile, FileMode.Open, FileAccess.Read);
-
+            using (var stream = File.Open(_ExcelFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var reader = ExcelReaderFactory.CreateReader(stream))
             {
-                do
-                {
-                    while (reader.Read())
-                    {
-                        // reader.GetDouble(0);
-                    }
-                } while (reader.NextResult());
-
                 ImportDataSet = reader.AsDataSet();
 
                 if (ImportDataSet is not null)
                 {
                     SaveInTable(ImportDataSet);
                     IsImported = true;
-
                 }
             }
+
+
             if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
         }
 
@@ -155,7 +147,7 @@ namespace AppliedAccounts.Models
                         _Text.Append($"INSERT INTO [{_Table.TableName}] VALUES (");
                         foreach (DataColumn _Column in _Table.Columns)
                         {
-                            string RowValue = _Row[_Column.ColumnName].ToString();
+                            string RowValue = _Row[_Column.ColumnName].ToString() ?? "";
                             if (RowValue.Contains("'"))
                             {
                                 RowValue = RowValue.Replace("'", ",");
@@ -166,11 +158,9 @@ namespace AppliedAccounts.Models
                         }
                         _Text.Append(')');
 
-
                         _Command.CommandText = _Text.ToString();
                         _Records += _Command.ExecuteNonQuery();
                         _Result = true;
-
 
                     }
                 }
