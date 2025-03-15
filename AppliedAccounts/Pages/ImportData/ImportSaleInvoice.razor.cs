@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components.Forms;
 using System.Data;
 using AppliedDB;
 using AppliedAccounts.Models;
 using AppliedAccounts.Data;
 using System.Diagnostics;
 using System.Text;
-using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 
@@ -17,13 +15,11 @@ namespace AppliedAccounts.Pages.ImportData
 
     public partial class ImportSaleInvoice
     {
-        [Inject] public NavigationManager NavManager { set; get; } = default!;
 
         #region Variables
-        public SaleInvoiceModel Model { get; set; }
-
-        public ImportExcelFile ImportExcel { get; set; }
         public AppUserModel AppUser { get; set; }
+        public ImportSaleInvoiceModel Model { get; set; }
+        public ImportExcelFile ImportExcel { get; set; }
         public DataSet? ExcelDataSet { get; set; }
         public DataTable? SalesData { get; set; }
         public DataTable? SalesSchema { get; set; }
@@ -53,16 +49,11 @@ namespace AppliedAccounts.Pages.ImportData
         #endregion
 
         #region Constructor
-        public ImportSaleInvoice()
-        {
-
-        }
+        //public ImportSaleInvoice() { }
 
         public ImportSaleInvoice(AppUserModel _AppUser)
         {
             AppUser = _AppUser; stopwatch.Start();
-
-
         }
         #endregion
 
@@ -124,7 +115,7 @@ namespace AppliedAccounts.Pages.ImportData
         {
             if (SalesData != null && SalesSchema != null && InvData != null)
             {
-                SaleInvoiceModel _Result = await Task.Run(() => GetDataTables());
+                ImportSaleInvoiceModel _Result = await Task.Run(() => GetDataTables());
                 Model = _Result;
             }
         }
@@ -132,9 +123,9 @@ namespace AppliedAccounts.Pages.ImportData
 
 
 
-        public SaleInvoiceModel GetDataTables()
+        public ImportSaleInvoiceModel GetDataTables()
         {
-            SaleInvoiceModel _Result = new();
+            ImportSaleInvoiceModel _Result = new();
             _Result.DBFile = AppUser.DataFile;
             GenerateInvoice();
             MyMessage.AppendLine($"{DateTime.Now} Task Completed.");
@@ -333,7 +324,7 @@ namespace AppliedAccounts.Pages.ImportData
                 Totals.Tot_Net += item.NetAmount;
             }
 
-            await JS.InvokeVoidAsync("showModol", "ModolSaleInvoice");
+            await js.InvokeVoidAsync("showModol", "ModolSaleInvoice");
 
         }
         #endregion
@@ -394,7 +385,7 @@ namespace AppliedAccounts.Pages.ImportData
                         Row["ID"] = 0;
                         Row["TranID"] = _TranID;
                         _Commands = new(Row, AppUser.DataFile);
-                        await Task.Run(()=>_Commands.SaveChanges());
+                        await Task.Run(() => _Commands.SaveChanges());
                         MyMessage.AppendLine($"{DateTime.Now} {master["Vou_No"]} Serial # {Row["Sr_No"]} is saved ---> {IsSaved} ");
                     }
                 }
@@ -422,8 +413,9 @@ namespace AppliedAccounts.Pages.ImportData
     }
 
     #region Model Class
-    public class SaleInvoiceModel
+    public class ImportSaleInvoiceModel
     {
+        //public AppUserModel AppUser { get; set; }
         public DataRow SaleMaster { get; set; }
         public DataRow SaleDetails { get; set; }
         public string DBFile { get; set; }
@@ -437,11 +429,8 @@ namespace AppliedAccounts.Pages.ImportData
         public bool ShowMessages { get; set; } = false;
         public bool PostData { get; set; } = false;
 
-        public SaleInvoiceModel()
-        {
-
-        }
-        public SaleInvoiceModel(DataTable _SalesTable1, DataTable _SaleTable2)
+        public ImportSaleInvoiceModel() { }
+        public ImportSaleInvoiceModel(DataTable _SalesTable1, DataTable _SaleTable2)
         {
             SaleMaster = _SalesTable1.NewRow();
             SaleDetails = _SaleTable2.NewRow();

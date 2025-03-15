@@ -1,22 +1,25 @@
 ﻿@page "/ImportData/ImportSalesInvoice"
+
+@attribute [Authorize]
 @using System.Data
 @using AppliedDB
 @using Microsoft.AspNetCore.Components.Forms
-@attribute [Authorize]
-@inject IJSRuntime JS
+
 
 @inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager NavManager;
+@inject IJSRuntime js
 
 
 @code {
     (decimal Tot_Qty, decimal Tot_Amount, decimal Tot_Tax, decimal Tot_Net) Totals;
     string ClientName = "Applied Software House";
     string Voucher = "Voucher No.";
+
+
     protected override void OnInitialized()
     {
         AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
-        Model = new();
-        Model.DBFile = AppUser.DataFile;
 
     }
 }

@@ -11,7 +11,7 @@ using Tables = AppliedDB.Enums.Tables;
 
 namespace AppliedAccounts.Models
 {
-    public class SaleInvoiceModel
+    public class SaleInvoiceModel 
     {
         #region Constructor
         public SaleInvoiceModel(AppUserModel _UserProfile)

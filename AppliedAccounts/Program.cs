@@ -15,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddSingleton<AppUserModel>();
 builder.Services.AddSingleton<UserProfile>();
 builder.Services.AddSingleton<Globals>();
 builder.Services.AddScoped<ProtectedSessionStorage>();

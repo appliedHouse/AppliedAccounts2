@@ -326,9 +326,16 @@ namespace AppliedDB
         #region Seek
         public DataRow Seek(Tables _Table, int ID)
         {
-            var _DataTable = GetTable(_Table).AsEnumerable().ToList();
-            var _DataRow = _DataTable.Where(rows => rows.Field<int>("ID") == ID).First();
-            return _DataRow;
+            if (ID > 0)
+            {
+                var _DataTable = GetTable(_Table).AsEnumerable().ToList();
+                if (_DataTable.Count > 0)
+                {
+                    var _DataRow = _DataTable.Where(rows => rows.Field<int>("ID") == ID).First();
+                    return _DataRow;
+                }
+            }
+            return null;
 
         }
 
