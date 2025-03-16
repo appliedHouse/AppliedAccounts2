@@ -50,6 +50,16 @@ namespace AppliedDB
             }
             return new DataTable();
         }
+
+        public async Task<DataTable> GetTableAsync(Tables _Table)
+        {
+            if (MyCommand is not null)
+            {
+                MyCommand.CommandText = $"SELECT * FROM [{_Table}]";
+                return await Task.Run(() => GetDataTable(_Table, MyCommand)); ;
+            }
+            return new DataTable();
+        }
         public DataTable GetTable(Tables _Table, string _Filter)
         {
             if (MyCommand is not null)

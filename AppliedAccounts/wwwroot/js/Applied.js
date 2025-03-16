@@ -25,7 +25,7 @@ window.displayPDF = function (fileUrl) {
 
 
 // Show Bootstrap Modol Class.
-function showModal(ModalID) {
+function showModol(ModalID) {
     var myModal = new bootstrap.Modal(document.getElementById(ModalID));
     myModal.show();
 }
@@ -76,3 +76,17 @@ window.showBlazorToast = () => {
 window.triggerFileUpload = function () {
     document.getElementById("inputFile").click();
 };
+
+
+// Table List Height Auto Adjust
+function adjustTableHeight() {
+    const tableContainer = document.getElementById("tableContainer");
+    const windowHeight = window.innerHeight;
+    const containerTop = tableContainer.getBoundingClientRect().top;
+    const maxHeight = windowHeight - containerTop - 20; // 20px less than bottom
+    tableContainer.style.maxHeight = maxHeight + "px";
+}
+
+// Adjust height on page load and window resize
+window.addEventListener("load", adjustTableHeight);
+window.addEventListener("resize", adjustTableHeight);

@@ -6,6 +6,7 @@ using AppliedAccounts.Data;
 using System.Diagnostics;
 using System.Text;
 using Microsoft.JSInterop;
+using System.Collections.Generic;
 
 
 
@@ -60,9 +61,7 @@ namespace AppliedAccounts.Pages.ImportData
         public ImportSaleInvoice(AppUserModel _AppUser)
         {
             AppUser = _AppUser;
-            stopwatch.Start();
-            MyMessage = new();
-            Model = new();
+
 
         }
         #endregion
@@ -78,12 +77,12 @@ namespace AppliedAccounts.Pages.ImportData
                 SpinnerMessage = "Excel file is being loaded.  Wait for some while";
                 ShowSpinner = true;
                 ExcelFileName = e.File.Name;
-                StateHasChanged();
+                await InvokeAsync(StateHasChanged);
 
 
                 ImportExcel = new(e.File, AppUser);
                 await ImportExcel.ImportDataAsync();            // ImportExcelFile.cs Function
-                IsExcelLoaded = true;
+                IsExcelLoaded = true;                           // Excel file has been loaded successfully.
                 MyMessage.AppendLine($"{DateTime.Now} Excel File loaded.... OK");
             }
             catch (Exception)
@@ -94,7 +93,7 @@ namespace AppliedAccounts.Pages.ImportData
             finally
             {
                 ShowSpinner = false;
-                StateHasChanged();
+                await InvokeAsync(StateHasChanged);
             }
 
         }
@@ -116,10 +115,9 @@ namespace AppliedAccounts.Pages.ImportData
 
                 try
                 {
-
                     await GetExcelSheetDataAsync(); // Ensure this is awaited if async
                     await UpdateClientListAsync();  // Ensure all the client has been update in DB.
-                    await GetDataTableAsync();      // Fixed method name
+                    await GetDataTablesAsync();      // Fixed method name
                 }
                 finally
                 {
@@ -128,7 +126,7 @@ namespace AppliedAccounts.Pages.ImportData
                     MyMessage.AppendLine($"{DateTime.Now} Total time spent in process: {ts.TotalSeconds} seconds");
 
                     ShowSpinner = false;
-                    Model.ShowData = true;
+                    Model.ShowData = true;     // display all imported sales invoices after process complete
 
                     await InvokeAsync(StateHasChanged);
                 }
@@ -137,16 +135,78 @@ namespace AppliedAccounts.Pages.ImportData
 
         private async Task UpdateClientListAsync()
         {
-            if (ClientData != null)
+            var Log = new Dictionary<string, bool>();
+
+            try
             {
-                var tb_Client = Source.GetTable(Enums.Tables.Customers);
-                foreach (DataRow Row in ClientData.Rows)
+                if (ClientData != null && Source != null)
                 {
+                    SpinnerMessage = "Sales invoice data is being Process... Customer Data Updating..";
+                    var tb_Client = Source.GetTable(Enums.Tables.Customers);
+                    var tb_ClientList = tb_Client.AsEnumerable().ToList();
+                    var ExcelColumn = "BP Name";
+                    var DataColumn = "Title";
 
+                    foreach (DataRow Row in ClientData.Rows)
+                    {
+                        var _Title = Row[ExcelColumn].ToString()?.Trim() ?? "";
+                        var _RowID = tb_ClientList.Where(row => _Title == row.Field<string>(DataColumn)).Select(row => row.Field<int>("ID")).FirstOrDefault();
 
+                        if (_RowID == 0)
+                        {
+
+                            Log.Add(_Title, false);
+                        }
+                        else
+                        {
+                            Log.Add(_Title, true);
+                        }
+
+                        await UpdateClient(Row, _RowID);
+                    }
 
                 }
             }
+            catch (Exception error)
+            {
+
+                MyMessage.Append(error.Message);
+            }
+
+        }
+
+        private async Task UpdateClient(DataRow _Row, int _RowID)
+        {
+            try
+            {
+                var _ClientRow = Source.GetNewRow(Enums.Tables.Customers);
+                _ClientRow["ID"] = _RowID;
+                _ClientRow["Code"] = _Row["BP Code"];
+                _ClientRow["Title"] = _Row["BP Name"];
+                _ClientRow["NTN"] = _Row["NTN"];
+                _ClientRow["ContactTo"] = _Row["Contact Person"];
+                _ClientRow["Email"] = _Row["Email Address"];
+                _ClientRow["Address1"] = _Row["Address Name 2"];
+                _ClientRow["Address2"] = _Row["Address Name 3"];
+                _ClientRow["Address3"] = _Row["Street"];
+                _ClientRow["City"] = _Row["City"];
+                _ClientRow["Status"] = 1;
+
+                CommandClass Commands = new(_ClientRow, Source.DBFile);
+                await Task.Run(() => 
+                { 
+                    Commands.SaveChanges();
+                    SpinnerMessage = _ClientRow["Title"].ToString() + " has been saved..";
+                });
+                
+            }
+            catch (Exception error)
+            {
+                MyMessage.Append(error.Message);
+            }
+
+
+
         }
 
         private async Task GetExcelSheetDataAsync()
@@ -154,7 +214,7 @@ namespace AppliedAccounts.Pages.ImportData
             SpinnerMessage = "Sales invoice data is being Process... Gathering Data sheets";
             string _TempGUID = AppRegistry.GetText(AppUser.DataFile, "ExcelImport");
             TempDB _TempDB = new(_TempGUID + ".db");
-            ClientData = await _TempDB.GetTempTableAsync("Client List");
+            ClientData = await _TempDB.GetTempTableAsync("Clients List");
             SalesData = await _TempDB.GetTempTableAsync("Data");
             SalesSchema = await _TempDB.GetTempTableAsync("Schema");
             InvData = await _TempDB.GetTempTableAsync("Invoice Data");
@@ -164,14 +224,14 @@ namespace AppliedAccounts.Pages.ImportData
         #region Get Data From SQLite Temp Data, 
         //Stored data from excel file to Temp
         // and here this data will call in a app as Data tables.
-        public async Task GetDataTableAsync()
-        {
-            if (SalesData != null && SalesSchema != null && InvData != null)
-            {
-                ImportSaleInvoiceModel _Result = await GetDataTablesAsync();
-                Model = _Result;
-            }
-        }
+        //public async Task GetDataTableAsync()
+        //{
+        //    if (SalesData != null && SalesSchema != null && InvData != null)
+        //    {
+        //        ImportSaleInvoiceModel _Result = await GetDataTablesAsync();
+        //        Model = _Result;
+        //    }
+        //}
 
 
 
@@ -202,6 +262,7 @@ namespace AppliedAccounts.Pages.ImportData
                 }
 
             }
+            Model = _Result;
             return _Result;
 
         }
