@@ -98,11 +98,17 @@
     else
     {
         <!-- Upload Excel File-->
+
         <div class="container">
             <div class="d-flex flex-row mb-3">
                 <div class="p-2">
-                    <button class="btn btn-primary w-100" disabled="@ShowSpinner" title="Upload Excel file" @onclick="TriggerFileInput">Upload Excel file</button>
+                    <button class="btn btn-primary w-100" disabled="@(IsExcelLoaded ? true : ShowSpinner)"
+                            title="Upload Excel file" @onclick="TriggerFileInput">
+                        Upload Excel file
+                    </button>
                     <InputFile id="inputFile" class="d-none" OnChange="GetExcelFile" />
+
+                    
                 </div>
                 <div class="p-2">
                     <label>@ExcelFileName</label>
