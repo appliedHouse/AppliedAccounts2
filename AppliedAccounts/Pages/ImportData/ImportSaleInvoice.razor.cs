@@ -22,6 +22,7 @@ namespace AppliedAccounts.Pages.ImportData
         public ImportExcelFile ImportExcel { get; set; }
         public StringBuilder MyMessage { get; set; }
         public DataSet? ExcelDataSet { get; set; }
+        public DataTable? ClientData { get; private set; }
         public DataTable? SalesData { get; set; }
         public DataTable? SalesSchema { get; set; }
         public DataTable? InvData { get; set; }
@@ -66,7 +67,7 @@ namespace AppliedAccounts.Pages.ImportData
         }
         #endregion
 
-        #region Get Excel file from Import Model, 
+        #region Upload Excel file. 
         // The Excel File save on server and
         // open from Server
         // Create a Temp Database Table and move all data to this temp SQLite Database File.
@@ -81,7 +82,7 @@ namespace AppliedAccounts.Pages.ImportData
 
 
                 ImportExcel = new(e.File, AppUser);
-                await ImportExcel.ImportDataAsync();
+                await ImportExcel.ImportDataAsync();            // ImportExcelFile.cs Function
                 IsExcelLoaded = true;
                 MyMessage.AppendLine($"{DateTime.Now} Excel File loaded.... OK");
             }
@@ -101,7 +102,7 @@ namespace AppliedAccounts.Pages.ImportData
 
         #region Import Data main method
 
-        public async Task GetImportedDataAsync()
+        public async Task GetImportDataAsync()
         {
             if (IsExcelLoaded)
             {
@@ -115,8 +116,10 @@ namespace AppliedAccounts.Pages.ImportData
 
                 try
                 {
+
                     await GetExcelSheetDataAsync(); // Ensure this is awaited if async
-                    await GetDataTableAsync(); // Fixed method name
+                    await UpdateClientListAsync();  // Ensure all the client has been update in DB.
+                    await GetDataTableAsync();      // Fixed method name
                 }
                 finally
                 {
@@ -132,12 +135,26 @@ namespace AppliedAccounts.Pages.ImportData
             }
         }
 
+        private async Task UpdateClientListAsync()
+        {
+            if (ClientData != null)
+            {
+                var tb_Client = Source.GetTable(Enums.Tables.Customers);
+                foreach (DataRow Row in ClientData.Rows)
+                {
+
+
+
+                }
+            }
+        }
 
         private async Task GetExcelSheetDataAsync()
         {
             SpinnerMessage = "Sales invoice data is being Process... Gathering Data sheets";
             string _TempGUID = AppRegistry.GetText(AppUser.DataFile, "ExcelImport");
             TempDB _TempDB = new(_TempGUID + ".db");
+            ClientData = await _TempDB.GetTempTableAsync("Client List");
             SalesData = await _TempDB.GetTempTableAsync("Data");
             SalesSchema = await _TempDB.GetTempTableAsync("Schema");
             InvData = await _TempDB.GetTempTableAsync("Invoice Data");
@@ -329,23 +346,26 @@ namespace AppliedAccounts.Pages.ImportData
             MyMessage.AppendLine($"{DateTime.Now} Gathering Invoice Data");
             #region Get Invoice Date
 
-            foreach (DataRow Row in InvData.Rows)
+            if (InvData != null)
             {
-                if (Row["Particular"].ToString() == "Invoice Date")
+                foreach (DataRow Row in InvData.Rows)
                 {
-                    Inv_Date = Conversion.ToDateTime((string)Row["Value"]);
-                }
-                if (Row["Particular"].ToString() == "Invoice No")
-                {
-                    Inv_No = (string)Row["Value"];
-                }
+                    if (Row["Particular"].ToString() == "Invoice Date")
+                    {
+                        Inv_Date = Conversion.ToDateTime((string)Row["Value"]);
+                    }
+                    if (Row["Particular"].ToString() == "Invoice No")
+                    {
+                        Inv_No = (string)Row["Value"];
+                    }
 
-                if (Row["Particular"].ToString() == "Due Date")
-                {
-                    Due_Date = Conversion.ToDateTime((string)Row["Value"]);
+                    if (Row["Particular"].ToString() == "Due Date")
+                    {
+                        Due_Date = Conversion.ToDateTime((string)Row["Value"]);
+                    }
+                    if (Row["Particular"].ToString() == "Batch") { Batch = (string)Row["Value"]; }
+                    if (Row["Particular"].ToString() == "RefNo") { RefNo = (string)Row["Value"]; }
                 }
-                if (Row["Particular"].ToString() == "Batch") { Batch = (string)Row["Value"]; }
-                if (Row["Particular"].ToString() == "RefNo") { RefNo = (string)Row["Value"]; }
             }
             #endregion
 
