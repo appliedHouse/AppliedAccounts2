@@ -6,7 +6,6 @@ using AppliedAccounts.Data;
 using System.Diagnostics;
 using System.Text;
 using Microsoft.JSInterop;
-using System.Collections.Generic;
 
 
 
@@ -43,7 +42,7 @@ namespace AppliedAccounts.Pages.ImportData
 
         DateTime Inv_Date = DateTime.Now;
         DateTime Due_Date = DateTime.Now;
-        string RefNo = string.Empty;
+        //string RefNo = string.Empty;
         string Batch = string.Empty;
         string Inv_No = string.Empty;
         int TotalRec = 0;
@@ -222,20 +221,7 @@ namespace AppliedAccounts.Pages.ImportData
         #endregion
 
         #region Get Data From SQLite Temp Data, 
-        //Stored data from excel file to Temp
-        // and here this data will call in a app as Data tables.
-        //public async Task GetDataTableAsync()
-        //{
-        //    if (SalesData != null && SalesSchema != null && InvData != null)
-        //    {
-        //        ImportSaleInvoiceModel _Result = await GetDataTablesAsync();
-        //        Model = _Result;
-        //    }
-        //}
-
-
-
-
+        
         public async Task<ImportSaleInvoiceModel> GetDataTablesAsync()
         {
             SpinnerMessage = "Sales invoice data is being Process... Gatting Data table";
@@ -305,29 +291,29 @@ namespace AppliedAccounts.Pages.ImportData
                     if (Counter == 1) { continue; }     // Skip record of Heading in Excel File. 
 
 
-                    DataRow _Row1 = Sale1.NewRow();
+                    DataRow _MasterRow = Sale1.NewRow();
                     int _CompanyID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Customers, (string)Row["Code"]);
                     int _EmployeeID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Employees, (string)Row["Employee"]);
                     decimal _Total = Conversion.ToDecimal(Row["Total"]);
 
                     if (_Total > 0)     // if Invoice amount is zero, skip this...
                     {
-                        _Row1["ID"] = Counter;
-                        _Row1["Vou_No"] = string.Concat(Batch, Counter.ToString("0000"));
-                        _Row1["Vou_Date"] = Inv_Date;
-                        _Row1["Company"] = _CompanyID;
-                        _Row1["Employee"] = _EmployeeID;
-                        _Row1["Ref_No"] = RefNo;
-                        _Row1["Inv_No"] = string.Concat(Inv_No, Counter.ToString("0000")); ;
-                        _Row1["Inv_Date"] = Inv_Date;
-                        _Row1["Pay_Date"] = Due_Date;
-                        _Row1["Amount"] = _Total;
-                        _Row1["Description"] = Row["CompanyName"];
-                        _Row1["Comments"] = $"Sale Invoice : {Row["CompanyName"]} for amount {_Total}"; ;
-                        _Row1["Status"] = "Submitted";
+                        _MasterRow["ID"] = Counter;
+                        _MasterRow["Vou_No"] = string.Concat(Batch, Counter.ToString("0000"));
+                        _MasterRow["Vou_Date"] = Inv_Date;
+                        _MasterRow["Company"] = _CompanyID;
+                        _MasterRow["Employee"] = _EmployeeID;
+                        _MasterRow["Ref_No"] = Batch;
+                        _MasterRow["Inv_No"] = string.Concat(Inv_No, Counter.ToString("0000")); ;
+                        _MasterRow["Inv_Date"] = Inv_Date;
+                        _MasterRow["Pay_Date"] = Due_Date;
+                        _MasterRow["Amount"] = _Total;
+                        _MasterRow["Description"] = Row["CompanyName"];
+                        _MasterRow["Comments"] = $"Sale Invoice : {Row["CompanyName"]} for amount {_Total}"; ;
+                        _MasterRow["Status"] = "Submitted";
 
-                        Sale1.Rows.Add(_Row1);
-                        Model.SaleInvoiceList.Add(_Row1);
+                        Sale1.Rows.Add(_MasterRow);
+                        Model.SaleInvoiceList.Add(_MasterRow);
                         Model.ShowData = false;
 
                         MyMessage.AppendLine($" # {Counter}");
@@ -354,43 +340,43 @@ namespace AppliedAccounts.Pages.ImportData
             {
                 foreach (DataRow Scheme in SalesSchema.Rows)
                 {
-
-                    if ((string)Scheme["Code"] != "0")
+                    var _Code = Scheme["Code"].ToString();
+                    if (string.IsNullOrEmpty(_Code) && _Code != "0")
                     {
                         decimal _Amount = Conversion.ToDecimal(Row[(string)Scheme["Amount"]]);
                         if (_Amount == 0) { continue; }          // Skip if amount is zero.
 
                         Counter2++; Sr_No++;
-                        DataRow _Row2 = Sale2.NewRow();
-                        _Row2["ID"] = Counter2;
-                        _Row2["Sr_No"] = Sr_No;
-                        _Row2["TranID"] = Counter;
-                        _Row2["Batch"] = Row["Batch"];
+                        DataRow _DetailRow2 = Sale2.NewRow();
+                        _DetailRow2["ID"] = Counter2;
+                        _DetailRow2["Sr_No"] = Sr_No;
+                        _DetailRow2["TranID"] = Counter;
+                        _DetailRow2["Batch"] = Row["Batch"];
 
                         int _Inventory = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Inventory, (string)Scheme["Code"]);
-                        _Row2["Inventory"] = _Inventory;
-                        _Row2["Batch"] = Row["Batch"];
+                        _DetailRow2["Inventory"] = _Inventory;
+                        _DetailRow2["Batch"] = Row["Batch"];
 
                         if ((string)Scheme["Entry ID"] == "A")          // Amount only
                         {
-                            _Row2["Qty"] = 1;
-                            _Row2["Rate"] = _Amount;
+                            _DetailRow2["Qty"] = 1;
+                            _DetailRow2["Rate"] = _Amount;
                         }
                         if ((string)Scheme["Entry ID"] == "Q")          // Quantity and Rate = Amount
                         {
-                            _Row2["Qty"] = Conversion.ToDecimal(Row[(string)Scheme["Qty"]]);
-                            _Row2["Rate"] = Conversion.ToDecimal(Row[(string)Scheme["Rate"]]);
+                            _DetailRow2["Qty"] = Conversion.ToDecimal(Row[(string)Scheme["Qty"]]);
+                            _DetailRow2["Rate"] = Conversion.ToDecimal(Row[(string)Scheme["Rate"]]);
                         }
 
                         decimal _TaxID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Taxes, (string)Scheme["STax"]);
-                        _Row2["Tax"] = _TaxID;
-                        _Row2["Tax_Rate"] = Functions.Code2Rate(AppUser.DataFile, (int)_Row2["Tax"]);
-                        _Row2["Description"] = Row[(string)Scheme["Remarks Code"]];
+                        _DetailRow2["Tax"] = _TaxID;
+                        _DetailRow2["Tax_Rate"] = Functions.Code2Rate(AppUser.DataFile, (int)_DetailRow2["Tax"]);
+                        _DetailRow2["Description"] = Row[(string)Scheme["Remarks Code"]];
                         int.TryParse(Row["Project"].ToString(), out int _projectID);
-                        _Row2["Project"] = _projectID;
+                        _DetailRow2["Project"] = _projectID;
 
-                        Sale2.Rows.Add(_Row2);
-                        Model.SaleDetailsList.Add(_Row2);
+                        Sale2.Rows.Add(_DetailRow2);
+                        Model.SaleDetailsList.Add(_DetailRow2);
                     }
                 }
             }
@@ -425,7 +411,7 @@ namespace AppliedAccounts.Pages.ImportData
                         Due_Date = Conversion.ToDateTime((string)Row["Value"]);
                     }
                     if (Row["Particular"].ToString() == "Batch") { Batch = (string)Row["Value"]; }
-                    if (Row["Particular"].ToString() == "RefNo") { RefNo = (string)Row["Value"]; }
+                    //if (Row["Particular"].ToString() == "RefNo") { RefNo = (string)Row["Value"]; }
                 }
             }
             #endregion
@@ -482,7 +468,7 @@ namespace AppliedAccounts.Pages.ImportData
             {
                 MyMessage.AppendLine($"{DateTime.Now} Invoice {master["Vou_No"]} is processing...");
                 master = Invoice;
-                details = Model.SaleDetailsList.Where(row => (int)row["TranID"] == (int)master["ID"]).ToList();
+                details = [.. Model.SaleDetailsList.Where(row => (int)row["TranID"] == (int)master["ID"])];
 
                 MyMessage.AppendLine($"{DateTime.Now} {details.Count} records found in invoice {master["Vou_No"]}");
                 Validated = Validation(master);
