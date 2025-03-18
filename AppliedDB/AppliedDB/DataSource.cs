@@ -976,7 +976,7 @@ namespace AppliedDB
         #region Get NewRow of Table
         public static DataRow GetNewRow(string DBFile, Tables _Table)
         {
-            var _DataTable = GetDataTable(DBFile, _Table);
+            using var _DataTable = GetDataTable(DBFile, _Table);
             if (_DataTable is not null)
             {
                 var _NewRow = _DataTable.NewRow();

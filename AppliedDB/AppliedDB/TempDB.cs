@@ -17,21 +17,21 @@ namespace AppliedDB
             MyConnection = new(new SQLiteConnection($"Data Source={_DBPath}"));
         }
 
-        public async Task<DataTable> GetTempTableAsync(string _DataName)
+        public async Task<DataTable> GetTempTableAsync(string _DataTableName)
         {
             TempTable = new DataTable();
             await Task.Run(() =>
             {
                 try
                 {
-                    TableName = _DataName;
+                    TableName = _DataTableName;
                     if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
 
                     SQLiteCommand _Command = new(MyConnection);
                     _Command.CommandText = $"SELECT * FROM [{TableName}]";
                     DataSet _DataSet = new DataSet();
                     SQLiteDataAdapter _Adapter = new(_Command);
-                    _Adapter.Fill(_DataSet, "SaleData");
+                    _Adapter.Fill(_DataSet, _DataTableName);
                     if (_DataSet.Tables.Count > 0)
                     {
                         TempTable = _DataSet.Tables[0];
