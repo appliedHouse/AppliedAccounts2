@@ -117,9 +117,5 @@ namespace AppliedAccounts.Data
 
     }
 
-    public enum downloadOption
-    {
-        displayPDF,
-        downloadFile
-    }
+    
 }

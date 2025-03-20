@@ -21,6 +21,8 @@ builder.Services.AddSingleton<Globals>();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthonticationStateProvider>();
 builder.Services.AddScoped<ToastService>();
+builder.Services.AddScoped<PrintService>();
+
 
 var app = builder.Build();
 

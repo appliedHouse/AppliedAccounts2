@@ -80,7 +80,7 @@ else
             if (SalesData?.Rows.Count > 0)
             {
                 <div class="table-container" id="tableContainer">
-                    <table class="table-list">
+                    <table class="table-list" style="width:100%">
                         <thead>
                             <tr>
                                 <th style="width:10%" class="tb-col-center">Vou No</th>
@@ -127,7 +127,7 @@ else
                 <div class="d-flex flex-row mb-3">
                     <div class="p-2">
                         <button class="btn btn-primary w1" disabled="@(IsExcelLoaded ? true : ShowSpinner)"
-                                title="Upload Excel file" @onclick="TriggerFileInput">
+                        title="Upload Excel file" @onclick="TriggerFileInput">
                             Upload Excel file
                         </button>
                         <InputFile id="inputFile" class="d-none" OnChange="GetExcelFile" />
@@ -197,9 +197,21 @@ else
                     </div>
                 </div>
                 <div class="row">
-                    <div class="table-container" id="tableContainer">
-                        <textarea id="txtShowMessages"> @MyMessage  </textarea>
-                    </div>
+                    <table class="table-message">
+                        <thead>
+                            <tr>
+                                <th>Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach(string message in MyMessage)
+                            {
+                                <tr>
+                                    <td>@message</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         }

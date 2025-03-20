@@ -3,6 +3,7 @@ using AppliedDB;
 using AppReports;
 using Microsoft.JSInterop;
 using System.Data;
+using static AppliedAccounts.Services.PrintService;
 using MESSAGE = AppMessages.Enums.Messages;
 
 
@@ -108,21 +109,14 @@ namespace AppliedAccounts.Pages.Sale
                     PrintClass.ReportRender();
                     PrintedReports.Add(PrintClass.OutputReport.FileFullName);
                     
-                    if(Option == downloadOption.displayPDF)
+                    if(Option == DownloadOption.displayPDF)
                     {
-                        await PrintingService.Print(PrintClass.OutputReport.FileLink);
+                        //await PrintingService.Print(PrintClass.OutputReport.FileLink);
                     }
                     else
                     {
                         await js.InvokeVoidAsync(Option.ToString(), PrintClass.OutputReport.FileLink);
                     }
-                    
-                    
-                    
-
-
-
-                    
 
                 }
             }

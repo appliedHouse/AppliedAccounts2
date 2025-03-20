@@ -7,11 +7,13 @@
 @using AppliedAccounts.Data;
 @using AppliedAccounts.Models;
 @using AppliedAccounts.Libs;
+@using AppliedAccounts.Services;
 
-@inject IConfiguration Config;
-@inject AuthenticationStateProvider authStateProvider;
-@inject NavigationManager NavManager;
+@inject IConfiguration Config
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager NavManager
 @inject IJSRuntime js
+@inject PrintService rptPrint
 
 @code {
     [Parameter] public string Vou_No { get; set; } = string.Empty;
