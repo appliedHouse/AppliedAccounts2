@@ -125,7 +125,7 @@ namespace AppliedAccounts.Data
     }
     #endregion
 
-    #region Language Class
+    #region Currency Class
     public class CurrencyClass
     {
         public int ID { get; set; }

@@ -1,9 +1,11 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppReports;
 using Microsoft.JSInterop;
 using System.Data;
-using static AppliedAccounts.Services.PrintService;
+
+//using static AppliedAccounts.Services.PrintService;
 using MESSAGE = AppMessages.Enums.Messages;
 
 
@@ -11,34 +13,38 @@ namespace AppliedAccounts.Pages.Sale
 {
     public partial class SaleInvoiceList
     {
-        
+
         public AppUserModel AppUser { get; set; }
         public Models.SaleInvoiceListModel Model { get; set; }
         public ReportModel PrintClass { get; set; }
         private bool IsPrinted { get; set; } = false;
         private bool IsPrinting { get; set; } = false;
         private List<string> PrintedReports { get; set; } = new();
+        public PrintService ReportService { get; set; }
+        public Globals MyGlobals { get; set; }
 
 
         public SaleInvoiceList()
         {
+            
         }
 
 
-
+        #region Delete
         public async void Delete(int ID)
         {
 
             await Task.Delay(1000);
             // Add code here to delete sales invocies.
         }
-
+        #endregion
+        #region Edit
         public async void Edit(int ID)
         {
             await Task.Delay(1000);
             // Add code here to delete sales invocies.
         }
-
+        #endregion
         #region Select All and Select One
         public void SelectAll()
         {
@@ -73,7 +79,7 @@ namespace AppliedAccounts.Pages.Sale
                 {
                     if (item.IsSelected)
                     {
-                        Print(item.Id, downloadOption.downloadFile);
+                        //Print(item.Id, DownloadOption.downloadFile);
 
                     }
 
@@ -81,47 +87,41 @@ namespace AppliedAccounts.Pages.Sale
             });
             IsPrinting = false;
             IsPrinted = true;
-            await InvokeAsync(() => StateHasChanged());
         }
 
-        public void Print(int ID)
+
+
+        //public async void Print(int ID, PrintService.DownloadOption _Option);
+        //       {
+        //        string _InvNo = PrintClass.ReportData.ReportTable.Rows[0]["Vou_No"].ToString() ?? ID.ToString("0000");
+        //        string _RecNo = Model.Records.First().Ref_No;
+
+        //        PrintClass.OutputReport.FileName = $"{_RecNo}INV-{_InvNo}";
+        //        PrintClass.ReportRender();
+        //        PrintedReports.Add(PrintClass.OutputReport.FileFullName);
+
+        //        if (Option == DownloadOption.displayPDF)
+        //        {
+        //            //await PrintingService.Print(PrintClass.OutputReport.FileLink);
+        //        }
+        //        else
+        //        {
+        //            await js.InvokeVoidAsync(Option.ToString(), PrintClass.OutputReport.FileLink);
+        //        }
+
+        //    }
+        //}
+        //}
+
+        public async Task Print(int ID)
         {
-            //PrintingService.Print("docs/sample.pdf")
-
-            Print(ID, downloadOption.displayPDF);
-                        
+            
+            ReportService.RptData = GetReportData(ID);              // always generate Data for report
+            ReportService.RptModel = CreateReportModel(ID);         // and then generate report parameters
+            ReportService.RptType = ReportType.Preview;
+            var ReportLisk = ReportService.GetReportLink();
+            await js.InvokeVoidAsync(ReportService.JSOption, ReportLisk);
         }
-
-        public async void Print(int ID, downloadOption Option)
-        {
-            IsPrinted = false;
-            if (PrintClass is not null)
-            {
-                PrintClass.OutputReport.ReportType = ReportType.PDF;
-                PrintClass.ReportData = GetReportData(ID);
-
-                if (PrintClass.ReportData.ReportTable.Rows.Count > 0)
-                {
-                    string _InvNo = PrintClass.ReportData.ReportTable.Rows[0]["Vou_No"].ToString() ?? ID.ToString("0000");
-                    string _RecNo = Model.Records.First().Ref_No;
-
-                    PrintClass.OutputReport.FileName = $"{_RecNo}INV-{_InvNo}";
-                    PrintClass.ReportRender();
-                    PrintedReports.Add(PrintClass.OutputReport.FileFullName);
-                    
-                    if(Option == DownloadOption.displayPDF)
-                    {
-                        //await PrintingService.Print(PrintClass.OutputReport.FileLink);
-                    }
-                    else
-                    {
-                        await js.InvokeVoidAsync(Option.ToString(), PrintClass.OutputReport.FileLink);
-                    }
-
-                }
-            }
-        }
-
         private ReportData GetReportData(int ID)
         {
             ReportData _Result = new();
@@ -132,16 +132,14 @@ namespace AppliedAccounts.Pages.Sale
             _Result.DataSetName = "ds_SaleInvoice";
 
             return _Result;
-
-
         }
 
-        private ReportModel CreateReportModel()
+        private ReportModel CreateReportModel(int _ID)
         {
-            ReportModel _Reportmodel = new ReportModel();
+
+            ReportModel _Reportmodel = new();
             try
             {
-
                 var _InvoiceNo = "INV-Testing";
                 var _Heading1 = "Sales Invoice";
                 var _Heading2 = $"Invoice No. {_InvoiceNo}";
@@ -150,6 +148,8 @@ namespace AppliedAccounts.Pages.Sale
                 var _CompanyName = AppUser.Company;
                 var _ReportFooter = AppFunctions.ReportFooter();
 
+
+
                 // Input Parameters  (.rdl report file)
                 _Reportmodel.InputReport.FilePath = _ReportPath;
                 _Reportmodel.InputReport.FileName = "CDCInv";
@@ -157,7 +157,6 @@ namespace AppliedAccounts.Pages.Sale
                 // output Parameters (like pdf, excel, word, html, tiff)
                 _Reportmodel.OutputReport.FilePath = AppUser.PDFFolder + "\\";
                 _Reportmodel.OutputReport.FileLink = "";
-                _Reportmodel.OutputReport.FileName = "SaleInvoice";
                 _Reportmodel.OutputReport.ReportType = _ReportOption;
                 // Reports Parameters
                 _Reportmodel.AddReportParameter("CompanyName", _CompanyName);
@@ -165,10 +164,22 @@ namespace AppliedAccounts.Pages.Sale
                 _Reportmodel.AddReportParameter("Heading2", _Heading2);
                 _Reportmodel.AddReportParameter("Footer", _ReportFooter);
 
-                var _SourceData = new DataTable();          // Inject a Data Table for print.
+                //var _InvNo = _Reportmodel.ReportData.ReportTable.Rows[0]["Vou_No"].ToString() ?? _ID.ToString("0000");
+                //var _RecNo = ""; // _Reportmodel.ReportData.DataSource.Records.First().Ref_No;
+                //var _SaveAs = _Reportmodel.OutputReport.FileName = $"{_RecNo}INV-{_InvNo}";
 
-                _Reportmodel.ReportData.DataSetName = "ds_SaleInvoice";
-                _Reportmodel.ReportData.ReportTable = _SourceData;
+                var _SaveAs = "Test";
+
+                _Reportmodel.OutputReport.FileName = _SaveAs;
+
+
+
+
+                //        string _RecNo = Model.Records.First().Ref_No;
+                //var _SourceData = new DataTable();          // Inject a Data Table for print.
+
+                //_Reportmodel.ReportData.DataSetName = "ds_SaleInvoice";
+                //_Reportmodel.ReportData.ReportTable = _SourceData;
             }
             catch (Exception)
             {
@@ -178,5 +189,7 @@ namespace AppliedAccounts.Pages.Sale
             return _Reportmodel;
         }
         #endregion
+
+
     }
 }

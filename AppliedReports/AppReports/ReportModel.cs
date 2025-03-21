@@ -1,6 +1,5 @@
 ﻿using Microsoft.Reporting.NETCore;
 using System.Data;
-using System.IO;
 
 
 namespace AppReports
@@ -14,6 +13,7 @@ namespace AppReports
         public ReportData ReportData { get; set; }
         public byte[] ReportBytes { get; set; }
         public bool IsReportRendered { get; set; } = false;
+        public string ReportUrl { get; set; } = string.Empty;
 
         public List<ReportParameter> ReportParameters { get; set; }
         //public bool Render => ReportRender();
@@ -80,8 +80,6 @@ namespace AppReports
                 ReportBytes = report.Render(_FileType);
                 Messages.Add($"{DateTimeNow}: Report Render bytes are {ReportBytes.Count()}");
 
-                
-
                 if (ReportBytes.Length > 0) { SaveReport(); }
                 else
                 {
@@ -102,48 +100,7 @@ namespace AppReports
             IsReportRendered = false;
             await Task.Run(() =>
             {
-                IsReportRendered = false;
-                Messages.Add($"{DateTimeNow}: Report rendering started");
-
-                if (ReportParameters.Count == 0) { DefaultParameters.GetDefaultParameters(); }
-                if (InputReport.IsFileExist)
-                {
-                    Messages.Add($"{DateTimeNow}: Report file found {InputReport.FileFullName}");
-
-                    var _ReportType = OutputReport.ReportType;
-                    Messages.Add($"{DateTimeNow}: Report Type is {OutputReport.ReportType}");
-
-                    OutputReport.MimeType = ReportMime.GetReportMime(_ReportType);
-                    Messages.Add($"{DateTimeNow}: Report MimeType is {OutputReport.MimeType}");
-
-                    OutputReport.FileExtention = OutputReport.GetFileExtention(_ReportType);
-                    Messages.Add($"{DateTimeNow}: Report File Extention is {OutputReport.FileExtention}");
-
-                    var _ReportFile = InputReport.FileFullName;
-                    var _FileType = RenderFormat.GetRenderFormat(_ReportType);
-                    var _ReportStream = new StreamReader(_ReportFile);
-                    Messages.Add($"{DateTimeNow}: {_ReportFile} is read as stream.");
-
-                    LocalReport report = new();
-                    report.LoadReportDefinition(_ReportStream);
-                    report.DataSources.Add(ReportData.DataSource);
-                    report.SetParameters(ReportParameters);
-                    ReportBytes = report.Render(_FileType);
-                    Messages.Add($"{DateTimeNow}: Report Render bytes are {ReportBytes.Count()}");
-
-                    if (ReportBytes.Length > 0) { SaveReport(); }
-                    else
-                    {
-                        Messages.Add($"{DateTimeNow}: ERROR: Report length is reporting zero");
-                    }
-                    Messages.Add($"{DateTimeNow}: Report rendering completed at {DateTimeNow}");
-                    IsReportRendered = true;
-                }
-                else
-                {
-                    Messages.Add($"{DateTimeNow}: Report file NOT found {InputReport.FileFullName}");
-                }
-
+                IsReportRendered = ReportRender();    
             });
             return IsReportRendered;
         }
@@ -213,7 +170,6 @@ namespace AppReports
             if (FilePath.Length > 0 && FileName.Length > 0 && FileExtention.Length > 0)
             {
                 return Path.Combine(FilePath, FileName + "." + FileExtention);
-                //return $"{FilePath}{FileName}.{FileExtention}";
             }
             return string.Empty;
         }

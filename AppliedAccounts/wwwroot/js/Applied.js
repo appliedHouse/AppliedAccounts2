@@ -81,10 +81,12 @@ window.triggerFileUpload = function () {
 // Table List Height Auto Adjust
 function adjustTableHeight() {
     const tableContainer = document.getElementById("tableContainer");
-    const windowHeight = window.innerHeight;
-    const containerTop = tableContainer.getBoundingClientRect().top;
-    const maxHeight = windowHeight - containerTop - 20; // 20px less than bottom
-    tableContainer.style.maxHeight = maxHeight + "px";
+    if (tableContainer != null) {
+        const windowHeight = window.innerHeight;
+        const containerTop = tableContainer.getBoundingClientRect().top;
+        const maxHeight = windowHeight - containerTop - 20; // 20px less than bottom
+        tableContainer.style.maxHeight = maxHeight + "px";
+    }
 }
 
 // Adjust height on page load and window resize

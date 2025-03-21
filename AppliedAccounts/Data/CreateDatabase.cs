@@ -42,11 +42,14 @@ namespace AppliedAccounts.Data
 
         public void GetTableNames()
         {
-            var tableNames = new List<string>();
-            if (MyConnection.State != System.Data.ConnectionState.Open) { MyConnection.Open(); }
-            var CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';";
-            var _Table = AppliedDB.DataSource.GetQueryTable(CommandText, MyConnection);
-            TableList = _Table.AsEnumerable().ToList();
+            if (!string.IsNullOrEmpty(MyConnection.ConnectionString))
+            {
+                var tableNames = new List<string>();
+                if (MyConnection.State != System.Data.ConnectionState.Open) { MyConnection.Open(); }
+                var CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';";
+                var _Table = AppliedDB.DataSource.GetQueryTable(CommandText, MyConnection);
+                TableList = _Table.AsEnumerable().ToList();
+            }
         }
 
         #region Create Tables

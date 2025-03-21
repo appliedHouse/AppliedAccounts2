@@ -21,7 +21,7 @@ namespace AppliedAccounts.Pages.ImportData
         public AppUserModel AppUser { get; set; }
         public ImportSaleInvoiceModel Model { get; set; }
         public ImportExcelFile ImportExcel { get; set; }
-        public StringBuilder MyMessage { get; set; }
+        public List<string> MyMessage { get; set; }
         public DataSet? ExcelDataSet { get; set; }
         public DataTable? ClientData { get; private set; }
         public DataTable? SalesData { get; set; }
@@ -38,6 +38,7 @@ namespace AppliedAccounts.Pages.ImportData
         public bool ShowImportButton { get; set; } = true;
         public string ExcelFileName { get; set; } = "";
         public string SpinnerMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = "";
 
 
 
@@ -83,12 +84,12 @@ namespace AppliedAccounts.Pages.ImportData
                 ImportExcel = new(e.File, AppUser);
                 await ImportExcel.ImportDataAsync();            // ImportExcelFile.cs Function
                 IsExcelLoaded = true;                           // Excel file has been loaded successfully.
-                MyMessage.AppendLine($"{DateTime.Now} Excel File loaded.... OK");
+                MyMessage.Add($"{DateTime.Now} Excel File loaded.... OK");
             }
             catch (Exception)
             {
 
-                MyMessage.AppendLine($"{DateTime.Now} ERROR: Excel file not loaded.... ");
+                MyMessage.Add($"{DateTime.Now} ERROR: Excel file not loaded.... ");
             }
             finally
             {
@@ -123,7 +124,7 @@ namespace AppliedAccounts.Pages.ImportData
                 {
                     stopwatch.Stop();
                     var ts = stopwatch.Elapsed;
-                    MyMessage.AppendLine($"{DateTime.Now} Total time spent in process: {ts.TotalSeconds} seconds");
+                    MyMessage.Add($"{DateTime.Now} Total time spent in process: {ts.TotalSeconds} seconds");
 
                     ShowSpinner = false;
                     Model.ShowData = true;     // display all imported sales invoices after process complete
@@ -242,7 +243,7 @@ namespace AppliedAccounts.Pages.ImportData
             ImportSaleInvoiceModel _Result = new();
             _Result.DBFile = AppUser.DataFile;
             await GenerateInvoice();
-            MyMessage.AppendLine($"{DateTime.Now} Task Completed.");
+            MyMessage.Add($"{DateTime.Now} Task Completed.");
 
             Model.ShowData = true;
 
@@ -275,11 +276,11 @@ namespace AppliedAccounts.Pages.ImportData
             await Task.Run(() =>
             {
                 SpinnerMessage = "Sales invoice data is being Process... Generating Invoices !!";
-                MyMessage.AppendLine($"{DateTime.Now} Start Process for Generate Invoice");
+                MyMessage.Add($"{DateTime.Now} Start Process for Generate Invoice");
                 #region Error Message
                 if (InvData is null || SalesData is null || SalesSchema is null)
                 {
-                    MyMessage.AppendLine($"{DateTime.Now} Date is not available to proceed...");
+                    MyMessage.Add($"{DateTime.Now} Date is not available to proceed...");
                     return;
                 }
                 #endregion
@@ -330,7 +331,7 @@ namespace AppliedAccounts.Pages.ImportData
                         Model.SaleInvoiceList.Add(_Row1);
                         Model.ShowData = false;
 
-                        MyMessage.AppendLine($" # {Counter}");
+                        MyMessage.Add($" # {Counter}");
 
                         GetInvoiceDetails(Row);                 // Generates detail record of sale invocies.
                     }
@@ -340,14 +341,14 @@ namespace AppliedAccounts.Pages.ImportData
                     }
                 }
             });
-            MyMessage.AppendLine($"{DateTime.Now} End Sales Invoice details process..");
+            MyMessage.Add($"{DateTime.Now} End Sales Invoice details process..");
         }
         #endregion
 
         #region Generate Sales Invoice Details Table
         public void GetInvoiceDetails(DataRow Row)
         {
-            MyMessage.AppendLine($"{DateTime.Now} Working of Sale Invoice details.");
+            MyMessage.Add($"{DateTime.Now} Working of Sale Invoice details.");
             var Counter2 = 0;
             var Sr_No = 0;
             if (SalesSchema is not null)
@@ -404,7 +405,7 @@ namespace AppliedAccounts.Pages.ImportData
         // 
         public void GetInvoiceData()
         {
-            MyMessage.AppendLine($"{DateTime.Now} Gathering Invoice Data");
+            MyMessage.Add($"{DateTime.Now} Gathering Invoice Data");
             #region Get Invoice Date
 
             if (InvData != null)
@@ -480,13 +481,13 @@ namespace AppliedAccounts.Pages.ImportData
 
             foreach (var Invoice in Model.SaleInvoiceList)
             {
-                MyMessage.AppendLine($"{DateTime.Now} Invoice {master["Vou_No"]} is processing...");
+                MyMessage.Add($"{DateTime.Now} Invoice {master["Vou_No"]} is processing...");
                 master = Invoice;
                 details = Model.SaleDetailsList.Where(row => (int)row["TranID"] == (int)master["ID"]).ToList();
 
-                MyMessage.AppendLine($"{DateTime.Now} {details.Count} records found in invoice {master["Vou_No"]}");
+                MyMessage.Add($"{DateTime.Now} {details.Count} records found in invoice {master["Vou_No"]}");
                 Validated = Validation(master);
-                MyMessage.AppendLine($"{DateTime.Now} {master["Vou_No"]} is {Validated} validated");
+                MyMessage.Add($"{DateTime.Now} {master["Vou_No"]} is {Validated} validated");
 
                 foreach (var Row in details)
                 {
@@ -496,16 +497,16 @@ namespace AppliedAccounts.Pages.ImportData
                     {
                         break;
                     }
-                    MyMessage.AppendLine($"{DateTime.Now} {master["Vou_No"]} Serial # {Row["Sr_No"]}  is {Validated} validated");
+                    MyMessage.Add($"{DateTime.Now} {master["Vou_No"]} Serial # {Row["Sr_No"]}  is {Validated} validated");
                 }
 
                 if (Validated)
                 {
-                    MyMessage.AppendLine($"{DateTime.Now} {master["Vou_No"]} validated for post / save... ");
+                    MyMessage.Add($"{DateTime.Now} {master["Vou_No"]} validated for post / save... ");
                     master["ID"] = 0;           // Set a Datarow for insert command
                     CommandClass _Commands = new(master, AppUser.DataFile);
                     var IsSaved = _Commands.SaveChanges();
-                    MyMessage.AppendLine($"{DateTime.Now} {master["Vou_No"]} saved ---> {IsSaved} ");
+                    MyMessage.Add($"{DateTime.Now} {master["Vou_No"]} saved ---> {IsSaved} ");
                     var _TranID = (int)master["ID"];        // Get ID after save row in SQLite Data Table.
                     foreach (var Row in details)
                     {
@@ -513,12 +514,12 @@ namespace AppliedAccounts.Pages.ImportData
                         Row["TranID"] = _TranID;
                         _Commands = new(Row, AppUser.DataFile);
                         await Task.Run(() => _Commands.SaveChanges());
-                        MyMessage.AppendLine($"{DateTime.Now} {master["Vou_No"]} Serial # {Row["Sr_No"]} is saved ---> {IsSaved} ");
+                        MyMessage.Add($"{DateTime.Now} {master["Vou_No"]} Serial # {Row["Sr_No"]} is saved ---> {IsSaved} ");
                     }
                 }
                 else
                 {
-                    MyMessage.AppendLine($"{DateTime.Now} ERROR : Sales Date is not valided to post...");
+                    MyMessage.Add($"{DateTime.Now} ERROR : Sales Date is not valided to post...");
                 }
             }
         }

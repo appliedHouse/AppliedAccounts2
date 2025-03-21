@@ -3,12 +3,13 @@
 
 @using AppliedAccounts.Libs
 @using AppliedAccounts.Models
-@using Append.Blazor.Printing
+@using AppliedAccounts.Services
 
 @inject AuthenticationStateProvider authStateProvider
-@inject PrintingService rptPrint
 @inject NavigationManager NavManager
 @inject IJSRuntime js
+@inject Globals DIGlobal;
+@inject PrintService DIPrintReport;
 
 
 @code {
@@ -19,10 +20,14 @@
     {
         try
         {
+            
             AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
-            if (AppUser != null) { Model = new(AppUser); PrintClass = CreateReportModel(); }
+            if (AppUser != null) { Model = new(AppUser); }
             else { Model = new(); }
             IsDataLoad = true;
+
+            MyGlobals = DIGlobal;
+            ReportService = new(js, MyGlobals);
         }
         catch (Exception)
         {
@@ -221,3 +226,5 @@ else
     <p>Data Not Load....</p>
 }
 
+
+<a href="D:\\AppliedAccounts2\\AppliedAccounts2App\\AppliedAccounts\\wwwroot\\PDFReports\\Test.pdf" target="_blank">...</a>
