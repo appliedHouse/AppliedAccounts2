@@ -27,7 +27,7 @@ namespace AppliedAccounts.Services
 
         public void Preview()
         {
-            js.InvokeVoidAsync("displayPDF", RptModel.OutputReport.FileFullName);
+            //js.InvokeVoidAsync("displayPDF", RptModel.OutputReport.FileFullName);
 
         }
 

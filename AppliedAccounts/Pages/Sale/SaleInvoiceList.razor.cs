@@ -120,7 +120,8 @@ namespace AppliedAccounts.Pages.Sale
             ReportService.RptModel = CreateReportModel(ID);         // and then generate report parameters
             ReportService.RptType = ReportType.Preview;
             var ReportLisk = ReportService.GetReportLink();
-            await js.InvokeVoidAsync(ReportService.JSOption, ReportLisk);
+            //await js.InvokeVoidAsync(ReportService.JSOption, ReportLisk);
+            await js.InvokeVoidAsync("downloadPDF", "File1.pdf", ReportService.RptModel.ReportBytes);
         }
         private ReportData GetReportData(int ID)
         {

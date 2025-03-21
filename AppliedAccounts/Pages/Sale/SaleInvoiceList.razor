@@ -10,6 +10,7 @@
 @inject IJSRuntime js
 @inject Globals DIGlobal;
 @inject PrintService DIPrintReport;
+@inject HttpClient Http
 
 
 @code {
@@ -20,7 +21,7 @@
     {
         try
         {
-            
+
             AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
             if (AppUser != null) { Model = new(AppUser); }
             else { Model = new(); }
@@ -112,7 +113,7 @@
                 </div>
             </div>
 
-            
+
         </EditForm>
 
         <div class="container">
@@ -227,4 +228,17 @@ else
 }
 
 
-<a href="D:\\AppliedAccounts2\\AppliedAccounts2App\\AppliedAccounts\\wwwroot\\PDFReports\\Test.pdf" target="_blank">...</a>
+@* <button @onclick="DownloadPdf">Download PDF</button> *@
+
+@code {
+    private async Task DownloadPdf()
+    {
+        var _Test = new AppliedAccounts.Pages.Testing.CreatePDFinMemory_and_Download();
+        //_Test.DownloadPdf();
+        _Test.fileData = _Test.GetPDFBytes();
+        await js.InvokeVoidAsync("downloadPDF", "invoice1.pdf", _Test.fileData);
+
+
+    }
+}
+

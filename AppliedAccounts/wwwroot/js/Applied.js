@@ -14,6 +14,14 @@ window.downloadFile = function (fileUrl) {
     document.body.removeChild(link);
 }
 
+function downloadPDF(fileName, byteArray) {
+    const blob = new Blob([byteArray], { type: 'application/pdf' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(link.href); // Clean up the object URL
+}
 
 // display a PDF File in Browser
 window.displayPDF = function (fileUrl) {
