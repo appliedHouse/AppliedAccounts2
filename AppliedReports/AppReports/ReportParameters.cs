@@ -6,6 +6,7 @@ namespace AppReports
 {
     public class ReportParameters
     {
+        public ReportParameters() { }
         public string? ReportPath { get; set; }
         public string? ReportFile { get; set; }
         public string? OutputPath { get; set; }

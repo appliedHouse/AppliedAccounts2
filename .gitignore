@@ -366,3 +366,5 @@ FodyWeavers.xsd
 /AppliedAccounts/wwwroot/SQLiteTemp/f37b44b2-e319-44d9-b4d5-31a5505e9545.db
 /AppliedAccounts/wwwroot/MyTypeScript.js.map
 /AppliedAccounts/wwwroot/MyTypeScript.js
+/AppliedAccounts/wwwroot/SQLiteDB/HFSSteel.db
+/AppliedAccounts/Pages/ImportData/ImportSaleInvoice.razor.cs

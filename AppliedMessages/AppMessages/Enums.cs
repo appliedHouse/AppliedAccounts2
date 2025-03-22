@@ -31,7 +31,7 @@ namespace AppMessages
             // Row and column
             Row_QtyZero,
             Row_RateZero,
-            Row_AmountZero,
+            Row_COAIsZero,
             Row_IDZero,
             Row_TaxIDZero,
             Row_TaxAmountZero,
@@ -100,6 +100,8 @@ namespace AppMessages
             UserProfileIsNull,
             VouNoNotDefine,
             BookIDIsZero,
+            BookNatureIsZero,
+            BookNatureIsNull,
             ConnectionsIsNull,
             RecordIsNull,
             RecordsAreNull,
@@ -129,6 +131,13 @@ namespace AppMessages
             AccountIDIsZero,
             CustomerIDIsZero,
             VouNoIsNull,
+            NoRecordFound,
+            PageIsNotValid,
+            VouDateLess,
+            VouDateMore,
+            Row_NoStatus,
+            VouNoNotDefineProperly,
+            SerialNoIsZero,
         }
 
         public enum Class

@@ -1,0 +1,162 @@
+﻿@layout PageLayout;
+@page "/Accounts/BooksList";
+@attribute [Authorize];
+@using AppliedAccounts.Libs;
+@using AppliedAccounts.Models;
+@using AppliedAccounts.Data;
+@using AppliedDB
+@using System.Data
+
+@inject AuthenticationStateProvider authorized;
+@inject NavigationManager NavManager;
+@inject IJSRuntime js
+
+
+@code {
+
+    private string UserRoll;
+    private string DateFormat = Format.DDMMYY;
+    private string CurrFormat = Format.Currency;
+    private decimal Tot_DR = 0.0M;
+    private decimal Tot_CR = 0.0M;
+
+
+    protected override void OnInitialized()
+    {
+        UserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
+        MyModel = new(0, UserProfile);   // BookID and UserProfile.
+        MyModel.Source = new(UserProfile);
+    }
+
+
+    private void BookNatureChanged(int _NatureID)
+    {
+        MyModel.BookNatureID = _NatureID;
+        MyModel.BookID = MyModel.Source.GetBookAccounts(MyModel.BookNatureID).First()?.ID ?? 0;
+    }
+
+    private void BookListChanged(int _BookID)
+    {
+        MyModel.BookID = _BookID; //result;
+        BookRecords = LoadBookRecords(MyModel.BookID);
+
+    }
+
+
+}
+
+<div class="PageHeading">
+    <h2>@MyModel.BookTitle</h2>
+</div>
+
+@* 
+ValueChanged="@((e) => BookNatureChanged(e))"
+ValueChanged="@((e) => BookListChanged(e))"
+ *@
+
+<EditForm Model="@MyModel">
+    <div class="d-flex flex-row mb-3 filter">
+        <div class="p-2">
+            <InputSelect id="ddBook" class="item-height"
+                         TValue="int"
+                         Value="@MyModel.BookNatureID"
+                         ValueExpression="@(() => MyModel.BookNatureID)"
+                         ValueChanged="@((e) => BookNatureChanged(e))">
+
+                @foreach (var item in MyModel.NatureAccountsList)
+                {
+                    <option value="@item.ID">@item.Title</option>
+                }
+
+            </InputSelect>
+        </div>
+        <div class="p-2">
+            <InputSelect id="ddBook" class="item-height"
+                         TValue="int"
+                         Value="@MyModel.BookID"
+                         ValueExpression="@(()=> MyModel.BookID)"
+                         ValueChanged="@((e)=>BookListChanged(e))">
+
+                @foreach (var item in MyModel.Source.GetBookAccounts(MyModel.BookNatureID))
+                {
+                    <option value="@item.ID">@item.Title</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="p-2">
+            <InputDate id="dateStat" class="item-height" @bind-Value="MyModel.DT_Start">
+
+            </InputDate>
+        </div>
+        <div class="p-2">
+            <InputDate id="dateStat" class="item-height" @bind-Value="MyModel.DT_End">
+
+            </InputDate>
+        </div>
+        <div class="p-2 search-btn">
+            <label for="floatingInput">
+                <InputText id="txtSearch" class="item-height" placeholder="Filter list"
+                           @bind-Value="MyModel.SearchText"
+                           @onclick="Refresh">
+                </InputText>
+            </label>
+        </div>
+        <div class="p-2">
+            <button type="submit" class="btn btn-refresh" @onclick="Refresh" title="Refresh"></button>
+        </div>
+        <div class="p-2">
+            <button type="submit" class="btn btn-new" @onclick="New" title="New"></button>
+        </div>
+    </div>
+
+    <div class="container">
+
+        @if (BookRecords != null)
+        {
+
+            <table class="table-list">
+                <thead>
+                    <tr>
+                        <th>Voucher</th>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Received</th>
+                        <th>Paid</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (BookView Record in LoadBookRecords(MyModel.BookID))
+                    {
+                        <tr>
+                            <td>@Record.Vou_No</td>
+                            <td>@Record.Vou_Date.ToString(Format.DDMMMYY)</td>
+                            <td>@Record.Description</td>
+                            <td class="amount">@Record.TReceived</td>
+                            <td class="amount">@Record.TPaid</td>
+                            <td class="amount">@Record.TBalance</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="container">
+                <div class="row">
+                    <div class="alert alert-warning" role="alert">
+                        No records found
+                    </div>
+
+                </div>
+                <div class="row">
+                    <button type="submit" class="btn btn-primary" @onclick="New"></button>
+                </div>
+            </div>
+        }
+    </div>
+
+
+
+
+</EditForm>

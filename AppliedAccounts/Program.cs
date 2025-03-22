@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using AppliedAccounts.Data;
 using AppliedAccounts.Authentication;
-using Append.Blazor.Printing;
+using AppliedAccounts.Services;
+
 
 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
@@ -14,11 +15,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddSingleton<AppUserModel>();
 builder.Services.AddSingleton<UserProfile>();
 builder.Services.AddSingleton<Globals>();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthonticationStateProvider>();
-builder.Services.AddScoped<IPrintingService, PrintingService>();
+builder.Services.AddScoped<ToastService>();
+builder.Services.AddScoped<PrintService>();
+builder.Services.AddHttpClient();
+
+
+
 
 var app = builder.Build();
 

@@ -11,7 +11,7 @@ using Tables = AppliedDB.Enums.Tables;
 
 namespace AppliedAccounts.Models
 {
-    public class SaleInvoiceModel
+    public class SaleInvoiceModel 
     {
         #region Constructor
         public SaleInvoiceModel(AppUserModel _UserProfile)
@@ -64,7 +64,7 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> Inventory { get; set; }
         public List<CodeTitle> Taxes { get; set; }
         public List<CodeTitle> Units { get; set; }
-        public AppMessages.AppMessages Messages { get; set; } = new();
+        public AppMessages.MessageClass Messages { get; set; } = new();
         public string NumberFormat { get; set; } = Format.Number;
         public string DateFormat { get; set; } = Format.DDMMMYY;
         public ReportModel Report { get; set; } = new();
@@ -139,10 +139,9 @@ namespace AppliedAccounts.Models
                 {
                     // Bill Payable Master Record 
 
-
-                    if ((string)Row1["Vou_No"] == "New")
+                    if (Row1.Field<string>("Vou_No")!.ToUpper().Equals("NEW"))
                     {
-                        Row1["Vou_No"] = NewVoucherNo.GetSaleVouNo(UserProfile.DataFile);
+                        Row1["Vou_No"] = NewVoucherNo.GetSaleInvoiceVoucher(UserProfile.DataFile,Row1.Field<DateTime>("Vou_Date"));
                     }
 
                     string DBFile = UserProfile.DataFile;
@@ -452,7 +451,7 @@ namespace AppliedAccounts.Models
 
             if (_Record.Qty == 0) { Messages.Add(MESSAGES.Row_QtyZero); _Validated = true; }
             if (_Record.Rate == 0) { Messages.Add(MESSAGES.Row_RateZero); _Validated = true; }
-            if (_Record.Amount == 0) { Messages.Add(MESSAGES.Row_AmountZero); _Validated = true; }
+            if (_Record.Amount == 0) { Messages.Add(MESSAGES.Row_COAIsZero); _Validated = true; }
             if (_Record.TaxAmount == 0) { Messages.Add(MESSAGES.Row_TaxAmountZero); _Validated = true; }
             if (_Record.Company == 0) { Messages.Add(MESSAGES.Row_CompanyIDZero); _Validated = true; }
             if (_Record.Inventory == 0) { Messages.Add(MESSAGES.Row_InventoryIDZero); _Validated = true; }
@@ -497,7 +496,7 @@ namespace AppliedAccounts.Models
 
                 if ((decimal)_Row["Qty"] == 0) { Messages.Add(MESSAGES.Row_QtyZero); _Validated = true; }
                 if ((decimal)_Row["Rate"] == 0) { Messages.Add(MESSAGES.Row_RateZero); _Validated = true; }
-                if ((decimal)_Row["Amount"] == 0) { Messages.Add(MESSAGES.Row_AmountZero); _Validated = true; }
+                if ((decimal)_Row["Amount"] == 0) { Messages.Add(MESSAGES.Row_COAIsZero); _Validated = true; }
                 if ((decimal)_Row["TaxAmount"] == 0) { Messages.Add(MESSAGES.Row_TaxAmountZero); _Validated = true; }
                 if ((decimal)_Row["Company"] == 0) { Messages.Add(MESSAGES.Row_CompanyIDZero); _Validated = true; }
                 if ((decimal)_Row["Inventory"] == 0) { Messages.Add(MESSAGES.Row_InventoryIDZero); _Validated = true; }

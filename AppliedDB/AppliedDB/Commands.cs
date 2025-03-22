@@ -8,11 +8,11 @@ namespace AppliedDB
 {
     public class Commands
     {
+        
         public static SQLiteCommand? Insert(DataRow CurrentRow, SQLiteConnection DBConnection)
         {
             if ((int)CurrentRow["ID"] == 0)
             {
-
                 DataColumnCollection _Columns = CurrentRow.Table.Columns;
                 SQLiteCommand _Command = new(DBConnection);
 
@@ -43,7 +43,7 @@ namespace AppliedDB
                     _ParameterName = string.Concat('@', _Column.ColumnName.Replace(" ", ""));
                     _Command.Parameters.AddWithValue(_ParameterName, CurrentRow[_Column.ColumnName]);
                 }
-
+                
                 CurrentRow["ID"] = DataSource.GetMaxID(_TableName,DBConnection);
                 _Command.Parameters["@ID"].Value = CurrentRow["ID"];
                 return _Command;
@@ -141,14 +141,15 @@ namespace AppliedDB
     }
     public class CommandClass
     {
-        public SQLiteCommand? CommandInsert { get; set; }
-        public SQLiteCommand? CommandUpdate { get; set; }
-        public SQLiteCommand? CommandDelete { get; set; }
-        public DataRow? Row { get; set; }
+        public SQLiteCommand CommandInsert { get; set; }
+        public SQLiteCommand CommandUpdate { get; set; }
+        public SQLiteCommand CommandDelete { get; set; }
+        public DataRow Row { get; set; }
         public string Action { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
         public int Effected { get; set; } = 0;
-        public AppMessages.AppMessages MyMessages { get; set; } = new();
+        public int PrimaryKeyID { get; set; } = 0;
+        public MessageClass MyMessages { get; set; } = new();
 
         #region Constructors
         public CommandClass()
@@ -174,41 +175,18 @@ namespace AppliedDB
 
             if ((int)Row["ID"] == 0) { Action = "Insert"; } else { Action = "Update"; }
 
-            CommandInsert = Commands.Insert(Row, DBConnection);
+            CommandInsert = Commands.Insert(Row, DBConnection); 
             CommandUpdate = Commands.UpDate(Row, DBConnection);
             CommandDelete = Commands.Delete(Row, DBConnection);
 
         }
 
-
-        public CommandClass(DataRow _Row, string DBFile, AppMessages.AppMessages _Messages)
-        {
-            Row = _Row;
-            MyMessages = _Messages;
-
-            if ((int)Row["ID"] == 0) { Action = "Insert"; } else { Action = "Update"; }
-
-            try
-            {
-                CommandInsert = Commands.Insert(Row, DBFile);
-                CommandUpdate = Commands.UpDate(Row, DBFile);
-                CommandDelete = Commands.Delete(Row, DBFile);
-                //MyMessages = _Messages;
-
-            }
-            catch (Exception)
-            {
-                MyMessages.Add(Messages.CommendError);
-            }
-
-
-
-        }
         #endregion
 
         // Insert and Update the Row
         public bool SaveChanges()
         {
+            bool result = false;
             if (Row is null) { MyMessages.Add(Messages.RowValueNull); return false; }
 
             if (Action == "Update")
@@ -237,19 +215,20 @@ namespace AppliedDB
                         CommandInsert.Connection.Open();
                         Effected = CommandInsert.ExecuteNonQuery();
                         CommandInsert.Connection.Close();
-                    }
+                        PrimaryKeyID = (int)CommandInsert.Parameters["@ID"].Value;
+                                            }
                     catch (Exception)
                     {
-                        MyMessages.Add(Messages.RowNotDeleted); return false;
+                        MyMessages.Add(Messages.RowNotDeleted); result= false;
                     }
 
                 }
             }
 
-            if (Effected == 0) { MyMessages.Add(Messages.NotSave); return false; }
-            if (Effected > 0) { MyMessages.Add(Messages.Save); return true; }
+            if (Effected == 0) { MyMessages.Add(Messages.NotSave); result= false; }
+            if (Effected > 0) { MyMessages.Add(Messages.Save); result= true; }
 
-            return false;
+            return result;
         }
 
         // Delete the row

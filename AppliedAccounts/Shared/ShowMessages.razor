@@ -3,12 +3,12 @@
 
 @code {
     [Parameter]
-    public AppMessages Messages { get; set; } = MessageClass.Messages;
+    public AppMessages.MessageClass MsgClass { get; set; }
 
-    protected override void OnAfterRender(bool firstRender)
-    {
-        Messages.ClearMessages();
-    }
+    // protected override void OnAfterRender(bool firstRender)
+    // {
+    //     MsgClass.ClearMessages();
+    // }
 }
 
 <style>
@@ -22,11 +22,13 @@
     .messages {
         margin-Top: 5px;
         margin-bottom: 10px;
+        margin-left:0px;
+        margin-right:0px;
     }
 </style>
 
 <div class="messages">
-    @foreach (var Message in Messages.MyMessages)
+    @foreach (var Message in MsgClass.MessageList)
     {
         @if (Message.MessageClass.Equals(Enums.Class.Error))
         {

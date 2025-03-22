@@ -1,9 +1,11 @@
 ﻿using AppliedAccounts.Data;
 using AppliedDB;
+using Microsoft.VisualBasic;
 using System.Data;
 using static AppliedAccounts.Pages.Accounts.COA1;
 using static AppliedDB.Enums;
-using static AppMessages.Enums;
+using AppMessages;
+using MESSAGES = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Models
 {
@@ -28,8 +30,8 @@ namespace AppliedAccounts.Models
         public string SelectedNature { get; set; } = "Select..";
         public string SelectedNotes { get; set; } = "Select..";
         public string SearchText { get; set; } = string.Empty;
-        public AppMessages.AppMessages MyMessages { get; set; } = new();
-       
+        public AppMessages.MessageClass MsgClass { get; set; } = new();
+
         #endregion
 
         #region Constructor
@@ -47,7 +49,7 @@ namespace AppliedAccounts.Models
             ClassList = DataSource.GetDataList(DBFile, Tables.COA_Class);
             NatureList = DataSource.GetDataList(DBFile, Tables.COA_Nature);
             NotesList = DataSource.GetDataList(DBFile, Tables.COA_Notes);
-            MyMessages = MessageClass.Messages;
+            // = MessageClass.Messages;
         }
         #endregion
 
@@ -127,12 +129,13 @@ namespace AppliedAccounts.Models
                 }
                 else
                 {
-                    if (_Row["Code"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
+                    if (_Row.Field<string>("Code").Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
                     if (_Row["Title"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
                     if (_Row["TitleClass"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
                     if (_Row["TitleNature"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
                     if (_Row["TitleNote"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
                 }
+
             }
             return _FilterRecords;
         }
@@ -141,7 +144,7 @@ namespace AppliedAccounts.Models
         #region Delete
         public bool Delete(int _ID)
         {
-            MyMessages = MessageClass.Messages;
+            //MyMessages = MessageClass.Messages;
             var _DeleteRow = DataSource.GetNewRow(DBFile, Tables.COA);
 
             if (_DeleteRow is not null)
@@ -167,10 +170,10 @@ namespace AppliedAccounts.Models
             var _NewRow = GetDataRow(Record);
             if (Validate(_NewRow))
             {
-                var _Commands = new CommandClass(_NewRow, DBFile, MyMessages);
+                var _Commands = new CommandClass(_NewRow, DBFile);
                 return _Commands.SaveChanges();
             }
-                        
+
             return false;
         }
         #endregion
@@ -209,20 +212,20 @@ namespace AppliedAccounts.Models
         private bool Validate(DataRow _Row)
         {
             var _Validated = true;
-            if (_Row["ID"] is null) { _Validated = false; MyMessages.Add(Messages.IDIsNull); }
-            if (_Row["Code"] is null) { _Validated = false; MyMessages.Add(Messages.CodeIsNull); }
-            if (_Row["Title"] is null) { _Validated = false; MyMessages.Add(Messages.TitleIsNull); }
-            if (_Row["Class"] is null) { _Validated = false; MyMessages.Add(Messages.ColumnIsNull); }
-            if (_Row["Nature"] is null) { _Validated = false; MyMessages.Add(Messages.ColumnIsNull); }
-            if (_Row["Notes"] is null) { _Validated = false; MyMessages.Add(Messages.ColumnIsNull); }
+            if (_Row["ID"] is null) { _Validated = false; MsgClass.Add(MESSAGES.IDIsNull); }
+            if (_Row["Code"] is null) { _Validated = false; MsgClass.Add(MESSAGES.CodeIsNull); }
+            if (_Row["Title"] is null) { _Validated = false; MsgClass.Add(MESSAGES.TitleIsNull); }
+            if (_Row["Class"] is null) { _Validated = false; MsgClass.Add(MESSAGES.ColumnIsNull); }
+            if (_Row["Nature"] is null) { _Validated = false; MsgClass.Add(MESSAGES.ColumnIsNull); }
+            if (_Row["Notes"] is null) { _Validated = false; MsgClass.Add(MESSAGES.ColumnIsNull); }
 
-            if (_Row["Code"].ToString().Length == 0) { _Validated = false; MyMessages.Add(Messages.CodeIsZero); }
-            if (_Row["Title"].ToString().Length == 0) { _Validated = false; MyMessages.Add(Messages.TitleIsZero); }
-            if (_Row["Class"].ToString().Length == 0) { _Validated = false; MyMessages.Add(Messages.AccClassZero); }
-            if (_Row["Nature"].ToString().Length == 0) { _Validated = false; MyMessages.Add(Messages.AccNatureZero); }
-            if (_Row["Notes"].ToString().Length == 0) { _Validated = false; MyMessages.Add(Messages.AccNotesZero); }
+            if (_Row["Code"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.CodeIsZero); }
+            if (_Row["Title"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.TitleIsZero); }
+            if (_Row["Class"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.AccClassZero); }
+            if (_Row["Nature"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.AccNatureZero); }
+            if (_Row["Notes"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.AccNotesZero); }
 
-            if (_Row["Code"].ToString().Length != 6) { _Validated = false; MyMessages.Add(Messages.CodeLength6); }
+            if (_Row["Code"].ToString()?.Length != 6) { _Validated = false; MsgClass.Add(MESSAGES.CodeLength6); }
 
 
             return _Validated;

@@ -2,64 +2,64 @@
     --applied-pageheight: 100vh
 }
 
-.AppTable {
-    display: table;
-    table-layout: auto;
+.table-container {
     width: 100%;
-    height: var(--applied-pageheight - 20px);
-    border: 2px solid black;
-    font-size: small;
+    overflow: auto; /* Enables scrolling */
+    border: 1px solid #ccc; /* Optional border */
 }
-
 
 .table-list {
     display: table;
-    width: 100%;
-    border: 2px solid black;
+    overflow-x: auto;
+    width: 100%; /* Adjust width as needed */
+    border: 2px solid green;
+    border-collapse: collapse;
+   
 }
 
-    .table-list tb-head {
-        height: 150px;
+
+    .table-list thead {
+        height: 50px;
     }
 
         .table-list thead tr {
-            background-color: blueviolet;
+            background-color: #96D4D4;
         }
 
             .table-list thead tr th {
-                background-color: lightblue;
-                color: blue;
+                background-color: #96D4D4;
+                color: darkmagenta;
                 text-align: center;
             }
-
 
     .table-list tbody {
         background-color: lightgoldenrodyellow;
         color: darkblue;
-        border-color: inherit;
-        border-style: solid;
-        border-width: 1px;
         font-size: small;
         text-align: center;
     }
 
         .table-list tbody tr td {
             background-color: antiquewhite;
+            padding: 8px;
+            border: 1px solid;
+            border-color: #96D4D4
         }
 
     .table-list tfoot {
-        background-color:brown;
+        background-color: brown;
         height: 25px;
-            
     }
-        .table-list tfoot tr{
-            background-color:antiquewhite;
+
+        .table-list tfoot tr {
+            background-color: antiquewhite;
         }
 
-    .table-list tfoot tr td {
-        background-color:burlywood
-    }
-
+            .table-list tfoot tr td {
+                background-color: burlywood;
+                padding: 5px;
+                border: 1px solid black;
+            }
 
 
 
@@ -96,14 +96,6 @@
     border-width: 1px;
 }
 
-
-.tb-foot {
-}
-
-.tb-foot-row {
-    background-color: lightgreen;
-    font-weight: 700;
-}
 
 
 
@@ -204,4 +196,16 @@ th .btn {
     justify-content: center;
     text-align: center;
     align-content: center;
+}
+
+
+/* Table Message */
+
+.table-message{
+    width: 100%;
+    background-color:lightgray
+}
+
+.table-message tbody tr td{
+    color:darkgoldenrod;
 }

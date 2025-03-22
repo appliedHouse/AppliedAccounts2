@@ -1,12 +1,16 @@
-﻿using System.Data;
-using System.Data.Entity;
+﻿using System;
+using System.Data;
 using System.Data.SQLite;
-using System.Security.Claims;
+using System.Net;
 using System.Text;
+using System.Xml.Linq;
+using AppliedAccounts.Pages.Accounts;
 using AppliedDB;
-using static System.Net.Mime.MediaTypeNames;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Reporting.Map.WebForms.BingMaps;
+using Windows.Devices.Sensors;
 using static AppliedDB.Enums;
-using static AppMessages.Enums;
 
 namespace AppliedAccounts.Data
 {
@@ -14,7 +18,7 @@ namespace AppliedAccounts.Data
     {
         public Connections ConnectionClass { get; set; }
         public SQLiteConnection MyConnection { get; set; }
-        public Array TableList { get; set; }
+        public List<DataRow> TableList { get; set; }
         public UserProfile AppUser { get; set; }
         public AppUserModel UserModel { get; set; }
         private string TableName { get; set; }
@@ -26,36 +30,26 @@ namespace AppliedAccounts.Data
         {
             UserModel = _UserModel;
             MyMessages = new List<string>();
-        }
+            ConnectionClass = new(UserModel);
 
-
-        public CreateDatabase(UserProfile _AppUser)
-        {
-            AppUser = _AppUser;
-            DBFile = Path.Combine(Directory.GetCurrentDirectory(),
-                AppUser.Profile.RootFolder,
-                AppUser.Profile.DataPath,
-                AppUser.Profile.DataFile);
-            MyConnection = new($"Data Source={DBFile}");
+            MyConnection = ConnectionClass.GetSQLiteUsers() ?? new();
             GetTableNames();
+            CreateTables();
         }
+
+
 
 
         public void GetTableNames()
         {
-            var tableNames = new List<string>();
-
-            if (MyConnection.State != System.Data.ConnectionState.Open) { MyConnection.Open(); }
-
-            var CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';";
-            var _Table = AppliedDB.DataSource.GetQueryTable(CommandText, MyConnection);
-            var _List = _Table.AsEnumerable().ToList();
-
-
-            //D:\AppliedAccounts2\AppliedAccounts2App\AppliedAccounts\wwwroot\SQLiteDB\HFSSteel.db 
-
-
-            //DataTablesList = tableNames;
+            if (!string.IsNullOrEmpty(MyConnection.ConnectionString))
+            {
+                var tableNames = new List<string>();
+                if (MyConnection.State != System.Data.ConnectionState.Open) { MyConnection.Open(); }
+                var CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';";
+                var _Table = AppliedDB.DataSource.GetQueryTable(CommandText, MyConnection);
+                TableList = _Table.AsEnumerable().ToList();
+            }
         }
 
         #region Create Tables
@@ -65,31 +59,15 @@ namespace AppliedAccounts.Data
         {
             var _SQLQuery = $"SELECT name FROM sqlite_master WHERE type in('table', 'view') ORDER BY 1";
             var _TableView = DataSource.GetDataTable(DBFile, _SQLQuery).AsDataView();
+            var _TablesList = Enum.GetValues(typeof(Tables)).Cast<Tables>().ToList();
 
-            TableList = Enum.GetValues(typeof(Tables));
-
-            foreach (Tables EnumTable in TableList)
+            foreach (Tables _Table in _TablesList)
             {
-                if ((int)EnumTable > 8999) { continue; }                      // Skip on Temporary Table Names. 
-
-                bool IsTableFound;
-                var _TargetTable = EnumTable;
-                var _TableName = EnumTable.ToString();
-
-                _TableView.RowFilter = $"Name='{_TableName}'";
-                if (_TableView.Count == 0) { IsTableFound = false; } else { IsTableFound = true; }
-
-                if (!IsTableFound)
-                {
-                    MyMessages.Append($"Crerated Table {_TargetTable}");
-                    CreateTable(_TargetTable);
-
-                }
+                if (_Table.ToString().StartsWith("tmp")) { continue; }
+                MyMessages.Append($"Crerated Table {_Table}");
+                CreateTable(_Table);
             }
         }
-
-
-
         #endregion
 
 
@@ -102,12 +80,10 @@ namespace AppliedAccounts.Data
             var _TableName = _Table.ToString();
             var _CommandText = $"SELECT count(name) FROM sqlite_master WHERE type in('table', 'view') AND name ='{_TableName}'";
             var _Command = new SQLiteCommand(_CommandText, MyConnection);
+            if (!MyConnection.State.Equals(ConnectionState.Open)) { MyConnection.Open(); }
             long TableExist = (long)_Command.ExecuteScalar();
             if (TableExist > 0) { return; }
             #endregion
-
-
-             
 
             switch (_Table)
             {
@@ -121,9 +97,18 @@ namespace AppliedAccounts.Data
                     break;
                 case Tables.COA_Notes:
                     break;
+                case Tables.Book:
+                    _CommandText = Book1();
+                    break;
+                case Tables.Book2:
+                    _CommandText = Book2();
+                    break;
+                case Tables.view_Book:
+                    _CommandText = View_Book();
+                    break;
                 case Tables.CashBook:
                     break;
-                
+
                 case Tables.BankBook:
                     _CommandText = BankBook();
                     //BankBook(UserName);
@@ -264,8 +249,30 @@ namespace AppliedAccounts.Data
                 default:
                     break;
             }
-        }
 
+
+            try
+            {
+                if (!MyConnection.State.Equals(ConnectionState.Open)) { MyConnection.Open(); }
+
+                _Command = new(_CommandText, MyConnection);
+                var rowsAffected = _Command.ExecuteNonQuery();
+                if (rowsAffected > 0)
+                {
+                    MyMessages.Add($"Table {_TableName} created successfully.");
+                }
+                else
+                {
+                    MyMessages.Add($"Table {_TableName} NOT created (Failed).");
+                }
+
+            }
+            catch (Exception e)
+            {
+                MyMessages.Add($"Error: {e.Message}");
+            }
+
+        }
 
 
 
@@ -295,7 +302,7 @@ namespace AppliedAccounts.Data
             return _Text.ToString();
         }
         #endregion
-        #region Bank Book
+        #region Bank Book, Cash book, Combine book
         public string BankBook()
         {
             var Text = new StringBuilder();
@@ -316,8 +323,85 @@ namespace AppliedAccounts.Data
             Text.AppendLine("[Comments] NVARCHAR(500), ");
             Text.AppendLine("[Status] NVARCHAR(10) NOT NULL DEFAULT Submitted);");
             return Text.ToString();
-
         }
+
+        private static string Book1()
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("CREATE TABLE [Book] (");
+            _Text.AppendLine("[ID]       INT PRIMARY KEY NOT NULL UNIQUE DEFAULT 0,");
+            _Text.AppendLine("[BookID]   INT NOT NULL DEFAULT 0 REFERENCES [COA] ([ID]),");
+            _Text.AppendLine("[Vou_No]   NVARCHAR(11) NOT NULL UNIQUE,");
+            _Text.AppendLine("[Vou_Date] DATETIME NOT NULL,");
+            _Text.AppendLine("[Amount]   DECIMAL NOT NULL DEFAULT(0.00),");
+            _Text.AppendLine("[Ref_No]   NVARCHAR(20), ");
+            _Text.AppendLine("[SheetNo]  NVARCHAR(20), ");
+            _Text.AppendLine("[Remarks]  NVARCHAR NOT NULL,");
+            _Text.AppendLine("[Status]   NVARCHAR(10) NOT NULL DEFAULT Submitted);");
+            return _Text.ToString();
+        }
+
+        private static string Book2()
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("CREATE TABLE[Book2]( ");
+            _Text.AppendLine("[ID] INT PRIMARY KEY NOT NULL UNIQUE,");
+            _Text.AppendLine("[TranID] INT NOT NULL REFERENCES[Book]([ID]),");
+            _Text.AppendLine("[SR_NO] INT NOT NULL DEFAULT 0,");
+            _Text.AppendLine("[COA] INT NOT NULL REFERENCES[COA]([ID]),");
+            _Text.AppendLine("[Company] INT REFERENCES[Customers]([ID]),");
+            _Text.AppendLine("[Employee] INT REFERENCES[Employees]([ID]),");
+            _Text.AppendLine("[Project] INT REFERENCES[Project]([ID]),");
+            _Text.AppendLine("[DR] DECIMAL NOT NULL DEFAULT(0.00),");
+            _Text.AppendLine("[CR] DECIMAL NOT NULL DEFAULT(0.00),");
+            _Text.AppendLine("[Description] NVARCHAR NOT NULL,");
+            _Text.AppendLine("[Comments] NVARCHAR);");
+            return _Text.ToString();
+        }
+
+        private static string View_Book()
+        {
+            var _Text = new StringBuilder();
+
+            _Text.AppendLine("CREATE VIEW [view_Book] AS ");
+            _Text.AppendLine("SELECT");
+            _Text.AppendLine("[B1].[ID] AS [ID1],");
+            _Text.AppendLine("[B1].[BookID],");
+            _Text.AppendLine("[B].[Title] As [TitleBook],");
+            _Text.AppendLine("[B1].[Vou_No],");
+            _Text.AppendLine("[B1].[Vou_Date],");
+            _Text.AppendLine("[B1].[Amount],");
+            _Text.AppendLine("[B1].[Ref_No],");
+            _Text.AppendLine("[B1].[SheetNo],");
+            _Text.AppendLine("[B1].[Remarks],");
+            _Text.AppendLine("[B1].[Status],");
+            _Text.AppendLine("[B2].[ID] AS [ID2],");
+            _Text.AppendLine("[B2].[TranID],");
+            _Text.AppendLine("[B2].[SR_NO],");
+            _Text.AppendLine("[B2].[COA],");
+            _Text.AppendLine("[A].[Title] As [TitleCOA],");
+            _Text.AppendLine("[B2].[Company],");
+            _Text.AppendLine("[C].[Title] As [TitleCompany],");
+            _Text.AppendLine("[B2].[Employee],");
+            _Text.AppendLine("[E].[Title] As [TitleEmployee],");
+            _Text.AppendLine("[B2].[Project],");
+            _Text.AppendLine("[P].[Title] As [TitleProject],");
+            _Text.AppendLine("[B2].[DR],");
+            _Text.AppendLine("[B2].[CR],");
+            _Text.AppendLine("[B2].[Description],");
+            _Text.AppendLine("[B2].[Comments]");
+            _Text.AppendLine("FROM [Book2] [B2]");
+            _Text.AppendLine("LEFT JOIN [Book]      [B1] ON [B1].[ID] = [B2].[TranID]");
+            _Text.AppendLine("LEFT JOIN [Customers] [C]  ON  [C].[ID] = [B2].[Company]");
+            _Text.AppendLine("LEFT JOIN [COA]       [A]  ON  [A].[ID] = [B2].[COA]");
+            _Text.AppendLine("LEFT JOIN [COA]       [B]  ON  [B].[ID] = [B1].[BookID]"); 
+            _Text.AppendLine("LEFT JOIN [Employees] [E]  ON  [E].[ID] = [B2].[Employee]");
+            _Text.AppendLine("LEFT JOIN [Project]   [P]  ON  [P].[ID] = [B2].[Project]");
+            
+            return _Text.ToString();
+        }
+
+
         #endregion
 
         #region Directories
@@ -354,7 +438,7 @@ namespace AppliedAccounts.Data
         }
 
         #endregion
-     
+
 
         #region Stock Position Data
         public string StockPositionData()
@@ -564,7 +648,7 @@ namespace AppliedAccounts.Data
             return _Text.ToString();
         }
         #endregion
-               
+
 
     }
 }

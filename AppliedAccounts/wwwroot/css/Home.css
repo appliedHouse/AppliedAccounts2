@@ -3,131 +3,133 @@
 
 
 body {
-  padding: 0;
-  margin: 0;
-  font-family: "Montserrat", sans-serif;
+    padding: 0;
+    margin: 0;
+    font-family: "Montserrat", sans-serif;
 }
 
 .global-btn-bg {
-  background-color: #1b00d4;
-  padding: 10px 30px;
-  border: none;
-  border-radius: 10px;
-  color: white;
-  font-size: 13px;
-}
-
-@media screen and (max-width: 291px) {
-  .navigation-bar .nav-btns {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .global-btn-bg {
     background-color: #1b00d4;
-    padding: 10px 25px;
+    padding: 10px 30px;
     border: none;
     border-radius: 10px;
     color: white;
     font-size: 13px;
-  }
+}
+
+@media screen and (max-width: 291px) {
+    .navigation-bar .nav-btns {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .global-btn-bg {
+        background-color: #1b00d4;
+        padding: 10px 25px;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-size: 13px;
+    }
 }
 
 .global-btn {
-  padding: 10px 50px;
-  border: none;
-  border-radius: 10px;
-  color: black;
-  border: 1px solid #1b00d4;
-  box-shadow: 0 5px 10px -5px #1b00d4;
-  background-color: transparent;
-  width: fit-content;
+    padding: 10px 50px;
+    border: none;
+    border-radius: 10px;
+    color: black;
+    border: 1px solid #1b00d4;
+    box-shadow: 0 5px 10px -5px #1b00d4;
+    background-color: transparent;
+    width: fit-content;
 }
 
 
 @media screen and (min-width: 768px) {
-  .widh-75 {
-    width: 75%;
-  }
+    .widh-75 {
+        width: 75%;
+    }
 }
 
 .text-theme {
-  color: #1b00d4;
+    color: #1b00d4;
 }
 
 .text-theme-dark {
-  color: #070038;
+    color: #070038;
 }
 
 .line-height {
-  line-height: 20px;
+    line-height: 20px;
 }
 
 /* -----HERO BANNER CSS-------- */
 
 .hero-banner {
-  background-image: url("../Images/Home/HeroBanner.jpg");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  min-height: 200px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+    background-image: url("../Images/Home/HeroBanner.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-.hero-banner h1 {
-  font-weight: bold;
-}
-.hero-banner p {
-  font-weight: 500;
-}
+    .hero-banner h1 {
+        font-weight: bold;
+    }
+
+    .hero-banner p {
+        font-weight: 500;
+    }
 
 /* --------ACCOUNTING MAIN ---- */
 .accounting-main p {
-  font-weight: normal;
-  color: #000000;
+    font-weight: normal;
+    color: #000000;
 }
 
 /* -----TESTIMONIAL_MAIN-------- */
 
 .testimonial-main h1 {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .testimonial-main .inner {
-  background-color: #2d3436;
-  border-radius: 20px;
+    background-color: #2d3436;
+    border-radius: 20px;
 }
 
-.testimonial-main .inner h3 {
-  font-weight: bold;
-}
+    .testimonial-main .inner h3 {
+        font-weight: bold;
+    }
 
 /* --FOOTER---- */
 @media screen and (max-width: 540px) {
-  .footer-main .addres-box {
-    display: flex;
-    flex-direction: column;
-    justify-content: center !important;
-    align-items: start !important;
-  }
+    .footer-main .addres-box {
+        display: flex;
+        flex-direction: column;
+        justify-content: center !important;
+        align-items: start !important;
+    }
 
-  .footer-main span {
-    font-size: 15px;
-  }
+    .footer-main span {
+        font-size: 15px;
+    }
 }
 
 .footer-main span {
-  font-weight: 500;
+    font-weight: 500;
 }
 
 
 /*Aamir CSS */
 
-:root{
-    --height-Heading : 75px;
+:root {
+    --height-Heading: 75px;
     --height-SubHeading: 20px;
     --height-NavMenu: auto;
 }
@@ -155,8 +157,8 @@ body {
     font-size: small;
 }
 
-.topnav{
-    height:var(--height-NavMenu);
+.topnav {
+    height: var(--height-NavMenu);
 }
 
 .AppTitle {
@@ -165,22 +167,9 @@ body {
     font-family: Calibri;
 }
 
-.PageHeading {
-    background-color: blueviolet;
-    border-top: solid 1px;
-    border-bottom: solid 1px;
-    text-align: center;
-    vertical-align: middle;
-    justify-items: center;
-    color: white;
-    margin: 3px;
-    height: 35px
-}
 
-.div-login{
-    
-    padding:3px;
-
+.div-login {
+    padding: 3px;
 }
 
 /*

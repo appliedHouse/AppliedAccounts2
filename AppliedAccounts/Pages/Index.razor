@@ -44,24 +44,26 @@
             {
                 var authState = AppAuthState;
                 UserName = AppAuthState.Result.User.Identity?.Name ?? "";
-                if (UserName.Length > 0)
-                {
-                    string MyMessage = $"WelCome {UserName} in Applied Accounts Application";
-                    js.DInvokeVoidAsync((window, c) => window.alert(c), MyMessage);
-                }
+                // if (UserName.Length > 0)
+                // {
+                //     string MyMessage = $"WelCome {UserName} in Applied Accounts Application";
+                //     js.DInvokeVoidAsync((window, c) => window.alert(c), MyMessage);
+                // }
 
             });
 
 
         }
     }
+
+    //Create or Update DataBase Tables.
     private async Task Create_Update_Database()
     {
         if (UserModel != null)
         {
             await Task.Run(() =>
             {
-                _ = new CreateDatabase(UserModel);
+                _ = new CreateDatabase(UserModel);         
             });
         }
     }

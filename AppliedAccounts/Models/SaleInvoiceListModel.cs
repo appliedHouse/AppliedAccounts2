@@ -14,7 +14,7 @@ namespace AppliedAccounts.Models
         public List<SalesRecord> Records { get; set; } = new();
         public List<DataRow> Data { get; set; } = new();
         public string SearchText { get; set; } = string.Empty;
-        public AppMessages.AppMessages MyMessages { get; set; } = new();
+        public AppMessages.MessageClass MsgClass { get; set; } = new();
         public decimal TotalAmount { get; set; } = 0.00M;
         public bool SelectAll { get; set; }
         
