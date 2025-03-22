@@ -44,6 +44,7 @@ namespace AppliedAccounts.Pages.ImportData
         public double BarPercent { get; set; }
         public bool IsProgress { get; set; } = false;
         public bool IsError { get; set; }
+        public bool IsBatch { get; set; }
 
 
         DateTime Inv_Date = DateTime.Now;
@@ -51,9 +52,9 @@ namespace AppliedAccounts.Pages.ImportData
         string RefNo = string.Empty;
         string Batch = string.Empty;
         string Inv_No = string.Empty;
-        
 
-        
+
+
         int Error = 0;
         int Skip = 0;
 
@@ -120,16 +121,16 @@ namespace AppliedAccounts.Pages.ImportData
 
                 try
                 {
-                    if(!IsError)
-                    { 
-                    await GetExcelSheetDataAsync(); // Ensure this is awaited if async
-                    await InvokeAsync(StateHasChanged);
+                    if (!IsError)
+                    {
+                        await GetExcelSheetDataAsync(); // Ensure this is awaited if async
+                        await InvokeAsync(StateHasChanged);
                     }
 
-                    if(!IsError)
-                    { 
-                    await UpdateClientListAsync();  // Ensure all the client has been update in DB.
-                    await InvokeAsync(StateHasChanged);
+                    if (!IsError)
+                    {
+                        await UpdateClientListAsync();  // Ensure all the client has been update in DB.
+                        await InvokeAsync(StateHasChanged);
                     }
 
                     if (!IsError)
@@ -164,6 +165,36 @@ namespace AppliedAccounts.Pages.ImportData
             SalesData = await _TempDB.GetTempTableAsync("Data");
             SalesSchema = await _TempDB.GetTempTableAsync("Schema");
             InvData = await _TempDB.GetTempTableAsync("Invoice Data");
+
+
+            // Validate the Batch is exist in Data Table Bill Receivable
+            IsError = await BatchValidaed();
+            await InvokeAsync(StateHasChanged);
+
+        }
+
+        private async Task<bool> BatchValidaed()
+        {
+            var ExcelBatch = string.Empty;
+            var TableBatch = string.Empty;
+
+            if (InvData != null && InvData.Rows.Count > 0)
+            {
+                ExcelBatch = InvData.AsEnumerable().ToList()
+                    .Where(row => row.Field<string>("Particular") == "Batch")
+                    .Select(row => row.Field<string>("Value")).First() ?? "";
+                if (ExcelBatch.Any()) { Batch = ExcelBatch; }               
+            }
+
+            var _Text = $"SELECT DISTINCT [Ref_No] FROM [BillReceivable] WHERE [Ref_No] = '{ExcelBatch}'";
+            using var _Table = await Task.Run(() => Source.GetTable(_Text));
+            if (_Table.Rows.Count > 0)
+            {
+                
+                ErrorMessage = $"Batch {ExcelBatch} number is already exist in Sale Invoice. Assign an unique number";
+                return true;   // pass value to IsError; Error found.
+            }
+            return false;      // No error found.   
         }
         #endregion
 
@@ -206,14 +237,9 @@ namespace AppliedAccounts.Pages.ImportData
                         Counter++;
                         double _Counter = double.Parse(Counter.ToString());
                         double _TotalRec = double.Parse(TotalRec.ToString());
-                        BarPercent = Math.Round((_Counter / _TotalRec) *100,2) ;
+                        BarPercent = Math.Round((_Counter / _TotalRec) * 100, 2);
                         await UpdateClient(Row, _RowID);
                         await InvokeAsync(StateHasChanged);
-
-                        if(Counter > 200)
-                        {
-                            bool Stop = true;
-                        }
                     }
 
                 }
@@ -307,7 +333,7 @@ namespace AppliedAccounts.Pages.ImportData
         #region Generate Invoice Master Table
         public async Task GenerateInvoice()
         {
-            
+
             MyMessage.Add($"{DateTime.Now} Start Process for Generate Invoice");
             #region Error Message
             if (InvData is null || SalesData is null || SalesSchema is null)
@@ -353,7 +379,7 @@ namespace AppliedAccounts.Pages.ImportData
                     _Row1["Vou_Date"] = Inv_Date;
                     _Row1["Company"] = _CompanyID;
                     _Row1["Employee"] = _EmployeeID;
-                    _Row1["Ref_No"] = RefNo;
+                    _Row1["Ref_No"] = Batch;                // Ref No. will be save as batch
                     _Row1["Inv_No"] = string.Concat(Inv_No, Counter.ToString("0000")); ;
                     _Row1["Inv_Date"] = Inv_Date;
                     _Row1["Pay_Date"] = Due_Date;
@@ -553,7 +579,11 @@ namespace AppliedAccounts.Pages.ImportData
                         Row["ID"] = 0;
                         Row["TranID"] = _TranID;
                         _Commands = new(Row, AppUser.DataFile);
-                        await Task.Run(() => { _Commands.SaveChanges(); });
+                        await Task.Run(() =>
+                        {
+                            SpinnerMessage = $"{master["Vou_No"]} is being saved.";
+                            _Commands.SaveChanges();
+                        });
 
                         MyMessage.Add($"{DateTime.Now} Serial # {Row["Sr_No"]} is saved ---> {IsSaved} ");
                     }
