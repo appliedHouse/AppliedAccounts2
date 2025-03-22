@@ -3,7 +3,7 @@
 
 @code {
     [Parameter]
-    public List<Message> Messages { get; set; } 
+    public MessageClass Messages { get; set; } 
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -26,7 +26,7 @@
 </style>
 
 <div class="messages">
-    @foreach (var Message in Messages)
+    @foreach (var Message in Messages.MessageList)
     {
         @if (Message.MessageClass.Equals(Enums.Class.Error))
         {
