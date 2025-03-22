@@ -2,6 +2,7 @@
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppReports;
+using BlazorJS;
 using Microsoft.JSInterop;
 using System.Data;
 
@@ -22,11 +23,11 @@ namespace AppliedAccounts.Pages.Sale
         private List<string> PrintedReports { get; set; } = new();
         public PrintService ReportService { get; set; }
         public Globals MyGlobals { get; set; }
-
+        public string PrintingMessage { get; set; }
 
         public SaleInvoiceList()
         {
-            
+
         }
 
 
@@ -72,56 +73,36 @@ namespace AppliedAccounts.Pages.Sale
         public async void PrintAll()
         {
             IsPrinting = true;
-            PrintedReports = new();
-            await Task.Run(() =>
+            await InvokeAsync(StateHasChanged);
+            PrintingMessage = "Priting Start.";
+
+            foreach (var item in Model.Records)
             {
-                foreach (var item in Model.Records)
+                if (item.IsSelected)
                 {
-                    if (item.IsSelected)
-                    {
-                        //Print(item.Id, DownloadOption.downloadFile);
-
-                    }
-
+                    PrintingMessage = $"Sales invoice for {Model.Record.TitleCustomer} is being printed.";
+                    await InvokeAsync(StateHasChanged);
+                    await Print(item.Id);
                 }
-            });
+            }
             IsPrinting = false;
-            IsPrinted = true;
+            await InvokeAsync(StateHasChanged);
         }
-
-
-
-        //public async void Print(int ID, PrintService.DownloadOption _Option);
-        //       {
-        //        string _InvNo = PrintClass.ReportData.ReportTable.Rows[0]["Vou_No"].ToString() ?? ID.ToString("0000");
-        //        string _RecNo = Model.Records.First().Ref_No;
-
-        //        PrintClass.OutputReport.FileName = $"{_RecNo}INV-{_InvNo}";
-        //        PrintClass.ReportRender();
-        //        PrintedReports.Add(PrintClass.OutputReport.FileFullName);
-
-        //        if (Option == DownloadOption.displayPDF)
-        //        {
-        //            //await PrintingService.Print(PrintClass.OutputReport.FileLink);
-        //        }
-        //        else
-        //        {
-        //            await js.InvokeVoidAsync(Option.ToString(), PrintClass.OutputReport.FileLink);
-        //        }
-
-        //    }
-        //}
-        //}
 
         public async Task Print(int ID)
         {
-            
+            //await InvokeAsync(StateHasChanged);
+            Model.Record = Model.Records.Where(row => row.Id == ID).First();
+            var _Batch = Model.Record.Ref_No;
+            var _Title = Model.Record.TitleCustomer.Replace(".", "_"); // Replace dot with _ for file name correction.
+            var _FileName = $"{_Batch}_{_Title}";
+
             ReportService.RptData = GetReportData(ID);              // always generate Data for report
             ReportService.RptModel = CreateReportModel(ID);         // and then generate report parameters
             ReportService.RptType = ReportType.Preview;
             var ReportLisk = ReportService.GetReportLink();
-            //await js.InvokeVoidAsync(ReportService.JSOption, ReportLisk);
-            await js.InvokeVoidAsync("downloadPDF", "File1.pdf", ReportService.RptModel.ReportBytes);
+            await js.InvokeVoidAsync("downloadPDF", _FileName, ReportService.RptModel.ReportBytes);
+            
         }
         private ReportData GetReportData(int ID)
         {

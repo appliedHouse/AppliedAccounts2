@@ -39,7 +39,11 @@ namespace AppliedAccounts.Pages.ImportData
         public string ExcelFileName { get; set; } = "";
         public string SpinnerMessage { get; set; } = "";
         public string ErrorMessage { get; set; } = "";
-
+        public int Counter { get; set; }
+        public int TotalRec { get; set; }
+        public double BarPercent { get; set; }
+        public bool IsProgress { get; set; } = false;
+        public bool IsError { get; set; }
 
 
         DateTime Inv_Date = DateTime.Now;
@@ -47,9 +51,9 @@ namespace AppliedAccounts.Pages.ImportData
         string RefNo = string.Empty;
         string Batch = string.Empty;
         string Inv_No = string.Empty;
-        int TotalRec = 0;
+        
 
-        int Counter = 0;
+        
         int Error = 0;
         int Skip = 0;
 
@@ -116,9 +120,23 @@ namespace AppliedAccounts.Pages.ImportData
 
                 try
                 {
+                    if(!IsError)
+                    { 
                     await GetExcelSheetDataAsync(); // Ensure this is awaited if async
+                    await InvokeAsync(StateHasChanged);
+                    }
+
+                    if(!IsError)
+                    { 
                     await UpdateClientListAsync();  // Ensure all the client has been update in DB.
-                    await GetDataTablesAsync();      // Fixed method name
+                    await InvokeAsync(StateHasChanged);
+                    }
+
+                    if (!IsError)
+                    {
+                        await GenerateSalesInvoiceAsync();      // Fixed method name
+                        await InvokeAsync(StateHasChanged);
+                    }
                 }
                 finally
                 {
@@ -133,10 +151,28 @@ namespace AppliedAccounts.Pages.ImportData
                 }
             }
         }
+        #endregion
 
+        //Sep 1
+        #region Get from Temp SQLiet DB file  to Data Tables
+        private async Task GetExcelSheetDataAsync()
+        {
+            SpinnerMessage = "Sales invoice data is being Process... Gathering Data sheets";
+            string _TempGUID = AppRegistry.GetText(AppUser.DataFile, "ExcelImport");
+            TempDB _TempDB = new(_TempGUID + ".db");
+            ClientData = await _TempDB.GetTempTableAsync("Clients List");
+            SalesData = await _TempDB.GetTempTableAsync("Data");
+            SalesSchema = await _TempDB.GetTempTableAsync("Schema");
+            InvData = await _TempDB.GetTempTableAsync("Invoice Data");
+        }
+        #endregion
+
+        //Step 2
+        #region Update Client List
         private async Task UpdateClientListAsync()
         {
             var Log = new Dictionary<string, bool>();
+            IsProgress = true;
 
             try
             {
@@ -148,8 +184,12 @@ namespace AppliedAccounts.Pages.ImportData
                     var ExcelColumn = "BP Name";
                     var DataColumn = "Title";
 
+                    TotalRec = ClientData.Rows.Count;
+                    Counter = 0;
+
                     foreach (DataRow Row in ClientData.Rows)
                     {
+
                         var _Title = Row[ExcelColumn].ToString()?.Trim() ?? "";
                         var _RowID = tb_ClientList.Where(row => _Title == row.Field<string>(DataColumn)).Select(row => row.Field<int>("ID")).FirstOrDefault();
 
@@ -163,14 +203,25 @@ namespace AppliedAccounts.Pages.ImportData
                             Log.Add(_Title, true);
                         }
 
+                        Counter++;
+                        double _Counter = double.Parse(Counter.ToString());
+                        double _TotalRec = double.Parse(TotalRec.ToString());
+                        BarPercent = Math.Round((_Counter / _TotalRec) *100,2) ;
                         await UpdateClient(Row, _RowID);
+                        await InvokeAsync(StateHasChanged);
+
+                        if(Counter > 200)
+                        {
+                            bool Stop = true;
+                        }
                     }
 
                 }
             }
             catch (Exception error)
             {
-
+                IsError = true;
+                ErrorMessage = error.Message;
                 MyMessage.Append(error.Message);
             }
 
@@ -194,12 +245,12 @@ namespace AppliedAccounts.Pages.ImportData
                 _ClientRow["Status"] = 1;
 
                 CommandClass Commands = new(_ClientRow, Source.DBFile);
-                await Task.Run(() => 
-                { 
+                await Task.Run(() =>
+                {
                     Commands.SaveChanges();
-                    SpinnerMessage = _ClientRow["Title"].ToString() + " has been saved..";
+                    SpinnerMessage = $"{_ClientRow["Title"]} is being updated..";
                 });
-                
+
             }
             catch (Exception error)
             {
@@ -209,40 +260,23 @@ namespace AppliedAccounts.Pages.ImportData
 
 
         }
-
-        private async Task GetExcelSheetDataAsync()
-        {
-            SpinnerMessage = "Sales invoice data is being Process... Gathering Data sheets";
-            string _TempGUID = AppRegistry.GetText(AppUser.DataFile, "ExcelImport");
-            TempDB _TempDB = new(_TempGUID + ".db");
-            ClientData = await _TempDB.GetTempTableAsync("Clients List");
-            SalesData = await _TempDB.GetTempTableAsync("Data");
-            SalesSchema = await _TempDB.GetTempTableAsync("Schema");
-            InvData = await _TempDB.GetTempTableAsync("Invoice Data");
-        }
         #endregion
 
-        #region Get Data From SQLite Temp Data, 
-        //Stored data from excel file to Temp
-        // and here this data will call in a app as Data tables.
-        //public async Task GetDataTableAsync()
-        //{
-        //    if (SalesData != null && SalesSchema != null && InvData != null)
-        //    {
-        //        ImportSaleInvoiceModel _Result = await GetDataTablesAsync();
-        //        Model = _Result;
-        //    }
-        //}
 
+        // Step 3
 
+        #region Get Sales Invocies from Data tables of Temp DB, 
 
-
-        public async Task<ImportSaleInvoiceModel> GetDataTablesAsync()
+        public async Task<ImportSaleInvoiceModel> GenerateSalesInvoiceAsync()
         {
             SpinnerMessage = "Sales invoice data is being Process... Gatting Data table";
             ImportSaleInvoiceModel _Result = new();
             _Result.DBFile = AppUser.DataFile;
+            IsProgress = true;
+            Counter = 0;
             await GenerateInvoice();
+            await InvokeAsync(StateHasChanged);
+
             MyMessage.Add($"{DateTime.Now} Task Completed.");
 
             Model.ShowData = true;
@@ -273,129 +307,133 @@ namespace AppliedAccounts.Pages.ImportData
         #region Generate Invoice Master Table
         public async Task GenerateInvoice()
         {
-            await Task.Run(() =>
+            
+            MyMessage.Add($"{DateTime.Now} Start Process for Generate Invoice");
+            #region Error Message
+            if (InvData is null || SalesData is null || SalesSchema is null)
             {
-                SpinnerMessage = "Sales invoice data is being Process... Generating Invoices !!";
-                MyMessage.Add($"{DateTime.Now} Start Process for Generate Invoice");
-                #region Error Message
-                if (InvData is null || SalesData is null || SalesSchema is null)
+                MyMessage.Add($"{DateTime.Now} Date is not available to proceed...");
+                return;
+            }
+            #endregion
+
+            Sale1 = DataSource.CloneTable(AppUser.DataFile, Enums.Tables.BillReceivable);
+            Sale2 = DataSource.CloneTable(AppUser.DataFile, Enums.Tables.BillReceivable2);
+
+            TotalRec = SalesData.Rows.Count;
+
+            GetInvoiceData();          // Gather data from excel sheet schema for creating voucher Data parameters.
+            MyMessage.Append("");
+
+            Model.ShowData = true;
+            IsProgress = true;
+            CommandClass _CommandClass = new CommandClass();
+            foreach (DataRow Row in SalesData.Rows)                 // Loop main sale invocies records. per record per invoice.
+            {
+                //SpinnerMessage = $"Sales invoice data is being Process... Generating Invoices {Counter}";
+                Counter++;
+                double _Counter = double.Parse(Counter.ToString());
+                double _TotalRec = double.Parse(TotalRec.ToString());
+                BarPercent = Math.Round((_Counter / _TotalRec) * 100, 2);
+
+                if (string.IsNullOrEmpty(Row["Code"].ToString())) { Error++; continue; }
+                if ((string)Row["Active"] != "1") { Skip++; continue; }
+                if (Counter == 1) { continue; }     // Skip record of Heading in Excel File. 
+
+
+                DataRow _Row1 = Sale1.NewRow();
+                int _CompanyID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Customers, (string)Row["Code"]);
+                int _EmployeeID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Employees, (string)Row["Employee"]);
+                decimal _Total = Conversion.ToDecimal(Row["Total"]);
+
+                if (_Total > 0)     // if Invoice amount is zero, skip this...
                 {
-                    MyMessage.Add($"{DateTime.Now} Date is not available to proceed...");
-                    return;
+                    _Row1["ID"] = Counter;
+                    _Row1["Vou_No"] = string.Concat(Batch, Counter.ToString("0000"));
+                    _Row1["Vou_Date"] = Inv_Date;
+                    _Row1["Company"] = _CompanyID;
+                    _Row1["Employee"] = _EmployeeID;
+                    _Row1["Ref_No"] = RefNo;
+                    _Row1["Inv_No"] = string.Concat(Inv_No, Counter.ToString("0000")); ;
+                    _Row1["Inv_Date"] = Inv_Date;
+                    _Row1["Pay_Date"] = Due_Date;
+                    _Row1["Amount"] = _Total;
+                    _Row1["Description"] = Row["CompanyName"];
+                    _Row1["Comments"] = $"Sale Invoice : {Row["CompanyName"]} for amount {_Total}"; ;
+                    _Row1["Status"] = "Submitted";
+
+                    Sale1.Rows.Add(_Row1);
+                    Model.SaleInvoiceList.Add(_Row1);
+                    Model.ShowData = false;
+
+                    MyMessage.Add($" # {Counter}");
+
+                    SpinnerMessage = $"{Row["CompanyName"]} is being generated.";
+                    await GetInvoiceDetails(Row);   // Generates detail record of sale invocies.
+                    await InvokeAsync(StateHasChanged);
                 }
-                #endregion
-
-                Sale1 = DataSource.CloneTable(AppUser.DataFile, Enums.Tables.BillReceivable);
-                Sale2 = DataSource.CloneTable(AppUser.DataFile, Enums.Tables.BillReceivable2);
-
-                TotalRec = SalesData.Rows.Count;
-
-                GetInvoiceData();          // Gather data from excel sheet schema for creating voucher Data parameters.
-                MyMessage.Append("");
-
-
-                Model.ShowData = true;
-                CommandClass _CommandClass = new CommandClass();
-                foreach (DataRow Row in SalesData.Rows)                 // Loop main sale invocies records. per record per invoice.
+                else
                 {
-                    SpinnerMessage = $"Sales invoice data is being Process... Generating Invoices {Counter}";
-                    Counter++;
-
-                    if (string.IsNullOrEmpty(Row["Code"].ToString())) { Error++; continue; }
-                    if ((string)Row["Active"] != "1") { Skip++; continue; }
-                    if (Counter == 1) { continue; }     // Skip record of Heading in Excel File. 
-
-
-                    DataRow _Row1 = Sale1.NewRow();
-                    int _CompanyID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Customers, (string)Row["Code"]);
-                    int _EmployeeID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Employees, (string)Row["Employee"]);
-                    decimal _Total = Conversion.ToDecimal(Row["Total"]);
-
-                    if (_Total > 0)     // if Invoice amount is zero, skip this...
-                    {
-                        _Row1["ID"] = Counter;
-                        _Row1["Vou_No"] = string.Concat(Batch, Counter.ToString("0000"));
-                        _Row1["Vou_Date"] = Inv_Date;
-                        _Row1["Company"] = _CompanyID;
-                        _Row1["Employee"] = _EmployeeID;
-                        _Row1["Ref_No"] = RefNo;
-                        _Row1["Inv_No"] = string.Concat(Inv_No, Counter.ToString("0000")); ;
-                        _Row1["Inv_Date"] = Inv_Date;
-                        _Row1["Pay_Date"] = Due_Date;
-                        _Row1["Amount"] = _Total;
-                        _Row1["Description"] = Row["CompanyName"];
-                        _Row1["Comments"] = $"Sale Invoice : {Row["CompanyName"]} for amount {_Total}"; ;
-                        _Row1["Status"] = "Submitted";
-
-                        Sale1.Rows.Add(_Row1);
-                        Model.SaleInvoiceList.Add(_Row1);
-                        Model.ShowData = false;
-
-                        MyMessage.Add($" # {Counter}");
-
-                        GetInvoiceDetails(Row);                 // Generates detail record of sale invocies.
-                    }
-                    else
-                    {
-                        Model.RejectedList.Add(Row);
-                    }
+                    Model.RejectedList.Add(Row);
                 }
-            });
+            }
             MyMessage.Add($"{DateTime.Now} End Sales Invoice details process..");
         }
         #endregion
 
         #region Generate Sales Invoice Details Table
-        public void GetInvoiceDetails(DataRow Row)
+        public async Task GetInvoiceDetails(DataRow Row)
         {
-            MyMessage.Add($"{DateTime.Now} Working of Sale Invoice details.");
-            var Counter2 = 0;
-            var Sr_No = 0;
-            if (SalesSchema is not null)
+            await Task.Run(() =>
             {
-                foreach (DataRow Scheme in SalesSchema.Rows)
+                MyMessage.Add($"{DateTime.Now} Working of Sale Invoice details.");
+                var Counter2 = 0;
+                var Sr_No = 0;
+                if (SalesSchema is not null)
                 {
-
-                    if ((string)Scheme["Code"] != "0")
+                    foreach (DataRow Scheme in SalesSchema.Rows)
                     {
-                        decimal _Amount = Conversion.ToDecimal(Row[(string)Scheme["Amount"]]);
-                        if (_Amount == 0) { continue; }          // Skip if amount is zero.
 
-                        Counter2++; Sr_No++;
-                        DataRow _Row2 = Sale2.NewRow();
-                        _Row2["ID"] = Counter2;
-                        _Row2["Sr_No"] = Sr_No;
-                        _Row2["TranID"] = Counter;
-                        _Row2["Batch"] = Row["Batch"];
-
-                        int _Inventory = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Inventory, (string)Scheme["Code"]);
-                        _Row2["Inventory"] = _Inventory;
-                        _Row2["Batch"] = Row["Batch"];
-
-                        if ((string)Scheme["Entry ID"] == "A")          // Amount only
+                        if ((string)Scheme["Code"] != "0")
                         {
-                            _Row2["Qty"] = 1;
-                            _Row2["Rate"] = _Amount;
-                        }
-                        if ((string)Scheme["Entry ID"] == "Q")          // Quantity and Rate = Amount
-                        {
-                            _Row2["Qty"] = Conversion.ToDecimal(Row[(string)Scheme["Qty"]]);
-                            _Row2["Rate"] = Conversion.ToDecimal(Row[(string)Scheme["Rate"]]);
-                        }
+                            decimal _Amount = Conversion.ToDecimal(Row[(string)Scheme["Amount"]]);
+                            if (_Amount == 0) { continue; }          // Skip if amount is zero.
 
-                        decimal _TaxID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Taxes, (string)Scheme["STax"]);
-                        _Row2["Tax"] = _TaxID;
-                        _Row2["Tax_Rate"] = Functions.Code2Rate(AppUser.DataFile, (int)_Row2["Tax"]);
-                        _Row2["Description"] = Row[(string)Scheme["Remarks Code"]];
-                        int.TryParse(Row["Project"].ToString(), out int _projectID);
-                        _Row2["Project"] = _projectID;
+                            Counter2++; Sr_No++;
+                            DataRow _Row2 = Sale2.NewRow();
+                            _Row2["ID"] = Counter2;
+                            _Row2["Sr_No"] = Sr_No;
+                            _Row2["TranID"] = Counter;
+                            _Row2["Batch"] = Batch;
 
-                        Sale2.Rows.Add(_Row2);
-                        Model.SaleDetailsList.Add(_Row2);
+                            int _Inventory = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Inventory, (string)Scheme["Code"]);
+                            _Row2["Inventory"] = _Inventory;
+                            _Row2["Batch"] = Batch;
+
+                            if ((string)Scheme["Entry ID"] == "A")          // Amount only
+                            {
+                                _Row2["Qty"] = 1;
+                                _Row2["Rate"] = _Amount;
+                            }
+                            if ((string)Scheme["Entry ID"] == "Q")          // Quantity and Rate = Amount
+                            {
+                                _Row2["Qty"] = Conversion.ToDecimal(Row[(string)Scheme["Qty"]]);
+                                _Row2["Rate"] = Conversion.ToDecimal(Row[(string)Scheme["Rate"]]);
+                            }
+
+                            decimal _TaxID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Taxes, (string)Scheme["STax"]);
+                            _Row2["Tax"] = _TaxID;
+                            _Row2["Tax_Rate"] = Functions.Code2Rate(AppUser.DataFile, (int)_Row2["Tax"]);
+                            _Row2["Description"] = Row[(string)Scheme["Remarks Code"]];
+                            int.TryParse(Row["Project"].ToString(), out int _projectID);
+                            _Row2["Project"] = _projectID;
+
+                            Sale2.Rows.Add(_Row2);
+                            Model.SaleDetailsList.Add(_Row2);
+                        }
                     }
                 }
-            }
-
+            });
             var Stop = true;
         }
         #endregion
@@ -457,6 +495,8 @@ namespace AppliedAccounts.Pages.ImportData
         }
         #endregion
 
+        // Step 4.  Posting of Sales Invoices generated by Process
+
         #region Post / Save invoices to Database
 
         private async void Post()
@@ -513,8 +553,9 @@ namespace AppliedAccounts.Pages.ImportData
                         Row["ID"] = 0;
                         Row["TranID"] = _TranID;
                         _Commands = new(Row, AppUser.DataFile);
-                        await Task.Run(() => _Commands.SaveChanges());
-                        MyMessage.Add($"{DateTime.Now} {master["Vou_No"]} Serial # {Row["Sr_No"]} is saved ---> {IsSaved} ");
+                        await Task.Run(() => { _Commands.SaveChanges(); });
+
+                        MyMessage.Add($"{DateTime.Now} Serial # {Row["Sr_No"]} is saved ---> {IsSaved} ");
                     }
                 }
                 else

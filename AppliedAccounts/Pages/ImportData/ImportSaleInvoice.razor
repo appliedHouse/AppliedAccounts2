@@ -41,7 +41,7 @@
 </style>
 
 
-@if (ErrorMessage.Length > 0)
+@if (IsError)
 {
     <div class="alert alert-danger" role="alert">
         @ErrorMessage
@@ -54,28 +54,11 @@ else
     <EditForm Model="Model">
         @if (Model.ShowData)
         {
-            <!-- Spinner and display Process Message-->
-            <div class="container mt-1 mb-1">
+            <div class="container p-2 m-2">
                 <div class="row">
-                    <div class="col">
-                        <button id="btnPost" disabled="@ShowSpinner" class="btn btn-warning" @onclick="(()=>Post())">Post</button>
-                    </div>
-                    @if (ShowSpinner)
-                    {
-                        <div class="row justify-content-center">
-                            <div class="col-4">
-                                <p>@SpinnerMessage</p>
-                            </div>
-                            <div class="col-1 center-txt">
-                                <div class="spinner-border text-warning" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                        </div>
-                    }
+                    <button class="btn btn-warning" @onclick="Post">POST</button>
                 </div>
             </div>
-
             <!-- Show Imported Sale Invocies Data-->
             if (SalesData?.Rows.Count > 0)
             {
@@ -127,7 +110,7 @@ else
                 <div class="d-flex flex-row mb-3">
                     <div class="p-2">
                         <button class="btn btn-primary w1" disabled="@(IsExcelLoaded ? true : ShowSpinner)"
-                        title="Upload Excel file" @onclick="TriggerFileInput">
+                                title="Upload Excel file" @onclick="TriggerFileInput">
                             Upload Excel file
                         </button>
                         <InputFile id="inputFile" class="d-none" OnChange="GetExcelFile" />
@@ -168,6 +151,18 @@ else
                         <div class="row justify-content-center">
                             <div class="col-6">
                                 <p>@SpinnerMessage</p>
+                                @if (IsProgress)
+                                {
+                                    <div class="progress bg-success progress-bar-striped progress-bar-animated">
+                                        <div class="progress-bar" role="progressbar"
+                                             style="width:@BarPercent%"
+                                             aria-valuenow="@Counter"
+                                             aria-valuemin="0"
+                                             aria-valuemax="@TotalRec">
+                                            @BarPercent.ToString("0.##")%
+                                        </div>
+                                    </div>
+                                }
                                 <p class="text-danger">This process may take some time, so please be patient.</p>
                             </div>
                             <div class="col-1 center-txt">
@@ -204,7 +199,7 @@ else
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach(string message in MyMessage)
+                            @foreach (string message in MyMessage)
                             {
                                 <tr>
                                     <td>@message</td>

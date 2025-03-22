@@ -28,7 +28,7 @@
             IsDataLoad = true;
 
             MyGlobals = DIGlobal;
-            ReportService = new(js, MyGlobals);
+            ReportService = new();
         }
         catch (Exception)
         {
@@ -210,7 +210,9 @@
         <div class="container mt-5">
             <div class="row justify-content-center">
                 <div class="col-4">
+                    <p class="fw-medium">Printing Reports</p>
                     <p>Wait..... Bulk Sales invoices are being printned..!!!</p>
+                    <p>@PrintingMessage</p>
                 </div>
                 <div class="col-1 center-txt">
                     <div class="spinner-border text-warning" role="status">
@@ -225,20 +227,5 @@
 else
 {
     <p>Data Not Load....</p>
-}
-
-
-@* <button @onclick="DownloadPdf">Download PDF</button> *@
-
-@code {
-    private async Task DownloadPdf()
-    {
-        var _Test = new AppliedAccounts.Pages.Testing.CreatePDFinMemory_and_Download();
-        //_Test.DownloadPdf();
-        _Test.fileData = _Test.GetPDFBytes();
-        await js.InvokeVoidAsync("downloadPDF", "invoice1.pdf", _Test.fileData);
-
-
-    }
 }
 
