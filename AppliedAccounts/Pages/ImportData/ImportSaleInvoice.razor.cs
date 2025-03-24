@@ -4,16 +4,10 @@ using AppliedDB;
 using AppliedAccounts.Models;
 using AppliedAccounts.Data;
 using System.Diagnostics;
-using System.Text;
 using Microsoft.JSInterop;
-using System.Collections.Generic;
-
-
 
 namespace AppliedAccounts.Pages.ImportData
 {
-
-
     public partial class ImportSaleInvoice
     {
 
@@ -45,6 +39,7 @@ namespace AppliedAccounts.Pages.ImportData
         public bool IsProgress { get; set; } = false;
         public bool IsError { get; set; }
         public bool IsBatch { get; set; }
+        public bool IsClientUpdate { get; set; }
 
 
         DateTime Inv_Date = DateTime.Now;
@@ -67,6 +62,7 @@ namespace AppliedAccounts.Pages.ImportData
         public ImportSaleInvoice(AppUserModel _AppUser)
         {
             AppUser = _AppUser;
+            IsClientUpdate = false;
 
 
         }
@@ -127,10 +123,13 @@ namespace AppliedAccounts.Pages.ImportData
                         await InvokeAsync(StateHasChanged);
                     }
 
-                    if (!IsError)
+                    if (IsClientUpdate)
                     {
-                        await UpdateClientListAsync();  // Ensure all the client has been update in DB.
-                        await InvokeAsync(StateHasChanged);
+                        if (!IsError)
+                        {
+                            await UpdateClientListAsync();  // Ensure all the client has been update in DB.
+                            await InvokeAsync(StateHasChanged);
+                        }
                     }
 
                     if (!IsError)
@@ -183,14 +182,14 @@ namespace AppliedAccounts.Pages.ImportData
                 ExcelBatch = InvData.AsEnumerable().ToList()
                     .Where(row => row.Field<string>("Particular") == "Batch")
                     .Select(row => row.Field<string>("Value")).First() ?? "";
-                if (ExcelBatch.Any()) { Batch = ExcelBatch; }               
+                if (ExcelBatch.Any()) { Batch = ExcelBatch; }
             }
 
             var _Text = $"SELECT DISTINCT [Ref_No] FROM [BillReceivable] WHERE [Ref_No] = '{ExcelBatch}'";
             using var _Table = await Task.Run(() => Source.GetTable(_Text));
             if (_Table.Rows.Count > 0)
             {
-                
+
                 ErrorMessage = $"Batch {ExcelBatch} number is already exist in Sale Invoice. Assign an unique number";
                 return true;   // pass value to IsError; Error found.
             }
@@ -527,6 +526,7 @@ namespace AppliedAccounts.Pages.ImportData
 
         private async void Post()
         {
+            SpinnerMessage = "Sale invoices are being posted in General Ledger";
             ShowSpinner = true;
             await SaveAsync();
             ShowSpinner = false;

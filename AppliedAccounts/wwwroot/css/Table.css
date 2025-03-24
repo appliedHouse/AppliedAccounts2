@@ -1,6 +1,15 @@
-﻿.root {
-    --applied-pageheight: 100vh
+﻿:root {
+    --applied-pageheight: 100vh;
+    --greenDark: #86A788;
+    --greenMedium: #AAB99A;
+    --greenLight: #D0DDD0;
+    --greenLow: #F0F0D7;
+    --HeadText: white;
+    --BodyText: darkblue;
+    --FootText: white;
+
 }
+
 
 .table-container {
     width: 100%;
@@ -14,7 +23,6 @@
     width: 100%; /* Adjust width as needed */
     border: 2px solid green;
     border-collapse: collapse;
-   
 }
 
 
@@ -23,40 +31,45 @@
     }
 
         .table-list thead tr {
-            background-color: #96D4D4;
+            background-color: var(--greenDark);
         }
 
             .table-list thead tr th {
-                background-color: #96D4D4;
-                color: darkmagenta;
+                background-color: var(--greenDark);
+                color: var(--HeadText);
                 text-align: center;
             }
 
     .table-list tbody {
-        background-color: lightgoldenrodyellow;
-        color: darkblue;
+        background-color: var(--greenLow);
+        color: var(--BodyText);
         font-size: small;
         text-align: center;
     }
 
-        .table-list tbody tr td {
-            background-color: antiquewhite;
-            padding: 8px;
-            border: 1px solid;
-            border-color: #96D4D4
+        .table-list tbody tr {
+            height:40px;
         }
 
+            .table-list tbody tr td {
+                background-color: var(--greenLow);
+                padding: 8px;
+                border: 1px solid;
+                border-color: #96D4D4
+            }
+
     .table-list tfoot {
-        background-color: brown;
+        background-color: var(--greenMedium);
+        color: var(--FootText);
         height: 25px;
     }
 
         .table-list tfoot tr {
-            background-color: antiquewhite;
+            background-color: var(--greenMedium);
         }
 
             .table-list tfoot tr td {
-                background-color: burlywood;
+                background-color: var(--greenMedium);
                 padding: 5px;
                 border: 1px solid black;
             }
@@ -84,7 +97,7 @@
     padding-right: 5px;
 }
 
-.
+
 .tb-body-row {
 }
 
@@ -104,23 +117,6 @@
     height: 30px;
     background-color: forestgreen;
     color: white;
-}
-
-
-
-.table-list-head {
-    background-color: darkblue;
-    color: ghostwhite;
-}
-
-.table-list-body {
-    background-color: linen;
-    color: darkslateblue;
-}
-
-.table-list-foot {
-    background-color: darkgoldenrod;
-    color: ghostwhite;
 }
 
 th-btn {
@@ -201,11 +197,11 @@ th .btn {
 
 /* Table Message */
 
-.table-message{
+.table-message {
     width: 100%;
-    background-color:lightgray
+    background-color: lightgray
 }
 
-.table-message tbody tr td{
-    color:darkgoldenrod;
-}
+    .table-message tbody tr td {
+        color: darkgoldenrod;
+    }
