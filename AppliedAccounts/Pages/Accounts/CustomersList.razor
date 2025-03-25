@@ -3,7 +3,7 @@
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
 
-@inject AuthenticationStateProvider authStateProvider;
+@inject AuthenticationStateProvider Authorized;
 @inject NavigationManager NavManager;
 @inject IJSRuntime js
 
@@ -12,7 +12,7 @@
 @code {
     protected override void OnInitialized()
     {
-        var AppUserProfile = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        var AppUserProfile = ((UserAuthonticationStateProvider)Authorized).AppUser;
         if (AppUserProfile != null) { Model = new(AppUserProfile); }
         else { Model = new(); }
     }

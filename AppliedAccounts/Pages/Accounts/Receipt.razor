@@ -1,5 +1,108 @@
-﻿<h3>Receipt</h3>
+﻿@page "/Accounts/Receipt"
+@attribute [Authorize]
+
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavManager
+@inject UserAuthonticationStateProvider Authorized
+
+@using AppliedAccounts.Libs;
+@using AppliedAccounts.Models;
 
 @code {
 
+    protected override void OnInitialized()
+    {
+        Model = new ReceiptModel();
+        Model.UserProfile = ((UserAuthonticationStateProvider)Authorized).AppUser;
+
+    }
+
+
+}
+
+<PageHeading Text="Receipt" />
+
+@if (Model.UserProfile != null)
+{
+
+    <EditForm Model="Model">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <InputText @bind-Value="Model.MyVoucher.Master.Vou_No" id="txtVouNo" class="form-control input-sm" placeholder="Voucher No" />
+                        <label for="txtVouDate">Voucher No</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <InputDate @bind-Value="Model.MyVoucher.Master.Vou_Date" id="txtVouDate" class="form-control input-sm" placeholder="Voucher No" />
+                        <label for="txtVouDate">Voucher Date</label>
+                    </div>
+
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <InputDate @bind-Value="Model.MyVoucher.Master.Ref_No" id="txtRefNo" class="form-control input-sm" placeholder="Voucher No" />
+                        <label for="txtRefNo">Voucher Date</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">Cash / Bank List</div>
+                <div class="col-md-3">Payer List</div>
+                <div class="col-md-3"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+            </div>
+        </div>
+        <hr />
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+            </div>
+        </div>
+
+
+    </EditForm>
+
+    @if (IsPageValid)
+    {
+
+
+
+    }
+    else
+    {
+
+        <h4 class="alert-heading">Error!</h4>
+        <p>There is an error in the page. Please contact the administrator.</p>
+        <hr>
+        <p class="mb-0">Error: @ErrorMessage</p>
+    }
 }

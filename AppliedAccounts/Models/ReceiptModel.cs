@@ -11,6 +11,7 @@ namespace AppliedAccounts.Models
     {
         #region Variables
         public int ReceiptID { get; set; }
+        public int[] NatureIDs { get; set; }
         public DateTime LastVoucherDate { get; set; }
         public DateTime MaxVouDate { get; set; }
         public MessageClass MsgClass { get; set; }
@@ -21,6 +22,7 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> Employees { get; set; }
         public List<CodeTitle> Projects { get; set; }
         public List<CodeTitle> Accounts { get; set; }
+        public List<CodeTitle> PayCOA { get; set; }
         public string DataFile { get; set; }
 
         public AppUserModel? UserProfile { get; set; }
@@ -29,7 +31,7 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public ReceiptModel() { }
-        public ReceiptModel(int _ReceiptID, AppUserModel _AppUserProfile) 
+        public void Start(int _ReceiptID) 
         {
             MsgClass = new();
             MyVoucher = new();
@@ -37,14 +39,12 @@ namespace AppliedAccounts.Models
             try
             {
                 ReceiptID = _ReceiptID;
-                UserProfile = _AppUserProfile;
-                DataFile = _AppUserProfile.DataFile;
+                DataFile = UserProfile?.DataFile ?? "";
 
-
-                if (UserProfile != null)
+                if (UserProfile != null && string.IsNullOrEmpty(DataFile))
                 {
                     Source = new(UserProfile);
-                    LastVoucherDate = AppRegistry.GetDate(Source.DBFile, "LastRecDate");
+                    LastVoucherDate = AppRegistry.GetDate(DataFile, "LastRecDate");
 
                     if (ReceiptID == 0) { MyVoucher = NewVoucher(); }   // Create a new voucher;
                     if (ReceiptID > 0)
@@ -56,6 +56,7 @@ namespace AppliedAccounts.Models
                     Employees = Source.GetEmployees();
                     Projects = Source.GetProjects();
                     Accounts = Source.GetAccounts();
+                    PayCOA = Source.GetAccounts();
                 }
                 else
                 {
@@ -72,6 +73,9 @@ namespace AppliedAccounts.Models
             }
         }
         #endregion
+
+        
+
 
         #region New Voucher
 
