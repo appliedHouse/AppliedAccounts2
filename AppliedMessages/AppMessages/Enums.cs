@@ -138,6 +138,9 @@ namespace AppMessages
             Row_NoStatus,
             VouNoNotDefineProperly,
             SerialNoIsZero,
+            MasterRecordisNull,
+            DetailRecordsisNull,
+            DetailRecordsAreZero,
         }
 
         public enum Class

@@ -4,6 +4,7 @@ using System.Data;
 using AppMessages;
 using MESSAGE = AppMessages.Enums.Messages;
 using Tables = AppliedDB.Enums.Tables;
+using AppliedAccounts.Models.Interface;
 
 namespace AppliedAccounts.Models
 {
@@ -31,8 +32,9 @@ namespace AppliedAccounts.Models
         public DateTime LastVoucherDate { get; set; }
         public DateTime MinVouDate = AppRegistry.MinDate;
         public DateTime MaxVouDate { get; set; }
+        public int Index { get; set; } = 0;
 
-        public string DataFile { get; set; } 
+        public string DataFile { get; set; }
         public bool Processing { get; set; } = false;
         private int CashNatureID = 0;
         private int BankNatureID = 0;
@@ -59,8 +61,8 @@ namespace AppliedAccounts.Models
 
                 CashNatureID = AppRegistry.GetNumber(DataFile, "CashBKNature");
                 BankNatureID = AppRegistry.GetNumber(DataFile, "BankBKNature");
-                
-             
+
+
 
                 if (UserProfile != null)
                 {
@@ -171,7 +173,7 @@ namespace AppliedAccounts.Models
         #region New Voucher
         private Voucher NewVoucher()
         {
-            
+
 
             Voucher _NewVoucher = new();
             _NewVoucher.Master.ID1 = 0;
@@ -270,8 +272,6 @@ namespace AppliedAccounts.Models
 
         public async Task SaveAllAsync()
         {
-            
-
             if (!Processing)
             {
                 await Task.Run(() =>
@@ -280,7 +280,7 @@ namespace AppliedAccounts.Models
 
                     if (MyVoucher.Master.Vou_No.ToUpper().Equals("NEW"))
                     {
-                        if(BookNature == CashNatureID)         // Cash Book Nature
+                        if (BookNature == CashNatureID)         // Cash Book Nature
                         {
                             MyVoucher.Master.Vou_No = NewVoucherNo.GetCashVoucher(UserProfile!.DataFile, MyVoucher.Master.Vou_Date);
                         }
@@ -338,7 +338,11 @@ namespace AppliedAccounts.Models
         }
         public void Remove(int _SrNo)
         {
-
+            MyVoucher.Detail = MyVoucher.Details.Where(row=> row.Sr_No == _SrNo).First();
+            if(MyVoucher.Detail != null)
+            {
+                MyVoucher.Details.Remove(MyVoucher.Detail);
+            }
         }
         #endregion
 
@@ -373,11 +377,11 @@ namespace AppliedAccounts.Models
 
         #region Navigation
 
-        private int _Index = 0;
+
         public void Top()
         {
 
-            _Index = 1;
+            Index = 1;
             if (MyVoucher.Details.Count > 0)
             { MyVoucher.Detail = MyVoucher.Details.First(); }
 
@@ -387,10 +391,10 @@ namespace AppliedAccounts.Models
 
             if (MyVoucher.Details.Count > 0)
             {
-                _Index = MyVoucher.Details.IndexOf(MyVoucher.Detail) + 1;
+                Index = MyVoucher.Details.IndexOf(MyVoucher.Detail) + 1;
                 var Counter = MyVoucher.Details.Count - 1;
-                if (_Index > Counter) { _Index = Counter; }
-                MyVoucher.Detail = MyVoucher.Details[_Index];
+                if (Index > Counter) { Index = Counter; }
+                MyVoucher.Detail = MyVoucher.Details[Index];
             }
         }
         public void Back()
@@ -398,76 +402,77 @@ namespace AppliedAccounts.Models
 
             if (MyVoucher.Details.Count > 0)
             {
-                _Index = MyVoucher.Details.IndexOf(MyVoucher.Detail) - 1;
-                if (_Index < 0) { _Index = 0; }
-                MyVoucher.Detail = MyVoucher.Details[_Index];
+                Index = MyVoucher.Details.IndexOf(MyVoucher.Detail) - 1;
+                if (Index < 0) { Index = 0; }
+                MyVoucher.Detail = MyVoucher.Details[Index];
             }
         }
         public void Last()
         {
-            _Index = MyVoucher.Details.Count - 1;
+            Index = MyVoucher.Details.Count - 1;
             if (MyVoucher.Details.Count > 0)
             { MyVoucher.Detail = MyVoucher.Details.Last(); }
         }
         #endregion
 
-    }
 
-    #region Models
 
-    public class Voucher
-    {
+        #region Models
 
-        public Voucher()
+        public class Voucher
         {
-            Master = new();
-            Detail = new();
-            Details = [];
+
+            public Voucher()
+            {
+                Master = new();
+                Detail = new();
+                Details = [];
+            }
+
+            public Master Master { get; set; }
+            public Detail Detail { get; set; }
+            public List<Detail> Details { get; set; }
         }
 
-        public Master Master { get; set; }
-        public Detail Detail { get; set; }
-        public List<Detail> Details { get; set; }
+
+        public class Master
+        {
+            public Master() { }
+            public int ID1 { get; set; }
+            public string Vou_No { get; set; }
+            public DateTime Vou_Date { get; set; }
+            public int BookID { get; set; }
+            public decimal Amount { get; set; }
+            public string Ref_No { get; set; }
+            public string SheetNo { get; set; }
+            public string Remarks { get; set; }
+            public string Status { get; set; }
+
+
+        }
+
+        public class Detail
+        {
+            public Detail() { }
+            public int ID2 { get; set; }
+            public int TranID { get; set; }
+            public int Sr_No { get; set; }
+            public int COA { get; set; }
+            public int Company { get; set; }
+            public int Employee { get; set; }
+            public int Project { get; set; }
+            public decimal DR { get; set; }
+            public decimal CR { get; set; }
+            public string Description { get; set; }
+            public string Comments { get; set; }
+            public string action { get; set; }
+
+            public string TitleAccount { get; set; }
+            public string TitleCompany { get; set; }
+            public string TitleProject { get; set; }
+            public string TitleEmployee { get; set; }
+
+        }
+        #endregion
     }
-
-
-    public class Master
-    {
-        public Master() { }
-        public int ID1 { get; set; }
-        public string Vou_No { get; set; }
-        public DateTime Vou_Date { get; set; }
-        public int BookID { get; set; }
-        public decimal Amount { get; set; }
-        public string Ref_No { get; set; }
-        public string SheetNo { get; set; }
-        public string Remarks { get; set; }
-        public string Status { get; set; }
-
-
-    }
-
-    public class Detail
-    {
-        public Detail() { }
-        public int ID2 { get; set; }
-        public int TranID { get; set; }
-        public int Sr_No { get; set; }
-        public int COA { get; set; }
-        public int Company { get; set; }
-        public int Employee { get; set; }
-        public int Project { get; set; }
-        public decimal DR { get; set; }
-        public decimal CR { get; set; }
-        public string Description { get; set; }
-        public string Comments { get; set; }
-        public string action { get; set; }
-
-        public string TitleAccount { get; set; }
-        public string TitleCompany { get; set; }
-        public string TitleProject { get; set; }
-        public string TitleEmployee { get; set; }
-
-    }
-    #endregion
 }

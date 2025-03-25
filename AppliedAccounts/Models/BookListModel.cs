@@ -1,9 +1,11 @@
-﻿using AppliedAccounts.Data;
-using AppliedDB;
+﻿using AppliedDB;
 using Messages = AppMessages.Enums.Messages;
+using AppliedAccounts.Models.Interface;
+using System.Data;
+
 namespace AppliedAccounts.Models
 {
-    public class BookListModel
+    public class BookListModel : IVoucherList
     {
         public List<CodeTitle> BookList { get; set; }
         public List<CodeTitle> NatureAccountsList { get; set; }
@@ -18,7 +20,7 @@ namespace AppliedAccounts.Models
         public DateTime DT_End { get; set; }
         public string SearchText { get; set; }
         public string BookTitle = "Book Title";
-        public bool PageIsValid = false;
+        public bool PageIsValid { get; set; } = false;
 
 
         public BookListModel() { }
@@ -59,6 +61,7 @@ namespace AppliedAccounts.Models
             
         }
 
+        public List<DataRow> LoadData() { return []; }
 
 
     }           // END

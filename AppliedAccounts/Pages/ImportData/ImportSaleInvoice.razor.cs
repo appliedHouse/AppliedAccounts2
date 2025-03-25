@@ -62,7 +62,7 @@ namespace AppliedAccounts.Pages.ImportData
         public ImportSaleInvoice(AppUserModel _AppUser)
         {
             AppUser = _AppUser;
-            IsClientUpdate = false;
+            IsClientUpdate = true;
 
 
         }

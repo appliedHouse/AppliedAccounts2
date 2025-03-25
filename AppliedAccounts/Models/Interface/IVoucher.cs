@@ -1,22 +1,37 @@
 ﻿using AppliedDB;
 using AppMessages;
 
-namespace AppliedAccounts.Models
+namespace AppliedAccounts.Models.Interface
 {
     public interface IVoucher
     {
         DateTime LastVoucherDate { get; set; }
         DateTime MaxVouDate { get; set; }
         MessageClass MsgClass { get; set; }
-        Voucher MyVoucher { get; set; }
         bool Processing { get; set; }
         DataSource Source { get; set; }
+        List<CodeTitle> Companies { get; set; } 
+        List<CodeTitle> Employees { get; set; } 
+        List<CodeTitle> Projects { get; set; } 
+        List<CodeTitle> Accounts { get; set; } 
         string DataFile { get; set; }
+        AppUserModel? UserProfile { get; set; }
+        int Index { get; set; }
 
+        #region Load Data
+        bool LoadData();
+        #endregion
+
+        #region Voucher Validation
+        bool IsVoucherValidated();
+        #endregion
+
+        #region New and Edit Record
 
         void Edit(int _SrNo);
         void New();
-        
+        #endregion
+
         #region Navigation
         void Top();
         void Next();
@@ -24,16 +39,14 @@ namespace AppliedAccounts.Models
         void Last();
         #endregion
 
+        #region Remove record from list
         void Remove(int _SrNo);
+        #endregion
 
         #region Add and Save Voucher
         void Save();
         Task SaveAllAsync();
         #endregion
-
-        bool IsVoucherValidated();
-        bool LoadData();
-
-
+        
     }
 }

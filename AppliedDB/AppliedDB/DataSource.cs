@@ -1061,7 +1061,27 @@ namespace AppliedDB
             return EmptyList;
 
         }
+
+
         #endregion
+
+        #region Get Receipt Voucher
+        public DataTable GetReceiptVoucher(int receiptID)
+        {
+            var _Table = new DataTable();
+            return _Table;
+        }
+
+        public DataTable GetReceiptList(int receiptID)
+        {
+            var _Table = new DataTable();
+            return _Table;
+        }
+
+        public
+
+        #endregion
+
 
     }
 
