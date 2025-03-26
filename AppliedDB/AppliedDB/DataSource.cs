@@ -3,7 +3,6 @@ using System.Data.SQLite;
 using System.Text;
 using Tables = AppliedDB.Enums.Tables;
 using Query = AppliedDB.Enums.Query;
-using System.Net;
 
 namespace AppliedDB
 {
@@ -27,7 +26,6 @@ namespace AppliedDB
             }
 
         }
-
 
         public DataSource(string _DBFile)
         {
@@ -1078,10 +1076,7 @@ namespace AppliedDB
             return _Table;
         }
 
-        public
-
         #endregion
-
 
     }
 

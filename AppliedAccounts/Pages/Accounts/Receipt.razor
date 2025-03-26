@@ -1,19 +1,22 @@
 ﻿@page "/Accounts/Receipt"
 @attribute [Authorize]
-
-@inject IJSRuntime JsRuntime
-@inject NavigationManager NavManager
-@inject UserAuthonticationStateProvider Authorized
-
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
+
+
+@inject AuthenticationStateProvider Authorized
+@inject NavigationManager NavManager
+@inject IJSRuntime js
+
+
 
 @code {
 
     protected override void OnInitialized()
     {
-        Model = new ReceiptModel();
-        Model.UserProfile = ((UserAuthonticationStateProvider)Authorized).AppUser;
+        var _UserProfile = ((UserAuthonticationStateProvider)Authorized).AppUser;
+        Model = new ReceiptModel(_UserProfile);
+        
 
     }
 

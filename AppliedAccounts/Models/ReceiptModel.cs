@@ -3,6 +3,7 @@ using AppliedAccounts.Models.Interface;
 using AppliedDB;
 using AppMessages;
 using System.Data;
+using SQLQueries;
 using MESSAGE = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Models
@@ -31,6 +32,11 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public ReceiptModel() { }
+        public ReceiptModel(AppUserModel _UserProfile) 
+        {
+            UserProfile = _UserProfile;
+            var query = Quries.ReceiptList;
+        }
         public void Start(int _ReceiptID) 
         {
             MsgClass = new();

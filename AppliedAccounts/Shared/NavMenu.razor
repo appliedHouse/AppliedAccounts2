@@ -51,8 +51,6 @@
             @if (AppUser?.UserID == "CDC")
             {
                 <CDCMenu></CDCMenu>
-                @* <button type="submit" class="btn-Menu" id="btn-account" @onclick="Accounts">Accounts</button>
-                <button type="submit" class="btn-Menu" id="btn-Sale" @onclick="Sale">Sale</button> *@
             }
             else
             {
@@ -64,7 +62,6 @@
                 <button type="submit" class="btn-Menu" id="btn-Payroll" @onclick="Payroll">Payroll</button>
                 <button type="submit" class="btn-Menu" id="btn-Taxation" @onclick="Taxation">Taxation</button>
                 <button type="submit" class="btn-Menu" id="btn-Admin" @onclick="Admin">Admin</button>
-                <button type="submit" class="btn-Menu" id="btn-logout" @onclick="LogOut">logout</button>
             }
 
             @if (IsAdmin)
@@ -72,6 +69,7 @@
                 <button type="submit" class="btn-Menu" id="btn-logout" @onclick="Config">Config</button>
             }
 
+            <button type="submit" class="btn-Menu" id="btn-logout" @onclick="LogOut">logout</button>
         </Authorized>
         <NotAuthorized>
             <button type="submit" id="byn-login" class="btn btn-menu btn-link" @onclick="Login">login</button>

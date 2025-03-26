@@ -513,7 +513,7 @@ namespace AppliedDB
             Text.Append("LEFT JOIN BillReceivable   [B1] ON [B1].[ID] = [B2].[TranID] ");
             Text.Append("LEFT JOIN Taxes                 [T]   ON [T].[ID]   = [B2].[Tax] ");
             Text.Append(") AS [SRETURN] ) ");
-            if (Filter.Length > 0) { Text.Append($" WHERE {Filter}"); }
+            if (string.IsNullOrEmpty(Filter)) { Text.Append($" WHERE {Filter}"); }
             return Text.ToString();
 
 
