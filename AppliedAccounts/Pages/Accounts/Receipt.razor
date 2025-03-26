@@ -16,18 +16,13 @@
     {
         var _UserProfile = ((UserAuthonticationStateProvider)Authorized).AppUser;
         Model = new ReceiptModel(_UserProfile);
-        
-
     }
-
-
 }
 
 <PageHeading Text="Receipt" />
 
 @if (Model.UserProfile != null)
 {
-
     <EditForm Model="Model">
         <div class="container">
             <div class="row">
