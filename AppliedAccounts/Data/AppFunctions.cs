@@ -18,7 +18,7 @@ namespace AppliedAccounts.Data
             int _Effected;
 
 
-            Message _Message = MessageClass.NewMessage;
+            // _Message = (new MessageClass()).Empty;
 
             try
             {
@@ -29,12 +29,12 @@ namespace AppliedAccounts.Data
                     if (_Command is not null)
                     {
                         _Effected = _Command.ExecuteNonQuery();
-                        _Message = MessageClass.Messages.GetMessage(Messages.Save);
-                        _Message.RowEffected = _Effected;
+                        //_Message = new(Messages.Save);
+                        //Message.RowEffected = _Effected;
                     }
                     else
                     {
-                        _Message = MessageClass.GetMessage(Messages.cmd_UpdateNull);
+                        //_Message = MessageClass.GetMessage(Messages.cmd_UpdateNull);
                     }
                 }
 
@@ -44,29 +44,29 @@ namespace AppliedAccounts.Data
                     if (_Command is not null)
                     {
                         _Effected = _Command.ExecuteNonQuery();
-                        _Message = MessageClass.Messages.GetMessage(Messages.RowInserted);
-                        _Message.RowEffected = _Effected;
+                        //_Message = MessageClass.Messages.GetMessage(Messages.RowInserted);
+                        //_Message.RowEffected = _Effected;
                     }
                     else
                     {
-                        _Message = MessageClass.GetMessage(Messages.cmd_InsertNull);
+                        //_Message = MessageClass.GetMessage(Messages.cmd_InsertNull);
                     }
 
                 }
             }
             catch (Exception)
             {
-                _Message = MessageClass.GetMessage(Messages.NotSave);
+                //_Message = MessageClass.GetMessage(Messages.NotSave);
             }
 
-            return _Message;
+            return new Message();
         }
 
         public static Message Delete(string DataFile, DataTable _Table, DataRow _Row)
         {
             var _ID = (int)_Row["ID"];
             var _Effected = 0;
-            Message _Message = new();
+            //Message _Message = new();
 
             try
             {
@@ -77,21 +77,21 @@ namespace AppliedAccounts.Data
                     if (_Command != null)
                     {
                         _Effected = _Command.ExecuteNonQuery();
-                        _Message = MessageClass.GetMessage(Messages.RowDeleted);
-                        _Message.RowEffected = _Effected;
+                        //_Message = MessageClass.GetMessage(Messages.RowDeleted);
+                        //_Message.RowEffected = _Effected;
                     }
                     else
                     {
-                        _Message = MessageClass.GetMessage(Messages.cmd_DeleteNull);
+                        //_Message = MessageClass.GetMessage(Messages.cmd_DeleteNull);
                     }
                 }
             }
             catch (Exception)
             {
-                _Message = MessageClass.GetMessage(Messages.NotSave);
+                //_Message = MessageClass.GetMessage(Messages.NotSave);
             }
 
-            return _Message;
+            return new Message(); //_Message;
 
         }
 
@@ -117,9 +117,5 @@ namespace AppliedAccounts.Data
 
     }
 
-    public enum downloadOption
-    {
-        displayPDF,
-        downloadFile
-    }
+    
 }

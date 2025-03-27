@@ -1,125 +1,106 @@
-﻿using AppliedAccounts.Data;
-using AppliedAccounts.Models;
+﻿using AppliedAccounts.Models;
+using AppliedAccounts.Services;
 using AppliedDB;
-using System.Data;
-using System.Linq.Expressions;
+using AppMessages;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+
 
 namespace AppliedAccounts.Pages.Accounts
 {
     public partial class Books
     {
+        [Parameter] public int ID { get; set; }
+        //[Parameter] public int NatureID { get; set; }
+        [Parameter] public int BookID { get; set; }
 
         public AppUserModel UserProfile { get; set; }
         public BookModel MyModel { get; set; } = new();
-        public List<CodeTitle> BookList { get; set; } = new();
-        public int BookNature { get; set; }
-        public DateTime DT_Start { get; set; }
-        public DateTime DT_End { get; set; }
-        public string SearchText { get; set; }
+        public MessageClass MsgClass { get; set; }
 
-        public BookRec BookRecord { get; set; }
-        public List<BookRec> BookRecords { get; set; }
+        public bool IsPageValid { get; set; } = true;
+        public ToastClass MyToastClass { get; set; }
 
-        public Books()
+        public ToastClass Toast { get; set; }
+        public Books() { }
+
+        public void ShowToast(ToastClass _toast)
         {
-            MyModel = new(0, UserProfile ?? new());
-
-
+            Toast = _toast;
+            ToastService.ShowToast(Toast);
         }
 
-        List<BookRec> LoadBookRecords(int _BookID)
+        public void Start()
         {
-            var _List = new List<BookRec>();
-            var _Data = MyModel.Source.GetBook(_BookID);
+            MsgClass = new();
+            MyToastClass = new();
+            MyModel = new(ID,BookID, UserProfile);
 
-            if (_Data != null)
-            {
-                decimal _Bal = 0.00M, _DR = 0.00M, _CR = 0.00M;
-                foreach (DataRow Row in _Data.Rows)
-                {
-                    _DR = Row.Field<decimal>("DR");
-                    _CR = Row.Field<decimal>("CR");
-                    _Bal += _CR - _DR;
-
-                    var _Record = new BookRec()
-                    {
-                        ID = Row.Field<int>("ID"),
-                        Vou_No = Row.Field<string>("Vou_No") ?? "---",
-                        Vou_Date = Row.Field<DateTime>("Vou_No"),
-                        Recevied = _CR,
-                        Paid = _DR,
-                        Balance = _Bal,
-                        Description = Row.Field<string>("Description") ?? "",
-                        txtRecevied = _CR.ToString("###,###,###.##"),
-                        txtPaid = _CR.ToString("###,###,###.##"),
-                        txtBalance = _Bal.ToString("###,###,###.##")
-                    };
-
-                    _List.Add(_Record);
-                }
-                return _List;
-            }
-            return [];
+            if (MyModel == null) { IsPageValid = false; MsgClass.Add("Model is null"); return; }
+            if (MyModel?.MyVoucher == null) { IsPageValid = false; MsgClass.Add("Voucher is null"); return; }
+            if (MyModel?.MyVoucher.Master == null) { IsPageValid = false; MsgClass.Add("Voucher master data is null"); return; }
+            if (MyModel?.MyVoucher.Detail == null) { IsPageValid = false; MsgClass.Add("Voucher detail data is null"); return; }
         }
 
-        public void Back() { NavManager.NavigateTo("/Menu/Accounts"); }
-
-        public List<CodeTitle> GetBookList(int _BookNature)
+        #region Drop Down Value changed events
+        private void BookIDChanged(int _BookID)
         {
-            MyModel.Source = new(UserProfile);
-            var _BookList = MyModel.Source.GetBookAccounts(_BookNature) ?? new();
-            return _BookList;
-
+            BookID = _BookID;
+            MyModel.MyVoucher.Master.BookID = BookID;
         }
 
+        private void AccountIDChanged(int _ID)
+        {
+            MyModel.MyVoucher.Detail.COA = _ID;
+            MyModel.MyVoucher.Detail.TitleAccount = MyModel.Accounts
+                .Where(e => e.ID == MyModel.MyVoucher.Detail.COA)
+                .Select(e => e.Title)
+                .First() ?? "";
+        }
 
-        #region Debit and Credit Amount format
-        //protected string FormatDR
-        //{
-        //    get => Model.Record.DR.ToString("N2");
-        //    set
-        //    {
-        //        if (decimal.TryParse(value, out var parsedValue))
-        //        {
-        //            Model.Record.DR = parsedValue; // Parse the value back
-        //        }
-        //    }
-        //}
+        private void CompanyIDChanged(int _ID)
+        {
+            MyModel.MyVoucher.Detail.Company = _ID;
+            MyModel.MyVoucher.Detail.TitleCompany = MyModel.Companies
+                .Where(e => e.ID == MyModel.MyVoucher.Detail.Company)
+                .Select(e => e.Title)
+                .First() ?? "";
+        }
+        private void ProjectIDChanged(int _ID)
+        {
+            MyModel.MyVoucher.Detail.Project = _ID;
+            MyModel.MyVoucher.Detail.TitleProject = MyModel.Projects
+                .Where(e => e.ID == MyModel.MyVoucher.Detail.Project)
+                .Select(e => e.Title)
+                .First() ?? "";
 
-        //protected string FormatCR
-        //{
-        //    get => Model.Record.CR.ToString("N2");
-        //    set
-        //    {
-        //        if (decimal.TryParse(value, out var parsedValue))
-        //        {
-        //            Model.Record.CR = parsedValue; // Parse the value back
-        //        }
-        //    }
-        //}
+        }
+        private void EmployeeIDChanged(int _ID)
+        {
+            MyModel.MyVoucher.Detail.Employee = _ID;
+            MyModel.MyVoucher.Detail.TitleEmployee = MyModel.Employees
+                .Where(e => e.ID == MyModel.MyVoucher.Detail.Employee)
+                .Select(e => e.Title)
+                .First() ?? "";
+        }
         #endregion
 
-        public string GetTitle(List<CodeTitle> _List, int _Value)
+        public async Task SaveAll()
         {
-            if (_List.Count == 0) { return string.Empty; }
-            if (_List is null) { return string.Empty; }
-            return _List.Where(x => x.ID == _Value).Select(x => x.Title).First();
+            await MyModel.SaveAllAsync(); // Ensure save operation completes successfully
+            await js.InvokeVoidAsync("closeModal", "SaveVoucher"); // Pass the ID as a string
+            ToastService.ShowToast(ToastClass.SaveToast);
+
         }
-    }
 
-    public class BookRec
-    {
-        public int ID { get; set; }
-        public string Vou_No { get; set; }
-        public DateTime Vou_Date { get; set; }
-        public string Description { get; set; }
-        public decimal Recevied { get; set; }
-        public decimal Paid { get; set; }
-        public decimal Balance { get; set; }
-        public string txtRecevied { get; set; }
-        public string txtPaid { get; set; }
-        public string txtBalance { get; set; }
+        public void BackPage() { NavManager.NavigateTo("/Accounts/BooksList");} 
+        
+
+       
+
 
     }
+
+    
 
 }

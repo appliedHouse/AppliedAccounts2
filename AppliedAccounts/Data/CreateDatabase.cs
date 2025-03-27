@@ -1,15 +1,8 @@
 ﻿using System;
 using System.Data;
 using System.Data.SQLite;
-using System.Net;
 using System.Text;
-using System.Xml.Linq;
-using AppliedAccounts.Pages.Accounts;
 using AppliedDB;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.Reporting.Map.WebForms.BingMaps;
-using Windows.Devices.Sensors;
 using static AppliedDB.Enums;
 
 namespace AppliedAccounts.Data
@@ -33,20 +26,24 @@ namespace AppliedAccounts.Data
             ConnectionClass = new(UserModel);
 
             MyConnection = ConnectionClass.GetSQLiteUsers() ?? new();
-            GetTableNames();
-            CreateTables();
+
+            if (!string.IsNullOrEmpty(MyConnection.ConnectionString))
+            {
+                GetTableNames();
+                CreateTables();
+            }
         }
-
-
-
 
         public void GetTableNames()
         {
-            var tableNames = new List<string>();
-            if (MyConnection.State != System.Data.ConnectionState.Open) { MyConnection.Open(); }
-            var CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';";
-            var _Table = AppliedDB.DataSource.GetQueryTable(CommandText, MyConnection);
-            TableList = _Table.AsEnumerable().ToList();
+            if (!string.IsNullOrEmpty(MyConnection.ConnectionString))
+            {
+                var tableNames = new List<string>();
+                if (MyConnection.State != System.Data.ConnectionState.Open) { MyConnection.Open(); }
+                var CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';";
+                var _Table = AppliedDB.DataSource.GetQueryTable(CommandText, MyConnection);
+                TableList = _Table.AsEnumerable().ToList();
+            }
         }
 
         #region Create Tables
@@ -73,13 +70,19 @@ namespace AppliedAccounts.Data
 
         public void CreateTable(Tables _Table)
         {
-            #region return if table exist
             var _TableName = _Table.ToString();
-            var _CommandText = $"SELECT count(name) FROM sqlite_master WHERE type in('table', 'view') AND name ='{_TableName}'";
-            var _Command = new SQLiteCommand(_CommandText, MyConnection);
-            if (!MyConnection.State.Equals(ConnectionState.Open)) { MyConnection.Open(); }
-            long TableExist = (long)_Command.ExecuteScalar();
-            if (TableExist > 0) { return; }
+            var _Command = new SQLiteCommand();
+            var _CommandText = string.Empty;
+
+            #region return if table exist
+            if (string.IsNullOrEmpty(MyConnection.ConnectionString))
+            {
+                _CommandText = $"SELECT count(name) FROM sqlite_master WHERE type in('table', 'view') AND name ='{_TableName}'";
+                _Command = new SQLiteCommand(_CommandText, MyConnection);
+                if (!MyConnection.State.Equals(ConnectionState.Open)) { MyConnection.Open(); }
+                long TableExist = (long)_Command.ExecuteScalar();
+                if (TableExist > 0) { return; }
+            }
             #endregion
 
             switch (_Table)
@@ -241,28 +244,41 @@ namespace AppliedAccounts.Data
                     _CommandText = Receipts();
                     break;
 
+                case Tables.Receipt:
+                    _CommandText = Receipt();
+                    break;
+
+                case Tables.Receipt2:
+                    _CommandText = Receipt2();
+                    break;
+
+                case Tables.view_Receipts:
+                    _CommandText = view_Receipts();
+                    break;
 
 
                 default:
                     break;
             }
 
-
             try
             {
-                if (!MyConnection.State.Equals(ConnectionState.Open)) { MyConnection.Open(); }
-
-                _Command = new(_CommandText, MyConnection);
-                var rowsAffected = _Command.ExecuteNonQuery();
-                if (rowsAffected > 0)
+                if (!string.IsNullOrEmpty(MyConnection.ConnectionString))
                 {
-                    MyMessages.Add($"Table {_TableName} created successfully.");
-                }
-                else
-                {
-                    MyMessages.Add($"Table {_TableName} NOT created (Failed).");
-                }
 
+                    if (!MyConnection.State.Equals(ConnectionState.Open)) { MyConnection.Open(); }
+
+                    _Command = new(_CommandText, MyConnection);
+                    var rowsAffected = _Command.ExecuteNonQuery();
+                    if (rowsAffected > 0)
+                    {
+                        MyMessages.Add($"Table {_TableName} created successfully.");
+                    }
+                    else
+                    {
+                        MyMessages.Add($"Table {_TableName} NOT created (Failed).");
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -350,7 +366,7 @@ namespace AppliedAccounts.Data
             _Text.AppendLine("[Employee] INT REFERENCES[Employees]([ID]),");
             _Text.AppendLine("[Project] INT REFERENCES[Project]([ID]),");
             _Text.AppendLine("[DR] DECIMAL NOT NULL DEFAULT(0.00),");
-            _Text.AppendLine("[CR] DEC NOT NULL DEFAULT(0.00),");
+            _Text.AppendLine("[CR] DECIMAL NOT NULL DEFAULT(0.00),");
             _Text.AppendLine("[Description] NVARCHAR NOT NULL,");
             _Text.AppendLine("[Comments] NVARCHAR);");
             return _Text.ToString();
@@ -391,10 +407,10 @@ namespace AppliedAccounts.Data
             _Text.AppendLine("LEFT JOIN [Book]      [B1] ON [B1].[ID] = [B2].[TranID]");
             _Text.AppendLine("LEFT JOIN [Customers] [C]  ON  [C].[ID] = [B2].[Company]");
             _Text.AppendLine("LEFT JOIN [COA]       [A]  ON  [A].[ID] = [B2].[COA]");
-            _Text.AppendLine("LEFT JOIN [COA]       [B]  ON  [B].[ID] = [B1].[BookID]"); 
+            _Text.AppendLine("LEFT JOIN [COA]       [B]  ON  [B].[ID] = [B1].[BookID]");
             _Text.AppendLine("LEFT JOIN [Employees] [E]  ON  [E].[ID] = [B2].[Employee]");
             _Text.AppendLine("LEFT JOIN [Project]   [P]  ON  [P].[ID] = [B2].[Project]");
-            
+
             return _Text.ToString();
         }
 
@@ -629,7 +645,7 @@ namespace AppliedAccounts.Data
         public string Receipts()
         {
             var _Text = new StringBuilder();
-            _Text.AppendLine("CREATE TABLE[Receipts](");
+            _Text.AppendLine("CREATE TABLE [Receipts](");
             _Text.AppendLine("[ID] INT PRIMARY KEY,");
             _Text.AppendLine("[Vou_No] TEXT(10), ");
             _Text.AppendLine("[Vou_Date] DATE NOT NULL, ");
@@ -642,6 +658,91 @@ namespace AppliedAccounts.Data
             _Text.AppendLine("[Amount] DECIMAL NOT NULL, ");
             _Text.AppendLine("[Description] NVARCHAR NOT NULL,");
             _Text.AppendLine("[Status] NVARCHAR(10) NOT NULL);");
+            return _Text.ToString();
+        }
+
+
+        public string Receipt()
+        {
+            var _Text = new StringBuilder();
+
+            _Text.AppendLine("CREATE TABLE[Receipt](");
+            _Text.AppendLine("[ID] INT NOT NULL UNIQUE,");
+            _Text.AppendLine("[Vou_No] NVARCHAR(11) NOT NULL UNIQUE,");
+            _Text.AppendLine("[Vou_Date] DATETIME NOT NULL, ");
+            _Text.AppendLine("[COA] INT NOT NULL, ");
+            _Text.AppendLine("[Ref_No] NVARCHAR(12), ");
+            _Text.AppendLine("[Payer] INT NOT NULL, ");
+            _Text.AppendLine("[Doc_No] NVARCHAR(20), ");
+            _Text.AppendLine("[Doc_Date] DATETIME, ");
+            _Text.AppendLine("[Pay_Mode] NVARCHAR(10), ");
+            _Text.AppendLine("[Amount] DECIMAL, ");
+            _Text.AppendLine("[Remarks] NVARCHAR(100), ");
+            _Text.AppendLine("[Comments] NVARCHAR, ");
+            _Text.AppendLine("[Status] NVARCHAR(10));");
+
+            return _Text.ToString();
+        }
+
+        public string Receipt2()
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("CREATE TABLE[Receipt2](");
+            _Text.AppendLine("[ID] INT NOT NULL UNIQUE, ");
+            _Text.AppendLine("[Sr_No] INT NOT NULL, ");
+            _Text.AppendLine("[TranID] INT NOT NULL,");
+            _Text.AppendLine("[Ref_No] NVARCHAR(20),");
+            _Text.AppendLine("[Account] INT NOT NULL,");
+            _Text.AppendLine("[DR] DECIMAL, ");
+            _Text.AppendLine("[CR] DECIMAL, ");
+            _Text.AppendLine("[Employee] INT, ");
+            _Text.AppendLine("[Project] INT, ");
+            _Text.AppendLine("[Description] NVARCHAR NOT NULL);");
+            return _Text.ToString();
+        }
+
+        public string view_Receipts()
+        {
+
+            var _Text = new StringBuilder();
+            _Text.AppendLine("CREATE VIEW [view_Receipts] AS");
+            _Text.AppendLine("SELECT ");
+            _Text.AppendLine("[R1].[Vou_No],");
+            _Text.AppendLine("[R1].[Vou_Date],");
+            _Text.AppendLine("[R1].[COA],");
+            _Text.AppendLine("[A1].[Title] AS[TitleCOA],");
+            _Text.AppendLine("[R1].[Ref_No], ");
+            _Text.AppendLine("[R1].[Payer], ");
+            _Text.AppendLine("[R1].[ID] AS[ID1],");
+            _Text.AppendLine(" [P].[Title] AS[TitlePayer],");
+            _Text.AppendLine("[R1].[Doc_No],");
+            _Text.AppendLine("[R1].[Doc_Date],");
+            _Text.AppendLine("[R1].[Pay_Mode],");
+            _Text.AppendLine("[R1].[Amount],");
+            _Text.AppendLine("[R1].[Remarks],");
+            _Text.AppendLine("[R1].[Comments],");
+            _Text.AppendLine("[R1].[Status],");
+            _Text.AppendLine("[R2].[ID] AS[ID2],");
+            _Text.AppendLine("[R2].[Sr_No],");
+            _Text.AppendLine("[R2].[TranID],");
+            _Text.AppendLine("[R2].[Ref_No],");
+            _Text.AppendLine("[R2].[Account],");
+            _Text.AppendLine("[A2].[Title] AS[TitleAccount],");
+            _Text.AppendLine("[R2].[DR],");
+            _Text.AppendLine("[R2].[CR],");
+            _Text.AppendLine("[R2].[Employee],");
+            _Text.AppendLine(" [E].[Title] AS[TitleEmployee],");
+            _Text.AppendLine("[R2].[Project],");
+            _Text.AppendLine(" [P].[Title] AS[TitleProject],");
+            _Text.AppendLine("[R2].[Description]");
+            _Text.AppendLine("FROM [Receipt2] [R2]");
+            _Text.AppendLine("LEFT JOIN[Receipt]   [R1] ON [R1].[ID] = [R2].[TranID]");
+            _Text.AppendLine("LEFT JOIN[COA]       [A1] ON [A1].[ID] = [R1].[COA]");
+            _Text.AppendLine("LEFT JOIN[COA]       [A2] ON [A2].[ID] = [R2].[Account]");
+            _Text.AppendLine("LEFT JOIN[Customers]  [C] ON  [C].[ID] = [R1].[Payer]");
+            _Text.AppendLine("LEFT JOIN[Employees]  [E] ON  [E].[ID] = [R2].[Employee]");
+            _Text.AppendLine("LEFT JOIN[Project]    [P] ON  [P].[ID] = [R2].[Project]");
+
             return _Text.ToString();
         }
         #endregion

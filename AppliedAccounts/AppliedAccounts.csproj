@@ -47,7 +47,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,6 +55,7 @@
     <ProjectReference Include="..\AppliedLanguage\AppLanguages.csproj" />
     <ProjectReference Include="..\AppliedMessages\AppMessages\AppMessages.csproj" />
     <ProjectReference Include="..\AppliedReports\AppReports\AppReports.csproj" />
+    <ProjectReference Include="..\SQLQueries\SQLQueries.csproj" />
   </ItemGroup>
 
 </Project>

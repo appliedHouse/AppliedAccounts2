@@ -4,21 +4,23 @@ using static AppMessages.Enums;
 
 namespace AppMessages
 {
-    public class AppMessages
+    public class MessageClass
     {
-        public List<Message> MyMessages { get; set; } = new();
-        //public Message MyMessage { get; set; } = new();
+        public Message MyMessage { get; set; }
+        public List<Message> MessageList { get; set; } = [];
         public DataTable MessagesTable { get; set; } = new();
 
-        public int Count => MyMessages.Count;
+        public Message Empty { get; set; } = new();
+
+        public int Count => MessageList.Count;
 
         #region Constructor
-        public AppMessages()
+        public MessageClass()
         {
 
 
         }
-        public AppMessages(DataTable _Table)
+        public MessageClass(DataTable _Table)
         {
             MessagesTable = _Table;
         }
@@ -26,19 +28,19 @@ namespace AppMessages
 
         #region Clear Message / Error List
         //public void ClearErrors() { MyErrors.Clear(); }
-        public void ClearMessages() { MyMessages.Clear(); }
+        public void ClearMessages() { MessageList.Clear(); }
         #endregion
 
         #region Add Message in the List
 
         public void Add(Messages _Code)
         {
-            MyMessages.Add(GetMessage(_Code));
+            MessageList.Add(GetMessage(_Code));
         }
 
         public void Add(string _Text)
         {
-            MyMessages.Add(GetMessage(_Text));
+            MessageList.Add(GetMessage(_Text));
         }
 
         

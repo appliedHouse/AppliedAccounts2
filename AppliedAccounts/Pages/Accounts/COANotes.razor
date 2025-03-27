@@ -20,9 +20,9 @@
 <PageHeading Text="Nature of Accounts"></PageHeading>
 
 @* Page Errors Show *@
-@if (Model.MyMessages.Count > 0)
+@if (Model.MsgClass.Count > 0)
 {
-    <PageErrors Messages="@Model.MyMessages"></PageErrors>
+    <PageErrors Messages="@Model.MsgClass"></PageErrors>
 }
 
 <EditForm Model="@Model">

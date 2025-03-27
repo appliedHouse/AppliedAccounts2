@@ -3,7 +3,7 @@
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
 
-@inject AuthenticationStateProvider authStateProvider;
+@inject AuthenticationStateProvider authorized;
 @inject NavigationManager NavManager;
 @inject IJSRuntime js
 
@@ -11,7 +11,7 @@
 @code {
     protected override void OnInitialized()
     {
-        var AppUserProfile = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        var AppUserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
         if (AppUserProfile != null) { Model = new(AppUserProfile); IsPageValid = GetPageIsValid(); }
         else { Model = new(); }
     }
@@ -22,9 +22,9 @@
 <PageHeading Text="Chart of Accounts" />
 
 @* Page Errors Show *@
-@if (Model.MyMessages.Count > 0)
+@if (Model.MsgClass.Count > 0)
 {
-    <PageErrors Messages="@Model.MyMessages"></PageErrors>
+    <PageErrors Messages="@Model.MsgClass"></PageErrors>
 }
 
 @if (IsPageValid)
@@ -132,8 +132,8 @@
 
         <div class="table-container">
 
-            <table class="AppTable">
-                <thead class="tb-head">
+            <table class="table-list">
+                <thead >
                     <tr class="tb-head-row tb-row-center">
                         <th style="Width:10%">Code</th>
                         <th style="Width:30%">Title</th>
@@ -148,7 +148,7 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody class="tb-body">
+                <tbody >
                     @foreach (COARecord _Record in Model.Records)
                     {
                         <tr class="tb-body-row">
@@ -176,7 +176,7 @@ else
     <div class="alert alert-danger d-flex align-items-center" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill" /></svg>
         <div>
-            @ErrorMessage
+            <p> Page is not vaid to load. some error may be occured.</p>
         </div>
     </div>
 }

@@ -17,6 +17,7 @@
     public string ImportText = "Import an excel file and generate sales invoice";
     public string CashBookText = "Daily cash transactions.";
     public string BankBookText = "Daily bank transactions.";
+    public string ReceiptText = "Receipts";
     public DataSet MyDataset = new();
 
 
@@ -54,7 +55,8 @@
             <MenuCard Message=@NotesText NavTo="/Accounts/COANotes" PicPath="./Images/Cards/COANotes.png" />
         </div>
         <div class="col-md-4">
-            <MenuCard Message=@CashBookText NavTo="/Accounts/Books" PicPath="./Images/Cards/CashbookPencil.jpg" />
+            <MenuCard Message=@CashBookText NavTo="/Accounts/BooksList" PicPath="./Images/Cards/CashbookPencil.jpg" />
+            <MenuCard Message=@ReceiptText NavTo="/Accounts/Receipt" PicPath="./Images/Cards/Receipt.jpg" />
         </div>
     </div>
 </div>

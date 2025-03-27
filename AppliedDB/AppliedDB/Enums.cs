@@ -34,10 +34,14 @@ namespace AppliedDB
             BankBook = 121,
             RevSheet = 122,
             view_BillPayable = 123,
-            Receipts = 124,
-            Book = 125,
-            Book2 = 126,
-            view_Book = 127,
+            Receipts = 124,                     // Receipt for single transaction (depreciated)
+            Receipt = 125,                      // New receipt (master) for multiple transaction
+            Receipt2 = 126,                     // New receipt (detail) for multiple transaction
+            view_Receipts = 127,                // View for new receipt (Multiple)
+            Book = 128,
+            Book2 = 129,
+            view_Book = 130,
+
 
             Customers = 201,
             City = 202,
@@ -132,7 +136,8 @@ namespace AppliedDB
             StockPosition,
             StockPositionData,
             StockPositionSUM,
-            Book2
+            Book2,
+            View_Book
         }
 
     }

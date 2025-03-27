@@ -90,11 +90,11 @@ namespace AppliedAccounts.Models
             return _CurrentRow;
         }
 
-        private bool Validate(DataRow _Row)
-        {
-            if (TB_Tax != null) { return true; }
-            return false;
-        }
+        //private bool Validate(DataRow _Row)
+        //{
+        //    if (TB_Tax != null) { return true; }
+        //    return false;
+        //}
 
 
         public void GetCurrentRow()
@@ -135,14 +135,14 @@ namespace AppliedAccounts.Models
             }
         }
 
-        public int SaveChanges()
-        {
-            AppMessages.Message _Effected = new();
-            if (Validate(CurrentRow))
-            {
-                _Effected = AppFunctions.Save(DataFile, TB_Tax, CurrentRow);
-            }
-            return _Effected.RowEffected;
-        }
+        //public int SaveChanges()
+        //{
+        //    AppMessages.Message _Effected = new();
+        //    if (Validate(CurrentRow))
+        //    {
+        //        _Effected = AppFunctions.Save(DataFile, TB_Tax, CurrentRow);
+        //    }
+        //    return _Effected.RowEffected;
+        //}
     }
 }

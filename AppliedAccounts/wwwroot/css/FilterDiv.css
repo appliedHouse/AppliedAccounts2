@@ -1,44 +1,59 @@
-﻿
+﻿:root {
+    --appBlue: #3498db;
+    --appBlueHover: #2958af;
+}
 
 .filter {
     background-color: antiquewhite;
-    margin-left: 5px;
-    margin-right: 5px;
-    padding-left: 5px;
-    padding-right: 5px;
-    padding-top: 3px;
-    padding-bottom: 3px;
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    padding: 5px;
     height: 40px;
     display: flex;
     align-items: center;
 }
-    .item-height{
-        height:25px
+
+.btn-refresh {
+    background-color: var(--appBlue);
+    color: white;
+    padding: 2px;
+    border: none;
+    cursor: pointer;
+    width: 32px
+}
+
+    .btn-refresh::before {
+        content: "\F130"; /* Unicode for Bootstrap "bi-search" icon */
+        font-family: "Bootstrap-icons";
+        font-size: 1rem;
+        margin-right: 0px;
     }
 
-    .filter txt-control {
-        height: 25px
+    .btn-refresh:hover {
+        background-color: var(--appBlueHover);
+        color: white;
     }
 
-    .filter btn-filter {
-        height: 25px
+
+.btn-new {
+    background-color: var(--appBlue);
+    color: white;
+    padding: 2px;
+    border: none;
+    cursor: pointer;
+    width: 32px
+}
+
+    .btn-new::before {
+        content: "\F4FA"; /* Unicode for Bootstrap "bi-search" icon */
+        font-family: "Bootstrap-icons";
+        font-size: 1rem;
+        margin-right: 0px;
     }
 
-    .filter w1{
-        width: 50px;
-    }
-
-    .filter w2 {
-        width: 100px;
-    }
-
-    .filter w3 {
-        width: 150px;
-    }
-
-    .filter dropdown1 {
-        width:
-    }
-
-    .filter dropdown2 {
+    .btn-new:hover {
+        background-color: var(--appBlueHover);
+        color: white;
     }

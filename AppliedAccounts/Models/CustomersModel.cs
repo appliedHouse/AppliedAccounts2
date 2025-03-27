@@ -13,10 +13,10 @@ namespace AppliedAccounts.Models
         public DataSource? Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public CustomerRecord Record { get; set; } = new();
-        public List<CustomerRecord> Records { get; set; } = new();
+        public List<CustomerRecord> Records { get; set; } = [];
         public List<DataRow> Data { get; set; } = new();
         public DataRow? MyDataRow { get; set; }
-        public AppMessages.AppMessages MyMessages { get; set; } = MessageClass.Messages;
+        public MessageClass MyMessages { get; set; } 
         public bool RecordNotFound { get; set; } = false;
         public string SearchText { get; set; } = string.Empty;
 
@@ -138,8 +138,8 @@ namespace AppliedAccounts.Models
         #region Delete
         public bool Delete(int _ID)
         {
-            MyMessages = MessageClass.Messages;
-            MyDataRow = Source.Seek(Tables.Customers, _ID);
+            //MyMessages = MessageClass.Messages;
+            MyDataRow = Source!.Seek(Tables.Customers, _ID);
             if (MyDataRow is not null)
             {
                 if ((int)MyDataRow["ID"] == _ID)
@@ -165,7 +165,7 @@ namespace AppliedAccounts.Models
             var _NewRow = GetDataRow(Record);
             if (Validate(_NewRow))
             {
-                var _Commands = new CommandClass(_NewRow, DBFile, MyMessages);
+                var _Commands = new CommandClass(_NewRow, DBFile);
 
                 return _Commands.SaveChanges();
             }
