@@ -81,8 +81,6 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-        
-
 
         #region New Voucher
 
