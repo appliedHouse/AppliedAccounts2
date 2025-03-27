@@ -1,15 +1,8 @@
 ﻿using System;
 using System.Data;
 using System.Data.SQLite;
-using System.Net;
 using System.Text;
-using System.Xml.Linq;
-using AppliedAccounts.Pages.Accounts;
 using AppliedDB;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.Reporting.Map.WebForms.BingMaps;
-using Windows.Devices.Sensors;
 using static AppliedDB.Enums;
 
 namespace AppliedAccounts.Data
@@ -259,7 +252,7 @@ namespace AppliedAccounts.Data
                     _CommandText = Receipt2();
                     break;
 
-                case Tables.view_Receipt:
+                case Tables.view_Receipts:
                     _CommandText = view_Receipts();
                     break;
 
@@ -652,7 +645,7 @@ namespace AppliedAccounts.Data
         public string Receipts()
         {
             var _Text = new StringBuilder();
-            _Text.AppendLine("CREATE TABLE[Receipts](");
+            _Text.AppendLine("CREATE TABLE [Receipts](");
             _Text.AppendLine("[ID] INT PRIMARY KEY,");
             _Text.AppendLine("[Vou_No] TEXT(10), ");
             _Text.AppendLine("[Vou_Date] DATE NOT NULL, ");
@@ -714,7 +707,6 @@ namespace AppliedAccounts.Data
             var _Text = new StringBuilder();
             _Text.AppendLine("CREATE VIEW [view_Receipts] AS");
             _Text.AppendLine("SELECT ");
-
             _Text.AppendLine("[R1].[Vou_No],");
             _Text.AppendLine("[R1].[Vou_Date],");
             _Text.AppendLine("[R1].[COA],");

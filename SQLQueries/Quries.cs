@@ -15,7 +15,14 @@ namespace SQLQueries
         public static string ReceiptList()
         {
             var _Text = new StringBuilder();
-            _Text.AppendLine("SELECT * FROM [Receipt]");
+            _Text.AppendLine("SELECT * FROM [view_Receipts]");
+            return _Text.ToString();
+        }
+
+        public static string Receipts()
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("SELECT * FROM [Receipts]");
             return _Text.ToString();
         }
 

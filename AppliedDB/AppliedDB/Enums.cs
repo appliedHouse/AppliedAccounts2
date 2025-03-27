@@ -37,7 +37,7 @@ namespace AppliedDB
             Receipts = 124,                     // Receipt for single transaction (depreciated)
             Receipt = 125,                      // New receipt (master) for multiple transaction
             Receipt2 = 126,                     // New receipt (detail) for multiple transaction
-            view_Receipt = 127,                 // View for new receipt (Multiple)
+            view_Receipts = 127,                // View for new receipt (Multiple)
             Book = 128,
             Book2 = 129,
             view_Book = 130,

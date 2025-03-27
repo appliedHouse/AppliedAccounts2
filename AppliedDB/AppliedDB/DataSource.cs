@@ -12,6 +12,7 @@ namespace AppliedDB
         public SQLiteConnection MyConnection { get; set; }
         public SQLiteCommand MyCommand { get; set; }
         public string DBFile => GetDataFile();
+        
 
         #region Constructor
         public DataSource(AppUserModel _UserProfile)
@@ -1066,8 +1067,16 @@ namespace AppliedDB
         #region Get Receipt Voucher
         public DataTable GetReceiptVoucher(int receiptID)
         {
-            var _Table = new DataTable();
-            return _Table;
+            if(receiptID > 0)
+            {
+                var QueryText = $"SELECT * FROM [view_Receipts] WHERE [TranID] = {receiptID}";
+                using var _Table = GetDataTable(DBFile, QueryText, "view_Receipt");
+                if(_Table != null && _Table.Columns.Count > 0)
+                {
+                    return _Table;
+                }
+            }
+            return new DataTable();
         }
 
         public DataTable GetReceiptList(int receiptID)

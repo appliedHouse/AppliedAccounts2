@@ -5,6 +5,7 @@ using AppMessages;
 using System.Data;
 using SQLQueries;
 using MESSAGE = AppMessages.Enums.Messages;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 
 namespace AppliedAccounts.Models
 {
@@ -47,7 +48,7 @@ namespace AppliedAccounts.Models
                 ReceiptID = _ReceiptID;
                 DataFile = UserProfile?.DataFile ?? "";
 
-                if (UserProfile != null && string.IsNullOrEmpty(DataFile))
+                if (UserProfile != null && !string.IsNullOrEmpty(DataFile))
                 {
                     Source = new(UserProfile);
                     LastVoucherDate = AppRegistry.GetDate(DataFile, "LastRecDate");
@@ -179,7 +180,10 @@ namespace AppliedAccounts.Models
                                 Ref_No = first.Field<string>("Ref_No") ?? "",
                                 Remarks = first.Field<string>("Remarks") ?? "",
                                 Comments = first.Field<string>("Comments") ?? "",
-                                Status = first.Field<string>("Status") ?? ""
+                                Status = first.Field<string>("Status") ?? "",
+
+                                TitleCOA = first.Field<string>("TitleCOA") ?? "",
+                                TitlePayer = first.Field<string>("TitlePayer") ?? "",
                             }).First() ?? new();
 
                             MyVoucher.Details = [.. VoucherData.Select(row => new Detail()
@@ -195,9 +199,9 @@ namespace AppliedAccounts.Models
                                 Description = row.Field<string>("Description") ?? "",
                                 Action = "get",
 
-                                TitleAccount = Accounts.Where(e=> e.ID == row.Field<int>("Account")).Select(e=> e.Title).First() ?? "",
-                                TitleProject = Projects.Where(e => e.ID == row.Field < int >("Project")).Select(e => e.Title).First() ?? "",
-                                TitleEmployee = Employees.Where(e => e.ID == row.Field < int >("Employee")).Select(e => e.Title).First() ?? "",
+                                TitleAccount = row.Field<string>("TitleAccount") ?? "",
+                                TitleProject = row.Field<string>("TitleProject") ?? "",
+                                TitleEmployee = row.Field<string>("TitleEmployee") ?? "",
                             })];
 
                             return true;
