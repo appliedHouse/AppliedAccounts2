@@ -12,8 +12,7 @@
 
 
 @code {
-
-    
+    [Parameter] public int ID { get; set; }
 
     protected override void OnInitialized()
     {
@@ -21,7 +20,7 @@
         var _UserProfile = ((UserAuthonticationStateProvider)Authorized).AppUser;
         Model = new ReceiptModel(_UserProfile);
         Model.Start(ID);
-        
+
         if (Model.MyVoucher == null) { ErrorMessage = "Voucher is null"; }
         if (Model.MyVoucher == null) { IsPageValid = false; }
     }
@@ -30,9 +29,15 @@
     {
         if (firstRender)
         {
-            
+
         }
     }
+
+    public async void BrwsCOA()
+    {
+        await js.InvokeVoidAsync("showModol", "browseCodeTitle");
+    }
+
 }
 
 <PageHeading Text="Receipt" />
@@ -102,6 +107,7 @@
             </div>
         </div>
 
+        <button class="btn btn-primary" @onclick="BrwsCOA">Browse</button>
 
     </EditForm>
 }
@@ -114,3 +120,25 @@ else
     <hr>
     <p class="mb-0">Error: @ErrorMessage</p>
 }
+
+
+<BrowseCodeTitle BrowseList="@Model.Accounts" InputValue="0"></BrowseCodeTitle>
+
+@* <!-- Browse Code title -->
+<div class="modal" id="browseCodeTitle" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Modal body text goes here.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Select</button>
+            </div>
+        </div>
+    </div>
+</div> *@

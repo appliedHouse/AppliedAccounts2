@@ -12,6 +12,7 @@ namespace AppliedDB
         public SQLiteConnection MyConnection { get; set; }
         public SQLiteCommand MyCommand { get; set; }
         public string DBFile => GetDataFile();
+        public string ErrorMessage { get; set; }
         
 
         #region Constructor
@@ -256,7 +257,7 @@ namespace AppliedDB
                         using var _Adapter = new SQLiteDataAdapter(_Command);
                         using var _DataSet = new DataSet();
                         _Adapter.Fill(_DataSet, (new Guid()).ToString());
-                        if (_Connection.State == ConnectionState.Open) { _Connection.Open(); }
+                        if (_Connection.State == ConnectionState.Open) { _Connection.Close(); }
                         if (_DataSet.Tables.Count == 1)
                         {
                             return _DataSet.Tables[0];
@@ -801,43 +802,37 @@ namespace AppliedDB
         {
             if (DBFile == null) { return new(); }
             if (DBFile.Length == 0) { return new(); }
+            
             //========================================================
-
 
             try
             {
                 string TableName = _Table.ToString();
                 var _CommandText = $"SELECT * FROM [{TableName}]";
                 var _Connection = Connections.GetClientConnection(DBFile);
-                _Connection.Open();
-                SQLiteCommand _Command = new(_CommandText, _Connection);
-                SQLiteDataAdapter _Adapter = new(_Command);
-                DataSet _DataSet = new();
-                _Adapter.Fill(_DataSet, TableName);
-                _Connection.Close();
+                if (_Connection != null)
+                {
+                    if(_Connection.State != ConnectionState.Open) { _Connection.Open(); }
+                    SQLiteCommand _Command = new(_CommandText, _Connection);
+                    SQLiteDataAdapter _Adapter = new(_Command);
+                    DataSet _DataSet = new();
+                    _Adapter.Fill(_DataSet, TableName);
+                    if (_Connection.State == ConnectionState.Open) { _Connection.Close(); }
 
-                if (_DataSet.Tables.Count == 1)
-                {
-                    _Command.Dispose();
-                    _Adapter.Dispose();
-                    return _DataSet.Tables[0];
-                }
-                else
-                {
-                    return new DataTable();
+                    if (_DataSet.Tables.Count == 1)
+                    {
+                        _Command.Dispose();
+                        _Adapter.Dispose();
+                        return _DataSet.Tables[0];
+                    }
                 }
             }
-            catch (SQLiteException)
-            {
-                return new DataTable();
-            }
-
             catch (Exception)
             {
-
-                return new DataTable();
+                
             }
 
+            return new DataTable();
         }
         public static DataTable GetDataTable(string DBFile, string _Query, string _TableName)
         {
@@ -851,12 +846,12 @@ namespace AppliedDB
             if (_Connection is not null)
             {
 
-                _Connection.Open();
+                if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
                 SQLiteCommand _Command = new(_CommandText, _Connection);
                 SQLiteDataAdapter _Adapter = new(_Command);
                 DataSet _DataSet = new();
                 _Adapter.Fill(_DataSet, _TableName);
-                _Connection.Close();
+                if (_Connection.State == ConnectionState.Open) { _Connection.Close(); }
 
                 if (_DataSet.Tables.Count == 1)
                 {
@@ -890,12 +885,12 @@ namespace AppliedDB
                 if (_Connection is not null)
                 {
 
-                    _Connection.Open();
+                    if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
                     SQLiteCommand _Command = new(_CommandText, _Connection);
                     SQLiteDataAdapter _Adapter = new(_Command);
                     DataSet _DataSet = new();
                     _Adapter.Fill(_DataSet, TableName);
-                    _Connection.Close();
+                    if (_Connection.State == ConnectionState.Open) { _Connection.Close(); }
 
                     if (_DataSet.Tables.Count == 1)
                     {
