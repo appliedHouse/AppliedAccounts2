@@ -1073,6 +1073,11 @@ namespace AppliedDB
             return _Table;
         }
 
+        public List<CodeTitle> GetInvoices()
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
     }

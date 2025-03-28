@@ -17,6 +17,7 @@ namespace AppliedAccounts.Models.Interface
         string DataFile { get; set; }
         AppUserModel? UserProfile { get; set; }
         int Index { get; set; }
+        int Count { get; }
 
         #region Load Data
         bool LoadData();
@@ -47,6 +48,10 @@ namespace AppliedAccounts.Models.Interface
         void Save();
         Task SaveAllAsync();
         #endregion
+
+        #region Print
+        void Print();
         
+        #endregion
     }
 }

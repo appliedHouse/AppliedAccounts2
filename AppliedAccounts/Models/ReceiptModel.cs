@@ -5,7 +5,6 @@ using AppMessages;
 using System.Data;
 using SQLQueries;
 using MESSAGE = AppMessages.Enums.Messages;
-using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 
 namespace AppliedAccounts.Models
 {
@@ -25,10 +24,13 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> Projects { get; set; }
         public List<CodeTitle> Accounts { get; set; }
         public List<CodeTitle> PayCOA { get; set; }
+        public List<CodeTitle> InvoiceList { get; set; }
         public string DataFile { get; set; }
 
         public AppUserModel? UserProfile { get; set; }
         public int Index { get; set; }
+        public bool RecordFound { get; set; }
+        public int Count => MyVoucher.Details.Count;  
         #endregion
 
         #region Constructor
@@ -37,11 +39,24 @@ namespace AppliedAccounts.Models
         {
             UserProfile = _UserProfile;
             var query = Quries.ReceiptList;
+            
+        }
+        public ReceiptModel(AppUserModel _UserProfile, int _ReceiptID)
+        {
+            UserProfile = _UserProfile;
+            ReceiptID = _ReceiptID;
+            Start(ReceiptID);
+            var query = Quries.ReceiptList;
+
         }
         public void Start(int _ReceiptID) 
         {
+            if(UserProfile is null) { return; }
+            Source ??= new(UserProfile);
+
             MsgClass = new();
             MyVoucher = new();
+            LastVoucherDate = AppRegistry.GetDate(Source.DBFile, "rcptDate");
 
             try
             {
@@ -64,19 +79,16 @@ namespace AppliedAccounts.Models
                     Projects = Source.GetProjects();
                     Accounts = Source.GetAccounts();
                     PayCOA = Source.GetAccounts();
+                    InvoiceList = Source.GetInvoices();
                 }
                 else
                 {
                     MsgClass.Add(MESSAGE.UserProfileIsNull);
                 }
-
-
             }
             catch (Exception)
             {
                 MsgClass.Add(MESSAGE.Default);
-
-
             }
         }
         #endregion
@@ -320,7 +332,15 @@ namespace AppliedAccounts.Models
             if (MyVoucher.Details.Count > 0)
             { MyVoucher.Detail = MyVoucher.Details.Last(); }
         }
+        #endregion
 
+        #region Print
+        public void Print()
+        {
+            throw new NotImplementedException();
+        }
+
+ 
         #endregion
 
         #region VoucherModel
@@ -366,6 +386,7 @@ namespace AppliedAccounts.Models
             public int Sr_No { get; set; }
             public int TranID { get; set; }
             public string Ref_No { get; set; }
+            public int Inv_No { get; set; }
             public int Account { get; set; }                // Settle account against receipt amount
             public decimal DR { get; set; }
             public decimal CR { get; set; }
@@ -376,6 +397,7 @@ namespace AppliedAccounts.Models
             public string TitleAccount { get; set; }
             public string TitleProject { get; set; }
             public string TitleEmployee { get; set; }
+            public string TitleInvoice { get; set; }
             public string Action { get; set; }
         }
         #endregion

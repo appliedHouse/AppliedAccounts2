@@ -36,6 +36,9 @@ namespace AppliedAccounts.Models
 
         public string DataFile { get; set; }
         public bool Processing { get; set; } = false;
+
+        public int Count => MyVoucher.Details.Count;
+
         private int CashNatureID = 0;
         private int BankNatureID = 0;
 
@@ -412,6 +415,11 @@ namespace AppliedAccounts.Models
             Index = MyVoucher.Details.Count - 1;
             if (MyVoucher.Details.Count > 0)
             { MyVoucher.Detail = MyVoucher.Details.Last(); }
+        }
+
+        public void Print()
+        {
+            throw new NotImplementedException();
         }
         #endregion
 

@@ -4,7 +4,9 @@
 
 @code {
     [Parameter] public BrowseListModel BrowseModel { get; set; }
-    [Parameter] public EventCallback<string> OutputValue { get; set; }
+    [Parameter] public string OutputValue { get; set; }
+    [Parameter]
+    public EventCallback<string> OnValueChanged { get; set; }
 
     public string SearchText = "";
     public List<CodeTitle> FilteredList { get; set; } = new();
@@ -17,85 +19,86 @@
         {
             IsPageValid = false;
         }
+    }
 
+   
+
+    private string newValue = "New Value";
+    private async Task UpdateParentValue()
+    {
+        await OnValueChanged.InvokeAsync(newValue); // Sends the new value to parent
     }
 
     
 
 }
 <link rel="stylesheet" href="css/BrowseTable.css" />
-
-<!-- Browse Code title -->
-
-@* if(IsPageValid)
-{
-    <div class="tableContainer">
-        <EditForm Model="BrowseModel">
-            <div class="modal modal-fullscreen" id="browseCodeTitle" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <div class="container">
-                                <div class="row filter" id="searchFilter">
-                                    <div class="col">
-                                        <InputText @bind-Value="@SearchText" @oninput="ChangeFilter"></InputText>
-                                        <label>Search</label>
-                                    </div>
+<div class="tableContainer">
+    <EditForm Model="BrowseModel">
+        <div class="modal modal-fullscreen"
+             id="browseCodeTitle"
+             tabindex="-1"
+             aria-labelledby="ModalLabel"
+             style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="container">
+                            <div class="row filter" id="searchFilter">
+                                <div class="col">
+                                    <InputText @bind-Value="@SearchText" @oninput="BrowseModel.ChangeFilter"></InputText>
+                                    <label>Search</label>
                                 </div>
                             </div>
                         </div>
-                        <div class="modal-body">
-                            <div class="container mt-3">
-                                <div class="table-responsive">
-                                    <table id="browsTable" class="table table-striped table-hover table-bordered text-center">
-                                        <thead class="table-browse" id="tableBrowse">
-                                            <tr>
-                                                <th style="width: 25%;">Code</th>
-                                                <th style="width: 70%;">Title</th>
-                                                <th style="width: 5%;">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @if (FilteredList != null)
-                                            {
-                                                @foreach (var item in FilteredList)
-                                                {
-                                                    <tr>
-                                                        <td>@item.Code</td>
-                                                        <td>@item.Title</td>
-                                                        <td>
-                                                            <button type="button"
-                                                            class="btn btn-link btn-sm w1"
-                                                            data-bs-dismiss="modal"
-                                                            @onclick="((e) => SelectValue(e))">
-                                                                <i class="fa-solid fa-circle-check"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            }
-                                            else
+                    </div>
+                    <div class="modal-body">
+                        <div class="container mt-3">
+                            <div class="table-responsive">
+                                <table id="browsTable" class="table table-striped table-hover table-bordered text-center">
+                                    <thead class="table-browse" id="tableBrowse">
+                                        <tr>
+                                            <th style="width: 25%;">Code</th>
+                                            <th style="width: 70%;">Title</th>
+                                            <th style="width: 5%;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (FilteredList != null)
+                                        {
+                                            @foreach (var item in BrowseModel.GetFilterList(BrowseModel.SearchText))
                                             {
                                                 <tr>
-                                                    <td><p>No List found.</p></td>
+                                                    <td>@item.Code</td>
+                                                    <td style="text-align:left">@item.Title</td>
+                                                    <td>
+                                                        <button type="button"
+                                                                class="btn btn-link btn-sm w1"
+                                                                data-bs-dismiss="modal"
+                                                                @onclick="(e => BrowseModel.SelectValue(item.ID))">
+                                                            <i class="fa-solid fa-circle-check"></i>
+                                                        </button>
+                                                    </td>
                                                 </tr>
                                             }
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td><p>No List found.</p></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-success btn-sm" btn-sm>Select</button>
-                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-success btn-sm" btn-sm>Select</button>
                     </div>
                 </div>
             </div>
-        </EditForm>
-    </div>
-}
-else
-{
-    <p>Browse window is not valid to show.</p>
-} *@
+        </div>
+    </EditForm>
+</div>

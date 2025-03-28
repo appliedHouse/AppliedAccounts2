@@ -1,6 +1,5 @@
 ﻿using AppliedDB;
 using Microsoft.AspNetCore.Components;
-using System.ComponentModel;
 
 namespace AppliedAccounts.Models
 {
@@ -11,13 +10,13 @@ namespace AppliedAccounts.Models
             BrowseList = [];
             FilteredList = [];
 
-            BrowseList.Add(new CodeTitle() { ID = 0, Code = "-", Title = "No Record Found" });
+            BrowseList.Add(new CodeTitle() { ID = 0, Code = "101", Title = "No Record Found" });
+            BrowseList.Add(new CodeTitle() { ID = 1, Code = "102", Title = "Asalam Alikum" });
+            BrowseList.Add(new CodeTitle() { ID = 2, Code = "103", Title = "Hello world." });
             //OutputValue = 0;
             Enable = false;
             SearchText = string.Empty;
         }
-
-        
 
         public List<CodeTitle> BrowseList { get; set; }
         public List<CodeTitle> FilteredList { get; set; }
@@ -34,7 +33,7 @@ namespace AppliedAccounts.Models
             FilteredList = _browseList;
         }
 
-        public List<CodeTitle> FilterList(string _searchText)
+        public List<CodeTitle> GetFilterList(string _searchText)
         {
             SearchText = _searchText;
             var _FilteredList = FilteredList ?? [];
@@ -54,7 +53,7 @@ namespace AppliedAccounts.Models
         public void ChangeFilter(ChangeEventArgs e)
         {
             SearchText = e.Value?.ToString() ?? "";
-            FilteredList = FilterList(SearchText);
+            FilteredList = GetFilterList(SearchText);
         }
 
         public void SelectValue(int _ID)
