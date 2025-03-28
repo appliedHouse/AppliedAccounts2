@@ -60,6 +60,23 @@ function closeModal(ModalID) {
     }
 }
 
+window.showBrowseModol = function (modalID, dotNetHelper) {
+    var myModal = new bootstrap.Modal(document.getElementById(modalID));
+    myModal.show();
+
+    document.getElementById(modalID).addEventListener('hidden.bs.modal', function () {
+        if (dotNetHelper) {
+            dotNetHelper.invokeMethodAsync('OnModalClose')
+                .then(() => console.log("C# method executed successfully"))
+                .catch((err) => console.error("Error calling C# method: " + err));
+        } else {
+            console.error("Error: dotNetHelper is null or undefined");
+        }
+    }, { once: true }); // Prevents duplicate listeners
+};
+
+
+
 
 function showAcordion() {
     var collapseElementList = [].slice.call(document.querySelectorAll('.collapse'));

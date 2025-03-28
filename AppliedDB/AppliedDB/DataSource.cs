@@ -13,7 +13,7 @@ namespace AppliedDB
         public SQLiteCommand MyCommand { get; set; }
         public string DBFile => GetDataFile();
         public string ErrorMessage { get; set; }
-        
+
 
         #region Constructor
         public DataSource(AppUserModel _UserProfile)
@@ -364,7 +364,7 @@ namespace AppliedDB
 
             var TableList = GetTable(_Table).AsEnumerable().ToList().Where(rows => rows.Field<int>("ID") == _ID).SingleOrDefault();
 
-            if(TableList != null)
+            if (TableList != null)
             {
                 return TableList[_column];
 
@@ -428,7 +428,6 @@ namespace AppliedDB
                 if (_Table is not null)
                 {
 
-
                     if (_Table.Rows.Count > 0)
                     {
                         _CodeTitleList.Add(new CodeTitle()
@@ -438,22 +437,16 @@ namespace AppliedDB
                             Title = "Select...."
                         });
 
-                        foreach (DataRow Row in _Table.Rows)
+
+                        _CodeTitleList.AddRange([.. _Table.AsEnumerable().ToList().Select(row => new CodeTitle
                         {
-                            if (Row["ID"] == null) { Row["ID"] = 0; }
-                            if (Row["Code"] == null) { Row["Code"] = string.Empty; }
-                            if (Row["Title"] == null) { Row["Title"] = string.Empty; }
+                            ID = row.Field<int>("ID"),
+                            Code = row.Field<string>("Code") ?? "",
+                            Title = row.Field<string>("Title")?.Trim() ?? ""
+                        }).OrderBy(e=> e.Title)
+                        ]);
 
-                            var _CodeTitle = new CodeTitle()
-                            {
-                                ID = (int)Row["ID"],
-                                Code = (string)Row["Code"],
-                                Title = (string)Row["Title"],
-                            };
-
-                            _CodeTitleList.Add(_CodeTitle);
-                            return _CodeTitleList;
-                        }
+                        return _CodeTitleList;
                     }
                 }
             }
@@ -802,7 +795,7 @@ namespace AppliedDB
         {
             if (DBFile == null) { return new(); }
             if (DBFile.Length == 0) { return new(); }
-            
+
             //========================================================
 
             try
@@ -812,7 +805,7 @@ namespace AppliedDB
                 var _Connection = Connections.GetClientConnection(DBFile);
                 if (_Connection != null)
                 {
-                    if(_Connection.State != ConnectionState.Open) { _Connection.Open(); }
+                    if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
                     SQLiteCommand _Command = new(_CommandText, _Connection);
                     SQLiteDataAdapter _Adapter = new(_Command);
                     DataSet _DataSet = new();
@@ -829,7 +822,7 @@ namespace AppliedDB
             }
             catch (Exception)
             {
-                
+
             }
 
             return new DataTable();
@@ -1062,11 +1055,11 @@ namespace AppliedDB
         #region Get Receipt Voucher
         public DataTable GetReceiptVoucher(int receiptID)
         {
-            if(receiptID > 0)
+            if (receiptID > 0)
             {
                 var QueryText = $"SELECT * FROM [view_Receipts] WHERE [TranID] = {receiptID}";
                 using var _Table = GetDataTable(DBFile, QueryText, "view_Receipt");
-                if(_Table != null && _Table.Columns.Count > 0)
+                if (_Table != null && _Table.Columns.Count > 0)
                 {
                     return _Table;
                 }

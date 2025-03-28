@@ -1,132 +1,101 @@
-﻿@using AppliedDB
+﻿@using AppliedAccounts.Models
+@using AppliedDB
 @using Microsoft.AspNetCore.Components
 
-
 @code {
-    [Parameter] public List<CodeTitle> BrowseList { get; set; }
-    [Parameter] public string InputValue { get; set; }
+    [Parameter] public BrowseListModel BrowseModel { get; set; }
     [Parameter] public EventCallback<string> OutputValue { get; set; }
 
     public string SearchText = "";
-    public List<CodeTitle> FilteredList { get; set; }
+    public List<CodeTitle> FilteredList { get; set; } = new();
+    public bool IsPageValid { get; set; } = true;
 
     protected override void OnInitialized()
     {
-        FilteredList = BrowseList;
-    }
-
-
-    
-    private void ChangeFilter(ChangeEventArgs e)
-    {
-        if (e.Value == null)
+        FilteredList = BrowseModel.BrowseList;
+        if(BrowseModel is null)
         {
-            FilteredList = BrowseList;
-            return;
+            IsPageValid = false;
         }
 
-        var _filterText = e.Value.ToString().ToLower() ?? "";
-
-        FilteredList = BrowseList.Where(x => x.Code.ToLower().Contains(_filterText) || x.Title.ToLower().Contains(_filterText)).ToList();
-
-
     }
 
-    private void SelectValue(MouseEventArgs e)
-    {
-        OutputValue.InvokeAsync(InputValue);
-    }
-
+    
 
 }
-
-<style>
-    #browseCodeTitle {
-        width: 50%;
-        height: 50%;
-        position: fixed;
-        top: 25%;
-        left: 25%;
-        margin: auto;
-    }
-
-
-    .modal-dialog {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-    }
-
-    .modal-content {
-        height: 100%;
-    }
-
-
-    .w1 {
-        width: 40px;
-    }
-</style>
-
+<link rel="stylesheet" href="css/BrowseTable.css" />
 
 <!-- Browse Code title -->
-<div class="tableContainer">
-    <EditForm Model="BrowseList">
-        <div class="modal modal-fullscreen" id="browseCodeTitle" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <div class="container">
-                            <div class="row filter" id="searchFilter">
-                                <div class="col">
-                                    <InputText @bind-Value="@SearchText" @oninput="ChangeFilter"></InputText>
-                                    <label>Search</label>
+
+@* if(IsPageValid)
+{
+    <div class="tableContainer">
+        <EditForm Model="BrowseModel">
+            <div class="modal modal-fullscreen" id="browseCodeTitle" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="container">
+                                <div class="row filter" id="searchFilter">
+                                    <div class="col">
+                                        <InputText @bind-Value="@SearchText" @oninput="ChangeFilter"></InputText>
+                                        <label>Search</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-body">
-
-
-                        <div class="container mt-3">
-                            <div class="table-responsive">
-                                <table id="browsTable" class="table table-striped table-hover table-bordered text-center">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th style="width: 25%;">Code</th>
-                                            <th style="width: 70%;">Title</th>
-                                            <th style="width: 5%;">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var item in FilteredList)
-                                        {
+                        <div class="modal-body">
+                            <div class="container mt-3">
+                                <div class="table-responsive">
+                                    <table id="browsTable" class="table table-striped table-hover table-bordered text-center">
+                                        <thead class="table-browse" id="tableBrowse">
                                             <tr>
-                                                <td>@item.Code</td>
-                                                <td>@item.Title</td>
-                                                <td>
-                                                    <button 
-                                                        type="button" 
-                                                        class="btn btn-outline-primary btn-sm w1" 
-                                                        data-bs-dismiss="modal" 
-                                                        @onclick="((e) => SelectValue(e))">
-                                                        <i class="fa-solid fa-circle-check"></i>
-                                                    </button>
-                                                </td>
+                                                <th style="width: 25%;">Code</th>
+                                                <th style="width: 70%;">Title</th>
+                                                <th style="width: 5%;">Action</th>
                                             </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            @if (FilteredList != null)
+                                            {
+                                                @foreach (var item in FilteredList)
+                                                {
+                                                    <tr>
+                                                        <td>@item.Code</td>
+                                                        <td>@item.Title</td>
+                                                        <td>
+                                                            <button type="button"
+                                                            class="btn btn-link btn-sm w1"
+                                                            data-bs-dismiss="modal"
+                                                            @onclick="((e) => SelectValue(e))">
+                                                                <i class="fa-solid fa-circle-check"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td><p>No List found.</p></td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Select</button>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-success btn-sm" btn-sm>Select</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </EditForm>
-</div>
+        </EditForm>
+    </div>
+}
+else
+{
+    <p>Browse window is not valid to show.</p>
+} *@
