@@ -341,8 +341,8 @@ namespace AppliedAccounts.Models
         }
         public void Remove(int _SrNo)
         {
-            MyVoucher.Detail = MyVoucher.Details.Where(row=> row.Sr_No == _SrNo).First();
-            if(MyVoucher.Detail != null)
+            MyVoucher.Detail = MyVoucher.Details.Where(row => row.Sr_No == _SrNo).First();
+            if (MyVoucher.Detail != null)
             {
                 MyVoucher.Details.Remove(MyVoucher.Detail);
             }
@@ -419,7 +419,7 @@ namespace AppliedAccounts.Models
 
         public void Print()
         {
-            throw new NotImplementedException();
+
         }
         #endregion
 

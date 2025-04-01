@@ -4,6 +4,7 @@ using AppliedDB;
 using AppMessages;
 using System.Data;
 using SQLQueries;
+using Microsoft.JSInterop;
 using MESSAGE = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Models
@@ -30,16 +31,18 @@ namespace AppliedAccounts.Models
         public AppUserModel? UserProfile { get; set; }
         public int Index { get; set; }
         public bool RecordFound { get; set; }
-        public int Count => MyVoucher.Details.Count;  
+        public int Count => MyVoucher.Details.Count;
+
+        private readonly IJSRuntime js;
         #endregion
 
         #region Constructor
         public ReceiptModel() { }
-        public ReceiptModel(AppUserModel _UserProfile) 
+        public ReceiptModel(AppUserModel _UserProfile)
         {
             UserProfile = _UserProfile;
             var query = Quries.ReceiptList;
-            
+
         }
         public ReceiptModel(AppUserModel _UserProfile, int _ReceiptID)
         {
@@ -49,9 +52,9 @@ namespace AppliedAccounts.Models
             var query = Quries.ReceiptList;
 
         }
-        public void Start(int _ReceiptID) 
+        public void Start(int _ReceiptID)
         {
-            if(UserProfile is null) { return; }
+            if (UserProfile is null) { return; }
             Source ??= new(UserProfile);
 
             MsgClass = new();
@@ -337,10 +340,11 @@ namespace AppliedAccounts.Models
         #region Print
         public void Print()
         {
-            throw new NotImplementedException();
+
+            //await js.InvokeVoidAsync("printPDF", "/PDFReports/Test.pdf"); // Path to your PDF
         }
 
- 
+
         #endregion
 
         #region VoucherModel
@@ -364,8 +368,8 @@ namespace AppliedAccounts.Models
             public int ID1 { get; set; }
             public string Vou_No { get; set; }
             public DateTime Vou_Date { get; set; }
-            public int COA {  get; set; }               // Amount received in this account i.e. cash or bank acc.
-            public int Payer {  get; set; }             // Customer, client, donner etc.
+            public int COA { get; set; }               // Amount received in this account i.e. cash or bank acc.
+            public int Payer { get; set; }             // Customer, client, donner etc.
             public string Ref_No { get; set; }          // Cheque No. c
             public string? Doc_No { get; set; }          // Cheque No. or on-line transaction no.
             public DateTime? Doc_Date { get; set; }      // Cheque No. or on-line transaction no.
@@ -374,7 +378,7 @@ namespace AppliedAccounts.Models
             public string Remarks { get; set; }
             public string Comments { get; set; }
             public string Status { get; set; }
-           
+
 
             public string TitlePayer { get; set; }
             public string TitleCOA { get; set; }

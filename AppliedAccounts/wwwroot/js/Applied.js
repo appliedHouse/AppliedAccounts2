@@ -99,3 +99,25 @@ function adjustTableHeight() {
 // Adjust height on page load and window resize
 window.addEventListener("load", adjustTableHeight);
 window.addEventListener("resize", adjustTableHeight);
+
+
+
+function printPage() {
+    window.print();
+}
+
+function printDiv(divId) {
+    var content = document.getElementById(divId).innerHTML;
+    var originalContent = document.body.innerHTML;
+    document.body.innerHTML = content;
+    window.print();
+    document.body.innerHTML = originalContent;
+    location.reload(); // Restore the page
+}
+
+function printPDF(pdfUrl) {
+    var win = window.open(pdfUrl, '_blank');
+    win.onload = function () {
+        win.print();
+    };
+}

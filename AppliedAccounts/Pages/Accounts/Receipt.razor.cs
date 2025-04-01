@@ -1,7 +1,5 @@
 ﻿using AppliedAccounts.Models;
-using AppliedAccounts.Models.Interface;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace AppliedAccounts.Pages.Accounts
 {
@@ -18,6 +16,7 @@ namespace AppliedAccounts.Pages.Accounts
             ErrorMessage = string.Empty;
         }
 
+        #region DropDown Changed
         private void COAIDChanged(int _ID)
         {
             MyModel.MyVoucher.Master.COA = _ID;
@@ -27,7 +26,6 @@ namespace AppliedAccounts.Pages.Accounts
                 .First() ?? "";
         }
 
-
         private void PayerIDChanged(int _ID)
         {
             MyModel.MyVoucher.Master.Payer = _ID;
@@ -36,7 +34,6 @@ namespace AppliedAccounts.Pages.Accounts
                 .Select(e => e.Title)
                 .First() ?? "";
         }
-
 
         private void AccountIDChanged(int _ID)
         {
@@ -63,6 +60,12 @@ namespace AppliedAccounts.Pages.Accounts
                 .Where(e => e.ID == MyModel.MyVoucher.Detail.Employee)
                 .Select(e => e.Title)
                 .First() ?? "";
+        }
+        #endregion
+
+        private void BackPage()
+        {
+            NavManager.NavigateTo("/Accounts/ReceiptList");
         }
     }
 }
