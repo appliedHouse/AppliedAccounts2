@@ -39,6 +39,9 @@ namespace AppliedAccounts.Models
 
         public int Count => MyVoucher.Details.Count;
 
+        public decimal Tot_DR { get; set; }
+        public decimal Tot_CR { get; set; }
+
         private int CashNatureID = 0;
         private int BankNatureID = 0;
 
@@ -339,7 +342,18 @@ namespace AppliedAccounts.Models
 
             }
         }
-        public void Remove(int _SrNo)
+        #endregion
+
+        #region Remove
+        public void Remove()
+        {
+            if (MyVoucher.Detail != null)
+            {
+                MyVoucher.Detail.action = "delete";
+                MyVoucher.Details.Remove(MyVoucher.Detail);
+            }
+        }
+        public void Remove(int _SrNo)   // Depreciated.
         {
             MyVoucher.Detail = MyVoucher.Details.Where(row => row.Sr_No == _SrNo).First();
             if (MyVoucher.Detail != null)
@@ -421,9 +435,17 @@ namespace AppliedAccounts.Models
         {
 
         }
+
+        public void CalculateTotal()
+        {
+            Tot_DR = 0; Tot_CR = 0;
+            if (MyVoucher.Details.Count > 0)
+            {
+                Tot_DR = MyVoucher.Details.Sum(e => e.DR);
+                Tot_CR = MyVoucher.Details.Sum(e => e.CR);
+            }
+        }
         #endregion
-
-
 
         #region Models
 

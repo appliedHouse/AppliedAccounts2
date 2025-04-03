@@ -12,13 +12,13 @@ namespace AppMessages
         {
 
             NoMessage,
-            Default,
-            Save,
-            NotSave,
-            Delete,
-            NotDelete,
-            Insert,
-            NotInsert,
+            Default = 1,
+            Save = 2,
+            NotSave =5 ,
+            Delete = 4,
+            NotDelete = 6,
+            Insert = 3,
+            NotInsert = 7,
 
             RowInserted,
             RowNotInserted,
@@ -85,8 +85,10 @@ namespace AppMessages
             DataTableNotFound,
             RecordNotSaved,
             RecordNotSavedError,
+            RecordNotValidated,
             DataLoadSucesscully,
             DataLoadFailed,
+
 
             SQLQueryError,
             CodeLength6,

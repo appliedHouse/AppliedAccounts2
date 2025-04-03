@@ -19,6 +19,13 @@ namespace AppliedAccounts.Models.Interface
         int Index { get; set; }
         int Count { get; }
 
+        decimal Tot_DR { get; set; }
+        decimal Tot_CR { get; set; }
+
+        void CalculateTotal();
+
+
+
         #region Load Data
         bool LoadData();
         #endregion
@@ -41,7 +48,7 @@ namespace AppliedAccounts.Models.Interface
         #endregion
 
         #region Remove record from list
-        void Remove(int _SrNo);
+        void Remove();
         #endregion
 
         #region Add and Save Voucher

@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Models;
+using AppliedDB;
 using Microsoft.AspNetCore.Components;
 
 namespace AppliedAccounts.Pages.Accounts
@@ -66,6 +67,11 @@ namespace AppliedAccounts.Pages.Accounts
         private void BackPage()
         {
             NavManager.NavigateTo("/Accounts/ReceiptList");
+        }
+
+        public void TestRecord()
+        {
+            MyModel.TestNew();
         }
     }
 }

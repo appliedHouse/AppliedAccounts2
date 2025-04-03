@@ -17,7 +17,7 @@
 
 @code {
 
-    private string UserRoll;
+    //private string UserRoll;
     private string DateFormat = Format.DDMMYY;
     private string CurrFormat = Format.Currency;
     private decimal Tot_DR = 0.0M;
@@ -336,13 +336,16 @@
                         <tbody>
                             @foreach (var item in MyModel.MyVoucher.Details)
                             {
+                                Tot_DR += item.DR;
+                                Tot_CR += item.CR;
+
                                 <tr>
                                     <td style="width:5%">@item.Sr_No</td>
                                     <td style="width:15%">@item.TitleAccount</td>
                                     <td style="width:15%">@item.TitleCompany</td>
                                     <td style="width:30%">@item.Description</td>
-                                    <td style="width:15%">@item.DR</td>
-                                    <td style="width:15%">@item.CR</td>
+                                    <td style="width:15%" class="amount">@item.DR</td>
+                                    <td style="width:15%" class="amount">@item.CR</td>
                                     <th style="width:5%">
                                         <button class="btn btn-Edit" @onclick="(()=>MyModel.Edit(item.Sr_No))"><i class="fa fa-keyboard"></i></button>
                                         <button class="btn btn-Del" @onclick="(()=>MyModel.Remove(item.Sr_No))"><i class="fa fa-trash-can"></i></button>
@@ -356,8 +359,8 @@
                                 <td></td>
                                 <td>TOTAL</td>
                                 <td></td>
-                                <td></td>
-                                <td></td>
+                                <td class="amount">@Tot_DR</td>
+                                <td class="amount">@Tot_DR</td>
                                 <td>
                                     <button class="btn btn-Add"><i class="fa fa-square-plus" style="font-size:24px"></i></button>
                                 </td>

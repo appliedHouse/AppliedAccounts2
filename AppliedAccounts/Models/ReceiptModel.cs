@@ -4,7 +4,6 @@ using AppliedDB;
 using AppMessages;
 using System.Data;
 using SQLQueries;
-using Microsoft.JSInterop;
 using MESSAGE = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Models
@@ -18,6 +17,7 @@ namespace AppliedAccounts.Models
         public DateTime MaxVouDate { get; set; }
         public MessageClass MsgClass { get; set; }
         public Voucher MyVoucher { get; set; }
+        public List<Detail> Deleted { get; set; }
         public bool Processing { get; set; }
         public DataSource Source { get; set; }
         public List<CodeTitle> Companies { get; set; }
@@ -33,7 +33,10 @@ namespace AppliedAccounts.Models
         public bool RecordFound { get; set; }
         public int Count => MyVoucher.Details.Count;
 
-        private readonly IJSRuntime js;
+        public decimal Tot_DR { get; set; }
+        public decimal Tot_CR { get; set; }
+
+
         #endregion
 
         #region Constructor
@@ -143,7 +146,7 @@ namespace AppliedAccounts.Models
 
             if (MyVoucher.Master == null) { MsgClass.Add(MESSAGE.MasterRecordisNull); return false; }
             if (MyVoucher.Details == null) { MsgClass.Add(MESSAGE.DetailRecordsisNull); return false; }
-            if (MyVoucher.Details.Count == 0) { MsgClass.Add(MESSAGE.DetailRecordsAreZero); return false; }
+            //if (MyVoucher.Details.Count == 0) { MsgClass.Add(MESSAGE.DetailRecordsAreZero); return false; }
 
             if (MyVoucher.Master.Vou_No.Length == 0) { MsgClass.Add(MESSAGE.VouNoNotDefine); }
             if (!MyVoucher.Master.Vou_No.ToLower().Equals("new"))
@@ -267,16 +270,30 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Remove Record
-        public void Remove(int _SrNo)
+        public void Remove()
         {
-            MyVoucher.Detail = MyVoucher.Details.Where(row => row.Sr_No == _SrNo).First();
-            if (MyVoucher.Detail != null)
+            if (MyVoucher.Detail is not null)
             {
-                MyVoucher.Details.Remove(MyVoucher.Detail);
+                var IsAlreadyDeleted = Deleted.Where(e => e.Sr_No == MyVoucher.Detail.Sr_No).Any();
+                if (!IsAlreadyDeleted)
+                {
+                    Deleted.Add(MyVoucher.Detail);
+                    MyVoucher.Details.Remove(MyVoucher.Detail);
+                    if (MyVoucher.Details.Count > 0)
+                    {
+                        MyVoucher.Detail = MyVoucher.Details.First();
+                    }
+                    else
+                    {
+                        MyVoucher.Detail = NewDetail();
+                    }
+                }
             }
+            CalculateTotal();
         }
 
         #endregion
+
 
         #region Save
         public void Save()
@@ -288,9 +305,13 @@ namespace AppliedAccounts.Models
                 {
                     MyVoucher.Detail.Action = "save";
                     MyVoucher.Details.Add(MyVoucher.Detail);
-
                 }
             }
+            else
+            {
+                MsgClass.Add(MESSAGE.RecordNotValidated);
+            }
+            CalculateTotal();
         }
 
         public Task SaveAllAsync()
@@ -298,6 +319,57 @@ namespace AppliedAccounts.Models
             throw new NotImplementedException();
         }
         #endregion
+
+
+        public void TestNew()
+        {
+            Voucher _NewVoucher = new();
+            _NewVoucher.Master.ID1 = 0;
+            _NewVoucher.Master.Vou_No = "New";
+            _NewVoucher.Master.Vou_Date = LastVoucherDate;
+            _NewVoucher.Master.COA = 2;
+            _NewVoucher.Master.Payer = 5;
+            _NewVoucher.Master.Ref_No = "Ref-12345";
+            _NewVoucher.Master.Doc_No = "Doc-09886";
+            _NewVoucher.Master.Doc_Date = DateTime.Now;
+            _NewVoucher.Master.Pay_Mode = "Bank";
+            _NewVoucher.Master.Amount = 1500.00M;
+            _NewVoucher.Master.Remarks = "Testing ";
+            _NewVoucher.Master.Comments = "Comments";
+            _NewVoucher.Master.Status = "Submitted";
+
+            var _SRNO = 1;
+            if (MyVoucher.Details.Count > 0)
+            {
+                _SRNO = MyVoucher.Details.Max(e => e.Sr_No) + 1;
+            }
+
+            var _Detail = new Detail();
+            {
+                _Detail.ID2 = 0;
+                _Detail.TranID = 0;
+                _Detail.Sr_No = _SRNO;
+                _Detail.Account = 15;
+                _Detail.Employee = 1;
+                _Detail.Project = 3;
+                _Detail.Inv_No = 10;
+                _Detail.Ref_No = "Master Ref-009";
+                _Detail.DR = 1500.00M;
+                _Detail.CR = 0.00M;
+                _Detail.Description = "Description";
+                _Detail.Action = "new";
+
+                _Detail.TitleAccount = Accounts.Where(e => e.ID == _Detail.Account).Select(e => e.Title).FirstOrDefault() ?? "";
+                _Detail.TitleProject = Projects.Where(e => e.ID == _Detail.Project).Select(e => e.Title).FirstOrDefault() ?? "";
+                _Detail.TitleEmployee = Employees.Where(e => e.ID == _Detail.Employee).Select(e => e.Title).FirstOrDefault() ?? ""; ;
+            }
+
+            _NewVoucher.Detail = _Detail;
+
+            MyVoucher = _NewVoucher;
+        }
+
+
 
         #region Navigation of Records
         public void Top()
@@ -342,6 +414,21 @@ namespace AppliedAccounts.Models
         {
 
             //await js.InvokeVoidAsync("printPDF", "/PDFReports/Test.pdf"); // Path to your PDF
+        }
+
+        public void Remove(int _SrNo)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void CalculateTotal()
+        {
+            Tot_DR = 0; Tot_CR = 0;
+            if(MyVoucher.Details.Count > 0)
+            {
+                Tot_DR = MyVoucher.Details.Sum(e => e.DR);
+                Tot_CR = MyVoucher.Details.Sum(e => e.CR);
+            }
         }
 
 

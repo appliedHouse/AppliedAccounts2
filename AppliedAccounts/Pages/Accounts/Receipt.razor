@@ -83,6 +83,11 @@
 </style>
 <PageHeading Text="Receipt" />
 
+@if (MyModel.MsgClass.Count > 0)
+{
+    <PageErrors Messages="MyModel.MsgClass"></PageErrors>
+}
+
 @if (IsPageValid)
 {
     <EditForm Model="MyModel">
@@ -315,100 +320,62 @@
             <div class="container control-buttons">
                 <div class="grid gap-0 column-gap-3 ctrl-gap">
                     <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
-                    <button @onclick="(()=>MyModel.Update(MyModel.MyVoucher.Detail.Sr_No))" " class="btn ctrl ctrl-edit"><i class="bi bi-floppy"></i></button>
-                    <button @onclick="(()=>MyModel.Remove(MyModel.MyVoucher.Detail.Sr_No))" class="btn ctrl ctrl-del"><i class="bi bi-trash"></i></button>
-
-                    <div class="btn-group" role="group" aria-label="Navigation Buttons" id="navigationBtns">
-                        <button type="button" class="btn ctrl ctrl-top" @onclick="MyModel.Top"><i class="bi bi-arrow-bar-left"></i></button>
-                        <button type="button" class="btn ctrl ctrl-next" @onclick="MyModel.Next"><i class="bi bi-arrow-right-short"></i></button>
-                        <button type="button" class="btn ctrl ctrl-back" @onclick="MyModel.Back"><i class="bi bi-arrow-left-short"></i></button>
-                        <button type="button" class="btn ctrl ctrl-last" @onclick="MyModel.Last"><i class="bi bi-arrow-bar-right"></i></button>
-                    </div>
-
-                    @if (MyModel.RecordFound)
+                    <button @onclick="MyModel.Save" class="btn ctrl ctrl-edit"><i class="bi bi-floppy"></i></button>
+                    @if (MyModel.Count > 0)
                     {
-                        <div class="btn-group" role="group" aria-label="Navigation Buttons" id="printBtns">
-                            <button type="button" class="btn ctrl ctrl-print" @onclick="Print">
-                                <i class="bi bi-printer"></i>
-                            </button>
-                            <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
-                                <i class="bi bi-search"></i>
-                            </button>
-                            <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
-                                <i class="bi bi-file-pdf"></i>
-                            </button>
-                            <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
-                                <i class="bi bi-file-earmark-excel"></i>
-                            </button>
-                            <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
-                                <i class="bi bi-file-earmark-word"></i>
-                            </button>
-                            <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
-                                <i class="bi bi-filetype-html"></i>
-                            </button>
-                            <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
-                                <i class="bi bi-file-earmark-image"></i>
-                            </button>
-                        </div>
-                    }
-
-                    @if (MyModel.RecordFound)
-                    {
-                        <button type="button" class="btn ctrl ctrl-saveAll" @onclick="MyModel.SaveAllAsync">
-                            <i class="bi bi-floppy-fill"></i>
-                        </button>
-                    }
-
-                    <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="BackPage">
-                        <i class="bi bi-arrow-left-circle-fill"></i>
-                    </button>
-                </div>
-            </div>
+                        
+                        <button @onclick="MyModel.Remove" class="btn ctrl ctrl-del"><i class="bi bi-trash"></i></button>
 
 
-            @* <div class="container">
-                <div class="row m-1">
-                    <div class="col-md-12">
-                        <button asp-page-handler="AddNew" type="submit" id="btnAddNew" class="btn btn-primary btn-w1">New</button>
-                        <button asp-page-handler="Save" type="submit" id="btnSave" class="btn btn-primary btn-w1">Save</button>
-
-                        <button asp-page-handler="BackPage" type="submit" id="btnBack" class="btn btn-primary btn-w1">Back</button>
-                        <div class="btn-group" role="group" aria-label="Default button group">
-                            <button type="submit" class="btn btn-outline-dark" asp-page-handler="Top"><i class="bi bi-chevron-double-left"></i></button>
-                            <button type="submit" class="btn btn-outline-dark" asp-page-handler="Next"><i class="bi bi-chevron-right"></i></button>
-                            <button type="submit" class="btn btn-outline-dark" asp-page-handler="Back"><i class="bi bi-chevron-left"></i></button>
-                            <button type="submit" class="btn btn-outline-dark" asp-page-handler="Last"><i class="bi bi-chevron-double-right"></i></button>
+                        <div class="btn-group" role="group" aria-label="Navigation Buttons" id="navigationBtns">
+                            <button type="button" class="btn ctrl ctrl-top" @onclick="MyModel.Top"><i class="bi bi-arrow-bar-left"></i></button>
+                            <button type="button" class="btn ctrl ctrl-next" @onclick="MyModel.Next"><i class="bi bi-arrow-right-short"></i></button>
+                            <button type="button" class="btn ctrl ctrl-back" @onclick="MyModel.Back"><i class="bi bi-arrow-left-short"></i></button>
+                            <button type="button" class="btn ctrl ctrl-last" @onclick="MyModel.Last"><i class="bi bi-arrow-bar-right"></i></button>
                         </div>
 
-                    </div>
-                </div>
-            </div>
- *@
-            <!--Form Buttoms-->
-            @* <div class="container bt-2 mb-2">
-                <div class="row">
-                    <div class="btn-group" role="group" aria-label="Basic example">
-                        <button type="button" class="btn btn-primary" @onclick="MyModel.New">New</button>
-                        <button type="button" class="btn btn-success" @onclick="MyModel.Save">Update</button>
-                        <button type="button" class="btn btn-info" @onclick="MyModel.Top">First</button>
-                        <button type="button" class="btn btn-info" @onclick="MyModel.Next">Next</button>
-                        <button type="button" class="btn btn-info" @onclick="MyModel.Back">Back</button>
-                        <button type="button" class="btn btn-info" @onclick="MyModel.Last">Last</button>
-
-                        @if(MyModel.Count > 0)
+                        @if (MyModel.MyVoucher.Master.Vou_No.ToUpper() != "NEW")
                         {
-                            <button type="button" class="btn btn-info" @onclick="MyModel.Print">
-                                <i class="bi bi-print-fill"></i>
-                            </button>
+                            <div class="btn-group" role="group" aria-label="Navigation Buttons" id="printBtns">
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="Print">
+                                    <i class="bi bi-printer"></i>
+                                </button>
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
+                                    <i class="bi bi-file-pdf"></i>
+                                </button>
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
+                                    <i class="bi bi-file-earmark-word"></i>
+                                </button>
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
+                                    <i class="bi bi-filetype-html"></i>
+                                </button>
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
+                                    <i class="bi bi-file-earmark-image"></i>
+                                </button>
+                            </div>
                         }
 
                         @if (MyModel.RecordFound)
                         {
-                            <button type="button" class="btn btn-warning" @onclick="MyModel.SaveAllAsync">Save</button>
+                            <button type="button" class="btn ctrl ctrl-saveAll" @onclick="MyModel.SaveAllAsync">
+                                <i class="bi bi-floppy-fill"></i>
+                            </button>
                         }
-                    </div>
+                    }
+                    <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="BackPage">
+                        <i class="bi bi-arrow-left-circle-fill"></i>
+                    </button>
+                    <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="MyModel.TestNew">
+                        <i class="bi bi-body-text"></i>
+                    </button>
                 </div>
-            </div> *@
+            </div>
 
             <!--Table Records-->
             <div class="continer">
@@ -422,7 +389,7 @@
                             <th style="width:10%">Debit</th>
                             <th style="width:10%">Credit</th>
                             <th style="width:10%">
-                                <button class="btn btn-primary" @onclick="MyModel.New">Add</button>
+                                <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
                             </th>
                         </tr>
                     </thead>
@@ -433,20 +400,21 @@
                             {
                                 @foreach (var item in MyModel.MyVoucher.Details)
                                 {
+
                                     <tr>
                                         <td>@item.Sr_No</td>
                                         <td>@item.Ref_No</td>
                                         <td>@item.TitleInvoice</td>
-                                        <td>@item.TitleAccount</td>
-                                        <td>@item.DR</td>
-                                        <td>@item.CR</td>
-                                        <td>
+                                        <td class="left">@item.TitleAccount</td>
+                                        <td class="amount">@item.DR</td>
+                                        <td class="amount">@item.CR</td>
+
                                         <td clas class="tb-col-left" s="td-btn">
                                             <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(()=> MyModel.Edit((int)item.ID2))"><i class="bi bi-pencil-fill"></i></button>
-                                            <label style="padding-left:5px; padding-right:5px;"> | </label>
-                                            <button id="btnDel" type="submit" class="btn-Del" @onclick="(()=> MyModel.Remove((int)item.ID2))"><i class="bi bi-trash-fill"></i></button>
+                                            @* <label style="padding-left:5px; padding-right:5px;"> | </label>
+                                            <button id="btnDel" type="submit" class="btn-Del" @onclick="MyModel.Remove"><i class="bi bi-trash-fill"></i></button> *@
                                         </td>
-                                        </td>
+
                                     </tr>
                                 }
                             }
@@ -456,6 +424,14 @@
                     <tfoot>
                         <tr>
                             <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>TOTAL</td>
+                            <td class="amount">@MyModel.Tot_DR</td>
+                            <td class="amount">@MyModel.Tot_CR</td>
+                            <td class="center">
+                                <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
+                            </td>
                         </tr>
                     </tfoot>
                 </table>
