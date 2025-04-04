@@ -85,22 +85,30 @@ namespace AppliedAccounts.Pages.Accounts
         }
         #endregion
 
-        public async Task SaveAll()
+        #region Save
+        public async void SaveAll()
         {
-            await MyModel.SaveAllAsync(); // Ensure save operation completes successfully
+            var IsSaved = false;
+            IsSaved = await MyModel.SaveAllAsync(); // Ensure save operation completes successfully
             await js.InvokeVoidAsync("closeModal", "SaveVoucher"); // Pass the ID as a string
-            ToastService.ShowToast(ToastClass.SaveToast);
 
+            if (IsSaved)
+            {
+                ToastService.ShowToast(ToastClass.SaveToast);
+            }
         }
+        #endregion
 
-        public void BackPage() { NavManager.NavigateTo("/Accounts/BooksList");} 
-        
 
-       
+        #region BackPage
+        public void BackPage() { NavManager.NavigateTo("/Accounts/BooksList");}
+        #endregion
+
+
 
 
     }
 
-    
+
 
 }

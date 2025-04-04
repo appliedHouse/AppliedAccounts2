@@ -27,15 +27,22 @@
         position: absolute;
         width: 150px;
         height: 100px;
-        background-color: transparent;
         margin: 9px;
+        overflow: hidden; /* Ensures the image does not overflow */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #ddd; /* Optional background */
     }
 
-    .crd-img {
-        height: auto;
-        width: auto;
-    }
+        .mnuImage img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures the image fills the frame while maintaining aspect ratio */
+            border-radius: 5px; /* Optional rounded corners */
+        }
 
+   
     .btn-div {
         position:absolute;
         top:80px;
@@ -65,7 +72,7 @@
 <section class="mnuCard">
     <div class="mnuImage">
         
-        <img class="card-img" src=@PicPath />
+        <img class="img-fluid" src=@PicPath />
     </div>
     <div class="text-msg">
         @Message;

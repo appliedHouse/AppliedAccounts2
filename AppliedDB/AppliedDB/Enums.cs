@@ -101,6 +101,12 @@ namespace AppliedDB
             Update,
             Delete
         }
+
+        public enum Status
+        {
+            Submitted,
+            Posted,
+        }
         public enum Query
         {
             SaleInvoice,

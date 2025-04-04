@@ -692,6 +692,7 @@ namespace AppliedAccounts.Data
             _Text.AppendLine("[Sr_No] INT NOT NULL, ");
             _Text.AppendLine("[TranID] INT NOT NULL,");
             _Text.AppendLine("[Ref_No] NVARCHAR(20),");
+            _Text.AppendLine("[Inv_No] INT,");
             _Text.AppendLine("[Account] INT NOT NULL,");
             _Text.AppendLine("[DR] DECIMAL, ");
             _Text.AppendLine("[CR] DECIMAL, ");

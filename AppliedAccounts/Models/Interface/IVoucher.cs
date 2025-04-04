@@ -8,7 +8,6 @@ namespace AppliedAccounts.Models.Interface
         DateTime LastVoucherDate { get; set; }
         DateTime MaxVouDate { get; set; }
         MessageClass MsgClass { get; set; }
-        bool Processing { get; set; }
         DataSource Source { get; set; }
         List<CodeTitle> Companies { get; set; } 
         List<CodeTitle> Employees { get; set; } 
@@ -18,6 +17,15 @@ namespace AppliedAccounts.Models.Interface
         AppUserModel? UserProfile { get; set; }
         int Index { get; set; }
         int Count { get; }
+
+        decimal Tot_DR { get; set; }
+        decimal Tot_CR { get; set; }
+
+        bool IsSaving { get; set; }
+
+        void CalculateTotal();
+
+
 
         #region Load Data
         bool LoadData();
@@ -41,12 +49,12 @@ namespace AppliedAccounts.Models.Interface
         #endregion
 
         #region Remove record from list
-        void Remove(int _SrNo);
+        void Remove();
         #endregion
 
         #region Add and Save Voucher
         void Save();
-        Task SaveAllAsync();
+        Task<bool> SaveAllAsync();
         #endregion
 
         #region Print

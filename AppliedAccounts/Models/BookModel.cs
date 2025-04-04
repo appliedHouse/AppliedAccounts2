@@ -18,6 +18,7 @@ namespace AppliedAccounts.Models
         public string BookNatureTitle { get; set; }
 
         public Voucher MyVoucher { get; set; }
+        public List<Detail> Deleted { get; set; } = [];
 
         public List<CodeTitle> Companies { get; set; } = [];
         public List<CodeTitle> Employees { get; set; } = [];
@@ -35,9 +36,13 @@ namespace AppliedAccounts.Models
         public int Index { get; set; } = 0;
 
         public string DataFile { get; set; }
-        public bool Processing { get; set; } = false;
 
         public int Count => MyVoucher.Details.Count;
+
+        public decimal Tot_DR { get; set; }
+        public decimal Tot_CR { get; set; }
+        public bool IsSaving { get; set; }
+        public bool IsSaved { get; set; }
 
         private int CashNatureID = 0;
         private int BankNatureID = 0;
@@ -273,80 +278,99 @@ namespace AppliedAccounts.Models
             }
         }
 
-        public async Task SaveAllAsync()
+        public async Task<bool> SaveAllAsync()
         {
-            if (!Processing)
+            IsSaved = true;
+
+            if (!IsSaving)
             {
+                IsSaving = true;
                 await Task.Run(() =>
                 {
-                    Processing = true;
-
-                    if (MyVoucher.Master.Vou_No.ToUpper().Equals("NEW"))
+                    try
                     {
-                        if (BookNature == CashNatureID)         // Cash Book Nature
+                        if (MyVoucher.Master.Vou_No.ToUpper().Equals("NEW"))
                         {
-                            MyVoucher.Master.Vou_No = NewVoucherNo.GetCashVoucher(UserProfile!.DataFile, MyVoucher.Master.Vou_Date);
+                            if (BookNature == CashNatureID)         // Cash Book Nature
+                            {
+                                MyVoucher.Master.Vou_No = NewVoucherNo.GetCashVoucher(UserProfile!.DataFile, MyVoucher.Master.Vou_Date);
+                            }
+
+                            if (BookNature == BankNatureID)         // Bank Book Nature
+                            {
+                                MyVoucher.Master.Vou_No = NewVoucherNo.GetBankVoucher(UserProfile!.DataFile, MyVoucher.Master.Vou_Date);
+                            }
                         }
 
-                        if (BookNature == BankNatureID)         // Bank Book Nature
+
+                        var Row1 = Source.GetNewRow(Tables.Book);
+
+                        Row1["ID"] = MyVoucher.Master.ID1;
+                        Row1["Vou_No"] = MyVoucher.Master.Vou_No;
+                        Row1["Vou_Date"] = MyVoucher.Master.Vou_Date;
+                        Row1["BookID"] = MyVoucher.Master.BookID;
+                        Row1["Ref_No"] = MyVoucher.Master.Vou_Date;
+                        Row1["SheetNo"] = MyVoucher.Master.SheetNo;
+                        Row1["Remarks"] = MyVoucher.Master.Remarks;
+                        Row1["Status"] = MyVoucher.Master.Status;
+                        Row1["Amount"] = MyVoucher.Details.Sum(e => e.DR) - MyVoucher.Details.Sum(e => e.CR);
+
+                        CommandClass cmdClass1 = new(Row1, Source.MyConnection);
+                        cmdClass1.SaveChanges();
+
+                        Row1["ID"] = cmdClass1.PrimaryKeyID;                // Get a new Id of record after save / insert.
+
+                        var Row2 = Source.GetNewRow(Tables.Book2);
+
+                        foreach (var item in MyVoucher.Details)
                         {
-                            MyVoucher.Master.Vou_No = NewVoucherNo.GetBankVoucher(UserProfile!.DataFile, MyVoucher.Master.Vou_Date);
+                            Row2["ID"] = item.ID2;
+                            Row2["TranID"] = Row1["ID"];
+                            Row2["SR_NO"] = item.Sr_No;
+                            Row2["COA"] = item.COA;
+                            Row2["Company"] = item.Company;
+                            Row2["Employee"] = item.Employee;
+                            Row2["Project"] = item.Project;
+                            Row2["DR"] = item.DR;
+                            Row2["CR"] = item.CR;
+                            Row2["Description"] = item.Description;
+                            Row2["Comments"] = item.Comments;
+
+                            CommandClass cmdClass2 = new(Row2, Source.MyConnection);
+                            cmdClass2.SaveChanges();
+
+
                         }
+
+                        IsSaving = false;
+
                     }
-
-
-                    var Row1 = Source.GetNewRow(Tables.Book);
-
-                    Row1["ID"] = MyVoucher.Master.ID1;
-                    Row1["Vou_No"] = MyVoucher.Master.Vou_No;
-                    Row1["Vou_Date"] = MyVoucher.Master.Vou_Date;
-                    Row1["BookID"] = MyVoucher.Master.BookID;
-                    Row1["Ref_No"] = MyVoucher.Master.Vou_Date;
-                    Row1["SheetNo"] = MyVoucher.Master.SheetNo;
-                    Row1["Remarks"] = MyVoucher.Master.Remarks;
-                    Row1["Status"] = MyVoucher.Master.Status;
-                    Row1["Amount"] = MyVoucher.Details.Sum(e => e.DR) - MyVoucher.Details.Sum(e => e.CR);
-
-                    CommandClass cmdClass1 = new(Row1, Source.MyConnection);
-                    cmdClass1.SaveChanges();
-
-                    Row1["ID"] = cmdClass1.PrimaryKeyID;                // Get a new Id of record after save / insert.
-
-                    var Row2 = Source.GetNewRow(Tables.Book2);
-
-                    foreach (var item in MyVoucher.Details)
+                    catch (Exception)
                     {
-                        Row2["ID"] = item.ID2;
-                        Row2["TranID"] = Row1["ID"];
-                        Row2["SR_NO"] = item.Sr_No;
-                        Row2["COA"] = item.COA;
-                        Row2["Company"] = item.Company;
-                        Row2["Employee"] = item.Employee;
-                        Row2["Project"] = item.Project;
-                        Row2["DR"] = item.DR;
-                        Row2["CR"] = item.CR;
-                        Row2["Description"] = item.Description;
-                        Row2["Comments"] = item.Comments;
-
-                        CommandClass cmdClass2 = new(Row2, Source.MyConnection);
-                        cmdClass2.SaveChanges();
-
+                        IsSaved = false;
 
                     }
 
-                    Processing = false;
                 });
+                IsSaving = false;
 
             }
+
+            return IsSaved;
         }
-        public void Remove(int _SrNo)
+        #endregion
+
+        #region Remove
+        public void Remove()
         {
-            MyVoucher.Detail = MyVoucher.Details.Where(row=> row.Sr_No == _SrNo).First();
-            if(MyVoucher.Detail != null)
+            if (MyVoucher.Detail != null)
             {
-                MyVoucher.Details.Remove(MyVoucher.Detail);
+                MyVoucher.Detail.action = "delete";                     // Marked record as deleted.
+                Deleted.Add(MyVoucher.Detail);                          // Add a record to delete while saving.
+                MyVoucher.Details.Remove(MyVoucher.Detail);             // Remove record from current list.
             }
         }
+
         #endregion
 
         #region Validation
@@ -419,11 +443,19 @@ namespace AppliedAccounts.Models
 
         public void Print()
         {
-            throw new NotImplementedException();
+
+        }
+
+        public void CalculateTotal()
+        {
+            Tot_DR = 0; Tot_CR = 0;
+            if (MyVoucher.Details.Count > 0)
+            {
+                Tot_DR = MyVoucher.Details.Sum(e => e.DR);
+                Tot_CR = MyVoucher.Details.Sum(e => e.CR);
+            }
         }
         #endregion
-
-
 
         #region Models
 
