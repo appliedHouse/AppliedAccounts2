@@ -198,6 +198,7 @@ namespace AppliedDB
                         CommandUpdate.Connection.Open();
                         Effected = CommandUpdate.ExecuteNonQuery();
                         CommandUpdate.Connection.Close();
+                        PrimaryKeyID = (int)CommandUpdate.Parameters["@ID"].Value;
                     }
                     catch (Exception)
                     {
@@ -216,10 +217,10 @@ namespace AppliedDB
                         Effected = CommandInsert.ExecuteNonQuery();
                         CommandInsert.Connection.Close();
                         PrimaryKeyID = (int)CommandInsert.Parameters["@ID"].Value;
-                                            }
+                    }
                     catch (Exception)
                     {
-                        MyMessages.Add(Messages.RowNotDeleted); result= false;
+                        MyMessages.Add(Messages.RowNotInserted); result= false;
                     }
 
                 }
@@ -252,6 +253,7 @@ namespace AppliedDB
                     }
                 }
             }
+            MyMessages.Add(Messages.RowNotDeleted);
             return false;
         }
     }
