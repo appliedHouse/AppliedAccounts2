@@ -1,14 +1,17 @@
 ﻿@page "/Accounts/Receipt"
-@page "/Accounts/Receipt/{ID:Int}"
+@page "/Accounts/Receipt/{ID:int}"
 @attribute [Authorize]
 @layout PageLayout
 @using AppliedAccounts.Libs
 @using AppliedAccounts.Models
 @using AppliedDB
+@using AppliedAccounts.Services
+@using Microsoft.Extensions.Hosting
 
 @inject AuthenticationStateProvider Authorized
 @inject NavigationManager NavManager
 @inject IJSRuntime js
+@inject ToastService ToastService
 
 @code {
     [Parameter] public int ID { get; set; }
@@ -27,6 +30,8 @@
         if (MyModel.MyVoucher == null) { IsPageValid = false; }
 
         MyModel.RecordFound = true;
+
+        //ToastService.OnShowToast += ShowToast;
     }
 
     private async void BrowsePayer()
@@ -45,6 +50,7 @@
         // await js.InvokeVoidAsync("showModol", "browseCodeTitle");
     }
 
+    
 
 
     private void HandleValueChanged(string newValue)
@@ -59,10 +65,6 @@
         string url = "PDFREports/Test.pdf";
         await js.InvokeVoidAsync("printPDF", url); // Path to your PDF
     }
-
-
-
-
 
 }
 
@@ -363,7 +365,7 @@
 
                         @if (MyModel.RecordFound)
                         {
-                            <button type="button" class="btn ctrl ctrl-saveAll" @onclick="MyModel.SaveAllAsync">
+                            <button type="button" class="btn ctrl ctrl-saveAll" @onclick="SaveAll">
                                 <i class="bi bi-floppy-fill"></i>
                             </button>
                         }
@@ -371,7 +373,7 @@
                     <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="BackPage">
                         <i class="bi bi-arrow-left-circle-fill"></i>
                     </button>
-                    <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="MyModel.TestNew">
+                    <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="TestRecord">
                         <i class="bi bi-body-text"></i>
                     </button>
                 </div>
@@ -382,13 +384,14 @@
                 <table class="table-list">
                     <thead>
                         <tr>
-                            <th style="width:10%">Sr. No.</th>
-                            <th style="width:10%">Ref. No.</th>
-                            <th style="width:10%">Inv. No</th>
-                            <th style="width:40%">Account</th>
+                            <th style="width:8%">Sr. No.</th>
+                            <th style="width:8%">Ref. No.</th>
+                            <th style="width:8%">Inv. No</th>
+                            <th style="width:20%">Account</th>
+                            <th style="width:20%">Project</th>
                             <th style="width:10%">Debit</th>
                             <th style="width:10%">Credit</th>
-                            <th style="width:10%">
+                            <th style="width:6%">
                                 <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
                             </th>
                         </tr>
@@ -406,8 +409,9 @@
                                         <td>@item.Ref_No</td>
                                         <td>@item.TitleInvoice</td>
                                         <td class="left">@item.TitleAccount</td>
-                                        <td class="amount">@item.DR</td>
-                                        <td class="amount">@item.CR</td>
+                                        <td class="left">@item.TitleProject</td>
+                                        <td class="amount">@item.DR.ToString(Format.Digit)</td>
+                                        <td class="amount">@item.CR.ToString(Format.Digit)</td>
 
                                         <td clas class="tb-col-left" s="td-btn">
                                             <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(()=> MyModel.Edit((int)item.ID2))"><i class="bi bi-pencil-fill"></i></button>
@@ -426,9 +430,10 @@
                             <td></td>
                             <td></td>
                             <td></td>
+                            <td></td>
                             <td>TOTAL</td>
-                            <td class="amount">@MyModel.Tot_DR</td>
-                            <td class="amount">@MyModel.Tot_CR</td>
+                            <td class="amount">@MyModel.Tot_DR.ToString(Format.Digit)</td>
+                            <td class="amount">@MyModel.Tot_CR.ToString(Format.Digit)</td>
                             <td class="center">
                                 <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
                             </td>
@@ -437,8 +442,6 @@
                 </table>
             </div>
         </div>
-
-        <button class="btn btn-primary" @onclick="BrowseCOA">Browse</button>
 
     </EditForm>
 }

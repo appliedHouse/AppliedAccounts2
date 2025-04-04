@@ -1075,7 +1075,7 @@ namespace AppliedDB
 
         public List<CodeTitle> GetInvoices()
         {
-            throw new NotImplementedException();
+            return new();
         }
 
         #endregion

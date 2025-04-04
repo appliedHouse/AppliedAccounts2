@@ -1,5 +1,5 @@
 ﻿using AppliedAccounts.Models;
-using AppliedDB;
+using AppliedAccounts.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace AppliedAccounts.Pages.Accounts
@@ -69,9 +69,36 @@ namespace AppliedAccounts.Pages.Accounts
             NavManager.NavigateTo("/Accounts/ReceiptList");
         }
 
+        private async void SaveAll()
+        {
+            var IsSaved = await MyModel.SaveAllAsync();
+            
+            await InvokeAsync(StateHasChanged);
+
+            if (IsSaved)
+            {
+                ToastService.ShowToast(ToastClass.SaveToast, $"Save | {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
+                //await Task.Delay(3000); // wait for 3 seconds
+                NavManager.NavigateTo($"/Accounts/Receipt/{MyModel.MyVoucher.Master.ID1}");
+            }
+        }
+
         public void TestRecord()
         {
-            MyModel.TestNew();
+
+            try
+            {
+                MyModel.TestNewAsync();
+                
+                
+
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowToast(ToastClass.ErrorToast, ex.Message);
+            }
+
+           
         }
     }
 }

@@ -8,7 +8,6 @@ namespace AppliedAccounts.Models.Interface
         DateTime LastVoucherDate { get; set; }
         DateTime MaxVouDate { get; set; }
         MessageClass MsgClass { get; set; }
-        bool Processing { get; set; }
         DataSource Source { get; set; }
         List<CodeTitle> Companies { get; set; } 
         List<CodeTitle> Employees { get; set; } 
@@ -21,6 +20,8 @@ namespace AppliedAccounts.Models.Interface
 
         decimal Tot_DR { get; set; }
         decimal Tot_CR { get; set; }
+
+        bool IsSaving { get; set; }
 
         void CalculateTotal();
 
@@ -53,7 +54,7 @@ namespace AppliedAccounts.Models.Interface
 
         #region Add and Save Voucher
         void Save();
-        Task SaveAllAsync();
+        Task<bool> SaveAllAsync();
         #endregion
 
         #region Print

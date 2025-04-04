@@ -1,9 +1,7 @@
 ﻿// Download Report File in Cleint
 
-
 const screenHeight = screen.height;
 document.documentElement.style.setProperty('--hight-screen', `${screenHeight}px`)
-
 
 window.downloadFile = function (fileUrl) {
     const link = document.createElement('a');
@@ -100,11 +98,11 @@ function adjustTableHeight() {
 window.addEventListener("load", adjustTableHeight);
 window.addEventListener("resize", adjustTableHeight);
 
-
-
 function printPage() {
+    // Print the entire page
     window.print();
 }
+
 
 function printDiv(divId) {
     var content = document.getElementById(divId).innerHTML;
@@ -116,6 +114,7 @@ function printDiv(divId) {
 }
 
 function printPDF(pdfUrl) {
+    // Open PDF File in New Browser Tab and print it
     var win = window.open(pdfUrl, '_blank');
     win.onload = function () {
         win.print();
