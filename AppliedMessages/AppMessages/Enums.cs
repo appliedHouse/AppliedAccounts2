@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AppMessages
+﻿namespace AppMessages
 {
     public class Enums
     {
@@ -14,12 +8,11 @@ namespace AppMessages
             NoMessage,
             Default = 1,
             Save = 2,
-            NotSave = 5,
+            NotSave =5 ,
             Delete = 4,
             NotDelete = 6,
             Insert = 3,
             NotInsert = 7,
-
 
             RowInserted,
             RowNotInserted,
@@ -51,6 +44,7 @@ namespace AppMessages
             Row_LessInv_Date,
             Row_MoreInv_Date,
             RowValueNull,
+            RowNotValidated,
 
             ColumnIsNull,
             ColumnDBNullValue,
@@ -144,6 +138,7 @@ namespace AppMessages
             MasterRecordisNull,
             DetailRecordsisNull,
             DetailRecordsAreZero,
+            
         }
 
         public enum Class

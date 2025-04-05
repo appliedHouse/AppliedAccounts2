@@ -17,6 +17,8 @@ namespace AppliedAccounts.Models.Interface
         DateTime DT_End { get; set; }
         bool PageIsValid { get; set; } = false;
 
+        string GetFilterText() { return string.Empty; }
+
         static List<DataRow> LoadData() { return []; }
 
     }

@@ -692,6 +692,7 @@ namespace AppliedAccounts.Data
             _Text.AppendLine("[Sr_No] INT NOT NULL, ");
             _Text.AppendLine("[TranID] INT NOT NULL,");
             _Text.AppendLine("[Ref_No] NVARCHAR(20),");
+            _Text.AppendLine("[Inv_No] INT,");
             _Text.AppendLine("[Account] INT NOT NULL,");
             _Text.AppendLine("[DR] DECIMAL, ");
             _Text.AppendLine("[CR] DECIMAL, ");
@@ -714,7 +715,7 @@ namespace AppliedAccounts.Data
             _Text.AppendLine("[R1].[Ref_No], ");
             _Text.AppendLine("[R1].[Payer], ");
             _Text.AppendLine("[R1].[ID] AS[ID1],");
-            _Text.AppendLine(" [P].[Title] AS[TitlePayer],");
+            _Text.AppendLine(" [C].[Title] AS[TitlePayer],");
             _Text.AppendLine("[R1].[Doc_No],");
             _Text.AppendLine("[R1].[Doc_Date],");
             _Text.AppendLine("[R1].[Pay_Mode],");

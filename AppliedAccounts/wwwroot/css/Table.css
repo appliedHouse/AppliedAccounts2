@@ -1,4 +1,5 @@
-﻿:root {
+﻿
+:root {
     --applied-pageheight: 100vh;
     --greenDark: #86A788;
     --greenMedium: #AAB99A;
@@ -7,7 +8,7 @@
     --HeadText: white;
     --BodyText: darkblue;
     --FootText: white;
-
+    --Border: #96D4D4
 }
 
 
@@ -15,6 +16,8 @@
     width: 100%;
     overflow: auto; /* Enables scrolling */
     border: 1px solid #ccc; /* Optional border */
+    margin-left: 15px;
+    margin-right: 15px;
 }
 
 .table-list {
@@ -31,13 +34,16 @@
     }
 
         .table-list thead tr {
-            background-color: var(--greenDark);
+            /*background-color: var(--greenDark);*/
+
         }
 
             .table-list thead tr th {
                 background-color: var(--greenDark);
                 color: var(--HeadText);
                 text-align: center;
+                border: 1px solid;
+                border-color: var(--Border)
             }
 
     .table-list tbody {
@@ -48,14 +54,14 @@
     }
 
         .table-list tbody tr {
-            height:40px;
+            height: 40px;
         }
 
             .table-list tbody tr td {
                 background-color: var(--greenLow);
                 padding: 8px;
                 border: 1px solid;
-                border-color: #96D4D4
+                border-color: var(--Border) 
             }
 
     .table-list tfoot {
@@ -65,88 +71,19 @@
     }
 
         .table-list tfoot tr {
-            background-color: var(--greenMedium);
+            /*background-color: var(--greenMedium);*/
         }
 
             .table-list tfoot tr td {
                 background-color: var(--greenMedium);
                 padding: 5px;
-                border: 1px solid black;
+                border: 1px solid;
+                border-color: var(--Border)
             }
 
-
-
-.tb-row-center {
-    text-align: center
-}
-
-
-.tb-col-left {
-    text-align: left;
-    padding-left: 5px;
-    padding-right: 5px;
-}
-
-.tb-col-center {
-    text-align: center;
-}
-
-.tb-col-right {
-    text-align: right;
-    padding-left: 5px;
-    padding-right: 5px;
-}
-
-
-.tb-body-row {
-}
-
-.tb-body-row-del {
-    background-color: grey;
-    color: white;
-    border-color: inherit;
-    border-style: solid;
-    border-width: 1px;
-}
-
-
-
-
-.tb-btn-add {
-    width: 30px;
-    height: 30px;
-    background-color: forestgreen;
-    color: white;
-}
-
-th-btn {
-    display: flex;
-    justify-content: center
-}
-
-
-th-btn-new {
-    width: auto;
-}
-
-
-.td-btn {
-    height: 100%;
-    width: 100%;
-    justify-content: center;
-    align-items: center; /* Center vertically as well */
-}
-
-th .btn {
-    margin: 0;
-    padding: 6px 12px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-    th .btn:hover {
-        background-color: #218838; /* Darken on hover for better visibility */
-    }
+                .table-list tfoot tr td .amount {
+                    text-align: left;
+                }
 
 .amount {
     text-align: right;
@@ -184,8 +121,17 @@ th .btn {
     text-align: right;
 }
 
+
+.left{
+    text-align:start;
+}
+
 .right {
-    text-align: right;
+    text-align: end;
+}
+
+.center{
+    text-align:center;
 }
 
 .chkbox-digit {
@@ -194,14 +140,3 @@ th .btn {
     align-content: center;
 }
 
-
-/* Table Message */
-
-.table-message {
-    width: 100%;
-    background-color: lightgray
-}
-
-    .table-message tbody tr td {
-        color: darkgoldenrod;
-    }

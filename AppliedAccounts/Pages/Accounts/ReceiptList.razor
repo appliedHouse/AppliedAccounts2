@@ -1,5 +1,158 @@
-﻿<h3>ReceiptList</h3>
+﻿@layout PageLayout;
+@page "/Accounts/ReceiptList";
+@attribute [Authorize];
+@using AppliedAccounts.Libs;
+@using AppliedAccounts.Models;
+@using AppliedAccounts.Data;
+@using AppliedDB
+@using System.Data
+
+@inject AuthenticationStateProvider authorized;
+@inject NavigationManager NavManager;
+@inject IJSRuntime js
 
 @code {
+    private string UserRoll;
+    private string DateFormat = Format.DDMMYY;
+    private string CurrFormat = Format.Currency;
+    private decimal Tot_DR = 0.0M;
+    private decimal Tot_CR = 0.0M;
+    protected override void OnInitialized()
+    {
+        UserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
+        MyModel = new(UserProfile ?? new());   // BookID and UserProfile.
+        MyModel.Source = new(UserProfile ?? new());
+
+        MyModel.PageIsValid = true;
+        if (MyModel.UserProfile is null) { MyModel.PageIsValid = false; return; }
+        if (MyModel.Source is null) { MyModel.PageIsValid = false; return; }
+    }
+
+    private void PayerListChanged(int _PayerID)
+    {
+        MyModel.PayerID = _PayerID; //result;
+
+    }
+
+    private void Edit(int ReceiptID)
+    {
+        NavManager.NavigateTo($"/Accounts/Receipt/{ReceiptID}");
+    }
+}
+
+
+@if (MyModel.PageIsValid)
+{
+    <EditForm Model="MyModel">
+        <div class="d-flex flex-row mb-3 filter">
+            <div class="p-1">From</div>
+            <div class="p-2">
+                <InputDate id="dateStat" class="item-height" @bind-Value="MyModel.DT_Start">
+
+                </InputDate>
+            </div>
+            <div class="p-1">To</div>
+            <div class="p-2">
+                <InputDate id="dateStat" class="item-height" @bind-Value="MyModel.DT_End">
+
+                </InputDate>
+            </div>
+            <div class="p-1">Search</div>
+            <div class="p-2 search-btn">
+                <label for="floatingInput">
+                    <InputText id="txtSearch" class="item-height" placeholder="Filter list"
+                               @bind-Value="MyModel.SearchText"
+                               @onclick="MyModel.RefreshData">
+                    </InputText>
+                </label>
+            </div>
+            <div class="p-2">
+                <InputSelect id="ddBook" class="item-height"
+                             TValue="int"
+                             Value="@MyModel.PayerID"
+                             ValueExpression="@(()=> MyModel.PayerID)"
+                             ValueChanged="@((e)=>PayerListChanged(e))">
+
+                    @foreach (var item in MyModel.PayerList)
+                    {
+                        <option value="@item.ID">@item.Title</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="p-2">
+                <button type="submit" class="btn btn-refresh" @onclick="MyModel.RefreshData" title="Refresh"></button>
+            </div>
+        </div>
+
+        <!-- Data List (Records)-->
+
+        <div class="table-container">
+            <table class="table-list">
+                <thead>
+                    <tr>
+                        <th style="width:5%">Vou #</th>
+                        <th style="width:5%">Date</th>
+                        <th style="width:15%">Account</th>
+                        <th style="width:15%">Payer</th>
+                        <th style="width:5%">Document #</th>
+                        <th style="width:5%">Doc. Date</th>
+                        <th style="width:5%">Ref #</th>
+                        <th style="width:5%">Amount</th>
+                        <th style="width:5%">
+                            <button class="btn btn-edit"><i class="bi bi-pencil-fill"></i></button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (MyModel.DataList is not null)
+                    {
+                        @foreach (var Item in MyModel.DataList)
+                        {
+                            int _ID = (int)Item["ID"];
+                            var _VouDate = ((DateTime)Item["Vou_Date"]).ToString(Format.DDMMMYY);
+                            var _DocDate = Item["Doc_Date"] == DBNull.Value ? "" : ((DateTime)Item["Dou_Date"]).ToString(Format.DDMMMYY); ;
+                            var _Amount = ((decimal)Item["Amount"]).ToString(Format.Digit);
+
+                            <tr>
+                                <td>@Item["Vou_No"]</td>
+                                <td>@_VouDate</td>
+                                <td class="left">@Item["TitleAccount"]</td>
+                                <td class="left">@Item["TitlePayer"]</td>
+                                <td>@Item["Doc_No"]</td>
+                                <td>@_DocDate</td>
+                                <td>@Item["Ref_No"]</td>
+                                <td class="amount">@_Amount</td>
+                                <td>
+                                    <button class="btn btn-edit" @onclick="(()=>Edit(_ID))"><i class="bi bi-pencil-fill"></i></button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </EditForm>
+
 
 }
+else
+{
+    <div class="alert alert-danger mt-2 container" role="alert">
+        Page is not valid.
+    </div>
+}
+<div>
+</div>

@@ -1,18 +1,70 @@
 ﻿@inherits LayoutComponentBase
+@using AppliedAccounts.Services
+@inject ToastService ToastService
+
+@code {
+    private ToastClass? Toast;
+
+    protected override void OnInitialized()
+    {
+        ToastService.OnShowToast += ShowToast;
+        ToastService.OnHideToast += HideToast;
+    }
+    private void ShowToast(ToastClass toast)
+    {
+        Toast = toast;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void HideToast()
+    {
+        InvokeAsync(() =>
+        {
+            Toast = null;
+            StateHasChanged();
+        });
+    }
+
+}
+
+@if (Toast?.ShowToast == true)
+{
+    <div class="toast-container position-fixed @Toast.GetPosition()" style="z-index: 9999;">
+        <div class="toast show @Toast.GetLevel()" role="alert">
+            <div class="toast-body">
+                @Toast.Message
+            </div>
+        </div>
+    </div>
+}
+
 
 
 <div class="pageLayout">
-    Applied Software House
+    <a href="/" class="home-link">Home</a>
+    <span class="title">Applied Software House</span>
 </div>
 <div class="col-12">
     @Body
 </div>
 
 <style>
-    .pageLayout{
-        position:sticky;
-        height:25px;
-        text-align:center;
+    .pageLayout {
+        position: sticky;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f0f0f0;
+        padding: 5px;
+    }
+
+    .home-link {
+        position: absolute;
+        left: 10px;
+    }
+
+    .title {
+        font-weight: bold;
     }
 </style>
-

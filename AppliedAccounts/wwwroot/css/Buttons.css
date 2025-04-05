@@ -1,31 +1,30 @@
 ﻿
-.btn{
-    width:90px;
+:root {
+    --control-bg: #F1EFEC;
+    --control-btn-bg: #EBE5C2
 }
+
 
 
 .center-btn {
     justify-content: center;
-   
 }
 
 .center-txt {
     text-align: center
-
 }
 
 .btn-print {
-    
     font-size: 1rem;
     color: darkgreen;
-    background-color:transparent;
-    border:none;
+    background-color: transparent;
+    border: none;
 }
 
-. btn-Search {
+.btn-Search {
     content: "Search";
     font-size: 2rem;
-    color:darkgreen;
+    color: darkgreen;
 }
 
 .btn-Edit {
@@ -34,7 +33,7 @@
     border: 0px;
     border-color: transparent;
     background-color: transparent;
-    width:15px;
+    width: 15px;
 }
 
 
@@ -102,15 +101,12 @@
     border: none;
 }
 
-
 .btn-post {
     font-size: 1rem;
     color: green;
     border: none;
     background-color: transparent;
 }
-
-
 
 .btn-center {
     margin: 0;
@@ -144,3 +140,77 @@
     }
 
 
+
+
+.control-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0px;
+    padding: 3px;
+    background-color: var(--control-bg);
+}
+
+    .control-buttons .ctrl-gap {
+        background-color: transparent;
+    }
+
+    .control-buttons .ctrl {
+        padding: 1px;
+        border: 0px;
+        width: 26px;
+        height: 26px;
+        margin: 3px;
+    }
+
+    .control-buttons .ctrl-new {
+        color: royalblue;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-edit {
+        color: #255F38;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-del {
+        color: orangered;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-print {
+        color: royalblue;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-top {
+        color: royalblue;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-next {
+        color: royalblue;
+        background-color: var(--control-btn-bg);
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    .control-buttons .ctrl-back {
+        color: royalblue;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-last {
+        color: royalblue;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-saveAll {
+        color: green;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-backPage {
+        color: #A5158C;
+        background-color: var(--control-btn-bg);
+    }
