@@ -2,7 +2,8 @@
 using System.Data.SQLite;
 using System.Text;
 using Tables = AppliedDB.Enums.Tables;
-using Query = AppliedDB.Enums.Query;
+using SQLQueries;
+using static AppliedDB.Enums;
 
 namespace AppliedDB
 {
@@ -20,7 +21,7 @@ namespace AppliedDB
         {
             UserProfile = _UserProfile;
             var _Connection = new Connections(_UserProfile);
-            MyConnection = _Connection.GetSQLiteClient();               // Get a connection of Client
+            MyConnection = _Connection!.GetSQLiteClient();               // Get a connection of Client
 
             if (MyConnection is not null)
             {
@@ -177,6 +178,7 @@ namespace AppliedDB
                 return new DataTable();
             }
         }
+
 
         private static DataTable GetDataTable(Tables _Table, SQLiteCommand _Command)
         {
@@ -1067,9 +1069,10 @@ namespace AppliedDB
             return new DataTable();
         }
 
-        public DataTable GetReceiptList(int receiptID)
+        public DataTable GetReceiptList(string _Filter)
         {
-            var _Table = new DataTable();
+            var _Table = GetTable(SQLQueries.Quries.ReceiptList(_Filter));
+            _Table ??= new DataTable();
             return _Table;
         }
 

@@ -24,6 +24,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\AppliedMessages\AppMessages\AppMessages.csproj" />
+		<ProjectReference Include="..\..\SQLQueries\SQLQueries.csproj" />
 	</ItemGroup>
 
 </Project>
