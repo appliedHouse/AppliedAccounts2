@@ -216,7 +216,7 @@ namespace AppReports
     }
     public class ReportData
     {
-        public string SQLQuery { get; set; } = string.Empty;
+        //public string SQLQuery { get; set; } = string.Empty;
         public DataTable ReportTable { get; set; } = new();
         public string DataSetName { get; set; } = string.Empty;
         public ReportDataSource DataSource => GetReportDataSource();

@@ -21,7 +21,8 @@ namespace AppliedAccounts.Models
         public string SearchText { get; set; }
         public string BookTitle = "Book Title";
         public bool PageIsValid { get; set; } = false;
-
+        public List<DataRow> DataList { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Enums.Tables Table { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public BookListModel() { }
         public BookListModel(int _BookID, AppUserModel _AppUserProfile)
@@ -54,16 +55,20 @@ namespace AppliedAccounts.Models
             catch (Exception)
             {
                 MsgClass.Add(Messages.PageIsNotValid);
-
             }
-
-
-            
         }
 
         public List<DataRow> LoadData() { return []; }
 
+        public string GetFilterText()
+        {
+            throw new NotImplementedException();
+        }
 
+        public void Print(int _ID)
+        {
+            throw new NotImplementedException();
+        }
     }           // END
 }
 

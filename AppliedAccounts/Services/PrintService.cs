@@ -1,7 +1,5 @@
 ﻿using AppReports;
-using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using AppliedAccounts.Data;
 
 namespace AppliedAccounts.Services
 {
@@ -12,18 +10,16 @@ namespace AppliedAccounts.Services
         public ReportType RptType { get; set; }
         public string RptUrl { get; set; }
         public string JSOption { get; set; }
-
+        public IJSRuntime JS { get; set; }
 
         public PrintService()
         {
-
         }
 
 
         public void Preview()
         {
-            //js.InvokeVoidAsync("displayPDF", RptModel.OutputReport.FileFullName);
-
+            JS.InvokeVoidAsync("displayPDF", RptModel.OutputReport.FileFullName);
         }
 
         public void Export(ReportType rptType)

@@ -4,12 +4,14 @@
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
 @using AppliedAccounts.Data;
+@using AppliedAccounts.Services
 @using AppliedDB
 @using System.Data
 
 @inject AuthenticationStateProvider authorized;
 @inject NavigationManager NavManager;
 @inject IJSRuntime js
+@inject PrintService PrintService;
 
 @code {
     private string UserRoll;
@@ -124,6 +126,7 @@
                                 <td class="amount">@_Amount</td>
                                 <td>
                                     <button class="btn btn-edit" @onclick="(()=>Edit(_ID))"><i class="bi bi-pencil-fill"></i></button>
+                                    <button class="btn btn-edit text-bg-success" @onclick="(()=>Print(_ID))"><i class="bi bi-printer-fill"></i></button>
                                 </td>
                             </tr>
                         }
