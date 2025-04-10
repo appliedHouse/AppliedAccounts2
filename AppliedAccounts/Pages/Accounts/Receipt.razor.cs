@@ -1,6 +1,7 @@
 ﻿using AppliedAccounts.Models;
 using AppliedAccounts.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace AppliedAccounts.Pages.Accounts
 {
@@ -9,6 +10,9 @@ namespace AppliedAccounts.Pages.Accounts
         public ReceiptModel MyModel { get; set; }
         public bool IsPageValid { get; set; }
         public string ErrorMessage { get; set; }
+        private bool IsWaiting { get; set; }
+        private string SpinnerMessage { get; set; }
+
 
         public Receipt()
         {
@@ -64,11 +68,14 @@ namespace AppliedAccounts.Pages.Accounts
         }
         #endregion
 
+        #region Back Page
         private void BackPage()
         {
             NavManager.NavigateTo("/Accounts/ReceiptList");
         }
+        #endregion
 
+        #region Save
         private async void SaveAll()
         {
             var IsSaved = await MyModel.SaveAllAsync();
@@ -82,6 +89,73 @@ namespace AppliedAccounts.Pages.Accounts
                 NavManager.NavigateTo($"/Accounts/Receipt/{MyModel.MyVoucher.Master.ID1}");
             }
         }
+        #endregion
+
+        #region Print
+        
+        public async Task Print(AppReports.ReportType _rptType)
+        {
+            try
+            {
+                SpinnerMessage = "Report is being generated.  Wait some wile.";
+                IsWaiting = true;
+                await Task.Run(() => { MyModel.Print(ID); MyModel.ReportService.JS = js;  });                // Initialize Report Data and Model
+                await Task.Run(() => { MyModel.ReportService.Generate(); }); // Generate Report & Create Bytes
+
+                var reportModel = MyModel.ReportService.RptModel;
+
+                if (reportModel?.ReportBytes?.Length > 0)
+                {
+                    switch (_rptType)
+                    {   
+                        case AppReports.ReportType.Print:
+                            var base64 = Convert.ToBase64String(reportModel.ReportBytes);
+                            await js.InvokeVoidAsync("printer", base64);
+                            break;
+                        case AppReports.ReportType.Preview:
+                            MyModel.ReportService.Preview();
+                            break;
+                        case AppReports.ReportType.PDF:
+                            MyModel.ReportService.PDF();
+                            break;
+                        case AppReports.ReportType.Excel:
+                            MyModel.ReportService.Excel();
+                            break;
+                        case AppReports.ReportType.Word:
+                            MyModel.ReportService.Word();
+                            break;
+                        case AppReports.ReportType.Image:
+                            MyModel.ReportService.Image();
+                            break;
+                        case AppReports.ReportType.HTML:
+                            MyModel.ReportService.HTML();
+                            break;
+                        default:
+                            break;
+                    }
+
+
+                    if(_rptType.Equals(AppReports.ReportType.Print))
+                    {
+                        
+                    }
+
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log or display error
+                Console.WriteLine($"Print error: {ex.Message}");
+            }
+            finally
+            {
+                IsWaiting = false;
+                await InvokeAsync(StateHasChanged);
+            }
+
+        }
+        #endregion
 
         public void TestRecord()
         {

@@ -58,7 +58,7 @@ namespace AppliedAccounts.Models.Interface
         #endregion
 
         #region Print
-        void Print();
+        void Print(int _ID);
         
         #endregion
     }

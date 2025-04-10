@@ -2,6 +2,7 @@
 @page "/Accounts/Receipt/{ID:int}"
 @attribute [Authorize]
 @layout PageLayout
+@using AppReports
 @using AppliedAccounts.Libs
 @using AppliedAccounts.Models
 @using AppliedDB
@@ -12,6 +13,7 @@
 @inject NavigationManager NavManager
 @inject IJSRuntime js
 @inject ToastService ToastService
+@inject PrintService PrintService
 
 @code {
     [Parameter] public int ID { get; set; }
@@ -50,7 +52,7 @@
         // await js.InvokeVoidAsync("showModol", "browseCodeTitle");
     }
 
-    
+
 
 
     private void HandleValueChanged(string newValue)
@@ -92,45 +94,48 @@
 
 @if (IsPageValid)
 {
-    <EditForm Model="MyModel">
-        <div class="container" id="formContainer">
-            <div class="row g-1 p-1">
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputText @bind-Value="MyModel.MyVoucher.Master.Vou_No" id="txtVouNo" class="form-control input-sm" placeholder="Voucher No." />
-                        <label for="txtVouDate">Voucher No</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputDate @bind-Value="MyModel.MyVoucher.Master.Vou_Date" id="txtVouDate" class="form-control input-sm" placeholder="Voucher Date" />
-                        <label for="txtVouDate">Voucher Date</label>
-                    </div>
+    @if (!IsWaiting)
+    {
 
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputText @bind-Value="MyModel.MyVoucher.Master.Ref_No" id="txtRefNo" class="form-control input-sm" placeholder="Reference No." />
-                        <label for="txtRefNo">Reference No.</label>
+        <EditForm Model="MyModel">
+            <div class="container" id="formContainer">
+                <div class="row g-1 p-1">
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputText @bind-Value="MyModel.MyVoucher.Master.Vou_No" id="txtVouNo" class="form-control input-sm" placeholder="Voucher No." />
+                            <label for="txtVouDate">Voucher No</label>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputText @bind-Value="MyModel.MyVoucher.Master.Pay_Mode" id="txtPayMode" class="form-control input-sm" placeholder="Payment Mode" />
-                        <label for="txtPayMode">Payment Mode</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row g-1 p-1">
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputSelect id="ddAccounts" class="form-control item-height"
-                                     TValue="int" @onclick="BrowseCOA"
-                                     Value="@MyModel.MyVoucher.Master.COA"
-                                     ValueExpression="@(() => @MyModel.MyVoucher.Master.COA)"
-                                     ValueChanged="@((e) => COAIDChanged(e))">
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputDate @bind-Value="MyModel.MyVoucher.Master.Vou_Date" id="txtVouDate" class="form-control input-sm" placeholder="Voucher Date" />
+                            <label for="txtVouDate">Voucher Date</label>
+                        </div>
 
-                            @if (MyModel.PayCOA.Any())
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputText @bind-Value="MyModel.MyVoucher.Master.Ref_No" id="txtRefNo" class="form-control input-sm" placeholder="Reference No." />
+                            <label for="txtRefNo">Reference No.</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputText @bind-Value="MyModel.MyVoucher.Master.Pay_Mode" id="txtPayMode" class="form-control input-sm" placeholder="Payment Mode" />
+                            <label for="txtPayMode">Payment Mode</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-1 p-1">
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputSelect id="ddAccounts" class="form-control item-height"
+                            TValue="int" @onclick="BrowseCOA"
+                            Value="@MyModel.MyVoucher.Master.COA"
+                            ValueExpression="@(() => @MyModel.MyVoucher.Master.COA)"
+                            ValueChanged="@((e) => COAIDChanged(e))">
+
+                                @if (MyModel.PayCOA.Any())
                             {
                                 @foreach (var item in MyModel.PayCOA)
                                 {
@@ -150,10 +155,10 @@
                 <div class="col-md-3">
                     <div class="form-floating">
                         <InputSelect id="ddPayer" class="form-control item-height"
-                                     TValue="int" @onclick="BrowseCOA"
-                                     Value="@MyModel.MyVoucher.Master.Payer"
-                                     ValueExpression="@(() => @MyModel.MyVoucher.Master.Payer)"
-                                     ValueChanged="@((e) => PayerIDChanged(e))">
+                        TValue="int" @onclick="BrowseCOA"
+                        Value="@MyModel.MyVoucher.Master.Payer"
+                        ValueExpression="@(() => @MyModel.MyVoucher.Master.Payer)"
+                        ValueChanged="@((e) => PayerIDChanged(e))">
                             @if (MyModel.Companies.Any())
                             {
                                 @foreach (var item in MyModel.Companies)
@@ -222,10 +227,10 @@
                 <div class="col-md-3">
                     <div class="form-floating">
                         <InputSelect id="ddProject" class="form-control item-height"
-                                     TValue="int" @onclick="BrowseCOA"
-                                     Value="@MyModel.MyVoucher.Detail.Project"
-                                     ValueExpression="@(() => @MyModel.MyVoucher.Detail.Project)"
-                                     ValueChanged="@((e) => ProjectIDChanged(e))">
+                        TValue="int" @onclick="BrowseCOA"
+                        Value="@MyModel.MyVoucher.Detail.Project"
+                        ValueExpression="@(() => @MyModel.MyVoucher.Detail.Project)"
+                        ValueChanged="@((e) => ProjectIDChanged(e))">
 
                             @if (MyModel.Projects.Any())
                             {
@@ -246,10 +251,10 @@
                 <div class="col-md-3">
                     <div class="form-floating">
                         <InputSelect id="ddEmployee" class="form-control item-height"
-                                     TValue="int" @onclick="BrowseCOA"
-                                     Value="@MyModel.MyVoucher.Detail.Employee"
-                                     ValueExpression="@(() => @MyModel.MyVoucher.Detail.Employee)"
-                                     ValueChanged="@((e) => EmployeeIDChanged(e))">
+                        TValue="int" @onclick="BrowseCOA"
+                        Value="@MyModel.MyVoucher.Detail.Employee"
+                        ValueExpression="@(() => @MyModel.MyVoucher.Detail.Employee)"
+                        ValueChanged="@((e) => EmployeeIDChanged(e))">
 
                             @if (MyModel.Employees.Any())
                             {
@@ -276,10 +281,10 @@
                     <div class="form-floating">
 
                         <InputSelect id="ddAccounts" class="form-control item-height"
-                                     TValue="int" @onclick="BrowseCOA"
-                                     Value="@MyModel.MyVoucher.Detail.Account"
-                                     ValueExpression="@(() => @MyModel.MyVoucher.Detail.Account)"
-                                     ValueChanged="@((e) => AccountIDChanged(e))">
+                        TValue="int" @onclick="BrowseCOA"
+                        Value="@MyModel.MyVoucher.Detail.Account"
+                        ValueExpression="@(() => @MyModel.MyVoucher.Detail.Account)"
+                        ValueChanged="@((e) => AccountIDChanged(e))">
 
                             @if (MyModel.Accounts.Any())
                             {
@@ -325,7 +330,7 @@
                     <button @onclick="MyModel.Save" class="btn ctrl ctrl-edit"><i class="bi bi-floppy"></i></button>
                     @if (MyModel.Count > 0)
                     {
-                        
+
                         <button @onclick="MyModel.Remove" class="btn ctrl ctrl-del"><i class="bi bi-trash"></i></button>
 
 
@@ -339,111 +344,117 @@
                         @if (MyModel.MyVoucher.Master.Vou_No.ToUpper() != "NEW")
                         {
                             <div class="btn-group" role="group" aria-label="Navigation Buttons" id="printBtns">
-                                <button type="button" class="btn ctrl ctrl-print" @onclick="Print">
-                                    <i class="bi bi-printer"></i>
-                                </button>
-                                <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
-                                    <i class="bi bi-search"></i>
-                                </button>
-                                <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
-                                    <i class="bi bi-file-pdf"></i>
-                                </button>
-                                <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
-                                    <i class="bi bi-file-earmark-excel"></i>
-                                </button>
-                                <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
-                                    <i class="bi bi-file-earmark-word"></i>
-                                </button>
-                                <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
-                                    <i class="bi bi-filetype-html"></i>
-                                </button>
-                                <button type="button" class="btn ctrl ctrl-print" @onclick="MyModel.Print">
-                                    <i class="bi bi-file-earmark-image"></i>
-                                </button>
-                            </div>
-                        }
+                                    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Print);})">
+                                        <i class="bi bi-printer"></i>
+                                    </button>
 
-                        @if (MyModel.RecordFound)
-                        {
-                            <button type="button" class="btn ctrl ctrl-saveAll" @onclick="SaveAll">
-                                <i class="bi bi-floppy-fill"></i>
-                            </button>
+                                    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Preview);})">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+                                    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.PDF);})">
+                                        <i class="bi bi-file-pdf"></i>
+                                    </button>
+                                    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Excel);})">
+                                        <i class="bi bi-file-earmark-excel"></i>
+                                    </button>
+                                    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Word);})">
+                                        <i class="bi bi-file-earmark-word"></i>
+                                    </button>
+                                    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.HTML);})">
+                                        <i class="bi bi-filetype-html"></i>
+                                    </button>
+                                    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Image);})">
+                                        <i class="bi bi-file-earmark-image"></i>
+                                    </button>
+                                </div>
+                            }
+
+                            @if (MyModel.RecordFound)
+                            {
+                                <button type="button" class="btn ctrl ctrl-saveAll" @onclick="SaveAll">
+                                    <i class="bi bi-floppy-fill"></i>
+                                </button>
+                            }
                         }
-                    }
-                    <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="BackPage">
-                        <i class="bi bi-arrow-left-circle-fill"></i>
-                    </button>
-                    <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="TestRecord">
-                        <i class="bi bi-body-text"></i>
-                    </button>
+                        <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="BackPage">
+                            <i class="bi bi-arrow-left-circle-fill"></i>
+                        </button>
+                        <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="TestRecord">
+                            <i class="bi bi-body-text"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!--Table Records-->
+                <div class="continer">
+                    <table class="table-list">
+                        <thead>
+                            <tr>
+                                <th style="width:8%">Sr. No.</th>
+                                <th style="width:8%">Ref. No.</th>
+                                <th style="width:8%">Inv. No</th>
+                                <th style="width:20%">Account</th>
+                                <th style="width:20%">Project</th>
+                                <th style="width:10%">Debit</th>
+                                <th style="width:10%">Credit</th>
+                                <th style="width:6%">
+                                    <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (MyModel.MyVoucher.Details is not null)
+                            {
+                                @if (MyModel.MyVoucher.Details.Count > 0)
+                                {
+                                    @foreach (var item in MyModel.MyVoucher.Details)
+                                    {
+
+                                        <tr>
+                                            <td>@item.Sr_No</td>
+                                            <td>@item.Ref_No</td>
+                                            <td>@item.TitleInvoice</td>
+                                            <td class="left">@item.TitleAccount</td>
+                                            <td class="left">@item.TitleProject</td>
+                                            <td class="amount">@item.DR.ToString(Format.Digit)</td>
+                                            <td class="amount">@item.CR.ToString(Format.Digit)</td>
+
+                                            <td clas class="tb-col-left" s="td-btn">
+                                                <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(()=> MyModel.Edit((int)item.ID2))"><i class="bi bi-pencil-fill"></i></button>
+                                                @* <label style="padding-left:5px; padding-right:5px;"> | </label>
+                                            <button id="btnDel" type="submit" class="btn-Del" @onclick="MyModel.Remove"><i class="bi bi-trash-fill"></i></button> *@
+                                            </td>
+
+                                        </tr>
+                                    }
+                                }
+                            }
+
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>TOTAL</td>
+                                <td class="amount">@MyModel.Tot_DR.ToString(Format.Digit)</td>
+                                <td class="amount">@MyModel.Tot_CR.ToString(Format.Digit)</td>
+                                <td class="center">
+                                    <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
 
-            <!--Table Records-->
-            <div class="continer">
-                <table class="table-list">
-                    <thead>
-                        <tr>
-                            <th style="width:8%">Sr. No.</th>
-                            <th style="width:8%">Ref. No.</th>
-                            <th style="width:8%">Inv. No</th>
-                            <th style="width:20%">Account</th>
-                            <th style="width:20%">Project</th>
-                            <th style="width:10%">Debit</th>
-                            <th style="width:10%">Credit</th>
-                            <th style="width:6%">
-                                <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (MyModel.MyVoucher.Details is not null)
-                        {
-                            @if (MyModel.MyVoucher.Details.Count > 0)
-                            {
-                                @foreach (var item in MyModel.MyVoucher.Details)
-                                {
-
-                                    <tr>
-                                        <td>@item.Sr_No</td>
-                                        <td>@item.Ref_No</td>
-                                        <td>@item.TitleInvoice</td>
-                                        <td class="left">@item.TitleAccount</td>
-                                        <td class="left">@item.TitleProject</td>
-                                        <td class="amount">@item.DR.ToString(Format.Digit)</td>
-                                        <td class="amount">@item.CR.ToString(Format.Digit)</td>
-
-                                        <td clas class="tb-col-left" s="td-btn">
-                                            <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(()=> MyModel.Edit((int)item.ID2))"><i class="bi bi-pencil-fill"></i></button>
-                                            @* <label style="padding-left:5px; padding-right:5px;"> | </label>
-                                            <button id="btnDel" type="submit" class="btn-Del" @onclick="MyModel.Remove"><i class="bi bi-trash-fill"></i></button> *@
-                                        </td>
-
-                                    </tr>
-                                }
-                            }
-                        }
-
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>TOTAL</td>
-                            <td class="amount">@MyModel.Tot_DR.ToString(Format.Digit)</td>
-                            <td class="amount">@MyModel.Tot_CR.ToString(Format.Digit)</td>
-                            <td class="center">
-                                <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-
-    </EditForm>
+        </EditForm>
+    }
+    else
+    {
+        <ShowSpinner Message="@SpinnerMessage" />
+    }
 }
 else
 {

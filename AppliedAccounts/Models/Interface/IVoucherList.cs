@@ -1,11 +1,13 @@
-﻿using AppliedDB;
+﻿using AppliedAccounts.Services;
+using AppliedDB;
 using AppMessages;
 using System.Data;
 using static AppliedDB.Enums;
 
 namespace AppliedAccounts.Models.Interface
 {
-    public class IVoucherList
+
+    public interface IVoucherList
     {
         AppUserModel? UserProfile { get; set; }
         DataSource Source { get; set; }
@@ -13,13 +15,15 @@ namespace AppliedAccounts.Models.Interface
         Tables Table { get; set; }
         string SearchText { get; set; }
         MessageClass MsgClass { get; set; }
+        PrintService Printer { get; set; }
         DateTime DT_Start { get; set; }
         DateTime DT_End { get; set; }
-        bool PageIsValid { get; set; } = false;
+        bool PageIsValid { get; set; }
 
-        string GetFilterText() { return string.Empty; }
+        string GetFilterText(); //{ return string.Empty; }
 
-        static List<DataRow> LoadData() { return []; }
-
+        void Print(int _ID);
+        
+        List<DataRow> LoadData(); // { return []; }
     }
 }

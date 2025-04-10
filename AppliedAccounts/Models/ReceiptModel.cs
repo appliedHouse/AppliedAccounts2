@@ -6,6 +6,9 @@ using System.Data;
 using SQLQueries;
 using MESSAGE = AppMessages.Enums.Messages;
 using static AppliedDB.Enums;
+using AppliedAccounts.Services;
+using AppliedAccounts.Pages.Accounts;
+using AppReports;
 
 namespace AppliedAccounts.Models
 {
@@ -17,6 +20,7 @@ namespace AppliedAccounts.Models
         public DateTime LastVoucherDate { get; set; }
         public DateTime MaxVouDate { get; set; }
         public MessageClass MsgClass { get; set; }
+        public PrintService ReportService { get; set; }
         public Voucher MyVoucher { get; set; }
         public List<Detail> Deleted { get; set; }
         public bool Processing { get; set; }
@@ -38,6 +42,8 @@ namespace AppliedAccounts.Models
         public decimal Tot_CR { get; set; }
 
         public bool IsSaving { get; set; } = false;
+        public ReportType rptType { get; set; }
+
 
         #endregion
 
@@ -311,7 +317,6 @@ namespace AppliedAccounts.Models
 
         #endregion
 
-
         #region Save
         public void Save()
         {
@@ -426,7 +431,6 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-
         public void TestNewAsync()
         {
             Voucher _NewVoucher = new();
@@ -475,8 +479,6 @@ namespace AppliedAccounts.Models
             MyVoucher = _NewVoucher;
         }
 
-
-
         #region Navigation of Records
         public void Top()
         {
@@ -516,17 +518,66 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Print
-        public void Print()
+        public void Print(int _ID)
         {
-
-            //await js.InvokeVoidAsync("printPDF", "/PDFReports/Test.pdf"); // Path to your PDF
+            ReportService = new()
+            {
+                RptData = GetReportData(_ID),              // always generate Data for report
+                RptModel = CreateReportModel(_ID),         // and then generate report parameters
+            };
+            //ReportService.RptType = ReportType.Preview;
+            //var ReportList = ReportService.GetReportLink();
         }
 
+        public ReportData GetReportData(int ID)
+        {
+            var _Query = Quries.Receipt(ID);
+            var _Table = Source.GetTable(_Query);
+            var _ReportData = new ReportData();
+
+            _ReportData.ReportTable = _Table;
+            _ReportData.DataSetName = "ds_receipt";
+
+            return _ReportData;
+        }
+
+        private ReportModel CreateReportModel(int ID)
+        {
+            var _InvoiceNo = "Receipt";
+            var _Heading1 = "Receipt";
+            var _Heading2 = $"REceipt No. {_InvoiceNo}";
+            var _ReportPath = UserProfile!.ReportFolder;
+            var _CompanyName = UserProfile.Company;
+            var _ReportFooter = AppFunctions.ReportFooter();
+
+            ReportModel rptModel = new();
+
+            rptModel.InputReport.FileName = $"Receipt";
+            rptModel.InputReport.FileExtention = "rdl";
+            rptModel.InputReport.FilePath = UserProfile!.ReportFolder;
+
+            rptModel.OutputReport.FileName = $"Receipt_{ID}";
+            rptModel.OutputReport.FileExtention = ".pdf";
+            rptModel.OutputReport.FilePath = UserProfile!.PDFFolder;
+            rptModel.OutputReport.ReportType = ReportType.PDF;
+
+            rptModel.AddReportParameter("CompanyName", _CompanyName);
+            rptModel.AddReportParameter("Heading1", _Heading1);
+            rptModel.AddReportParameter("Heading2", _Heading2);
+            rptModel.AddReportParameter("Footer", _ReportFooter);
+
+            return rptModel;
+        }
+        #endregion
+
+        #region Remove
         public void Remove(int _SrNo)
         {
             throw new NotImplementedException();
         }
+        #endregion
 
+        #region Calculation
         public void CalculateTotal()
         {
             Tot_DR = 0; Tot_CR = 0;
