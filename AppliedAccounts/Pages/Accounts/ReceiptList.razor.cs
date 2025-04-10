@@ -16,7 +16,6 @@ namespace AppliedAccounts.Pages.Accounts
         public string SpinnerMessage { get; set; }
         public ReceiptList()
         {
-
             IsWaiting = false;
         }
 
@@ -24,18 +23,25 @@ namespace AppliedAccounts.Pages.Accounts
         {
             try
             {
-                SpinnerMessage = "Report is being generated.  Wait some wile.";
+                SpinnerMessage = "Report is being generated.  Wait for some while.";
                 IsWaiting = true;
-                await Task.Run(()=> { MyModel.Print(ID); }); // Generate Report
+
+                await Task.Run(() =>
+                {
+                    MyModel.Print(ID);
+                    MyModel.ReportService.JS = js;                              // Inject js into Print Servce
+                    MyModel.ReportService.NavManager = NavManager;              // Inject NavManager into Print Service
+                });
 
                 var reportModel = MyModel.ReportService.RptModel;
 
                 if (reportModel?.ReportBytes?.Length > 0)
                 {
-                    var reportName = reportModel.OutputReport.FileName + ID.ToString();
-                    var reportBytes = reportModel.ReportBytes;
+                    //var reportName = reportModel.OutputReport.FileName + ID.ToString();
+                    var base64 = Convert.ToBase64String(reportModel.ReportBytes);
+                    await js.InvokeVoidAsync("printer", base64);
 
-                    await js.InvokeVoidAsync("downloadPDF", reportName, reportBytes);
+                    //await js.InvokeVoidAsync("downloadPDF", reportName, reportBytes);
                 }
             }
             catch (Exception ex)
@@ -54,7 +60,7 @@ namespace AppliedAccounts.Pages.Accounts
         {
             try
             {
-                SpinnerMessage = "Report is being generated.  Wait some wile.";
+                SpinnerMessage = "Report is being generated.  Wait for some while.";
                 IsWaiting = true;
                 await Task.Run(() => { MyModel.Print(ID); }); // Generate Report
                 
@@ -70,7 +76,6 @@ namespace AppliedAccounts.Pages.Accounts
                 await InvokeAsync(StateHasChanged);
                 PrintService.Preview();
             }
-
         }
 
     }

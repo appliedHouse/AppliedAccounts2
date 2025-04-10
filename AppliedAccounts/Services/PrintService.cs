@@ -1,5 +1,5 @@
-﻿using AppliedAccounts.Pages.Testing;
-using AppReports;
+﻿using AppReports;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace AppliedAccounts.Services
@@ -12,44 +12,11 @@ namespace AppliedAccounts.Services
         public string RptUrl { get; set; }
         public string JSOption { get; set; }
         public IJSRuntime JS { get; set; }
+        public NavigationManager NavManager { get; set; }
+        public string DownLoadPath = "PDFReports";
 
         public PrintService()
         {
-        }
-
-
-        public void Preview()
-        {
-            
-            RptModel.ReportRender(ReportType.Preview);
-            JS.InvokeVoidAsync("DisplayPDF", RptModel.ReportBytes);
-        }
-
-
-        public void Export(ReportType rptType)
-        {
-            switch (rptType)    
-            {
-                case ReportType.Print:
-                    break;
-                case ReportType.Preview:
-                    JS.InvokeVoidAsync("displayPDF", RptModel.OutputReport.FileFullName);
-                    break;
-                case ReportType.PDF:
-                    break;
-                case ReportType.Excel:
-                    break;
-                case ReportType.Word:
-                    break;
-                case ReportType.Image:
-                    break;
-                case ReportType.HTML:
-                    break;
-                default:
-                    break;
-            }
-
-            
         }
 
         public byte[] Generate()
@@ -76,9 +43,9 @@ namespace AppliedAccounts.Services
                 if (RptModel.ReportRender())
                 {
                     if (RptType == ReportType.Preview)
-                    { JSOption = DownloadOption.displayPDF.ToString(); }
+                    { JSOption = "displayPDF"; }
                     else
-                    { JSOption = DownloadOption.downloadFile.ToString(); }
+                    { JSOption = "downloadFile"; }
                     return JSOption;
                 }
             }
@@ -93,35 +60,48 @@ namespace AppliedAccounts.Services
             return RptUrl;
         }
 
+
+        public void Preview()
+        {
+            RptModel.ReportRender(ReportType.Preview);
+            JS.InvokeVoidAsync("DisplayPDF", RptModel.ReportBytes);
+        }
+
         internal void PDF()
         {
-            throw new NotImplementedException();
+            RptModel.ReportRender(ReportType.PDF);
+            JS.InvokeVoidAsync("downloadPDF", RptModel.OutputReport.FileName, RptModel.ReportBytes);
         }
 
         internal void Excel()
         {
-            throw new NotImplementedException();
+            RptModel.ReportRender(ReportType.Excel);
+
+            var FileLink = $"{NavManager.BaseUri}{DownLoadPath}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
+            NavManager.NavigateTo(FileLink, forceLoad: true);
         }
 
         internal void Word()
         {
-            throw new NotImplementedException();
+            RptModel.ReportRender(ReportType.Word);
+
+            var FileLink = $"{NavManager.BaseUri}{DownLoadPath}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
+            NavManager.NavigateTo(FileLink, forceLoad: true);
         }
 
         internal void Image()
         {
-            throw new NotImplementedException();
+            RptModel.ReportRender(ReportType.Image);
+            var FileLink = $"{NavManager.BaseUri}{DownLoadPath}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
+            NavManager.NavigateTo(FileLink, forceLoad: true);
+            //JS.InvokeVoidAsync("open", FileLink, "_blank");
         }
 
         internal void HTML()
         {
-            throw new NotImplementedException();
-        }
-
-        public enum DownloadOption
-        {
-            displayPDF,
-            downloadFile,
+            RptModel.ReportRender(ReportType.HTML);
+            var FileLink = $"{NavManager.BaseUri}{DownLoadPath}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
+            JS.InvokeVoidAsync("open", FileLink, "_blank");
         }
     }
 }

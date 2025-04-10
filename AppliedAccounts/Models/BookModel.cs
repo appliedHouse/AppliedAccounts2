@@ -41,7 +41,7 @@ namespace AppliedAccounts.Models
 
         public decimal Tot_DR { get; set; }
         public decimal Tot_CR { get; set; }
-        public bool IsSaving { get; set; }
+        public bool IsWaiting { get; set; }
         public bool IsSaved { get; set; }
 
         private int CashNatureID = 0;
@@ -282,9 +282,9 @@ namespace AppliedAccounts.Models
         {
             IsSaved = true;
 
-            if (!IsSaving)
+            if (!IsWaiting)
             {
-                IsSaving = true;
+                IsWaiting = true;
                 await Task.Run(() =>
                 {
                     try
@@ -342,7 +342,7 @@ namespace AppliedAccounts.Models
 
                         }
 
-                        IsSaving = false;
+                        IsWaiting = false;
 
                     }
                     catch (Exception)
@@ -352,7 +352,7 @@ namespace AppliedAccounts.Models
                     }
 
                 });
-                IsSaving = false;
+                IsWaiting = false;
 
             }
 

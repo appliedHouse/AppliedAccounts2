@@ -79,68 +79,74 @@ namespace AppliedAccounts.Pages.Accounts
         private async void SaveAll()
         {
             var IsSaved = await MyModel.SaveAllAsync();
-            
+
             await InvokeAsync(StateHasChanged);
 
             if (IsSaved)
             {
                 ToastService.ShowToast(ToastClass.SaveToast, $"Save | {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
-                //await Task.Delay(3000); // wait for 3 seconds
                 NavManager.NavigateTo($"/Accounts/Receipt/{MyModel.MyVoucher.Master.ID1}");
             }
         }
         #endregion
 
         #region Print
-        
+
         public async Task Print(AppReports.ReportType _rptType)
         {
             try
             {
-                SpinnerMessage = "Report is being generated.  Wait some wile.";
+                SpinnerMessage = "Report File is being generated.  Wait for  some while.";
                 IsWaiting = true;
-                await Task.Run(() => { MyModel.Print(ID); MyModel.ReportService.JS = js;  });                // Initialize Report Data and Model
-                await Task.Run(() => { MyModel.ReportService.Generate(); }); // Generate Report & Create Bytes
-
+                
+                await Task.Run(() =>
+                {
+                    MyModel.Print(ID);
+                    MyModel.ReportService.JS = js;                              // Inject js into Print Servce
+                    MyModel.ReportService.NavManager = NavManager;              // Inject NavManager into Print Service
+                });                
+                
                 var reportModel = MyModel.ReportService.RptModel;
 
                 if (reportModel?.ReportBytes?.Length > 0)
                 {
                     switch (_rptType)
-                    {   
+                    {
                         case AppReports.ReportType.Print:
                             var base64 = Convert.ToBase64String(reportModel.ReportBytes);
                             await js.InvokeVoidAsync("printer", base64);
                             break;
                         case AppReports.ReportType.Preview:
                             MyModel.ReportService.Preview();
+                            ToastService.ShowToast(ToastClass.DownLoadToast, $"Preview | {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
                             break;
                         case AppReports.ReportType.PDF:
                             MyModel.ReportService.PDF();
+                            ToastService.ShowToast(ToastClass.DownLoadToast, "PDF File has been download."); // show the toast
                             break;
                         case AppReports.ReportType.Excel:
                             MyModel.ReportService.Excel();
+                            ToastService.ShowToast(ToastClass.DownLoadToast, "Excel File has been download."); // show the toast
                             break;
                         case AppReports.ReportType.Word:
                             MyModel.ReportService.Word();
+                            ToastService.ShowToast(ToastClass.DownLoadToast, "Word File has been download."); // show the toast
                             break;
                         case AppReports.ReportType.Image:
                             MyModel.ReportService.Image();
+                            
+                            ToastService.ShowToast(ToastClass.DownLoadToast, "Image File has been download."); // show the toast
                             break;
                         case AppReports.ReportType.HTML:
                             MyModel.ReportService.HTML();
+                            ToastService.ShowToast(ToastClass.DownLoadToast, "HTML File has been download."); // show the toast
                             break;
                         default:
                             break;
                     }
 
 
-                    if(_rptType.Equals(AppReports.ReportType.Print))
-                    {
-                        
-                    }
 
-                    
                 }
             }
             catch (Exception ex)
@@ -163,8 +169,8 @@ namespace AppliedAccounts.Pages.Accounts
             try
             {
                 MyModel.TestNewAsync();
-                
-                
+
+
 
             }
             catch (Exception ex)
@@ -172,7 +178,7 @@ namespace AppliedAccounts.Pages.Accounts
                 ToastService.ShowToast(ToastClass.ErrorToast, ex.Message);
             }
 
-           
+
         }
     }
 }

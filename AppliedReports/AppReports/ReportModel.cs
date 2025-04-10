@@ -1,5 +1,7 @@
-﻿using Microsoft.Reporting.NETCore;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.Reporting.NETCore;
 using System.Data;
+
 
 
 namespace AppReports
@@ -14,11 +16,14 @@ namespace AppReports
         public byte[] ReportBytes { get; set; }
         public bool IsReportRendered { get; set; } = false;
         public string ReportUrl { get; set; } = string.Empty;
+        public string ReportPath { get; set; } = string.Empty;
 
         public List<ReportParameter> ReportParameters { get; set; }
         //public bool Render => ReportRender();
         private readonly string DateTimeFormat = "yyyy-MM-dd [hh:mm:ss]";
         private string DateTimeNow => DateTime.Now.ToString(DateTimeFormat);
+        public NavigationManager NavManager { get; set; }
+        
         #endregion
 
         #region Constructor
@@ -32,10 +37,9 @@ namespace AppReports
             ReportBytes = Array.Empty<byte>();
 
             Messages.Add($"{DateTimeNow}: Report Class Started.");
+            ReportPath = "PDFReports/";
 
         }
-
-
 
 
         #endregion
@@ -146,6 +150,9 @@ namespace AppReports
                     OutputReport.FileStream = fstream;
                     Messages.Add($"{DateTimeNow}: Report saved sucessfully");
                     Messages.Add($"{DateTimeNow}: Created a file {_FileName}");
+
+                    ReportUrl = $"{OutputReport.FilePath}/{OutputReport.FileName}{OutputReport.FileExtention}";
+
                 }
             }
             else

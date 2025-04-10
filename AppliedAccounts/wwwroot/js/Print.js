@@ -31,6 +31,16 @@ function downloadPDF(fileName, byteArray) {
     URL.revokeObjectURL(link.href); // Clean up the object URL
 }
 
+function downloadFile(fileName, byteArray, mimeType) {
+    const blob = new Blob([byteArray], { type: mimeType });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(link.href); // Clean up the object URL
+}
+
+
 function DisplayPDF(byteArray) {
     const bytes = new Uint8Array(byteArray);
     const blob = new Blob([bytes], { type: "application/pdf" });

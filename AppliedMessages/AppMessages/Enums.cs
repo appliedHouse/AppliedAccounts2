@@ -137,7 +137,7 @@
             MasterRecordisNull = 201,
             DetailRecordsisNull = 203,
             DetailRecordsAreZero = 205,
-            
+            AmountNotEqual = 218,
         }
 
         public enum Class

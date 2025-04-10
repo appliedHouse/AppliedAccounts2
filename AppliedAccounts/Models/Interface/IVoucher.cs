@@ -21,7 +21,7 @@ namespace AppliedAccounts.Models.Interface
         decimal Tot_DR { get; set; }
         decimal Tot_CR { get; set; }
 
-        bool IsSaving { get; set; }
+        bool IsWaiting { get; set; }
 
         void CalculateTotal();
 

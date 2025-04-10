@@ -7,7 +7,6 @@ using SQLQueries;
 using MESSAGE = AppMessages.Enums.Messages;
 using static AppliedDB.Enums;
 using AppliedAccounts.Services;
-using AppliedAccounts.Pages.Accounts;
 using AppReports;
 
 namespace AppliedAccounts.Models
@@ -41,8 +40,9 @@ namespace AppliedAccounts.Models
         public decimal Tot_DR { get; set; }
         public decimal Tot_CR { get; set; }
 
-        public bool IsSaving { get; set; } = false;
+        public bool IsWaiting { get; set; } = false;
         public ReportType rptType { get; set; }
+
 
 
         #endregion
@@ -177,6 +177,21 @@ namespace AppliedAccounts.Models
 
             return IsValid;
         }
+
+        public bool IsAmountEqual()
+        {
+            
+            decimal _Amount1 = MyVoucher.Master.Amount;
+            decimal _Amount2 = CalculateNetAmount();
+
+            if (_Amount1 != _Amount2)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         #endregion
 
         #region Load Data
@@ -338,11 +353,19 @@ namespace AppliedAccounts.Models
 
         public async Task<bool> SaveAllAsync()
         {
-            var IsSaved = true;
-            if (!IsSaving)
+            MsgClass = new();
+            if (!IsAmountEqual())
             {
-                IsSaving = true;
-                MsgClass = new();
+                MsgClass.Add(MESSAGE.AmountNotEqual);
+                return false;
+            }
+
+
+            var IsSaved = true;
+            if (!IsWaiting)
+            {
+                IsWaiting = true;
+               
 
                 await Task.Run(() =>
                 {
@@ -416,7 +439,7 @@ namespace AppliedAccounts.Models
                     }
                 });
 
-                IsSaving = false;
+                IsWaiting = false;
             }
             return IsSaved;
         }
@@ -525,8 +548,8 @@ namespace AppliedAccounts.Models
                 RptData = GetReportData(_ID),              // always generate Data for report
                 RptModel = CreateReportModel(_ID),         // and then generate report parameters
             };
-            //ReportService.RptType = ReportType.Preview;
-            //var ReportList = ReportService.GetReportLink();
+            ReportService.Generate();                       // Generate Report & Create reports byte[]
+
         }
 
         public ReportData GetReportData(int ID)
@@ -545,7 +568,7 @@ namespace AppliedAccounts.Models
         {
             var _InvoiceNo = "Receipt";
             var _Heading1 = "Receipt";
-            var _Heading2 = $"REceipt No. {_InvoiceNo}";
+            var _Heading2 = $"Receipt No. {_InvoiceNo}";
             var _ReportPath = UserProfile!.ReportFolder;
             var _CompanyName = UserProfile.Company;
             var _ReportFooter = AppFunctions.ReportFooter();

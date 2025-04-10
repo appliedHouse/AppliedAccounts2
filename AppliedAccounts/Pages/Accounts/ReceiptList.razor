@@ -40,6 +40,11 @@
     {
         NavManager.NavigateTo($"/Accounts/Receipt/{ReceiptID}");
     }
+
+    private void AddNew()
+    {
+        NavManager.NavigateTo($"/Accounts/Receipt");
+    }
 }
 
 
@@ -103,7 +108,7 @@
                             <th style="width:5%">Ref #</th>
                             <th style="width:5%">Amount</th>
                             <th style="width:5%">
-                                <button class="btn btn-edit"><i class="bi bi-pencil-fill"></i></button>
+                                <button class="btn btn-edit" @onclick="AddNew"><i class="bi bi-clipboard2-plus"></i></button>
                             </th>
                         </tr>
                     </thead>
@@ -114,7 +119,7 @@
                             {
                                 int _ID = (int)Item["ID"];
                                 var _VouDate = ((DateTime)Item["Vou_Date"]).ToString(Format.DDMMMYY);
-                                var _DocDate = Item["Doc_Date"] == DBNull.Value ? "" : ((DateTime)Item["Dou_Date"]).ToString(Format.DDMMMYY); ;
+                                var _DocDate = Item["Doc_Date"] == DBNull.Value ? "" : ((DateTime)Item["Doc_Date"]).ToString(Format.DDMMMYY); ;
                                 var _Amount = ((decimal)Item["Amount"]).ToString(Format.Digit);
 
                                 <tr>
@@ -129,7 +134,6 @@
                                     <td>
                                         <button class="btn btn-edit" @onclick="(()=>Edit(_ID))"><i class="bi bi-pencil-fill"></i></button>
                                         <button class="btn btn-edit text-bg-success" @onclick="(()=>Print(_ID))"><i class="bi bi-printer-fill"></i></button>
-                                        <button class="btn btn-edit text-bg-success" @onclick="(()=>PrintPreview(_ID))"><i class="bi bi-search"></i></button>
                                     </td>
                                 </tr>
                             }

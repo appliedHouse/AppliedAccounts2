@@ -369,7 +369,7 @@
                                 </div>
                             }
 
-                            @if (MyModel.RecordFound)
+                            @if (MyModel.RecordFound && MyModel.IsAmountEqual())
                             {
                                 <button type="button" class="btn ctrl ctrl-saveAll" @onclick="SaveAll">
                                     <i class="bi bi-floppy-fill"></i>

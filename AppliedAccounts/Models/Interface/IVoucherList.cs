@@ -23,7 +23,7 @@ namespace AppliedAccounts.Models.Interface
         string GetFilterText(); //{ return string.Empty; }
 
         void Print(int _ID);
-        
+      
         List<DataRow> LoadData(); // { return []; }
     }
 }
