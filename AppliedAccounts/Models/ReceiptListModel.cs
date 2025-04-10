@@ -21,12 +21,10 @@ namespace AppliedAccounts.Models
         public string SearchText { get; set; }
         public MessageClass MsgClass { get; set; }
         public PrintService Printer { get; set; }
-
         public DateTime DT_Start { get; set; }
         public DateTime DT_End { get; set; }
         public bool PageIsValid { get; set; } = false;
-        public Globals AppGlobal { get; set; }
-
+        public PrintService ReportService { get; set; }
         public ReceiptListModel(AppUserModel _AppUserModel)
         {
             UserProfile = _AppUserModel;
@@ -68,7 +66,7 @@ namespace AppliedAccounts.Models
                 return _Text.ToString();
             }
 
-            if(PayerID > 0)
+            if (PayerID > 0)
             {
                 _Text.Append($"[Payer] == {PayerID}");
                 return _Text.ToString();
@@ -88,39 +86,57 @@ namespace AppliedAccounts.Models
         #region Print
         public void Print(int _ID)
         {
-            var _SourceData = Source.GetReceiptVoucher(_ID);
+            ReportService = new()
+            {
+                RptData = GetReportData(_ID),              // always generate Data for report
+                RptModel = CreateReportModel(_ID),         // and then generate report parameters
+               
 
-            ReportData rptDate = new();
-            rptDate.ReportTable = Source.GetReceiptVoucher(_ID); ;
-            rptDate.DataSetName = "ds_Receipt"; 
-
-            ReportModel rptModel = new();
-
-            rptModel.InputReport.FileName = "Receipt";
-            rptModel.InputReport.FileExtention = ".rdl";
-            rptModel.InputReport.FilePath = AppGlobal.ReportPath;
-
-            rptModel.OutputReport.FileName = $"Receipt_{_ID}";
-            rptModel.OutputReport.FileExtention = ".pdf";
-            rptModel.OutputReport.FilePath = AppGlobal.PDFPath;
-            rptModel.OutputReport.ReportType = ReportType.PDF;
-
-            rptModel.ReportData = rptDate;
-
-            Printer = new();
-            Printer.RptData = rptDate;
-            Printer.RptModel = rptModel;
-            Printer.RptType = ReportType.PDF;
-            Printer.RptUrl = Printer.GetReportLink();
-
+            };
+            ReportService.RptType = ReportType.Preview;
+            var ReportList = ReportService.GetReportLink();
+            //await js.InvokeVoidAsync("downloadPDF", _FileName, ReportService.RptModel.ReportBytes);
 
         }
 
-        private ReportData GetReportData()
+        public ReportData GetReportData(int ID)
         {
-            var _Report = new ReportData();
-            
-            return _Report;
+            var _Query = SQLQueries.Quries.Receipt(ID);
+            var _Table = Source.GetTable(_Query);
+            var _ReportData = new ReportData();
+
+            _ReportData.ReportTable = _Table;
+            _ReportData.DataSetName = "ds_receipt";
+
+            return _ReportData;
+        }
+
+        private ReportModel CreateReportModel(int ID)
+        {
+            var _InvoiceNo = "Receipt";
+            var _Heading1 = "Receipt";
+            var _Heading2 = $"REceipt No. {_InvoiceNo}";
+            var _ReportPath = UserProfile!.ReportFolder;
+            var _CompanyName = UserProfile.Company;
+            var _ReportFooter = AppFunctions.ReportFooter();
+
+            ReportModel rptModel = new();
+
+            rptModel.InputReport.FileName = $"Receipt";
+            rptModel.InputReport.FileExtention = "rdl";
+            rptModel.InputReport.FilePath = UserProfile!.ReportFolder;
+
+            rptModel.OutputReport.FileName = $"Receipt_{ID}";
+            rptModel.OutputReport.FileExtention = ".pdf";
+            rptModel.OutputReport.FilePath = UserProfile!.PDFFolder;
+            rptModel.OutputReport.ReportType = ReportType.PDF;
+
+            rptModel.AddReportParameter("CompanyName", _CompanyName);
+            rptModel.AddReportParameter("Heading1", _Heading1);
+            rptModel.AddReportParameter("Heading2", _Heading2);
+            rptModel.AddReportParameter("Footer", _ReportFooter);
+
+            return rptModel;
         }
 
         #endregion

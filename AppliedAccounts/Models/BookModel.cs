@@ -455,6 +455,11 @@ namespace AppliedAccounts.Models
                 Tot_CR = MyVoucher.Details.Sum(e => e.CR);
             }
         }
+
+        public void Print(int _ID)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
         #region Models

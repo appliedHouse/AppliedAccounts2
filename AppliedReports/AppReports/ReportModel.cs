@@ -41,6 +41,13 @@ namespace AppReports
         #endregion
 
         #region Report Render
+        public bool ReportRender(ReportType rptType)
+        {
+            OutputReport.ReportType = rptType;
+            return ReportRender();
+        }
+
+
         public bool ReportRender()
         {
             IsReportRendered = false;
@@ -61,7 +68,7 @@ namespace AppReports
                 Messages.Add($"{DateTimeNow}: Report File Extention is {OutputReport.FileExtention}");
 
                 string lastPart = Path.GetFileName(Path.GetDirectoryName(OutputReport.FilePath)) ?? "OutputPath";
-                OutputReport.FileLink = $"/{lastPart}/{OutputReport.FileName}{OutputReport.FileExtention}";
+                OutputReport.FileLink = GetFileLink();
                 Messages.Add($"{DateTimeNow}: Report File download link is {OutputReport.FileLink}");
 
                 var _ReportFile = InputReport.FileFullName;
@@ -80,14 +87,18 @@ namespace AppReports
                 ReportBytes = report.Render(_FileType);
                 Messages.Add($"{DateTimeNow}: Report Render bytes are {ReportBytes.Count()}");
 
-                if (ReportBytes.Length > 0) { SaveReport(); }
-                else
+                if (OutputReport.ReportType != ReportType.Print)
                 {
-                    Messages.Add($"{DateTimeNow}: ERROR: Report length is reporting zero");
+
+                    if (ReportBytes.Length > 0) { SaveReport(); }
+                    else
+                    {
+                        Messages.Add($"{DateTimeNow}: ERROR: Report length is reporting zero");
+                    }
+                    
                 }
                 Messages.Add($"{DateTimeNow}: Report rendering completed at {DateTimeNow}");
                 IsReportRendered = true;
-
             }
             else
             {
@@ -95,6 +106,12 @@ namespace AppReports
             }
             return IsReportRendered;
         }
+
+        private string GetFileLink()
+        {
+            return OutputReport.FileFullName;
+        }
+
         public async Task<bool> ReportRenderAsync()
         {
             IsReportRendered = false;
@@ -191,7 +208,7 @@ namespace AppReports
 
             if (FilePath.Length > 0 && FileName.Length > 0 && _Extention.Length > 0)
             {
-                return $"{FilePath}{FileName}{_Extention}";
+                return $"{FilePath}/{FileName}{_Extention}";
             }
             return string.Empty;
         }

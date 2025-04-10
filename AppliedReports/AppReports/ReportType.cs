@@ -2,6 +2,7 @@
 {
     public enum ReportType
     {
+        Print,
         Preview,
         PDF,
         Excel,

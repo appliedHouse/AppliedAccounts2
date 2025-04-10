@@ -2,6 +2,7 @@
 using Messages = AppMessages.Enums.Messages;
 using AppliedAccounts.Models.Interface;
 using System.Data;
+using AppliedAccounts.Services;
 
 namespace AppliedAccounts.Models
 {
@@ -23,6 +24,7 @@ namespace AppliedAccounts.Models
         public bool PageIsValid { get; set; } = false;
         public List<DataRow> DataList { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public Enums.Tables Table { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public PrintService Printer { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public BookListModel() { }
         public BookListModel(int _BookID, AppUserModel _AppUserProfile)
