@@ -2,8 +2,6 @@
 {
     public class Conversion
     {
-
-
         public static string Row2Money(object _Value, string _Format)
         {
             return ToDecimal(_Value).ToString(_Format);
@@ -28,6 +26,7 @@
 
         public static int ToInteger(object _Value)
         {
+            _Value ??= "";
             try
             {
                 var type = _Value.GetType();

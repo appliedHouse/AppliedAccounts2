@@ -63,14 +63,6 @@
         }
     }
 
-    // private async Task DownloadFile(string fileUrl)
-    // {
-    //     // Specify the relative URL to the file in the wwwroot folder
-    //     //var fileUrl = "/PDFReports/SaleInvoice.xlsx";
-
-    //     // Call the JavaScript function to download the file
-    //     await js.InvokeVoidAsync("downloadFile", fileUrl);
-    // }
 
     bool IsDataLoad = false;
     string NoRecordFound = "No Record Found....";
@@ -135,7 +127,7 @@
                         <th style="width:9%">City</th>
                         <th style="width:10%">Amount</th>
                         <th style="width:8%" class="td-btn center-btn">
-                            <button id="btnAdd" class="tb-btn-add" @onclick="()=>Model.Add()"><i class="bi bi-plus-circle-fill"></i></button>
+                            <button id="btnAdd" class="tb-btn-add" @onclick="()=>Edit(0)"><i class="bi bi-plus-circle-fill"></i></button>
                         </th>
                         <th style="width:4%; justify-items:center">
                             All

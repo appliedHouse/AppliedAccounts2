@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>", Scope = "member", Target = "~M:AppliedAccounts.Pages.Sale.SaleInvoiceList.Print(System.Int32)")]
+[assembly: SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>", Scope = "member", Target = "~M:AppliedAccounts.Models.SaleInvoiceModel.LoadData~System.Boolean")]

@@ -1,5 +1,8 @@
-﻿using AppliedDB;
+﻿using AppliedAccounts.Services;
+using AppliedDB;
 using AppMessages;
+using AppReports;
+using Microsoft.AspNetCore.Components;
 
 namespace AppliedAccounts.Models.Interface
 {
@@ -8,6 +11,7 @@ namespace AppliedAccounts.Models.Interface
         DateTime LastVoucherDate { get; set; }
         DateTime MaxVouDate { get; set; }
         MessageClass MsgClass { get; set; }
+        PrintService ReportService { get; set; }
         DataSource Source { get; set; }
         List<CodeTitle> Companies { get; set; } 
         List<CodeTitle> Employees { get; set; } 
@@ -23,6 +27,9 @@ namespace AppliedAccounts.Models.Interface
 
         bool IsWaiting { get; set; }
 
+        NavigationManager NavManager { get; set; }
+
+
         void CalculateTotal();
 
 
@@ -37,7 +44,7 @@ namespace AppliedAccounts.Models.Interface
 
         #region New and Edit Record
 
-        void Edit(int _SrNo);
+        void Edit(int _ID2);
         void New();
         #endregion
 
@@ -59,7 +66,9 @@ namespace AppliedAccounts.Models.Interface
 
         #region Print
         void Print(int _ID);
-        
+        ReportData GetReportData(int ID);
+        ReportModel CreateReportModel(int ID);
+
         #endregion
     }
 }

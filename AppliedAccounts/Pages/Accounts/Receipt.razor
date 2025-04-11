@@ -52,16 +52,12 @@
         // await js.InvokeVoidAsync("showModol", "browseCodeTitle");
     }
 
-
-
-
     private void HandleValueChanged(string newValue)
     {
         OutputValue = newValue;
         Console.WriteLine($"Value updated in parent: {OutputValue}");
     }
-
-
+    
     public async void Print()
     {
         string url = "PDFREports/Test.pdf";
@@ -82,6 +78,10 @@
 
     #printBtns {
         margin-right: 5px;
+    }
+
+    .input-group-text {
+        width: 30%;
     }
 
 </style>
@@ -130,220 +130,220 @@
                     <div class="col-md-3">
                         <div class="form-floating">
                             <InputSelect id="ddAccounts" class="form-control item-height"
-                            TValue="int" @onclick="BrowseCOA"
-                            Value="@MyModel.MyVoucher.Master.COA"
-                            ValueExpression="@(() => @MyModel.MyVoucher.Master.COA)"
-                            ValueChanged="@((e) => COAIDChanged(e))">
+                                         TValue="int" @onclick="BrowseCOA"
+                                         Value="@MyModel.MyVoucher.Master.COA"
+                                         ValueExpression="@(() => @MyModel.MyVoucher.Master.COA)"
+                                         ValueChanged="@((e) => COAIDChanged(e))">
 
                                 @if (MyModel.PayCOA.Any())
-                            {
-                                @foreach (var item in MyModel.PayCOA)
                                 {
-                                    <option value="@item.ID">@item.Title</option>
+                                    @foreach (var item in MyModel.PayCOA)
+                                    {
+                                        <option value="@item.ID">@item.Title</option>
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                <option value="0">No Records - Accounts</option>
-                            }
-
-                        </InputSelect>
-                        <label for="ddAccounts">Account</label>
-                    </div>
-
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputSelect id="ddPayer" class="form-control item-height"
-                        TValue="int" @onclick="BrowseCOA"
-                        Value="@MyModel.MyVoucher.Master.Payer"
-                        ValueExpression="@(() => @MyModel.MyVoucher.Master.Payer)"
-                        ValueChanged="@((e) => PayerIDChanged(e))">
-                            @if (MyModel.Companies.Any())
-                            {
-                                @foreach (var item in MyModel.Companies)
+                                else
                                 {
-                                    <option value="@item.ID">@item.Title</option>
+                                    <option value="0">No Records - Accounts</option>
                                 }
-                            }
-                            else
-                            {
-                                <option value="0">No Records - Payer</option>
-                            }
 
-                        </InputSelect>
-                        <label for="ddPayer">Payer</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputText @bind-Value="MyModel.MyVoucher.Master.Doc_No" id="txtDocNo" class="form-control input-sm" placeholder="Document No." />
-                        <label for="txtDocNo">Document No.</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputDate @bind-Value="MyModel.MyVoucher.Master.Doc_Date" id="txtDocDate" class="form-control input-sm" placeholder="Document Date" />
-                        <label for="txtDocDate">Document No.</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row g-1 p-1">
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <InputText @bind-Value="MyModel.MyVoucher.Master.Remarks" id="txtDocDate" class="form-control input-sm" placeholder="Remarks" />
-                        <label for="txtRemarks">Remarks</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputText @bind-Value="MyModel.MyVoucher.Master.Comments" id="txtDocDate" class="form-control input-sm" placeholder="Comments" />
-                        <label for="txtComments">Comments</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputNumber @bind-Value="MyModel.MyVoucher.Master.Amount" id="txtAmount" step=".01" class="form-control input-sm" placeholder="Amount" />
-                        <label for="txtDocDate">Amount</label>
-                    </div>
-                </div>
-
-            </div>
-            <hr class="line" />
-            <div class="row g-1 p-1">
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputNumber @bind-Value="MyModel.MyVoucher.Detail.Sr_No" id="txtSrNo" step="1" class="form-control input-sm" placeholder="Sr. No" />
-                        <label for="txtSrNo">Sr. No.</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputNumber @bind-Value="MyModel.MyVoucher.Detail.Inv_No" id="txtInvNo" step="1" class="form-control input-sm" placeholder="Invoice No" />
-                        <label for="txtSrNo">Invoice No.</label>
-                    </div>
-
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputSelect id="ddProject" class="form-control item-height"
-                        TValue="int" @onclick="BrowseCOA"
-                        Value="@MyModel.MyVoucher.Detail.Project"
-                        ValueExpression="@(() => @MyModel.MyVoucher.Detail.Project)"
-                        ValueChanged="@((e) => ProjectIDChanged(e))">
-
-                            @if (MyModel.Projects.Any())
-                            {
-                                @foreach (var item in MyModel.Projects)
-                                {
-                                    <option value="@item.ID">@item.Title</option>
-                                }
-                            }
-                            else
-                            {
-                                <option value="0">No Records - Projects</option>
-                            }
-
-                        </InputSelect>
-                        <label for="ddProject">Project</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputSelect id="ddEmployee" class="form-control item-height"
-                        TValue="int" @onclick="BrowseCOA"
-                        Value="@MyModel.MyVoucher.Detail.Employee"
-                        ValueExpression="@(() => @MyModel.MyVoucher.Detail.Employee)"
-                        ValueChanged="@((e) => EmployeeIDChanged(e))">
-
-                            @if (MyModel.Employees.Any())
-                            {
-                                @foreach (var item in MyModel.Employees)
-                                {
-                                    <option value="@item.ID">@item.Title</option>
-                                }
-                            }
-                            else
-                            {
-                                <option value="0">No Records - Employee</option>
-                            }
-
-                        </InputSelect>
-                        <label for="ddEmployee">Employees</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="container">
-            <div class="row g-1 p-1">
-                <div class="col-md-3">
-                    <div class="form-floating">
-
-                        <InputSelect id="ddAccounts" class="form-control item-height"
-                        TValue="int" @onclick="BrowseCOA"
-                        Value="@MyModel.MyVoucher.Detail.Account"
-                        ValueExpression="@(() => @MyModel.MyVoucher.Detail.Account)"
-                        ValueChanged="@((e) => AccountIDChanged(e))">
-
-                            @if (MyModel.Accounts.Any())
-                            {
-                                @foreach (var item in MyModel.Accounts)
-                                {
-                                    <option value="@item.ID">@item.Title</option>
-                                }
-                            }
-                            else
-                            {
-                                <option value="0">No Records - Accounts</option>
-                            }
-
-                        </InputSelect>
-                        <label for="ddAccounts">Account</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputNumber @bind-Value="MyModel.MyVoucher.Detail.DR" id="txtDR" step="1" class="form-control input-sm" placeholder="Debit Amount" />
-                        <label for="txtDR">Debit</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputNumber @bind-Value="MyModel.MyVoucher.Detail.CR" id="txtCR" step="1" class="form-control input-sm" placeholder="Credit Amount" />
-                        <label for="txtCR">Credit</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputText @bind-Value="MyModel.MyVoucher.Detail.Description" id="txtDescription" step="1" class="form-control input-sm" placeholder="Description" />
-                        <label for="txtDescription">Description</label>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- Control Buttons-->
-            <div class="container control-buttons">
-                <div class="grid gap-0 column-gap-3 ctrl-gap">
-                    <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
-                    <button @onclick="MyModel.Save" class="btn ctrl ctrl-edit"><i class="bi bi-floppy"></i></button>
-                    @if (MyModel.Count > 0)
-                    {
-
-                        <button @onclick="MyModel.Remove" class="btn ctrl ctrl-del"><i class="bi bi-trash"></i></button>
-
-
-                        <div class="btn-group" role="group" aria-label="Navigation Buttons" id="navigationBtns">
-                            <button type="button" class="btn ctrl ctrl-top" @onclick="MyModel.Top"><i class="bi bi-arrow-bar-left"></i></button>
-                            <button type="button" class="btn ctrl ctrl-next" @onclick="MyModel.Next"><i class="bi bi-arrow-right-short"></i></button>
-                            <button type="button" class="btn ctrl ctrl-back" @onclick="MyModel.Back"><i class="bi bi-arrow-left-short"></i></button>
-                            <button type="button" class="btn ctrl ctrl-last" @onclick="MyModel.Last"><i class="bi bi-arrow-bar-right"></i></button>
+                            </InputSelect>
+                            <label for="ddAccounts">Account</label>
                         </div>
 
-                        @if (MyModel.MyVoucher.Master.Vou_No.ToUpper() != "NEW")
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputSelect id="ddPayer" class="form-control item-height"
+                                         TValue="int" @onclick="BrowseCOA"
+                                         Value="@MyModel.MyVoucher.Master.Payer"
+                                         ValueExpression="@(() => @MyModel.MyVoucher.Master.Payer)"
+                                         ValueChanged="@((e) => PayerIDChanged(e))">
+                                @if (MyModel.Companies.Any())
+                                {
+                                    @foreach (var item in MyModel.Companies)
+                                    {
+                                        <option value="@item.ID">@item.Title</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="0">No Records - Payer</option>
+                                }
+
+                            </InputSelect>
+                            <label for="ddPayer">Payer</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputText @bind-Value="MyModel.MyVoucher.Master.Doc_No" id="txtDocNo" class="form-control input-sm" placeholder="Document No." />
+                            <label for="txtDocNo">Document No.</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputDate @bind-Value="MyModel.MyVoucher.Master.Doc_Date" id="txtDocDate" class="form-control input-sm" placeholder="Document Date" />
+                            <label for="txtDocDate">Document No.</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-1 p-1">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <InputText @bind-Value="MyModel.MyVoucher.Master.Remarks" id="txtDocDate" class="form-control input-sm" placeholder="Remarks" />
+                            <label for="txtRemarks">Remarks</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputText @bind-Value="MyModel.MyVoucher.Master.Comments" id="txtDocDate" class="form-control input-sm" placeholder="Comments" />
+                            <label for="txtComments">Comments</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputNumber @bind-Value="MyModel.MyVoucher.Master.Amount" id="txtAmount" step=".01" class="form-control input-sm" placeholder="Amount" />
+                            <label for="txtDocDate">Amount</label>
+                        </div>
+                    </div>
+
+                </div>
+                <hr class="line" />
+                <div class="row g-1 p-1">
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputNumber @bind-Value="MyModel.MyVoucher.Detail.Sr_No" id="txtSrNo" step="1" class="form-control input-sm" placeholder="Sr. No" />
+                            <label for="txtSrNo">Sr. No.</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputNumber @bind-Value="MyModel.MyVoucher.Detail.Inv_No" id="txtInvNo" step="1" class="form-control input-sm" placeholder="Invoice No" />
+                            <label for="txtSrNo">Invoice No.</label>
+                        </div>
+
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputSelect id="ddProject" class="form-control item-height"
+                                         TValue="int" @onclick="BrowseCOA"
+                                         Value="@MyModel.MyVoucher.Detail.Project"
+                                         ValueExpression="@(() => @MyModel.MyVoucher.Detail.Project)"
+                                         ValueChanged="@((e) => ProjectIDChanged(e))">
+
+                                @if (MyModel.Projects.Any())
+                                {
+                                    @foreach (var item in MyModel.Projects)
+                                    {
+                                        <option value="@item.ID">@item.Title</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="0">No Records - Projects</option>
+                                }
+
+                            </InputSelect>
+                            <label for="ddProject">Project</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputSelect id="ddEmployee" class="form-control item-height"
+                                         TValue="int" @onclick="BrowseCOA"
+                                         Value="@MyModel.MyVoucher.Detail.Employee"
+                                         ValueExpression="@(() => @MyModel.MyVoucher.Detail.Employee)"
+                                         ValueChanged="@((e) => EmployeeIDChanged(e))">
+
+                                @if (MyModel.Employees.Any())
+                                {
+                                    @foreach (var item in MyModel.Employees)
+                                    {
+                                        <option value="@item.ID">@item.Title</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="0">No Records - Employee</option>
+                                }
+
+                            </InputSelect>
+                            <label for="ddEmployee">Employees</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="row g-1 p-1">
+                    <div class="col-md-3">
+                        <div class="form-floating">
+
+                            <InputSelect id="ddAccounts" class="form-control item-height"
+                                         TValue="int" @onclick="BrowseCOA"
+                                         Value="@MyModel.MyVoucher.Detail.Account"
+                                         ValueExpression="@(() => @MyModel.MyVoucher.Detail.Account)"
+                                         ValueChanged="@((e) => AccountIDChanged(e))">
+
+                                @if (MyModel.Accounts.Any())
+                                {
+                                    @foreach (var item in MyModel.Accounts)
+                                    {
+                                        <option value="@item.ID">@item.Title</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="0">No Records - Accounts</option>
+                                }
+
+                            </InputSelect>
+                            <label for="ddAccounts">Account</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputNumber @bind-Value="MyModel.MyVoucher.Detail.DR" id="txtDR" step="1" class="form-control input-sm" placeholder="Debit Amount" />
+                            <label for="txtDR">Debit</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputNumber @bind-Value="MyModel.MyVoucher.Detail.CR" id="txtCR" step="1" class="form-control input-sm" placeholder="Credit Amount" />
+                            <label for="txtCR">Credit</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputText @bind-Value="MyModel.MyVoucher.Detail.Description" id="txtDescription" step="1" class="form-control input-sm" placeholder="Description" />
+                            <label for="txtDescription">Description</label>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Control Buttons-->
+                <div class="container control-buttons">
+                    <div class="grid gap-0 column-gap-3 ctrl-gap">
+                        <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
+                        <button @onclick="MyModel.Save" class="btn ctrl ctrl-edit"><i class="bi bi-floppy"></i></button>
+                        @if (MyModel.Count > 0)
                         {
-                            <div class="btn-group" role="group" aria-label="Navigation Buttons" id="printBtns">
+
+                            <button @onclick="MyModel.Remove" class="btn ctrl ctrl-del"><i class="bi bi-trash"></i></button>
+
+
+                            <div class="btn-group" role="group" aria-label="Navigation Buttons" id="navigationBtns">
+                                <button type="button" class="btn ctrl ctrl-top" @onclick="MyModel.Top"><i class="bi bi-arrow-bar-left"></i></button>
+                                <button type="button" class="btn ctrl ctrl-next" @onclick="MyModel.Next"><i class="bi bi-arrow-right-short"></i></button>
+                                <button type="button" class="btn ctrl ctrl-back" @onclick="MyModel.Back"><i class="bi bi-arrow-left-short"></i></button>
+                                <button type="button" class="btn ctrl ctrl-last" @onclick="MyModel.Last"><i class="bi bi-arrow-bar-right"></i></button>
+                            </div>
+
+                            @if (MyModel.MyVoucher.Master.Vou_No.ToUpper() != "NEW")
+                            {
+                                <div class="btn-group" role="group" aria-label="Navigation Buttons" id="printBtns">
                                     <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Print);})">
                                         <i class="bi bi-printer"></i>
                                     </button>

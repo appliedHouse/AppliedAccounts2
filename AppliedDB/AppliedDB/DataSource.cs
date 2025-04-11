@@ -723,6 +723,11 @@ namespace AppliedDB
 
         }
 
+        public List<CodeTitle> GetInvoices()
+        {
+            // Generate Unpaid invoices to show in Receipt Page..... it is pending now.
+            return new();
+        }
         public static List<CodeTitle> GetCodeTitle(string _Table, SQLiteConnection DBConnection)
         {
             var _Sort = "Title";
@@ -1076,11 +1081,22 @@ namespace AppliedDB
             return _Table;
         }
 
-        public List<CodeTitle> GetInvoices()
-        {
-            return new();
-        }
+        #endregion
 
+        #region Get Sales Invoice
+        public DataTable GetSalesInvoice(int SaleInvoiceID)
+        {
+            if (SaleInvoiceID > 0)
+            {
+                var QueryText = $"SELECT * FROM [view_BillReceivable] WHERE [TranID] = {SaleInvoiceID}";
+                using var _Table = GetDataTable(DBFile, QueryText, "view_BillReceivable");
+                if (_Table != null && _Table.Columns.Count > 0)
+                {
+                    return _Table;
+                }
+            }
+            return new DataTable();
+        }
         #endregion
 
     }

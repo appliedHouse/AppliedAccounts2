@@ -40,10 +40,9 @@ namespace AppliedAccounts.Pages.Sale
         }
         #endregion
         #region Edit
-        public async void Edit(int ID)
+        public void Edit(int ID)
         {
-            await Task.Delay(1000);
-            // Add code here to delete sales invocies.
+            NavManager.NavigateTo($"/Sale/SaleInvoice/{ID}");
         }
         #endregion
         #region Select All and Select One

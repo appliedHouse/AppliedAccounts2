@@ -1,0 +1,38 @@
+﻿<InputText @bind-Value="_displayValue"
+           @onblur="FormatValue"
+           @oninput="OnInputChanged"
+           class="form-control" />
+
+@code {
+    [Parameter] public decimal Value { get; set; }
+    [Parameter] public EventCallback<decimal> ValueChanged { get; set; }
+
+    private string _displayValue;
+
+    protected override void OnInitialized()
+    {
+        _displayValue = FormatDecimal(Value);
+    }
+
+    private void OnInputChanged(ChangeEventArgs e)
+    {
+        _displayValue = e.Value?.ToString() ?? "";
+        if (decimal.TryParse(_displayValue, out var result))
+        {
+            ValueChanged.InvokeAsync(result);
+        }
+    }
+
+    private void FormatValue()
+    {
+        if (decimal.TryParse(_displayValue, out var result))
+        {
+            _displayValue = FormatDecimal(result);
+        }
+    }
+
+    private string FormatDecimal(decimal val)
+    {
+        return val.ToString(Format.Digit); // customize as needed
+    }
+}
