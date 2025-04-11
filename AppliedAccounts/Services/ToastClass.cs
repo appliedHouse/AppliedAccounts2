@@ -94,5 +94,14 @@
             Position = ToastPosition.Bottom,
             ShowToast = true,
         };
+
+        public static ToastClass DownLoadToast { get; set; } = new()
+        {
+            Message = "File has been download",
+            Level = ToastLevel.Info,
+            Position = ToastPosition.Bottom,
+            ShowToast = true,
+            delayTime = 10000                // 10 second
+        };
     }
 }

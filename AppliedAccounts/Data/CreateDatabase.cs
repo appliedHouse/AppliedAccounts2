@@ -715,7 +715,7 @@ namespace AppliedAccounts.Data
             _Text.AppendLine("[R1].[Ref_No], ");
             _Text.AppendLine("[R1].[Payer], ");
             _Text.AppendLine("[R1].[ID] AS[ID1],");
-            _Text.AppendLine(" [P].[Title] AS[TitlePayer],");
+            _Text.AppendLine(" [C].[Title] AS[TitlePayer],");
             _Text.AppendLine("[R1].[Doc_No],");
             _Text.AppendLine("[R1].[Doc_Date],");
             _Text.AppendLine("[R1].[Pay_Mode],");

@@ -42,8 +42,31 @@ namespace AppMessages
         {
             MessageList.Add(GetMessage(_Text));
         }
+       
+        public void Error(string _Text)
+        {
+            MessageList.Add(GetMessage(_Text, Class.Error));
+        }
 
-        
+        public void Alert(string _Text)
+        {
+            MessageList.Add(GetMessage(_Text, Class.Alert));
+        }
+
+        public void Warrning(string _Text)
+        {
+            MessageList.Add(GetMessage(_Text, Class.Warrning));
+        }
+
+        public void Danger(string _Text)
+        {
+            MessageList.Add(GetMessage(_Text, Class.Danger));
+        }
+
+        public void Critical(string _Text)
+        {
+            MessageList.Add(GetMessage(_Text, Class.Critical));
+        }
 
         #endregion
 
@@ -72,12 +95,23 @@ namespace AppMessages
             return _Message; ;
         }
 
-        private Message GetMessage(string _Text)
+        public static Message GetMessage(string _Text)
         {
             return new Message()
             {
                 MessageID = -1,
                 MessageClass = Class.Error,
+                MessageDate = DateTime.Now,
+                MessageText = _Text
+            };
+        }
+
+        public static Message GetMessage(string _Text, Class _Class)
+        {
+            return new Message()
+            {
+                MessageID = -1,
+                MessageClass = _Class,
                 MessageDate = DateTime.Now,
                 MessageText = _Text
             };

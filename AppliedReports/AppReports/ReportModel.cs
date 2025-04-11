@@ -1,5 +1,7 @@
-﻿using Microsoft.Reporting.NETCore;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.Reporting.NETCore;
 using System.Data;
+
 
 
 namespace AppReports
@@ -14,11 +16,14 @@ namespace AppReports
         public byte[] ReportBytes { get; set; }
         public bool IsReportRendered { get; set; } = false;
         public string ReportUrl { get; set; } = string.Empty;
+        public string ReportPath { get; set; } = string.Empty;
 
         public List<ReportParameter> ReportParameters { get; set; }
         //public bool Render => ReportRender();
         private readonly string DateTimeFormat = "yyyy-MM-dd [hh:mm:ss]";
         private string DateTimeNow => DateTime.Now.ToString(DateTimeFormat);
+        public NavigationManager NavManager { get; set; }
+        
         #endregion
 
         #region Constructor
@@ -32,15 +37,21 @@ namespace AppReports
             ReportBytes = Array.Empty<byte>();
 
             Messages.Add($"{DateTimeNow}: Report Class Started.");
+            ReportPath = "PDFReports/";
 
         }
-
-
 
 
         #endregion
 
         #region Report Render
+        public bool ReportRender(ReportType rptType)
+        {
+            OutputReport.ReportType = rptType;
+            return ReportRender();
+        }
+
+
         public bool ReportRender()
         {
             IsReportRendered = false;
@@ -61,7 +72,7 @@ namespace AppReports
                 Messages.Add($"{DateTimeNow}: Report File Extention is {OutputReport.FileExtention}");
 
                 string lastPart = Path.GetFileName(Path.GetDirectoryName(OutputReport.FilePath)) ?? "OutputPath";
-                OutputReport.FileLink = $"/{lastPart}/{OutputReport.FileName}{OutputReport.FileExtention}";
+                OutputReport.FileLink = GetFileLink();
                 Messages.Add($"{DateTimeNow}: Report File download link is {OutputReport.FileLink}");
 
                 var _ReportFile = InputReport.FileFullName;
@@ -80,14 +91,18 @@ namespace AppReports
                 ReportBytes = report.Render(_FileType);
                 Messages.Add($"{DateTimeNow}: Report Render bytes are {ReportBytes.Count()}");
 
-                if (ReportBytes.Length > 0) { SaveReport(); }
-                else
+                if (OutputReport.ReportType != ReportType.Print)
                 {
-                    Messages.Add($"{DateTimeNow}: ERROR: Report length is reporting zero");
+
+                    if (ReportBytes.Length > 0) { SaveReport(); }
+                    else
+                    {
+                        Messages.Add($"{DateTimeNow}: ERROR: Report length is reporting zero");
+                    }
+                    
                 }
                 Messages.Add($"{DateTimeNow}: Report rendering completed at {DateTimeNow}");
                 IsReportRendered = true;
-
             }
             else
             {
@@ -95,6 +110,12 @@ namespace AppReports
             }
             return IsReportRendered;
         }
+
+        private string GetFileLink()
+        {
+            return OutputReport.FileFullName;
+        }
+
         public async Task<bool> ReportRenderAsync()
         {
             IsReportRendered = false;
@@ -129,6 +150,9 @@ namespace AppReports
                     OutputReport.FileStream = fstream;
                     Messages.Add($"{DateTimeNow}: Report saved sucessfully");
                     Messages.Add($"{DateTimeNow}: Created a file {_FileName}");
+
+                    ReportUrl = $"{OutputReport.FilePath}/{OutputReport.FileName}{OutputReport.FileExtention}";
+
                 }
             }
             else
@@ -191,7 +215,7 @@ namespace AppReports
 
             if (FilePath.Length > 0 && FileName.Length > 0 && _Extention.Length > 0)
             {
-                return $"{FilePath}{FileName}{_Extention}";
+                return $"{FilePath}/{FileName}{_Extention}";
             }
             return string.Empty;
         }
@@ -216,7 +240,7 @@ namespace AppReports
     }
     public class ReportData
     {
-        public string SQLQuery { get; set; } = string.Empty;
+        //public string SQLQuery { get; set; } = string.Empty;
         public DataTable ReportTable { get; set; } = new();
         public string DataSetName { get; set; } = string.Empty;
         public ReportDataSource DataSource => GetReportDataSource();

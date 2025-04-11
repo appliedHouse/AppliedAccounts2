@@ -18,10 +18,10 @@
             });
         }
 
-        public void ShowToast(ToastClass toast, string _Message)
+        public void ShowToast(ToastClass toast, string? _Message)
         {
             toast.ShowToast = true;
-            toast.Message = _Message;
+            toast.Message = _Message ?? toast.Message;
             OnShowToast?.Invoke(toast);
 
             Task.Delay(toast.delayTime).ContinueWith(_ =>

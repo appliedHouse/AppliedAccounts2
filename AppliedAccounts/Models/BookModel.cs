@@ -5,6 +5,9 @@ using AppMessages;
 using MESSAGE = AppMessages.Enums.Messages;
 using Tables = AppliedDB.Enums.Tables;
 using AppliedAccounts.Models.Interface;
+using Microsoft.AspNetCore.Components;
+using AppliedAccounts.Services;
+using AppReports;
 
 namespace AppliedAccounts.Models
 {
@@ -41,8 +44,10 @@ namespace AppliedAccounts.Models
 
         public decimal Tot_DR { get; set; }
         public decimal Tot_CR { get; set; }
-        public bool IsSaving { get; set; }
+        public bool IsWaiting { get; set; }
         public bool IsSaved { get; set; }
+        public NavigationManager NavManager { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public PrintService ReportService { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         private int CashNatureID = 0;
         private int BankNatureID = 0;
@@ -282,9 +287,9 @@ namespace AppliedAccounts.Models
         {
             IsSaved = true;
 
-            if (!IsSaving)
+            if (!IsWaiting)
             {
-                IsSaving = true;
+                IsWaiting = true;
                 await Task.Run(() =>
                 {
                     try
@@ -342,7 +347,7 @@ namespace AppliedAccounts.Models
 
                         }
 
-                        IsSaving = false;
+                        IsWaiting = false;
 
                     }
                     catch (Exception)
@@ -352,7 +357,7 @@ namespace AppliedAccounts.Models
                     }
 
                 });
-                IsSaving = false;
+                IsWaiting = false;
 
             }
 
@@ -454,6 +459,21 @@ namespace AppliedAccounts.Models
                 Tot_DR = MyVoucher.Details.Sum(e => e.DR);
                 Tot_CR = MyVoucher.Details.Sum(e => e.CR);
             }
+        }
+
+        public void Print(int _ID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ReportData GetReportData(int ID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ReportModel CreateReportModel(int ID)
+        {
+            throw new NotImplementedException();
         }
         #endregion
 

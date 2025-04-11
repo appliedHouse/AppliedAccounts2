@@ -2,7 +2,8 @@
 using System.Data.SQLite;
 using System.Text;
 using Tables = AppliedDB.Enums.Tables;
-using Query = AppliedDB.Enums.Query;
+using SQLQueries;
+using static AppliedDB.Enums;
 
 namespace AppliedDB
 {
@@ -20,7 +21,7 @@ namespace AppliedDB
         {
             UserProfile = _UserProfile;
             var _Connection = new Connections(_UserProfile);
-            MyConnection = _Connection.GetSQLiteClient();               // Get a connection of Client
+            MyConnection = _Connection!.GetSQLiteClient();               // Get a connection of Client
 
             if (MyConnection is not null)
             {
@@ -177,6 +178,7 @@ namespace AppliedDB
                 return new DataTable();
             }
         }
+
 
         private static DataTable GetDataTable(Tables _Table, SQLiteCommand _Command)
         {
@@ -721,6 +723,11 @@ namespace AppliedDB
 
         }
 
+        public List<CodeTitle> GetInvoices()
+        {
+            // Generate Unpaid invoices to show in Receipt Page..... it is pending now.
+            return new();
+        }
         public static List<CodeTitle> GetCodeTitle(string _Table, SQLiteConnection DBConnection)
         {
             var _Sort = "Title";
@@ -1067,17 +1074,29 @@ namespace AppliedDB
             return new DataTable();
         }
 
-        public DataTable GetReceiptList(int receiptID)
+        public DataTable GetReceiptList(string _Filter)
         {
-            var _Table = new DataTable();
+            var _Table = GetTable(SQLQueries.Quries.ReceiptList(_Filter));
+            _Table ??= new DataTable();
             return _Table;
         }
 
-        public List<CodeTitle> GetInvoices()
-        {
-            return new();
-        }
+        #endregion
 
+        #region Get Sales Invoice
+        public DataTable GetSalesInvoice(int SaleInvoiceID)
+        {
+            if (SaleInvoiceID > 0)
+            {
+                var QueryText = $"SELECT * FROM [view_BillReceivable] WHERE [TranID] = {SaleInvoiceID}";
+                using var _Table = GetDataTable(DBFile, QueryText, "view_BillReceivable");
+                if (_Table != null && _Table.Columns.Count > 0)
+                {
+                    return _Table;
+                }
+            }
+            return new DataTable();
+        }
         #endregion
 
     }

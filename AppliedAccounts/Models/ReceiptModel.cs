@@ -6,6 +6,9 @@ using System.Data;
 using SQLQueries;
 using MESSAGE = AppMessages.Enums.Messages;
 using static AppliedDB.Enums;
+using AppliedAccounts.Services;
+using AppReports;
+using Microsoft.AspNetCore.Components;
 
 namespace AppliedAccounts.Models
 {
@@ -17,6 +20,7 @@ namespace AppliedAccounts.Models
         public DateTime LastVoucherDate { get; set; }
         public DateTime MaxVouDate { get; set; }
         public MessageClass MsgClass { get; set; }
+        public PrintService ReportService { get; set; }
         public Voucher MyVoucher { get; set; }
         public List<Detail> Deleted { get; set; }
         public bool Processing { get; set; }
@@ -37,7 +41,11 @@ namespace AppliedAccounts.Models
         public decimal Tot_DR { get; set; }
         public decimal Tot_CR { get; set; }
 
-        public bool IsSaving { get; set; } = false;
+        public bool IsWaiting { get; set; } = false;
+        public ReportType rptType { get; set; }
+        public NavigationManager NavManager { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+
 
         #endregion
 
@@ -46,7 +54,6 @@ namespace AppliedAccounts.Models
         public ReceiptModel(AppUserModel _UserProfile)
         {
             UserProfile = _UserProfile;
-            var query = Quries.ReceiptList;
 
         }
         public ReceiptModel(AppUserModel _UserProfile, int _ReceiptID)
@@ -54,7 +61,7 @@ namespace AppliedAccounts.Models
             UserProfile = _UserProfile;
             ReceiptID = _ReceiptID;
             Start(ReceiptID);
-            var query = Quries.ReceiptList;
+           
 
         }
         public void Start(int _ReceiptID)
@@ -133,10 +140,10 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Edit Record
-        public void Edit(int _SrNo)
+        public void Edit(int _ID2)
         {
             var _Detail = MyVoucher.Detail;
-            MyVoucher.Detail = MyVoucher.Details.Where(e => e.Sr_No == _SrNo).First() ?? _Detail;
+            MyVoucher.Detail = MyVoucher.Details.Where(e => e.ID2 == _ID2).First() ?? _Detail;
         }
         #endregion
 
@@ -171,6 +178,21 @@ namespace AppliedAccounts.Models
 
             return IsValid;
         }
+
+        public bool IsAmountEqual()
+        {
+
+            decimal _Amount1 = MyVoucher.Master.Amount;
+            decimal _Amount2 = CalculateNetAmount();
+
+            if (_Amount1 != _Amount2)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         #endregion
 
         #region Load Data
@@ -289,28 +311,33 @@ namespace AppliedAccounts.Models
                 }
                 else
                 {
+                    Deleted ??= [];
                     // Delete from List and save in deleted list, if Voucher is already in DB , would be deleted from DB when Save All.
-                    var IsAlreadyDeleted = Deleted.Where(e => e.Sr_No == MyVoucher.Detail.Sr_No).Any();
-                    if (!IsAlreadyDeleted)
+                    if (Deleted.Count > 0)
                     {
-                        Deleted.Add(MyVoucher.Detail);
-                        MyVoucher.Details.Remove(MyVoucher.Detail);
-                        if (MyVoucher.Details.Count > 0)
+                        var IsAlreadyDeleted = Deleted.Where(e => e.Sr_No == MyVoucher.Detail.Sr_No).Any();
+                        if (!IsAlreadyDeleted)
                         {
-                            MyVoucher.Detail = MyVoucher.Details.First();
-                        }
-                        else
-                        {
-                            MyVoucher.Detail = NewDetail();
+                            // show Message already deleted. not can npot be deleted.
                         }
                     }
+                    Deleted.Add(MyVoucher.Detail);
+                    MyVoucher.Details.Remove(MyVoucher.Detail);
+                    if (MyVoucher.Details.Count > 0)
+                    {
+                        MyVoucher.Detail = MyVoucher.Details.First();
+                    }
+                    else
+                    {
+                        MyVoucher.Detail = NewDetail();
+                    }
+
                 }
+                CalculateTotal();
             }
-            CalculateTotal();
         }
 
         #endregion
-
 
         #region Save
         public void Save()
@@ -333,11 +360,19 @@ namespace AppliedAccounts.Models
 
         public async Task<bool> SaveAllAsync()
         {
-            var IsSaved = true;
-            if (!IsSaving)
+            MsgClass = new();
+            if (!IsAmountEqual())
             {
-                IsSaving = true;
-                MsgClass = new();
+                MsgClass.Add(MESSAGE.AmountNotEqual);
+                return false;
+            }
+
+
+            var IsSaved = true;
+            if (!IsWaiting)
+            {
+                IsWaiting = true;
+
 
                 await Task.Run(() =>
                 {
@@ -373,6 +408,38 @@ namespace AppliedAccounts.Models
 
                         if (IsSaved)         // If master record saved successfully.
                         {
+                            Deleted ??= [];
+                            if (Deleted.Count > 0)
+                            {
+                                foreach(var item in Deleted)
+                                {
+                                    DataRow RowDeleted = Source.GetNewRow(Tables.Receipt2);
+                                    RowDeleted["ID"] = item.ID2;
+                                    RowDeleted["TranID"] = ReceiptID;
+                                    RowDeleted["SR_NO"] = item.Sr_No;
+                                    RowDeleted["Account"] = item.Account;
+                                    RowDeleted["Employee"] = item.Employee;
+                                    RowDeleted["Project"] = item.Project;
+                                    RowDeleted["Ref_No"] = string.IsNullOrEmpty(item.Ref_No) ? DBNull.Value : item.Ref_No;
+                                    RowDeleted["Inv_No"] = item.Inv_No.Equals(0) ? DBNull.Value : item.Inv_No;
+                                    RowDeleted["DR"] = item.DR;
+                                    RowDeleted["CR"] = item.CR;
+                                    RowDeleted["Description"] = item.Description;
+
+                                    _Command = new(RowDeleted, Source.DBFile);
+                                    if(!_Command.DeleteRow())
+                                    {
+                                        MsgClass.Add(MESSAGE.RowNotDeleted);
+                                    }
+                                }
+
+                                int _SRNO = 1;
+                                foreach(var item in MyVoucher.Details)
+                                {
+                                    item.Sr_No =_SRNO++;        // Reset Serial No after deleted row process 
+                                }
+                            }
+
                             if (MyVoucher.Master.ID1 == 0)
                             {
                                 MyVoucher.Master.ID1 = _Command.PrimaryKeyID;
@@ -411,7 +478,7 @@ namespace AppliedAccounts.Models
                     }
                 });
 
-                IsSaving = false;
+                IsWaiting = false;
             }
             return IsSaved;
         }
@@ -425,7 +492,6 @@ namespace AppliedAccounts.Models
             return true;
         }
         #endregion
-
 
         public void TestNewAsync()
         {
@@ -444,38 +510,38 @@ namespace AppliedAccounts.Models
             _NewVoucher.Master.Comments = "Comments";
             _NewVoucher.Master.Status = "Submitted";
 
-            var _SRNO = 1;
-            if (MyVoucher.Details.Count > 0)
+            MyVoucher.Master = _NewVoucher.Master;
+
+            for (int i = 1; i < 4; i++)
             {
-                _SRNO = MyVoucher.Details.Max(e => e.Sr_No) + 1;
+
+                var _Detail = new Detail();
+                {
+                    _Detail.ID2 = 0;
+                    _Detail.TranID = 0;
+                    _Detail.Sr_No = i;
+                    _Detail.Account = 15;
+                    _Detail.Employee = 1;
+                    _Detail.Project = 3;
+                    _Detail.Inv_No = 10;
+                    _Detail.Ref_No = "Master Ref-009";
+                    _Detail.DR = 500.00M;
+                    _Detail.CR = 0.00M;
+                    _Detail.Description = "Description";
+                    _Detail.Action = "new";
+
+                    _Detail.TitleAccount = Accounts.Where(e => e.ID == _Detail.Account).Select(e => e.Title).FirstOrDefault() ?? "";
+                    _Detail.TitleProject = Projects.Where(e => e.ID == _Detail.Project).Select(e => e.Title).FirstOrDefault() ?? "";
+                    _Detail.TitleEmployee = Employees.Where(e => e.ID == _Detail.Employee).Select(e => e.Title).FirstOrDefault() ?? ""; ;
+                }
+
+                _NewVoucher.Details.Add(_Detail);
             }
 
-            var _Detail = new Detail();
-            {
-                _Detail.ID2 = 0;
-                _Detail.TranID = 0;
-                _Detail.Sr_No = _SRNO;
-                _Detail.Account = 15;
-                _Detail.Employee = 1;
-                _Detail.Project = 3;
-                _Detail.Inv_No = 10;
-                _Detail.Ref_No = "Master Ref-009";
-                _Detail.DR = 1500.00M;
-                _Detail.CR = 0.00M;
-                _Detail.Description = "Description";
-                _Detail.Action = "new";
+            MyVoucher.Details = _NewVoucher.Details;
+            MyVoucher.Detail = MyVoucher.Details.First();
 
-                _Detail.TitleAccount = Accounts.Where(e => e.ID == _Detail.Account).Select(e => e.Title).FirstOrDefault() ?? "";
-                _Detail.TitleProject = Projects.Where(e => e.ID == _Detail.Project).Select(e => e.Title).FirstOrDefault() ?? "";
-                _Detail.TitleEmployee = Employees.Where(e => e.ID == _Detail.Employee).Select(e => e.Title).FirstOrDefault() ?? ""; ;
-            }
-
-            _NewVoucher.Detail = _Detail;
-
-            MyVoucher = _NewVoucher;
         }
-
-
 
         #region Navigation of Records
         public void Top()
@@ -516,17 +582,66 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Print
-        public void Print()
+        public void Print(int _ID)
         {
+            ReportService = new()
+            {
+                RptData = GetReportData(_ID),              // always generate Data for report
+                RptModel = CreateReportModel(_ID),         // and then generate report parameters
+            };
+            ReportService.Generate();                       // Generate Report & Create reports byte[]
 
-            //await js.InvokeVoidAsync("printPDF", "/PDFReports/Test.pdf"); // Path to your PDF
         }
 
+        public ReportData GetReportData(int ID)
+        {
+            var _Query = Quries.Receipt(ID);
+            var _Table = Source.GetTable(_Query);
+            var _ReportData = new ReportData();
+
+            _ReportData.ReportTable = _Table;
+            _ReportData.DataSetName = "ds_receipt";
+
+            return _ReportData;
+        }
+
+        public ReportModel CreateReportModel(int ID)
+        {
+            var _InvoiceNo = "Receipt";
+            var _Heading1 = "Receipt";
+            var _Heading2 = $"Receipt No. {_InvoiceNo}";
+            var _ReportPath = UserProfile!.ReportFolder;
+            var _CompanyName = UserProfile.Company;
+            var _ReportFooter = AppFunctions.ReportFooter();
+
+            ReportModel rptModel = new();
+
+            rptModel.InputReport.FileName = $"Receipt";
+            rptModel.InputReport.FileExtention = "rdl";
+            rptModel.InputReport.FilePath = UserProfile!.ReportFolder;
+
+            rptModel.OutputReport.FileName = $"Receipt_{ID}";
+            rptModel.OutputReport.FileExtention = ".pdf";
+            rptModel.OutputReport.FilePath = UserProfile!.PDFFolder;
+            rptModel.OutputReport.ReportType = ReportType.PDF;
+
+            rptModel.AddReportParameter("CompanyName", _CompanyName);
+            rptModel.AddReportParameter("Heading1", _Heading1);
+            rptModel.AddReportParameter("Heading2", _Heading2);
+            rptModel.AddReportParameter("Footer", _ReportFooter);
+
+            return rptModel;
+        }
+        #endregion
+
+        #region Remove
         public void Remove(int _SrNo)
         {
             throw new NotImplementedException();
         }
+        #endregion
 
+        #region Calculation
         public void CalculateTotal()
         {
             Tot_DR = 0; Tot_CR = 0;

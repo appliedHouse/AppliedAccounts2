@@ -1,368 +1,409 @@
 ﻿@page "/Sale/SaleInvoice"
-@page "/Sale/SaleInvoice/{Vou_No}"
-
+@page "/Sale/SaleInvoice/{ID:int}"
+@layout PageLayout
 @attribute [Authorize];
 
+@using AppReports
 @using AppliedDB;
 @using AppliedAccounts.Data;
 @using AppliedAccounts.Models;
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Services;
 
-@inject IConfiguration Config
-@inject AuthenticationStateProvider authStateProvider
+@inject AuthenticationStateProvider Authorized
 @inject NavigationManager NavManager
 @inject IJSRuntime js
-@inject PrintService rptPrint
+@inject ToastService ToastService
+@inject PrintService PrintService
 
 @code {
-    [Parameter] public string Vou_No { get; set; } = string.Empty;
-    bool RecordFound => GetRecordFound();
-    public Globals? AppGlobals { get; set; }
+    [Parameter] public int ID { get; set; }
 
     protected override void OnInitialized()
     {
-        AppGlobals = new(Config);
-        var UserProfile = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
-        Model = new(UserProfile); 
-        Model.GetSaleInvoice(Vou_No);
-        //Model.Report = Model.Print();
-        //Model.Report.ReportData.ReportTable = Model.GetReportTable();
-        if (Model.SaleInvoiceRecords.Count > 0) { Record = Model.SaleInvoiceRecords[0]; }
-        if (Model.SaleInvoiceRecords.Count == 0)
-        {
-            Record = new()
-                {
-                    Vou_No = "New",
-                    Vou_Date = DateTime.Now,
-                    Pay_Date = DateTime.Now,
-                    Inv_Date = DateTime.Now,
-                    Sr_No = 1
-                };
-        }
-    }
+        var UserProfile = ((UserAuthonticationStateProvider)Authorized).AppUser;
+        MyModel = new(UserProfile, ID);
 
-    bool GetRecordFound()
-    {
-        if (Model.SaleInvoiceRecords.Count > 0) { return true; } else { return false; }
+        // Validate page
+        IsPageValid = true;
+        if (MyModel is null) { IsPageValid = false; }
+        if (MyModel!.Source is null) { IsPageValid = false; }
+        if (MyModel!.MyVoucher is null) { IsPageValid = false; }
     }
-
 }
-
-
-
-<style>
-    .input-group-text {
-        width: 30%;
-    }
-</style>
-
 <PageHeading Text="Sale Invoice" />
 
-@if (Vou_No.Length > 0)
+@if(MyModel.MsgClass.Count > 0)
 {
-    <EditForm Model="@Model" OnSubmit="Submit">
-        <InputNumber hidden @bind-Value="@Record.ID1"></InputNumber>
-        <InputNumber hidden @bind-Value="@Record.ID2"></InputNumber>
-        <InputText hidden @bind-Value="@Record.Status"></InputText>
-
-        <div class="container-fluid">
-            <div class="container group1">
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3 txt">
-                            <InputText @bind-Value="@Record.Vou_No" class="form-control" id="txtVouNo" placeholder="Voucher No" readonly />
-                            <label for="txtVouNo">Voucher No.</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3 txt">
-                            <InputDate @bind-Value="@Record.Vou_Date" class="form-control" id="txtVouDate" placeholder="Voucher Date" />
-                            <label for="txtVouNo">Voucher Date</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3 txt">
-                            <InputDate @bind-Value="@Record.Inv_Date" class="form-control" id="txtInvDate" placeholder="Invoice Date" />
-                            <label for="txtInvNo">Invoice Date</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3 txt">
-                            <InputDate @bind-Value="@Record.Pay_Date" class="form-control" id="txtPayDate" placeholder="Payment Date" />
-                            <label for="txtPayNo">Payment Date</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <InputText @bind-Value="@Record.Inv_No" class="form-control" id="txtInvNo" placeholder="Invoice No" />
-                            <label for="txtInvNo">Invoice No.</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <InputText @bind-Value="@Record.Ref_No" class="form-control" id="txtRefNo" placeholder="Reference No" />
-                            <label for="txtRefNo">Reference No.</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <InputSelect id="ddSaleman" class="form-select" TValue="int" Value="@Record.Employee" ValueExpression="@(() => Record.Employee)" ValueChanged="@((e) => EmployeeChanged(e))">
-                                @foreach (CodeTitle _CodeTitle in Model.Employees)
-                                {
-                                    <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
-                                }
-                            </InputSelect>
-                            <label for="ddSaleman">Saleman</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <InputSelect id="ddSaleman" class="form-select"
-                                         TValue="int"
-                                         Value="@Record.Company"
-                                         ValueExpression="@(() => Record.Company)"
-                                         ValueChanged="@((e) => CompanyChanged(e))">
-                                @foreach (CodeTitle _CodeTitle in Model.Customers)
-                                {
-                                    <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
-                                }
-                            </InputSelect>
-                            <label for="ddSaleman">Client / Customer</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3">
-
-                            <InputText id="txtRemarks" class="form-control" @bind-Value="@Record.Remarks" placeholder="Remarks" />
-                            <label for="txtRemarks">Remaks</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3">
-
-                            <InputText id="txtComments" class="form-control" @bind-Value="@Record.Comments" placeholder="Comments" />
-                            <label for="txtComments">Comments</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="container group2">
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <InputNumber id="txtSrNo" Step="1" class="form-control" @bind-Value="@Record.Sr_No" placeholder="Serial No." />
-                            <label for="txtSrNo">Serial No.</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <InputSelect id="ddInventory" class="form-select" TValue="int" Value="@Record.Inventory" ValueExpression="@(() => Record.Inventory)" ValueChanged="@((e) => InventoryChanged(e))">
-                                @foreach (CodeTitle _CodeTitle in Model.Inventory)
-                                {
-                                    <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
-                                }
-                            </InputSelect>
-                            <label for="ddSaleman">Stock</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <InputText id="txtBatch" Step="1" class="form-control" @bind-Value="@Record.Batch" placeholder="Batch No." />
-                            <label for="txtBatch">Batch No.</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <InputSelect id="ddUnits" class="form-select"
-                                         TValue="int"
-                                         Value="@Record.Unit"
-                                         ValueExpression="@(() => Record.Unit)"
-                                         ValueChanged="@((e) => UnitChanged(e))">
-                                @foreach (CodeTitle _CodeTitle in Model.Units)
-                                {
-                                    <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
-                                }
-                            </InputSelect>
-                            <label for="ddUnits">Unit of Measure</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <InputNumber id="txtBatch" Step=".0001" class="form-control" @bind-Value="@Record.Qty" placeholder="Stock Quantity" />
-                            <label for="txtBatch">Quantity</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <InputNumber id="txtRate" Step=".0001" class="form-control" @bind-Value="@Record.Rate" placeholder="Stock Rate" />
-                            <label for="txtRate">Rate</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <InputNumber id="txtAmount" class="form-control" Value="@Record.Amount" ValueExpression="(()=> Record.Amount)" placeholder="Sale Price" />
-                            <label for="txtAmount">Amount</label>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <InputSelect id="ddTaxID" class="form-select" TValue="int" Value="@Record.TaxID" ValueExpression="@(() => Record.TaxID)" ValueChanged="@((e) => TaxChanged(e))">
-                                @foreach (CodeTitle _CodeTitle in Model.Taxes)
-                                {
-                                    <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
-                                }
-                            </InputSelect>
-                            <label for="ddTaxID">Tax Category</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <InputNumber id="txtTaxRate" class="form-control" Value="@Record.TaxRate" ValueExpression="(()=> Record.TaxRate)" placeholder="Tax Rate %" />
-                            <label for="txtTaxRate">Tax Rate %</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <InputNumber id="txtTaxAmount" class="form-control" Value="@Record.TaxAmount" ValueExpression="(()=> Record.TaxAmount)" placeholder="Tax Amount" />
-                            <label for="txtTaxAmount">Tax Amount</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <InputNumber id="txtNetAmount" class="form-control" Value="@Record.NetAmount" ValueExpression="(()=> Record.NetAmount)" placeholder="Net Amount" />
-                            <label for="txtNetAmount">Net Amount</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-floating mb-3">
-                            <InputText id="txtComments" class="form-control" @bind-Value="@Record.Description" placeholder="Comments" />
-                            <label for="txtComments">Item's Description</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="container bt-2 mb-2">
-            <div class="row">
-                <div class="btn-group" role="group" aria-label="Basic example">
-                    <button type="button" class="btn btn-primary" @onclick="New">New</button>
-                    <button type="button" class="btn btn-success" @onclick="Update">Update</button>
-                    <button type="button" class="btn btn-info" @onclick="First">First</button>
-                    <button type="button" class="btn btn-info" @onclick="Next">Next</button>
-                    <button type="button" class="btn btn-info" @onclick="Back">Back</button>
-                    <button type="button" class="btn btn-info" @onclick="Last">Last</button>
-                    @* <PrintButton PrintingModel="@Model.Report"></PrintButton> *@
-                    @if (RecordFound)
-                    {
-                        <button type="button" class="btn btn-warning" @onclick="Save">Save</button>
-                    }
-                </div>
-            </div>
-        </div>
+    <PageErrors Messages="@MyModel.MsgClass"></PageErrors>
+}
 
 
-        <div class="container">
-            <table class="table-list">
-                <thead class="tb-head">
-                    <tr >
-                        <td>Stock Item</td>
-                        <td>Batch</td>
-                        <td class="amount-width">Qty</td>
-                        <td class="amount-width">Rate</td>
-                        <td class="amount-width">Amount</td>
-                        <td class="amount-width">Tax Rate</td>
-                        <td class="amount-width">Tax Amount</td>
-                        <td class="amount-width">Net Amount</td>
-                        <td style="text-align:center">
-                            <div class="form-check form-switch chkbox-digit">
-                                <InputCheckbox class="form-check-input" @bind-Value="@Model.ShowDigits" @onclick="Digits" id="chkDigits" checked />
-                                <label class="form-check-label" for="chkDigits">0.00</label>
+
+@if (IsPageValid)
+{
+    @if (!IsWaiting)
+    {
+        <EditForm Model="@MyModel" OnSubmit="Submit">
+            <InputNumber hidden @bind-Value="@MyModel.MyVoucher.Master.ID1"></InputNumber>
+            <InputNumber hidden @bind-Value="@MyModel.MyVoucher.Detail.ID2"></InputNumber>
+            <InputText hidden @bind-Value="@MyModel.MyVoucher.Master.Status"></InputText>
+
+            <!-- FORM CONTROLS -->
+            <div class="container-fluid">
+                <!-- Voucher master -->
+                <div class="container group1">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1 txt">
+                                <InputText @bind-Value="@MyModel.MyVoucher.Master.Vou_No" class="form-control" id="txtVouNo" placeholder="Voucher No" readonly />
+                                <label for="txtVouNo">Voucher No.</label>
                             </div>
-                        </td>
-                    </tr>
-                </thead>
-                <tbody >
-                    @foreach (SaleInvoiceRecord SaleRecord in Model.SaleInvoiceRecords)
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1 txt">
+                                <InputDate @bind-Value="@MyModel.MyVoucher.Master.Vou_Date" class="form-control" id="txtVouDate" placeholder="Voucher Date" />
+                                <label for="txtVouNo">Voucher Date</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1 txt">
+                                <InputDate @bind-Value="@MyModel.MyVoucher.Master.Inv_Date" class="form-control" id="txtInvDate" placeholder="Invoice Date" />
+                                <label for="txtInvNo">Invoice Date</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1 txt">
+                                <InputDate @bind-Value="@MyModel.MyVoucher.Master.Pay_Date" class="form-control" id="txtPayDate" placeholder="Payment Date" />
+                                <label for="txtPayNo">Payment Date</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-1 p-1">
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <InputText @bind-Value="@MyModel.MyVoucher.Master.Inv_No" class="form-control" id="txtInvNo" placeholder="Invoice No" />
+                                <label for="txtInvNo">Invoice No.</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <InputText @bind-Value="@MyModel.MyVoucher.Master.Ref_No" class="form-control" id="txtRefNo" placeholder="Reference No" />
+                                <label for="txtRefNo">Reference No.</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <InputSelect id="ddSaleman" class="form-select" TValue="int" Value="@MyModel.MyVoucher.Master.Employee" ValueExpression="@(() => MyModel.MyVoucher.Master.Employee)" ValueChanged="@((e) => EmployeeChanged(e))">
+                                    @foreach (CodeTitle _CodeTitle in MyModel.Employees)
+                                    {
+                                        <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                    }
+                                </InputSelect>
+                                <label for="ddSaleman">Saleman</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <InputSelect id="ddSaleman" class="form-select"
+                                             TValue="int"
+                                             Value="@MyModel.MyVoucher.Master.Company"
+                                             ValueExpression="@(() => MyModel.MyVoucher.Master.Company)"
+                                             ValueChanged="@((e) => CompanyChanged(e))">
+                                    @foreach (CodeTitle _CodeTitle in MyModel.Companies)
+                                    {
+                                        <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                    }
+                                </InputSelect>
+                                <label for="ddSaleman">Client / Customer</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-1 p-1">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-1">
+
+                                <InputText id="txtRemarks" class="form-control" @bind-Value="@MyModel.MyVoucher.Master.Remarks" placeholder="Remarks" />
+                                <label for="txtRemarks">Remaks</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-1">
+
+                                <InputText id="txtComments" class="form-control" @bind-Value="@MyModel.MyVoucher.Master.Comments" placeholder="Comments" />
+                                <label for="txtComments">Comments</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voucher Detail -->
+                <div class="container group2">
+                    <div class="row g-1 p-1">
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <InputNumber id="txtSrNo" Step="1" class="form-control" @bind-Value="@MyModel.MyVoucher.Detail.Sr_No" placeholder="Serial No." />
+                                <label for="txtSrNo">Serial No.</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <InputSelect id="ddInventory" class="form-select" TValue="int" Value="@MyModel.MyVoucher.Detail.Inventory" ValueExpression="@(() => MyModel.MyVoucher.Detail.Inventory)" ValueChanged="@((e) => InventoryChanged(e))">
+                                    @foreach (CodeTitle _CodeTitle in MyModel.Inventory)
+                                    {
+                                        <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                    }
+                                </InputSelect>
+                                <label for="ddSaleman">Stock</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <InputText id="txtBatch" Step="1" class="form-control" @bind-Value="@MyModel.MyVoucher.Detail.Batch" placeholder="Batch No." />
+                                <label for="txtBatch">Batch No.</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <InputSelect id="ddUnits" class="form-select"
+                                             TValue="int"
+                                             Value="@MyModel.MyVoucher.Detail.Unit"
+                                             ValueExpression="@(() => MyModel.MyVoucher.Detail.Unit)"
+                                             ValueChanged="@((e) => UnitChanged(e))">
+                                    @foreach (CodeTitle _CodeTitle in MyModel.Units)
+                                    {
+                                        <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                    }
+                                </InputSelect>
+                                <label for="ddUnits">Unit of Measure</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-1 p-1">
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <FormatedInputNumber Value="@MyModel.MyVoucher.Detail.Qty"
+                                                     ValueChanged="@((val) => MyModel.MyVoucher.Detail.Qty = val)" />
+                                @* <InputNumber  id="txtBatch" Step=".0001" class="form-control" @bind-Value="@MyModel.MyVoucher.Detail.Qty" placeholder="Stock Quantity" /> *@
+                                <label for="txtBatch">Quantity</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <InputNumber id="txtRate" Step=".0001" class="form-control" @bind-Value="@MyModel.MyVoucher.Detail.Rate" placeholder="Stock Rate" />
+                                <label for="txtRate">Rate</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <InputNumber id="txtAmount" class="form-control" Value="@MyModel.MyVoucher.Detail.Gross" ValueExpression="(()=> MyModel.MyVoucher.Detail.Gross)" placeholder="Sale Price" />
+                                <label for="txtAmount">Amount</label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row g-1 p-1">
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <InputSelect id="ddTaxID" class="form-select" TValue="int" Value="@MyModel.MyVoucher.Detail.TaxID" ValueExpression="@(() => MyModel.MyVoucher.Detail.TaxID)" ValueChanged="@((e) => TaxChanged(e))">
+                                    @foreach (CodeTitle _CodeTitle in MyModel.Taxes)
+                                    {
+                                        <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                    }
+                                </InputSelect>
+                                <label for="ddTaxID">Tax Category</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <InputNumber id="txtTaxRate" class="form-control" Value="@MyModel.MyVoucher.Detail.TaxRate" ValueExpression="(()=> MyModel.MyVoucher.Detail.TaxRate)" placeholder="Tax Rate %" />
+                                <label for="txtTaxRate">Tax Rate %</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <InputNumber id="txtTaxAmount" class="form-control" Value="@MyModel.MyVoucher.Detail.TaxAmount" ValueExpression="(()=> MyModel.MyVoucher.Detail.TaxAmount)" placeholder="Tax Amount" />
+                                <label for="txtTaxAmount">Tax Amount</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <InputNumber id="txtNetAmount" class="form-control" Value="@MyModel.MyVoucher.Detail.NetAmount" ValueExpression="(()=> MyModel.MyVoucher.Detail.NetAmount)" placeholder="Net Amount" />
+                                <label for="txtNetAmount">Net Amount</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-1 p-1">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-1">
+                                <InputText id="txtComments" class="form-control" @bind-Value="@MyModel.MyVoucher.Detail.Description" placeholder="Comments" />
+                                <label for="txtComments">Item's Description</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="container control-buttons">
+                <div class="grid gap-0 column-gap-3 ctrl-gap">
+                    <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
+                    <button @onclick="MyModel.Save" class="btn ctrl ctrl-edit"><i class="bi bi-floppy"></i></button>
+                    @if (MyModel.Count > 0)
                     {
 
-                        var _NavTo = $"/Sale/SaleInvoice/{SaleRecord.ID2}";
-                        var _Title = $"Edit Sr No {SaleRecord.Sr_No}";
+                        <button @onclick="MyModel.Remove" class="btn ctrl ctrl-del"><i class="bi bi-trash"></i></button>
 
-                        if (SaleRecord.ID2 >= 0)
+
+                        <div class="btn-group" role="group" aria-label="Navigation Buttons" id="navigationBtns">
+                            <button type="button" class="btn ctrl ctrl-top" @onclick="MyModel.Top"><i class="bi bi-arrow-bar-left"></i></button>
+                            <button type="button" class="btn ctrl ctrl-next" @onclick="MyModel.Next"><i class="bi bi-arrow-right-short"></i></button>
+                            <button type="button" class="btn ctrl ctrl-back" @onclick="MyModel.Back"><i class="bi bi-arrow-left-short"></i></button>
+                            <button type="button" class="btn ctrl ctrl-last" @onclick="MyModel.Last"><i class="bi bi-arrow-bar-right"></i></button>
+                        </div>
+
+                        @if (MyModel.MyVoucher.Master.Vou_No.ToUpper() != "NEW")
+                        {
+                            <div class="btn-group" role="group" aria-label="Navigation Buttons" id="printBtns">
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Print);})">
+                                    <i class="bi bi-printer"></i>
+                                </button>
+
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Preview);})">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.PDF);})">
+                                    <i class="bi bi-file-pdf"></i>
+                                </button>
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Excel);})">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Word);})">
+                                    <i class="bi bi-file-earmark-word"></i>
+                                </button>
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.HTML);})">
+                                    <i class="bi bi-filetype-html"></i>
+                                </button>
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Image);})">
+                                    <i class="bi bi-file-earmark-image"></i>
+                                </button>
+                            </div>
+                        }
+
+                        @if (true)
+                        {
+                            <button type="button" class="btn ctrl ctrl-saveAll" @onclick="SaveAll">
+                                <i class="bi bi-floppy-fill"></i>
+                            </button>
+                        }
+                    }
+                    <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="BackPage">
+                        <i class="bi bi-arrow-left-circle-fill"></i>
+                    </button>
+                    <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="TestRecord">
+                        <i class="bi bi-body-text"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Voucher in Data Table-->
+            <div class="container">
+                <table class="table-list">
+                    <thead>
+                        <tr>
+                            <th>Stock Item</th>
+                            <th>Batch</th>
+                            <th class="amount-width">Qty</th>
+                            <th class="amount-width">Rate</th>
+                            <th class="amount-width">Amount</th>
+                            <th class="amount-width">Tax Rate</th>
+                            <th class="amount-width">Tax Amount</th>
+                            <th class="amount-width">Net Amount</th>
+                            <th style="text-align:center">
+                                <div class="form-check form-switch chkbox-digit">
+                                    <InputCheckbox class="form-check-input" @bind-Value="@ShowDigits" @onclick="Digits" id="chkDigits" checked />
+                                    <label class="form-check-label" for="chkDigits">0.00</label>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var SaleRecord in MyModel.MyVoucher.Details)
                         {
 
-                            <tr class="tb-body-row" style="padding-left:12px">
-                                <td style="padding-left:5px">@SaleRecord.TitleInventory</td>
-                                <td>@SaleRecord.Batch</td>
-                                <td class="amount">@Model.ToAmount(@SaleRecord.Qty)</td>
-                                <td class="amount">@Model.ToAmount(@SaleRecord.Rate)</td>
-                                <td class="amount">@Model.ToAmount(@SaleRecord.Amount)</td>
-                                <td class="amount-red">@Model.ToAmount(@SaleRecord.TaxRate)</td>
-                                <td class="amount-blue">@Model.ToAmount(@SaleRecord.TaxAmount)</td>
-                                <td class="amount-blue">@Model.ToAmount(@SaleRecord.NetAmount)</td>
-                                <td style="text-align:center">
-                                    <button type="button" id="si_btn_edit" class="btn btn-link btn-edit" title="Edit" @onclick="()=>Edit(SaleRecord.Sr_No)">
-                                        <i class="bi bi-pencil-fill"></i>
-                                    </button>
+                            var _NavTo = $"/Sale/SaleInvoice/{SaleRecord.ID2}";
+                            var _Title = $"Edit Sr No {SaleRecord.Sr_No}";
 
-                                    <button type="button" id="si_btn_delete" class="btn btn-link btn-del" title="Delete" @onclick="()=>Delete(SaleRecord.Sr_No)">
+                            if (SaleRecord.ID2 >= 0)
+                            {
+
+                                <tr class="tb-body-row" style="padding-left:12px">
+                                    <td style="padding-left:5px">@SaleRecord.TitleInventory</td>
+                                    <td>@SaleRecord.Batch</td>
+                                    <td class="amount">@MyModel.ToAmount(@SaleRecord.Qty)</td>
+                                    <td class="amount">@MyModel.ToAmount(@SaleRecord.Rate)</td>
+                                    <td class="amount">@MyModel.ToAmount(@SaleRecord.Gross)</td>
+                                    <td class="amount-red">@MyModel.ToAmount(@SaleRecord.TaxRate)</td>
+                                    <td class="amount-blue">@MyModel.ToAmount(@SaleRecord.TaxAmount)</td>
+                                    <td class="amount-blue">@MyModel.ToAmount(@SaleRecord.NetAmount)</td>
+                                    <td style="text-align:center">
+                                        <button type="button" id="si_btn_edit" class="btn btn-link btn-edit" title="Edit" @onclick="()=>MyModel.Edit(SaleRecord.Sr_No)">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </button>
+
+
+                                        @*  <button type="button" id="si_btn_delete" class="btn btn-link btn-del" title="Delete" @onclick="()=>MyModel.Delete(SaleRecord.Sr_No)">
                                         <i class="bi bi-trash-fill btn-trash"></i>
                                     </button>
-
-                                </td>
-                            </tr>
+                                    *@
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr class="tb-body-row-del" style="padding-left:12px">
+                                    <td style="padding-left:5px">@SaleRecord.TitleInventory</td>
+                                    <td>@SaleRecord.Batch</td>
+                                    <td class="amount">@MyModel.ToAmount(@SaleRecord.Qty)</td>
+                                    <td class="amount">@MyModel.ToAmount(@SaleRecord.Rate)</td>
+                                    <td class="amount">@MyModel.ToAmount(@SaleRecord.Gross)</td>
+                                    <td class="amount-red">@MyModel.ToAmount(@SaleRecord.TaxRate)</td>
+                                    <td class="amount-blue">@MyModel.ToAmount(@SaleRecord.TaxAmount)</td>
+                                    <td class="amount-blue">@MyModel.ToAmount(@SaleRecord.NetAmount)</td>
+                                    <td style="text-align:center">
+                                        <button type="button" id="si_btn_edit" class="btn btn-link btn-UnDel" title="UnDelete" @onclick="()=>Delete(SaleRecord.Sr_No)">
+                                            <i class="bi bi-recycle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
                         }
-                        else
-                        {
-                            <tr class="tb-body-row-del" style="padding-left:12px">
-                                <td style="padding-left:5px">@SaleRecord.TitleInventory</td>
-                                <td>@SaleRecord.Batch</td>
-                                <td class="amount">@Model.ToAmount(@SaleRecord.Qty)</td>
-                                <td class="amount">@Model.ToAmount(@SaleRecord.Rate)</td>
-                                <td class="amount">@Model.ToAmount(@SaleRecord.Amount)</td>
-                                <td class="amount-red">@Model.ToAmount(@SaleRecord.TaxRate)</td>
-                                <td class="amount-blue">@Model.ToAmount(@SaleRecord.TaxAmount)</td>
-                                <td class="amount-blue">@Model.ToAmount(@SaleRecord.NetAmount)</td>
-                                <td style="text-align:center">
-                                    <button type="button" id="si_btn_edit" class="btn btn-link btn-UnDel" title="UnDelete" @onclick="()=>Delete(SaleRecord.Sr_No)">
-                                        <i class="bi bi-recycle"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        }
-                    }
 
-                </tbody>
-                <tfoot class="tb-foot">
-                    <tr class="tb-foot-row">
-                        <td></td>
-                        <td>TOTAL</td>
-                        <td class="amount">@Model.ToAmount(Model.Totals.Tot_Qty)</td>
-                        <td></td>
-                        <td class="amount">@Model.ToAmount(Model.Totals.Tot_Amount)</td>
-                        <td></td>
-                        <td class="amount">@Model.ToAmount(@Model.Totals.Tot_TaxAmount)</td>
-                        <td class="amount">@Model.ToAmount(@Model.Totals.Tot_NetAmount)</td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-    </EditForm>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                            <td>TOTAL</td>
+                            <td class="amount">@MyModel.ToAmount(MyModel.Totals.Tot_Qty)</td>
+                            <td></td>
+                            <td class="amount">@MyModel.ToAmount(MyModel.Totals.Tot_Gross)</td>
+                            <td></td>
+                            <td class="amount">@MyModel.ToAmount(@MyModel.Totals.Tot_TaxAmount)</td>
+                            <td class="amount">@MyModel.ToAmount(@MyModel.Totals.Tot_NetAmount)</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </EditForm>
+    }
+    else
+    {
+        <ShowSpinner Message="@SpinnerMessage" />
+    }
 }
+
 else
 {
     <div class="alert alert-warning" role="alert">
