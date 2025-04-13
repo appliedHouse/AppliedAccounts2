@@ -6,13 +6,6 @@ namespace AppliedAccounts.Data
 {
     public class AppRegistry : IAppRegistry
     {
-
-        //public static readonly string DateYMD = "yyyy-MM-dd";
-        //public static readonly string FormatCurrency1 = "#,##0.00";
-        //public static readonly string FormatCurrency2 = "#,##0";
-        //public static readonly string FormatDate = "dd-MMM-yyyy";
-        //public static readonly string FormatDateY2 = "dd-MMM-yy";
-        //public static readonly string FormatDateM2 = "dd-MM-yy";
         public static readonly DateTime MinDate = new(2020, 01, 01);
         public static readonly DateTime MinVouDate = new(2024, 06, 01);
         public static readonly DateTime MaxVouDate = new(2030, 01, 01);

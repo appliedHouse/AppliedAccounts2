@@ -23,7 +23,7 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public PurchaseInvoiceListModel() { }
-        public PurchaseInvoiceListModel(AppUserModel UserProfile) 
+        public PurchaseInvoiceListModel(AppUserModel UserProfile)
         {
             AppUser = UserProfile;
             DBFile = AppUser.DataFile;
@@ -31,7 +31,7 @@ namespace AppliedAccounts.Models
             Data = Source.GetList(Enums.Query.PurchaseInvoiceList);
             Records = GetFilterRecords();
 
-            Pages = (int)Math.Ceiling((float)Records.Count / PerPage );
+            Pages = (int)Math.Ceiling((float)Records.Count / PerPage);
 
             if (Records.Count > 0)
             {
@@ -143,22 +143,23 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-        
-    }
 
-    public class PurchaseRecord
-    {
-        public int ID { get; set; } = 0;
-        public string Vou_No { get; set; } = string.Empty;
-        public DateTime Vou_Date { get; set; } = DateTime.Now;
-        public DateTime Inv_Date { get; set; } = DateTime.Now;
-        public DateTime Pay_Date { get; set; } = DateTime.Now;
-        public string TitleCustomer { get; set; } = string.Empty;
-        public string TitleEmployee { get; set; } = string.Empty;
-        public string City { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public decimal Amount { get; set; } = 0.00M;
-        public ReportModel Report { get; set; } = new();
 
+
+        public class PurchaseRecord
+        {
+            public int ID { get; set; } = 0;
+            public string Vou_No { get; set; } = string.Empty;
+            public DateTime Vou_Date { get; set; } = DateTime.Now;
+            public DateTime Inv_Date { get; set; } = DateTime.Now;
+            public DateTime Pay_Date { get; set; } = DateTime.Now;
+            public string TitleCustomer { get; set; } = string.Empty;
+            public string TitleEmployee { get; set; } = string.Empty;
+            public string City { get; set; } = string.Empty;
+            public string Description { get; set; } = string.Empty;
+            public decimal Amount { get; set; } = 0.00M;
+            public ReportModel Report { get; set; } = new();
+
+        }
     }
 }

@@ -1,0 +1,44 @@
+﻿@page "/Purchase/PurchaseList"
+@attribute [Authorize]
+@layout PageLayout
+
+@using AppliedAccounts.Libs
+@using AppliedAccounts.Models
+@using AppliedAccounts.Services
+
+@inject AuthenticationStateProvider Authorized
+@inject NavigationManager NavManager
+@inject IJSRuntime js
+@inject PrintService PrintReport;
+
+@code {
+    private bool IsPageValid = true;
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            AppUser = ((UserAuthonticationStateProvider)Authorized).AppUser;
+            if (AppUser != null) { MyModel = new(AppUser); }
+        }
+        catch (Exception)
+        {
+            IsPageValid = false;
+        }
+
+    }
+}
+
+<PageHeading Text="Stock Purchased"></PageHeading>
+
+@if(IsPageValid)
+{
+    
+}
+else
+{
+    <div class="alert alert-danger">
+        <h4>Purcahe List Page</h4>
+        <p>Sorry, the page has some error. Contact to Adminstrator</p>
+    </div>
+}
