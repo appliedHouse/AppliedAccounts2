@@ -460,6 +460,11 @@ namespace AppliedAccounts.Models
             Tot_CR = MyVoucher.Details.Sum(x => x.NetAmount);
             Tot_DR = MyVoucher.Details.Sum(x => x.NetAmount);
         }
+
+        public decimal GetGross() { return MyVoucher.Detail.Qty * MyVoucher.Detail.Rate; }
+        public decimal GetTaxAmount() { return GetGross() * MyVoucher.Detail.TaxRate; }
+        public decimal GetNetAmount() { return GetGross() + GetTaxAmount(); }
+
         #endregion
 
 
