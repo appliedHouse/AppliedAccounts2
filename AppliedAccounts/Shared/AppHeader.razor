@@ -1,7 +1,7 @@
 ﻿@using AppliedAccounts.Data;
 @using System.Security.Claims;
 
-@inject AuthenticationStateProvider authStateProvider;
+@inject AuthenticationStateProvider Authorized;
 
 @code {
     private AppliedDB.AppUserModel AppUser { get; set; }
@@ -10,7 +10,7 @@
 
     protected override void OnInitialized()
     {
-        AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        AppUser = ((UserAuthonticationStateProvider)Authorized).AppUser;
         CompanyName = AppUser.Company;
         AppUserName = AppUser.DisplayName;
     }
@@ -19,7 +19,7 @@
     {
         await Task.Run(() =>
         {
-            AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+            AppUser = ((UserAuthonticationStateProvider)Authorized).AppUser;
             CompanyName = AppUser.Company;
             AppUserName = AppUser.DisplayName;
             InvokeAsync(()=>StateHasChanged());

@@ -3,6 +3,7 @@ using Messages = AppMessages.Enums.Messages;
 using AppliedAccounts.Models.Interface;
 using System.Data;
 using AppliedAccounts.Services;
+using Microsoft.AspNetCore.Components;
 
 namespace AppliedAccounts.Models
 {
@@ -25,6 +26,13 @@ namespace AppliedAccounts.Models
         public List<DataRow> DataList { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public Enums.Tables Table { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public PrintService Printer { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public AppUserModel? AppUser { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string DBFile { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public object Record { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public List<object> Records { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public decimal TotalAmount { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool SelectAll { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public NavigationManager NavManager { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public BookListModel() { }
         public BookListModel(int _BookID, AppUserModel _AppUserProfile)
@@ -68,6 +76,16 @@ namespace AppliedAccounts.Models
         }
 
         public void Print(int _ID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Edit(int _ID)
+        {
+            throw new NotImplementedException();
+        }
+
+        List<object> IVoucherList.LoadData()
         {
             throw new NotImplementedException();
         }
