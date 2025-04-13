@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Text;
 
 namespace AppliedAccounts.Data
 {
@@ -9,7 +10,7 @@ namespace AppliedAccounts.Data
         public DateTime MinDate { get; set; }
         public DateTime MaxDate { get; set; }
         public string SearchText { get; set; } 
-        public string GetFilterText { get; set; }
+        
         public ListFilter(string DBFile) {
 
             DateFrom = DateTime.Now;
@@ -17,8 +18,27 @@ namespace AppliedAccounts.Data
             MinDate = AppRegistry.GetDate(DBFile, "Vou_DtFrom");
             MaxDate = AppRegistry.GetDate(DBFile, "Vou_DtTo");
             SearchText = string.Empty;
-            GetFilterText = string.Empty;
+            
         }
+
+        public void ClearSearch()
+        {
+            SearchText = string.Empty;
+        }
+
+        public string GetFilterText()
+        {
+            if(SearchText.Length == 0) { return string.Empty; }
+
+            var _Text = new StringBuilder();
+
+            _Text.Append(" WHERE ");
+            _Text.Append("");
+
+            return _Text.ToString();
+        }
+
+
 
     }
 }

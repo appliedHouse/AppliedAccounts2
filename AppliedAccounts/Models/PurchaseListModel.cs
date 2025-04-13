@@ -5,6 +5,7 @@ using AppliedDB;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
 using System.Data;
+using System.Text;
 
 namespace AppliedAccounts.Models
 {
@@ -14,7 +15,7 @@ namespace AppliedAccounts.Models
         public DataSource Source { get; set; }
         public NavigationManager NavManager { get; set; }
         public string DBFile { get; set; }
-        public ListFilter Filter { get; set; }
+        public ListFilter FilterClass { get; set; }
         public List<PurchaseRecord> Records { get; set; }
         
         public MessageClass MsgClass { get; set; }
@@ -23,13 +24,17 @@ namespace AppliedAccounts.Models
         public PurchaseListModel(AppUserModel _AppUser)
         {
             AppUser = _AppUser;
+            DBFile = AppUser.DataFile;
+            Source = new DataSource(DBFile);
+            MsgClass = new();
+            FilterClass = new(DBFile);
+            Table = AppliedDB.Enums.Tables.view_BillPayable;
+            LoadData();
         }
 
-        public string GetFilterText()
-        {
-            throw new NotImplementedException();
-        }
 
+
+        
         public void Print(int _ID)
         {
             throw new NotImplementedException();
@@ -41,7 +46,30 @@ namespace AppliedAccounts.Models
         }
         public List<PurchaseRecord> LoadData()
         {
-            throw new NotImplementedException();
+            
+            using var _Table = Source.GetTable(SQLQueries.Quries.ViewPurchaseInvoice(FilterClass.GetFilterText()));
+
+
+            foreach(DataRow item in _Table.Rows)
+            {
+                var _Record = new PurchaseRecord
+                {
+                    ID = item.Field<int>("ID"),
+                    Vou_No = item.Field<string>("Vou_No") ?? "",
+                    Vou_Date = item.Field<DateTime>("Vou_Date"),
+                    Batch = item.Field<string>("Batch") ?? "",
+                    SupplierID = item.Field<int>("SupplierID"),
+                    SupplierTitle = item.Field<string>("SupplierTitle") ?? "",
+                //    Gross = item.Field<decimal>("Gross"),
+                //    TaxRate = item.Field<decimal>("TaxRate"),
+                //    TaxAmount = item.Field<decimal>("TaxAmount"),
+                //    NetAmount = item.Field<decimal>("NetAmount")
+                };
+                Records.Add(_Record);
+            }
+
+            return Records;
+
         }
         public Paging Pages { get; set; } = new();
     }

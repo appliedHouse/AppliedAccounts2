@@ -11,7 +11,7 @@ namespace AppliedAccounts.Models.Interface
         DataSource Source { get; set; }
         NavigationManager NavManager { get; set; }
         string DBFile { get; set; }
-        ListFilter Filter { get; set; }
+        ListFilter FilterClass { get; set; }
         List<T> Records { get; set; }
         MessageClass MsgClass { get; set; }
         AppliedDB.Enums.Tables Table { get; set; }

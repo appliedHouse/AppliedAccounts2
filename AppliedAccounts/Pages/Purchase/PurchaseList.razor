@@ -29,11 +29,40 @@
     }
 }
 
-<PageHeading Text="Stock Purchased"></PageHeading>
+
 
 @if(IsPageValid)
 {
-    
+    <PageHeading Text="List of Purchased Invoices" />
+
+    <EditForm Model=@MyModel>
+
+        <div class="container mb-2">
+            <div class="d-flex flex-row mb-3 filter">
+                <div class="p-2">
+                    <InputText @bind-Value="@MyModel.FilterClass.SearchText" class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
+                </div>
+                <div class="p-2">
+                    <button type="button" class="btn btn-primary btn-sm" @onclick="()=>Search()">Search</button>
+
+                </div>
+                <div class="p-2">
+                    @if (MyModel.FilterClass.SearchText.Length > 0)
+                    {
+                        <button type="button" style="margin-top:5px; margin-left:5px" class="btn btn-primary btn-sm" @onclick="MyModel.FilterClass.ClearSearch">Clear</button>
+                    }
+                </div>
+                <div class="p-2 mx-auto">
+                    @if (MyModel.Records.Count > 0)
+                    {
+                        <button type="submit" class="btn-print" @onclick="(()=>PrintAll())"><i class="bi bi-printer-fill"></i> All</button>
+                    }
+                </div>
+            </div>
+        </div>
+
+
+    </EditForm>
 }
 else
 {
