@@ -29,7 +29,7 @@ namespace AppliedAccounts.Models
             MsgClass = new();
             FilterClass = new(DBFile);
             Table = AppliedDB.Enums.Tables.view_BillPayable;
-            LoadData();
+            Records = LoadData();
         }
 
 
@@ -46,7 +46,9 @@ namespace AppliedAccounts.Models
         }
         public List<PurchaseRecord> LoadData()
         {
-            
+            var _result = new List<PurchaseRecord>();
+
+
             using var _Table = Source.GetTable(SQLQueries.Quries.ViewPurchaseInvoice(FilterClass.GetFilterText()));
 
 
@@ -65,10 +67,10 @@ namespace AppliedAccounts.Models
                 //    TaxAmount = item.Field<decimal>("TaxAmount"),
                 //    NetAmount = item.Field<decimal>("NetAmount")
                 };
-                Records.Add(_Record);
+                _result.Add(_Record);
             }
 
-            return Records;
+            return _result;
 
         }
         public Paging Pages { get; set; } = new();

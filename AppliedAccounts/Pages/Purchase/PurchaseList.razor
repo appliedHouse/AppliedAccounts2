@@ -60,9 +60,36 @@
                 </div>
             </div>
         </div>
-
-
     </EditForm>
+
+    <div class="container">
+        <table class="table-list">
+            <thead>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in MyModel.Records)
+                {
+                    <tr>
+                        <td>@item.Vou_No</td>
+                        <td>@item.Vou_Date</td>
+                        <td>@item.SupplierTitle</td>
+                </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 }
 else
 {

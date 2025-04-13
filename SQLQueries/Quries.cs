@@ -122,10 +122,10 @@ namespace SQLQueries
             _Text.AppendLine("[BP2].[Rate],");
             _Text.AppendLine("[BP2].[Tax],");
             _Text.AppendLine("[BP2].[Tax_Rate],");
-            _Text.AppendLine("[BP2].[Description]");
+            _Text.AppendLine("[BP2].[Description],");
             _Text.AppendLine("[BP2].[Project]");
             _Text.AppendLine("FROM [BillPayable] [BP1]");
-            _Text.AppendLine("LEFT JOIN [BillPayable2] [BP2] ON [BP1].[ID1] = [BP2].[TranID];");
+            _Text.AppendLine("LEFT JOIN [BillPayable2] [BP2] ON [BP1].[ID] = [BP2].[TranID]");
             _Text.AppendLine(" ) [Purchased] ");
             
             if(!string.IsNullOrEmpty(_Filter))
