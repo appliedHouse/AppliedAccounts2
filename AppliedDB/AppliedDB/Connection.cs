@@ -4,7 +4,8 @@ namespace AppliedDB
 {
     public class Connections : IDisposable
     {
-        public static string BasePath => Directory.GetCurrentDirectory();
+        public static string AppPath => Directory.GetCurrentDirectory();
+        public static string BasePath { get; set; }
         public static string RootPath { get; set; } = "";
         public static string UsersPath { get; set; } = "";
         public static string ClientPath { get; set; } = "";
@@ -32,6 +33,7 @@ namespace AppliedDB
         public Connections(AppUserModel _UserProfile)
         {
             AppUserProfile = _UserProfile;
+            BasePath = _UserProfile.BasePath;
             DB_Client = AppUserProfile.DataFile;
             DB_Session = AppUserProfile.Session;
 
@@ -46,8 +48,6 @@ namespace AppliedDB
             SystemPath = AppUserProfile.SystemFolder;
             SessionPath = AppUserProfile.SessionFolder;
             TempDBPath = AppUserProfile.TempDBFolder;
-                       
-
         }
 
 
@@ -55,32 +55,32 @@ namespace AppliedDB
         #region Connection non static
         public SQLiteConnection? GetSQLiteUsers()
         {
-            return GetSQLiteConnection(Path.Combine(BasePath, RootPath, ClientPath, DB_Client));
+            return GetSQLiteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Client));
         }
 
         public SQLiteConnection? GetSQLiteClient()
         {
-            return GetSQLiteConnection(Path.Combine(BasePath, RootPath, ClientPath, DB_Client));
+            return GetSQLiteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Client));
         }
 
         public SQLiteConnection? GetSQLiteLanguage()
         {
-            return GetSQLiteConnection(Path.Combine(BasePath, RootPath, ClientPath, DB_Language));
+            return GetSQLiteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Language));
         }
 
         public SQLiteConnection? GetSQLiteMessage()
         {
-            return GetSQLiteConnection(Path.Combine(BasePath, RootPath, ClientPath, DB_Message));
+            return GetSQLiteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Message));
         }
 
         public SQLiteConnection? GetSQLiteSystem()
         {
-            return GetSQLiteConnection(Path.Combine(BasePath, RootPath, ClientPath, DB_System));
+            return GetSQLiteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_System));
         }
 
         public SQLiteConnection? GetSQLiteSession()
         {
-            return GetSQLiteConnection(Path.Combine(BasePath, RootPath, ClientPath, DB_Session));
+            return GetSQLiteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Session));
         }
 
         public static string GetTempDBPath()

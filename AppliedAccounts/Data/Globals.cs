@@ -2,23 +2,13 @@
 
 namespace AppliedAccounts.Data
 {
-    public class Globals : IGlobals
+    public class Globals
     {
        
         public readonly IConfiguration Config;
+        public readonly NavigationManager NavManager;
 
-        public string BasePath { get; set; } = string.Empty;
-        public string RootPath { get; set; } = string.Empty;
-        public string ReportPath { get; set; } = string.Empty;
-        public string UsersPath { get; set; } = string.Empty;
-        public string ClientPath { get; set; } = string.Empty;
-        public string PDFPath { get; set; } = string.Empty;
-        public string DBTempPath { get; set; } = string.Empty;
-        public string SystemPath { get; set; } = string.Empty;
-        public string ImagesPath { get; set; } = string.Empty;
-        public string LanguagesPath { get; set; } = string.Empty;
-        public string MessagesPath { get; set; } = string.Empty;
-        public string SessionPath { get; set; } = string.Empty;
+        public AppPath AppPaths { get; set; } = new();
         public AuthorClass Author { get; set; } = new();
         public LanguageClass Language { get; set; } = new();
         public CurrencyClass Currency { get; set; } = new();
@@ -26,32 +16,35 @@ namespace AppliedAccounts.Data
 
         public Globals() { }
 
-        public Globals(IConfiguration _Config)
+        public Globals(IConfiguration _Config, NavigationManager _NavManager)
         {
             Config = _Config;
-            BasePath = Directory.GetCurrentDirectory();
-            RootPath = Config.GetValue<string>("Paths:RootPath") ?? "wwwroot";
-            SystemPath = Config.GetValue<string>("Paths:SystemPath") ?? "System";
-            ImagesPath = Config.GetValue<string>("Paths:ImagesPath") ?? "Images";
-            ReportPath = Config.GetValue<string>("Paths:ReportPath") ?? "Reports";
-            LanguagesPath = Config.GetValue<string>("Paths:LanguagesPath") ?? "Languages";
-            MessagesPath = Config.GetValue<string>("Paths:MessagesPath") ?? "Messages";
-            PDFPath = Config.GetValue<string>("Paths:PDFPath") ?? "PDFReports";
-            ClientPath = Config.GetValue<string>("Paths:ClientPath") ?? "SQLiteDB";
-            UsersPath = Config.GetValue<string>("Paths:UsersPath") ?? "SQLiteDB";
-            DBTempPath = Config.GetValue<string>("Paths:DBTempPath") ?? "SQLiteTemp";
-            SessionPath = Config.GetValue<string>("Paths:SessionPath") ?? "Sessions";
+            NavManager = _NavManager;
 
-            SystemPath = Path.Combine(BasePath, RootPath, SystemPath);
-            //ImagesPath = Path.Combine(BasePath, RootPath, ImagesPath);
-            ReportPath = Path.Combine(BasePath, RootPath, ReportPath);
-            LanguagesPath = Path.Combine(BasePath, RootPath, LanguagesPath);
-            MessagesPath = Path.Combine(BasePath, RootPath, MessagesPath);
-            PDFPath = Path.Combine(BasePath, RootPath, PDFPath);
-            UsersPath = Path.Combine(BasePath, RootPath, UsersPath);
-            DBTempPath = Path.Combine(BasePath, RootPath, DBTempPath);
-            SessionPath = Path.Combine(BasePath, RootPath, SessionPath);
-            ClientPath = Path.Combine(BasePath, RootPath, ClientPath);
+            AppPaths.BasePath = NavManager.BaseUri;
+            AppPaths.FirstPath = Directory.GetCurrentDirectory();
+            AppPaths.RootPath = Config.GetValue<string>("Paths:RootPath") ?? "wwwroot";
+            AppPaths.SystemPath = Config.GetValue<string>("Paths:SystemPath") ?? "System";
+            AppPaths.ImagesPath = Config.GetValue<string>("Paths:ImagesPath") ?? "Images";
+            AppPaths.ReportPath = Config.GetValue<string>("Paths:ReportPath") ?? "Reports";
+            AppPaths.LanguagesPath = Config.GetValue<string>("Paths:LanguagesPath") ?? "Languages";
+            AppPaths.MessagesPath = Config.GetValue<string>("Paths:MessagesPath") ?? "Messages";
+            AppPaths.PDFPath = Config.GetValue<string>("Paths:PDFPath") ?? "PDFReports";
+            AppPaths.ClientPath = Config.GetValue<string>("Paths:ClientPath") ?? "SQLiteDB";
+            AppPaths.UsersPath = Config.GetValue<string>("Paths:UsersPath") ?? "SQLiteDB";
+            AppPaths.DBTempPath = Config.GetValue<string>("Paths:DBTempPath") ?? "SQLiteTemp";
+            AppPaths.SessionPath = Config.GetValue<string>("Paths:SessionPath") ?? "Sessions";
+
+            //AppPaths.SystemPath = Path.Combine(BasePath, RootPath, SystemPath);
+            ////ImagesPath = Path.Combine(BasePath, RootPath, ImagesPath);
+            //AppPaths.ReportPath = Path.Combine(BasePath, RootPath, ReportPath);
+            //AppPaths.LanguagesPath = Path.Combine(BasePath, RootPath, LanguagesPath);
+            //AppPaths.MessagesPath = Path.Combine(BasePath, RootPath, MessagesPath);
+            //AppPaths.PDFPath = Path.Combine(BasePath, RootPath, PDFPath);
+            //AppPaths.UsersPath = Path.Combine(BasePath, RootPath, UsersPath);
+            //AppPaths.DBTempPath = Path.Combine(BasePath, RootPath, DBTempPath);
+            //AppPaths.SessionPath = Path.Combine(BasePath, RootPath, SessionPath);
+            //AppPaths.ClientPath = Path.Combine(BasePath, RootPath, ClientPath);
 
             Author = new()
             {
@@ -83,22 +76,24 @@ namespace AppliedAccounts.Data
         }
     }
 
-    #region Interface
-    public interface IGlobals
+    public class AppPath
     {
-        string BasePath { get; set; }
-        string RootPath { get; set; }
-        string ImagesPath { get; set; }
-        string ReportPath { get; set; }
-        string LanguagesPath { get; set; }
-        string MessagesPath { get; set; }
-        string PDFPath { get; set; }
-        string ClientPath { get; set; }
-        string UsersPath { get; set; }
-        string DBTempPath { get; set; }
-        string SystemPath { get; set; }
+        public string BasePath { get; set; } = string.Empty;
+        public string FirstPath { get; set; } = string.Empty;
+        public string RootPath { get; set; } = string.Empty;
+        public string ReportPath { get; set; } = string.Empty;
+        public string UsersPath { get; set; } = string.Empty;
+        public string ClientPath { get; set; } = string.Empty;
+        public string PDFPath { get; set; } = string.Empty;
+        public string DBTempPath { get; set; } = string.Empty;
+        public string SystemPath { get; set; } = string.Empty;
+        public string ImagesPath { get; set; } = string.Empty;
+        public string LanguagesPath { get; set; } = string.Empty;
+        public string MessagesPath { get; set; } = string.Empty;
+        public string SessionPath { get; set; } = string.Empty;
+
     }
-    #endregion
+
 
     #region Author Class
     public class AuthorClass

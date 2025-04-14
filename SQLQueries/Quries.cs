@@ -107,7 +107,6 @@ namespace SQLQueries
             _Text.AppendLine("[BP1].[Ref_No],");
             _Text.AppendLine("[BP1].[Inv_No],");
             _Text.AppendLine("[BP1].[Inv_Date],");
-            _Text.AppendLine("[BP1].[Inv_Date],");
             _Text.AppendLine("[BP1].[Pay_Date],");
             _Text.AppendLine("[BP1].[Amount],");
             _Text.AppendLine("[BP1].[Description] AS [Remarks],");

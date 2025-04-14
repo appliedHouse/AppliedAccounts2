@@ -1,4 +1,5 @@
 ﻿using AppliedDB;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.Security.Claims;
@@ -9,12 +10,14 @@ namespace AppliedAccounts.Authentication
     {
         private readonly ProtectedSessionStorage _sessionStorage;
         private readonly ClaimsPrincipal AnyOne = new(new ClaimsIdentity());
+        private readonly NavigationManager _navManager;
         public AppUserModel AppUser = new AppUserModel();
         public IEnumerable<Claim> Claims { get; set; }
 
-        public UserAuthonticationStateProvider(ProtectedSessionStorage sessionStorage)
+        public UserAuthonticationStateProvider(ProtectedSessionStorage sessionStorage, NavigationManager NavManager)
         {
             _sessionStorage = sessionStorage;
+            _navManager = NavManager;
             Claims = new List<Claim>();
         }
 
@@ -44,6 +47,7 @@ namespace AppliedAccounts.Authentication
                                 new ("LanguageID",userSession.LanguageID.ToString()),
                                 new ("Session",userSession.SessionGuid.ToString()),
 
+                                new ("AppPath",_navManager.BaseUri),
                                 new ("RootFolder",userSession.RootFolder.ToString()),
                                 new ("UsersFolder",userSession.UsersFolder.ToString()),
                                 new ("ClientsFolder",userSession.ClientsFolder.ToString()),  // Data base Folder
