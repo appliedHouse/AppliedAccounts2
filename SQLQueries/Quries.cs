@@ -103,7 +103,9 @@ namespace SQLQueries
             _Text.AppendLine("[BP1].[Vou_No],");
             _Text.AppendLine("[BP1].[Vou_Date],");
             _Text.AppendLine("[BP1].[Company],");
+            _Text.AppendLine("[C].[Title] AS [CompanyTitle],");
             _Text.AppendLine("[BP1].[Employee],");
+            _Text.AppendLine("[E].[Title] AS [EmployeeTitle],");
             _Text.AppendLine("[BP1].[Ref_No],");
             _Text.AppendLine("[BP1].[Inv_No],");
             _Text.AppendLine("[BP1].[Inv_Date],");
@@ -116,6 +118,7 @@ namespace SQLQueries
             _Text.AppendLine("[BP2].[Sr_No],");
             _Text.AppendLine("[BP2].[TranID],");
             _Text.AppendLine("[BP2].[Inventory],");
+            _Text.AppendLine("[I].[Title] AS [InventoryTitle],");
             _Text.AppendLine("[BP2].[Batch],");
             _Text.AppendLine("[BP2].[Qty],");
             _Text.AppendLine("[BP2].[Rate],");
@@ -125,6 +128,10 @@ namespace SQLQueries
             _Text.AppendLine("[BP2].[Project]");
             _Text.AppendLine("FROM [BillPayable] [BP1]");
             _Text.AppendLine("LEFT JOIN [BillPayable2] [BP2] ON [BP1].[ID] = [BP2].[TranID]");
+            _Text.AppendLine("LEFT JOIN [Customers]      [C] ON   [C].[ID] = [BP1].[Company]");
+            _Text.AppendLine("LEFT JOIN [Employees]      [E] ON   [E].[ID] = [BP1].[Employee]");
+            _Text.AppendLine("LEFT JOIN [Inventory]      [I] ON   [I].[ID] = [BP2].[Inventory]");
+            _Text.AppendLine("LEFT JOIN [Taxes]          [T] ON   [T].[ID] = [BP2].[Tax]");
             _Text.AppendLine(" ) [Purchased] ");
             
             if(!string.IsNullOrEmpty(_Filter))

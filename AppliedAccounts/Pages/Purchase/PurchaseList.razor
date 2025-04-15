@@ -31,7 +31,7 @@
 
 
 
-@if(IsPageValid)
+@if (IsPageValid)
 {
     <PageHeading Text="List of Purchased Invoices" />
 
@@ -39,6 +39,13 @@
 
         <div class="container mb-2">
             <div class="d-flex flex-row mb-3 filter">
+                <div class="p-2">
+                    <InputDate @bind-Value="@MyModel.FilterClass.DateFrom"></InputDate>
+                </div>
+                <div class="p-2">
+                    <InputDate @bind-Value="@MyModel.FilterClass.DateTo"></InputDate>
+                </div>
+
                 <div class="p-2">
                     <InputText @bind-Value="@MyModel.FilterClass.SearchText" class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
                 </div>
@@ -66,9 +73,19 @@
         <table class="table-list">
             <thead>
                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <th style="width:10%">Voucher</th>
+                    <th style="width:10%">Date</th>
+                    <th style="width:10%">Invoice</th>
+                    <th style="width:10%">Inv Date</th>
+                    <th style="width:30%">Supplier</th>
+                    <th style="width:10%">Amount</th>
+                    <th style="width:10%">
+                        <button id="btnAdd" class="tb-btn-add" @onclick="()=>Edit(0)"><i class="bi bi-plus-circle-fill"></i></button>
+                    </th>
+                    <th style="width:4%; justify-items:center">
+                        All
+                        <input type="checkbox" name="selectRow" value="1" @onclick="SelectAll">
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -76,9 +93,30 @@
                 {
                     <tr>
                         <td>@item.Vou_No</td>
-                        <td>@item.Vou_Date</td>
+                        <td>@item.Vou_Date.ToString(Format.DDMMMYY)</td>
+                        <td>@item.Inv_No</td>
+                        <td>@item.Inv_Date.ToString(Format.DDMMMYY)</td>
                         <td>@item.SupplierTitle</td>
-                </tr>
+                        <td class="amount">@item.Amount.ToString(Format.Digit)</td>
+
+                        <td>
+                            @if (item.Status.Equals(AppliedDB.Enums.Status.Submitted.ToString()))
+                            {
+                                <button type="submit" class="btn-Edit" @onclick="()=>Edit(item.ID2)"><i class="bi bi-pencil-fill"></i></button>
+                                <button type="submit" class="btn-Del" @onclick="()=>Delete(item.ID2)"><i class="bi bi-trash-fill"></i></button>
+                            }
+                            else
+                            {
+                                <label>@item.Status</label>
+                            }
+                            <button type="submit" class="btn-print" @onclick="(()=>Print(item.ID1))"><i class="bi bi-printer-fill"></i></button>
+                        </td>
+                        <td class="tb-col-center">
+                            <input type="checkbox" name="selectRow" @bind="item.IsSelected">
+                        </td>
+
+
+                    </tr>
                 }
             </tbody>
             <tfoot>

@@ -1,11 +1,9 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models.Interface;
-using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
 using System.Data;
-using System.Text;
 
 namespace AppliedAccounts.Models
 {
@@ -17,9 +15,11 @@ namespace AppliedAccounts.Models
         public string DBFile { get; set; }
         public ListFilter FilterClass { get; set; }
         public List<PurchaseRecord> Records { get; set; }
+        public PurchaseRecord Record { get; set; }
 
         public MessageClass MsgClass { get; set; }
         public AppliedDB.Enums.Tables Table { get; set; }
+        public bool SelectAll { get; set; }
 
         public PurchaseListModel(AppUserModel _AppUser)
         {
@@ -31,9 +31,6 @@ namespace AppliedAccounts.Models
             Table = AppliedDB.Enums.Tables.view_BillPayable;
             Records = LoadData();
         }
-
-
-
 
         public void Print(int _ID)
         {
@@ -60,12 +57,13 @@ namespace AppliedAccounts.Models
                     Vou_No = item.Field<string>("Vou_No") ?? "",
                     Vou_Date = item.Field<DateTime>("Vou_Date"),
                     SupplierID = item.Field<int>("Company"),
+                    SupplierTitle = item.Field<string>("CompanyTitle") ?? "",
                     Inv_No = item.Field<string>("Inv_No") ?? "",
                     Inv_Date = item.Field<DateTime>("Inv_Date"),
                     Pay_Date = item.Field<DateTime>("Pay_Date"),
                     Amount = item.Field<decimal>("Amount"),
                     Remarks = item.Field<string>("Remarks") ?? "",
-                    Comments = item.Field<string>("comments") ?? "",
+                    Comments = item.Field<string>("Comments") ?? "",
                     Status = item.Field<string>("Status") ?? "",
                     ID2 = item.Field<int>("ID2"),
                     Sr_No = item.Field<int>("Sr_No"),

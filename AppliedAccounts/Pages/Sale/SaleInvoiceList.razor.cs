@@ -145,22 +145,9 @@ namespace AppliedAccounts.Pages.Sale
                 _Reportmodel.AddReportParameter("Heading2", _Heading2);
                 _Reportmodel.AddReportParameter("Footer", _ReportFooter);
 
-                //var _InvNo = _Reportmodel.ReportData.ReportTable.Rows[0]["Vou_No"].ToString() ?? _ID.ToString("0000");
-                //var _RecNo = ""; // _Reportmodel.ReportData.DataSource.Records.First().Ref_No;
-                //var _SaveAs = _Reportmodel.OutputReport.FileName = $"{_RecNo}INV-{_InvNo}";
-
                 var _SaveAs = "Test";
 
                 _Reportmodel.OutputReport.FileName = _SaveAs;
-
-
-
-
-                //        string _RecNo = Model.Records.First().Ref_No;
-                //var _SourceData = new DataTable();          // Inject a Data Table for print.
-
-                //_Reportmodel.ReportData.DataSetName = "ds_SaleInvoice";
-                //_Reportmodel.ReportData.ReportTable = _SourceData;
             }
             catch (Exception)
             {
