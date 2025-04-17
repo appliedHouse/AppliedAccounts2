@@ -1,15 +1,8 @@
 ﻿@layout LoginLayout
-@page "/Users/Login1"
-@using AppliedAccounts.Data;
-@using AppliedDB;
-@using System.Data.SQLite;
-@using System.Data;
+@page "/Users/Resetpw"
+@using System.ComponentModel.DataAnnotations
 
-@inject NavigationManager NavManager;
-@inject AuthenticationStateProvider authStateProvider;
-@inject Globals _Global;
-
-<EditForm Model="@Model" OnValidSubmit="@Submit">
+<EditForm Model="@model" OnValidSubmit="@HandleSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -22,24 +15,26 @@
             </div>
 
             <div class="login-right">
-                <h2>Login</h2>
+                <h2>Reset Password</h2>
+                <InputText class="input" type="password" @bind-Value="model.CurrentPassword" placeholder="Current Password" />
+                <InputText class="input" type="password" @bind-Value="model.NewPassword" placeholder="New Password" />
+                <InputText class="input" type="password" @bind-Value="model.ConfirmPassword" placeholder="Confirm New Password" />
 
-                <InputText class="input" @bind-Value="@Model.UserID" placeholder="ID" />
-                <InputText class="input" @bind-Value="@Model.Password" type="password" placeholder="Password" />
+                <button class="login-button" type="submit">Reset Password</button>
 
-                <div class="options">
-                    <label>
-                        <InputCheckbox @bind-Value="Model.IsSaved" /> Remember Me
-                    </label>
-                    <a class="forgot-link" href="/Users/Resetpw">Forgot Password?</a>
-                </div>
-
-                <button class="login-button" type="submit">Login</button>
-
-                @if (!IsLogin)
+                @if (isSuccess)
                 {
-                    <div class="alert alert-danger mt-3">You are not login...</div>
-                    <button type="button" class="btn btn-primary w-100 mt-2" @onclick="ReLoad">Reset Page</button>
+                    <div class="alert alert-success mt-3">
+                        Password has been successfully changed!
+                    </div>
+                    <button type="button" class="btn btn-primary w-100 mt-2" @onclick="GoToLogin">Back to Login</button>
+                }
+
+                @if (isMismatch)
+                {
+                    <div class="alert alert-danger mt-3">
+                        New password and confirm password do not match.
+                    </div>
                 }
             </div>
         </div>
@@ -143,39 +138,47 @@
 </style>
 
 @code {
-    public class UserModel
-{
-    public string UserID { get; set; }
-    public string Password { get; set; }
-    public bool IsSaved { get; set; }
-    public string DataFile { get; set; }
-    public string Designation { get; set; }
-    public string Company { get; set; }
-}
-
-    protected override void OnInitialized()
+    public class ResetPasswordModel
     {
-        
-        Model.UserID = "";
-        Model.Password = "";
-        Model.IsSaved = false;
-        Model.DataFile = "";
-        Model.Designation = "";
-        Model.Company = "";
+        [Required]
+        public string UserID { get; set; }
+
+        [Required]
+        public string CurrentPassword { get; set; }
+
+        [Required]
+        public string NewPassword { get; set; }
+
+        [Required]
+        [Compare(nameof(NewPassword), ErrorMessage = "Passwords do not match.")]
+        public string ConfirmPassword { get; set; }
     }
 
-    private UserModel Model = new UserModel();
+    private ResetPasswordModel model = new ResetPasswordModel();
 
-    private void Submit()
+    private bool isSuccess = false;
+    private bool isMismatch = false;
+
+    private void HandleSubmit()
     {
-        // Implement login logic
-        IsLogin = true; // or false based on authentication
+        isMismatch = false;
+
+        if (model.NewPassword != model.ConfirmPassword)
+        {
+            isMismatch = true;
+            return;
+        }
+
+        // TODO: Add your password change logic here
+        // Example: Validate current password, update new password in database
+
+        isSuccess = true;
     }
 
-    private void ReLoad()
-    {
-        NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
-    }
+    [Inject] NavigationManager NavManager { get; set; }
 
-    private bool IsLogin = true; // Replace with your actual logic
+    private void GoToLogin()
+    {
+        NavManager.NavigateTo("/Users/Login1");
+    }
 }
