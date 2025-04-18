@@ -1,5 +1,7 @@
 ﻿
 function printer(rptBytes64) {
+    // This function will open the printer dialoge box
+    console.log("Input Base64 string:", rptBytes64);
     const byteCharacters = atob(rptBytes64);
     const byteNumbers = new Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {

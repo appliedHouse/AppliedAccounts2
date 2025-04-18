@@ -22,22 +22,25 @@ namespace AppReports
         //public bool Render => ReportRender();
         private readonly string DateTimeFormat = "yyyy-MM-dd [hh:mm:ss]";
         private string DateTimeNow => DateTime.Now.ToString(DateTimeFormat);
-        public NavigationManager NavManager { get; set; }
         
         #endregion
 
         #region Constructor
         public ReportModel()
         {
-            Messages = new List<string>();
+            Messages = [];
             InputReport = new InputReport();
             OutputReport = new OutputReport();
             ReportData = new ReportData();
-            ReportParameters = new List<ReportParameter>();
-            ReportBytes = Array.Empty<byte>();
+            ReportParameters = [];
+            ReportBytes = [];
 
             Messages.Add($"{DateTimeNow}: Report Class Started.");
-            ReportPath = "PDFReports/";
+            ReportPath ??= "PDFReports";
+            ReportUrl ??= "http://localhost/";
+
+            InputReport.BasePath = Directory.GetCurrentDirectory();
+            OutputReport.ReportUrl = ReportUrl;
 
         }
 
@@ -56,6 +59,8 @@ namespace AppReports
         {
             IsReportRendered = false;
             Messages.Add($"{DateTimeNow}: Report rendering started");
+            Messages.Add($"{DateTimeNow}: Report Base URL {ReportUrl}");
+            Messages.Add($"{DateTimeNow}: Report ReportPath {ReportPath}");
 
             if (ReportParameters.Count == 0) { DefaultParameters.GetDefaultParameters(); }
             if (InputReport.IsFileExist)
@@ -68,11 +73,12 @@ namespace AppReports
                 OutputReport.MimeType = ReportMime.GetReportMime(_ReportType);
                 Messages.Add($"{DateTimeNow}: Report MimeType is {OutputReport.MimeType}");
 
-                OutputReport.FileExtention = OutputReport.GetFileExtention(_ReportType);
+                //OutputReport.FileExtention = OutputReport.GetFileExtention(_ReportType);
                 Messages.Add($"{DateTimeNow}: Report File Extention is {OutputReport.FileExtention}");
 
-                string lastPart = Path.GetFileName(Path.GetDirectoryName(OutputReport.FilePath)) ?? "OutputPath";
-                OutputReport.FileLink = GetFileLink();
+                //string lastPart = Path.GetFileName(Path.GetDirectoryName(OutputReport.FilePath)) ?? "OutputPath";
+                //OutputReport.FileLink = GetFileLink();
+                Messages.Add($"{DateTimeNow}: Report File Full Name is {OutputReport.FileFullName}");
                 Messages.Add($"{DateTimeNow}: Report File download link is {OutputReport.FileLink}");
 
                 var _ReportFile = InputReport.FileFullName;
@@ -111,10 +117,10 @@ namespace AppReports
             return IsReportRendered;
         }
 
-        private string GetFileLink()
-        {
-            return OutputReport.FileFullName;
-        }
+        //private string GetFileLink()
+        //{
+        //    return OutputReport.FileFullName;
+        //}
 
         public async Task<bool> ReportRenderAsync()
         {
@@ -151,7 +157,7 @@ namespace AppReports
                     Messages.Add($"{DateTimeNow}: Report saved sucessfully");
                     Messages.Add($"{DateTimeNow}: Created a file {_FileName}");
 
-                    ReportUrl = $"{OutputReport.FilePath}/{OutputReport.FileName}{OutputReport.FileExtention}";
+                    //ReportUrl = $"{OutputReport.FilePath}/{OutputReport.FileName}{OutputReport.FileExtention}";
 
                 }
             }
@@ -176,12 +182,15 @@ namespace AppReports
 
     public class InputReport
     {
-        public string FilePath { get; set; } = string.Empty;
-        public string FileName { get; set; } = string.Empty;
-        public string FileExtention { get; set; } = string.Empty;
+        public string FilePath { get; set; } = string.Empty;            // Path after wwwroot
+        public string FileName { get; set; } = string.Empty;            // File name
+        public string FileExtention { get; set; } = string.Empty;       // Extention without dot
+        public string BasePath { get; set; } = Directory.GetCurrentDirectory();
+        public string RootPath { get; set; } = "wwwroot";
 
         public string FileFullName => GetFullName();
         public bool IsFileExist => GetFileExist();
+
 
         private bool GetFileExist()
         {
@@ -193,36 +202,41 @@ namespace AppReports
         {
             if (FilePath.Length > 0 && FileName.Length > 0 && FileExtention.Length > 0)
             {
-                return Path.Combine(FilePath, FileName + "." + FileExtention);
+                return Path.Combine(BasePath, RootPath, FilePath, FileName + "." + FileExtention);
             }
             return string.Empty;
         }
     }
     public class OutputReport
     {
-        public string FilePath { get; set; } = string.Empty;
-        public string FileName { get; set; } = string.Empty;
-        public string FileLink { get; set; } = string.Empty;
-        public string FileExtention { get; set; } = string.Empty;
+        public string ReportUrl { get; set; }       // like http://localhist:xxx/
+        public string BasePath { get; set; } = Directory.GetCurrentDirectory();
+        public string RootPath { get; set; } = "wwwroot";
+        public string FilePath { get; set; } = string.Empty;            // file path after wwwroot
+        public string FileName { get; set; } = string.Empty;            // file Name
+        public string FileExtention => GetFileExtention(ReportType);       // File Extention get dynamically
+        public string FileLink => GetFileLink();                         // Create a lick to display file         
         public ReportType ReportType { get; set; } = ReportType.Preview;
         public string MimeType { get; set; } = string.Empty;
         public FileStream FileStream { get; set; }
         public bool IsFileExist => File.Exists(FileFullName);
         public string FileFullName => GetFullName();
+        
         private string GetFullName()
         {
             var _Extention = GetFileExtention(ReportType);
 
             if (FilePath.Length > 0 && FileName.Length > 0 && _Extention.Length > 0)
             {
-                return $"{FilePath}/{FileName}{_Extention}";
+                return Path.Combine(BasePath,RootPath,FilePath,FileName+FileExtention);
+                
             }
             return string.Empty;
         }
 
         public string GetFileLink()
         {
-            return $"{FileLink}{FileName}{FileExtention}";
+            return $"{ReportUrl}/{FilePath}/{FileName}{FileExtention}";
         }
 
 

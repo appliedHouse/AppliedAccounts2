@@ -12,6 +12,7 @@
     <TargetFramework>net9.0-windows10.0.17763.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>Icon200.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -43,6 +44,10 @@
     <None Remove="wwwroot\SQLiteDB\**" />
     <None Remove="wwwroot\SQLiteTemp\**" />
     <None Remove="wwwroot\System\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Icon200.ico" />
   </ItemGroup>
 
   <ItemGroup>

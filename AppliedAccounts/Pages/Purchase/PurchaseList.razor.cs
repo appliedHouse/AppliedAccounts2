@@ -121,7 +121,7 @@ namespace AppliedAccounts.Pages.Purchase
                 _Reportmodel.InputReport.FileExtention = "rdl";
                 // output Parameters (like pdf, excel, word, html, tiff)
                 _Reportmodel.OutputReport.FilePath = AppUser.PDFFolder + "\\";
-                _Reportmodel.OutputReport.FileLink = "";
+                //_Reportmodel.OutputReport.FileLink = "";
                 _Reportmodel.OutputReport.ReportType = _ReportOption;
                 // Reports Parameters
                 _Reportmodel.AddReportParameter("CompanyName", _CompanyName);

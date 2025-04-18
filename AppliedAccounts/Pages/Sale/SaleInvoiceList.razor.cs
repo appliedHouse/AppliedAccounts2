@@ -100,7 +100,9 @@ namespace AppliedAccounts.Pages.Sale
             ReportService.RptModel = CreateReportModel(ID);         // and then generate report parameters
             ReportService.RptType = ReportType.Preview;
             var ReportList = ReportService.GetReportLink();
-            await js.InvokeVoidAsync("downloadPDF", _FileName, ReportService.RptModel.ReportBytes);
+            string base64String = Convert.ToBase64String(ReportService.RptModel.ReportBytes);
+
+            await js.InvokeVoidAsync("printer", base64String);
             
         }
         private ReportData GetReportData(int ID)
@@ -129,25 +131,27 @@ namespace AppliedAccounts.Pages.Sale
                 var _CompanyName = AppUser.Company;
                 var _ReportFooter = AppFunctions.ReportFooter();
 
-
+                _Reportmodel.ReportUrl = NavManager.BaseUri;
 
                 // Input Parameters  (.rdl report file)
                 _Reportmodel.InputReport.FilePath = _ReportPath;
                 _Reportmodel.InputReport.FileName = "CDCInv";
                 _Reportmodel.InputReport.FileExtention = "rdl";
+                
                 // output Parameters (like pdf, excel, word, html, tiff)
-                _Reportmodel.OutputReport.FilePath = AppUser.PDFFolder + "\\";
-                _Reportmodel.OutputReport.FileLink = "";
+                _Reportmodel.OutputReport.FilePath = AppUser.PDFFolder;
+                _Reportmodel.OutputReport.FileName = "SaleInvoice_" + _ID.ToString("0000");
+                _Reportmodel.OutputReport.ReportType = ReportType.Preview;
                 _Reportmodel.OutputReport.ReportType = _ReportOption;
+                _Reportmodel.OutputReport.ReportUrl = _Reportmodel.ReportUrl;
                 // Reports Parameters
                 _Reportmodel.AddReportParameter("CompanyName", _CompanyName);
                 _Reportmodel.AddReportParameter("Heading1", _Heading1);
                 _Reportmodel.AddReportParameter("Heading2", _Heading2);
                 _Reportmodel.AddReportParameter("Footer", _ReportFooter);
 
-                var _SaveAs = "Test";
-
-                _Reportmodel.OutputReport.FileName = _SaveAs;
+                //var _SaveAs = _Reportmodel.OutputReport.FileFullName;
+                //_Reportmodel.OutputReport.FileName = _SaveAs;
             }
             catch (Exception)
             {

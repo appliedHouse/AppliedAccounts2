@@ -515,7 +515,7 @@ namespace AppliedAccounts.Models
                 Reportmodel.InputReport.FileExtention = "rdl";
                 // output Parameters (like pdf, excel, word, html, tiff)
                 Reportmodel.OutputReport.FilePath = _Globals.AppPaths.PDFPath;
-                Reportmodel.OutputReport.FileLink = _Globals.AppPaths.PDFPath;
+                //Reportmodel.OutputReport.FileLink = _Globals.AppPaths.PDFPath;
                 Reportmodel.OutputReport.FileName = _ReportFile;
                 Reportmodel.OutputReport.ReportType = _RptType;
                 // Reports Parameters

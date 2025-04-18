@@ -138,8 +138,6 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-
-
         #region Save
         public void Save()
         {
@@ -168,280 +166,6 @@ namespace AppliedAccounts.Models
         //}
         #endregion
 
-        #region Record Add in List
-        //public int NewRecord(SaleInvoiceRecord NewRecord)
-        //{
-        //    //var _Found = false;
-        //foreach (SaleInvoiceRecord _Record in SaleInvoiceRecords)
-        //{
-        //    if (_Record.Sr_No == NewRecord.Sr_No)
-        //    {
-        //        _Found = true;
-        //    }
-        //}
-
-        //if (!_Found)
-        //{
-        //    NewRecord.Status = VoucherStatus.Submitted.ToString();
-        //    NewRecord.ID1 = 0;
-        //    NewRecord.ID2 = 0;
-        //    SaleInvoiceRecords.Add(NewRecord);
-        //}
-        //return 0;
-        //}
-        #endregion
-
-        #region Get / Set Sales Invoice Record (Table to Variable)
-        //public bool SetSaleInvoiceRecord(int _ID)
-        //{
-        //    if (View_SalesInvoice is not null)
-        //    {
-        //        if (View_SalesInvoice.Rows.Count > 0)
-        //        {
-        //            View_SalesInvoice.DefaultView.RowFilter = $"ID2={_ID}";
-        //            if (View_SalesInvoice.DefaultView.Count > 0)
-        //            {
-        //                var _Row = View_SalesInvoice.DefaultView[0].Row;
-        //                _Row = AppliedDB.Functions.RemoveNull(_Row);
-
-        //                SaleInvoiceRecord = new();
-        //                SaleInvoiceRecord.ID1 = (int)_Row["ID1"];
-        //                SaleInvoiceRecord.ID2 = (int)_Row["ID2"];
-        //                SaleInvoiceRecord.Vou_No = (string)_Row["Vou_No"];
-        //                SaleInvoiceRecord.Ref_No = (string)_Row["Ref_No"];
-        //                SaleInvoiceRecord.Inv_No = (string)_Row["Inv_No"];
-        //                SaleInvoiceRecord.TranID = (int)_Row["TranID"];
-        //                SaleInvoiceRecord.Sr_No = (int)_Row["Sr_No"];
-        //                SaleInvoiceRecord.Inventory = (int)_Row["Inventory"];
-        //                SaleInvoiceRecord.Company = (int)_Row["Company"];
-        //                SaleInvoiceRecord.Employee = (int)_Row["Employee"];
-        //                SaleInvoiceRecord.Project = (int)_Row["Project"];
-        //                SaleInvoiceRecord.TaxID = (int)_Row["Tax"];
-        //                SaleInvoiceRecord.Vou_Date = (DateTime)_Row["Vou_Date"];
-        //                SaleInvoiceRecord.Inv_Date = (DateTime)_Row["Inv_Date"];
-        //                SaleInvoiceRecord.Pay_Date = (DateTime)_Row["Pay_Date"];
-        //                SaleInvoiceRecord.Remarks = (string)_Row["Description"];
-        //                SaleInvoiceRecord.Comments = (string)_Row["Comments"];
-        //                SaleInvoiceRecord.Description = (string)_Row["Description2"];
-        //                SaleInvoiceRecord.Batch = (string)_Row["Batch"];
-        //                SaleInvoiceRecord.Status = (string)_Row["Status"];
-        //                SaleInvoiceRecord.Qty = (decimal)_Row["Qty"];
-        //                SaleInvoiceRecord.Rate = (decimal)_Row["Rate"];
-        //                SaleInvoiceRecord.TaxRate = (decimal)_Row["Tax_Rate"];
-
-        //                SaleInvoiceRecord.TitleInventory = Source.SeekTitle(Tables.Inventory, (int)_Row["Inventory"]);
-        //                SaleInvoiceRecord.TitleEmployee = Source.SeekTitle(Tables.Employees, (int)_Row["Employee"]);
-        //                SaleInvoiceRecord.TitleProject = Source.SeekTitle(Tables.Project, (int)_Row["Project"]);
-        //                SaleInvoiceRecord.TitleTaxID = Source.SeekTitle(Tables.Taxes, (int)_Row["Tax"]);
-        //                SaleInvoiceRecord.TaxRate = Source.SeekTaxRate((int)_Row["Tax"]);
-
-        //                SetTotals();
-
-        //                return true;
-
-        //            }
-        //        }
-        //    }
-        //    return false;
-        //}
-
-        //public bool GetSaleInvoiceRecord(SaleInvoiceRecord _ModelRecord)
-        //{
-        //    if (_ModelRecord.ID2 > 0)
-        //    {
-        //        foreach (SaleInvoiceRecord _Item in SaleInvoiceRecords)
-        //        {
-        //            _Item.Vou_No = _ModelRecord.Vou_No;
-        //            _Item.Vou_Date = _ModelRecord.Vou_Date;
-        //            _Item.Inv_No = _ModelRecord.Inv_No;
-        //            _Item.Inv_Date = _ModelRecord.Inv_Date;
-        //            _Item.Pay_Date = _ModelRecord.Pay_Date;
-        //            _Item.Ref_No = _ModelRecord.Ref_No;
-        //            _Item.Company = _ModelRecord.Company;
-        //            _Item.Employee = _ModelRecord.Employee;
-        //            _Item.Remarks = _ModelRecord.Remarks;
-        //            _Item.Comments = _ModelRecord.Comments;
-        //            _Item.Status = "Updated";
-
-        //            if (_Item.ID2 == _ModelRecord.ID2)
-        //            {
-        //                _Item.Inventory = _ModelRecord.Inventory;
-        //                _Item.Qty = _ModelRecord.Qty;
-        //                _Item.Rate = _ModelRecord.Rate;
-        //                _Item.TaxID = _ModelRecord.TaxID;
-        //                _Item.Project = _ModelRecord.Project;
-        //                _Item.Description = _ModelRecord.Description;
-        //            }
-        //        }
-
-        //    }
-
-        //    return false;
-        //}
-        //public void GetSaleInvoice(string _InvoiceNo)
-        //{
-        //    SaleInvoiceRecords = SetSaleInvoice(_InvoiceNo);
-        //    Report.ReportData.ReportTable = SaleInvoiceRecords.ToDataTable();
-        //    SetTotals();
-        //}
-
-        //public List<SaleInvoiceRecord> SetSaleInvoice(string _InvoiceNo)
-        //{
-        //    List<SaleInvoiceRecord> _List = new();
-        //    if (_InvoiceNo is not null)
-        //    {
-
-        //        InvoiceNo = _InvoiceNo;
-
-
-        //        View_SalesInvoice.DefaultView.RowFilter = $"Vou_No='{InvoiceNo}'";
-        //        if (View_SalesInvoice.DefaultView.Count > 0)
-        //        {
-        //            foreach (DataRowView RowView in View_SalesInvoice.DefaultView)
-        //            {
-        //                var _ID = (int)RowView["ID2"];
-        //                if (SetSaleInvoiceRecord(_ID))
-        //                {
-
-        //                    _List.Add(SaleInvoiceRecord);
-        //                }
-        //            }
-
-        //        }
-        //    }
-
-
-        //    return _List;
-        //}
-
-
-        #endregion
-
-        #region Totals
-        //public void SetTotals()
-        //{
-        //    Totals = new();
-        //    Totals.NumberFormat = NumberFormat;
-        //    if (SaleInvoiceRecords.Count > 0)
-        //    {
-        //        foreach (var _Record in SaleInvoiceRecords)
-        //        {
-        //            if (_Record.ID2 >= 0)
-        //            {
-        //                Totals.Tot_Qty += _Record.Qty;
-        //                Totals.Tot_Amount += _Record.Amount;
-        //                Totals.Tot_TaxAmount += _Record.TaxAmount;
-        //                Totals.Tot_NetAmount += _Record.NetAmount;
-        //            }
-        //        }
-        //    }
-        //}
-        #endregion
-
-        #region Validation of Record and DataRow
-        //public bool Validation(SaleInvoiceRecord _Record)
-        //{
-        //    var _Validated = true;
-
-        //    if (_Record.Qty == 0) { Messages.Add(MESSAGES.Row_QtyZero); _Validated = true; }
-        //    if (_Record.Rate == 0) { Messages.Add(MESSAGES.Row_RateZero); _Validated = true; }
-        //    if (_Record.Amount == 0) { Messages.Add(MESSAGES.Row_COAIsZero); _Validated = true; }
-        //    if (_Record.TaxAmount == 0) { Messages.Add(MESSAGES.Row_TaxAmountZero); _Validated = true; }
-        //    if (_Record.Company == 0) { Messages.Add(MESSAGES.Row_CompanyIDZero); _Validated = true; }
-        //    if (_Record.Inventory == 0) { Messages.Add(MESSAGES.Row_InventoryIDZero); _Validated = true; }
-        //    if (_Record.TaxID == 0) { Messages.Add(MESSAGES.Row_TaxIDZero); _Validated = true; }
-        //    if (_Record.Project == 0) { Messages.Add(MESSAGES.Row_ProjectIDZero); _Validated = true; }
-        //    if (_Record.Remarks.Length == 0) { Messages.Add(MESSAGES.Row_NoRemarks); _Validated = true; }
-        //    if (_Record.Description.Length == 0) { Messages.Add(MESSAGES.Row_NoDescription); _Validated = true; }
-
-        //    return _Validated;
-        //}
-        //public bool Validation(DataRow _Row)
-        //{
-        //    // return if row status is deleted.
-        //    if ((int)_Row["ID"] < 0) { return true; }
-
-        //    var _Validated = true;
-        //    if (_Row.Table.TableName.Equals(Tables.BillReceivable))
-        //    {
-        //        if (_Row is null) { Messages.Add(MESSAGES.RowValueNull); _Validated = false; }
-        //        if (_Row["ID"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Vou_No"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Vou_Date"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Company"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Employee"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Inv_No"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Inv_Date"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Pay_Date"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Amount"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Description"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-
-        //        if (_Row is null) { Messages.Add(MESSAGES.RowValueNull); _Validated = false; }
-        //        if (_Row["ID"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Vou_No"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Vou_Date"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Company"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Employee"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Inv_No"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Inv_Date"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Pay_Date"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Amount"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Description"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-
-        //        if ((decimal)_Row["Qty"] == 0) { Messages.Add(MESSAGES.Row_QtyZero); _Validated = true; }
-        //        if ((decimal)_Row["Rate"] == 0) { Messages.Add(MESSAGES.Row_RateZero); _Validated = true; }
-        //        if ((decimal)_Row["Amount"] == 0) { Messages.Add(MESSAGES.Row_COAIsZero); _Validated = true; }
-        //        if ((decimal)_Row["TaxAmount"] == 0) { Messages.Add(MESSAGES.Row_TaxAmountZero); _Validated = true; }
-        //        if ((decimal)_Row["Company"] == 0) { Messages.Add(MESSAGES.Row_CompanyIDZero); _Validated = true; }
-        //        if ((decimal)_Row["Inventory"] == 0) { Messages.Add(MESSAGES.Row_InventoryIDZero); _Validated = true; }
-        //        if ((decimal)_Row["TaxID"] == 0) { Messages.Add(MESSAGES.Row_TaxIDZero); _Validated = true; }
-        //        if ((decimal)_Row["Project"] == 0) { Messages.Add(MESSAGES.Row_ProjectIDZero); _Validated = true; }
-        //        if (_Row["Remarks"].ToString()?.Length == 0) { Messages.Add(MESSAGES.Row_NoRemarks); _Validated = true; }
-        //        if ((decimal)_Row["Description"] == 0) { Messages.Add(MESSAGES.Row_NoDescription); _Validated = true; }
-
-        //        if ((DateTime)_Row["Pay_Date"] < (DateTime)_Row["Inv_Date"]) { Messages.Add(MESSAGES.Sale_PayLessInvDate); }
-
-        //    }
-
-        //    if (_Row.Table.TableName.Equals(Tables.BillReceivable2))
-        //    {
-        //        if (_Row is null) { Messages.Add(MESSAGES.RowValueNull); _Validated = false; }
-        //        if (_Row["ID"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Sr_No"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["TranID"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Inventory"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Batch"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Qty"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Rate"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Tax"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["TaxRate"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-        //        if (_Row["Description"] == null) { Messages.Add(MESSAGES.ColumnIsNull); _Validated = false; }
-
-        //        if (_Row["ID"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Sr_No"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["TranID"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Inventory"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Batch"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Qty"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Rate"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Tax"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["TaxRate"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-        //        if (_Row["Description"] == DBNull.Value) { Messages.Add(MESSAGES.ColumnDBNullValue); _Validated = false; }
-
-
-        //        if ((int)_Row["TranID"] == 0) { Messages.Add(MESSAGES.ColumnValueZero); _Validated = false; }
-        //        if ((int)_Row["Inventory"] == 0) { Messages.Add(MESSAGES.ColumnValueZero); _Validated = false; }
-
-        //        var __TaxRate = Source.SeekTaxRate((int)_Row["TaxID"]);
-        //        if (__TaxRate.Equals((decimal)_Row["TaxRate"])) { Messages.Add(MESSAGES.Sale_TaxRateNotMatch); _Validated = false; }
-
-        //    }
-
-        //    return _Validated;
-
-        //}
-        #endregion
-
         #region Convert decimal to String Text
         public string ToAmount(object _Object)
         {
@@ -466,7 +190,6 @@ namespace AppliedAccounts.Models
         public decimal GetNetAmount() { return GetGross() + GetTaxAmount(); }
 
         #endregion
-
 
         #region Load Data
         public bool LoadData()
@@ -538,7 +261,6 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-
         #region Is Voucher is valided 
         public bool IsVoucherValidated()
         {
@@ -587,6 +309,7 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
+        #region Get New Detail (Empty)
         public Detail NewDetail()
         {
             MyVoucher.Details ??= [];           // Construct new if found null;
@@ -605,6 +328,7 @@ namespace AppliedAccounts.Models
             _Detail.Unit = 0;
             return _Detail;
         }
+        #endregion
 
         #region Navigation of Records
         public void Top()
@@ -644,7 +368,7 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-        #region 
+        #region Remove
         public void Remove()
         {
             throw new NotImplementedException();
@@ -682,9 +406,8 @@ namespace AppliedAccounts.Models
         }
         public ReportModel CreateReportModel(int _ID)
         {
-            var _InvoiceNo = MyVoucher.Master.Vou_No;
             var _Heading1 = "Sale Invoice";
-            var _Heading2 = $"Sale Invoice [{_InvoiceNo}]";
+            var _Heading2 = $"{_Heading1} [{MyVoucher.Master.Vou_No}]";
             var _ReportPath = UserProfile!.ReportFolder;
             var _CompanyName = UserProfile.Company;
             var _ReportFooter = AppFunctions.ReportFooter();
@@ -696,9 +419,7 @@ namespace AppliedAccounts.Models
             rptModel.InputReport.FilePath = UserProfile!.ReportFolder;
 
             rptModel.OutputReport.FileName = $"Receipt_{_ID}";
-            rptModel.OutputReport.FileExtention = ".pdf";
             rptModel.OutputReport.FilePath = UserProfile!.PDFFolder;
-            rptModel.OutputReport.ReportType = ReportType.PDF;
 
             rptModel.AddReportParameter("CompanyName", _CompanyName);
             rptModel.AddReportParameter("Heading1", _Heading1);

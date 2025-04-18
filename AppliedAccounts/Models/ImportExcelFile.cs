@@ -29,6 +29,10 @@ namespace AppliedAccounts.Models
 
         public async Task ImportDataAsync()
         {
+            try
+            {
+
+           
 
             var _Directory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelFiles");
             if (!Directory.Exists(_Directory)) { Directory.CreateDirectory(_Directory); }
@@ -37,8 +41,9 @@ namespace AppliedAccounts.Models
 
             if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
 
-            using (FileStream fs = new(_ExcelFile, FileMode.Create))
+            using (FileStream fs = new(_ExcelFile, FileMode.Create, FileAccess.Write))
             { await ExcelFile.OpenReadStream().CopyToAsync(fs); }
+
 
             using (var stream = File.Open(_ExcelFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var reader = ExcelReaderFactory.CreateReader(stream))
@@ -54,6 +59,12 @@ namespace AppliedAccounts.Models
 
 
             if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
+            }
+            catch (Exception error)
+            {
+                var message = error.Message;
+                throw;
+            }
         }
 
         #endregion
