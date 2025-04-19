@@ -127,7 +127,7 @@ namespace AppliedAccounts.Pages.Sale
                 var ReportList = ReportService.GetReportLink();
                 var rptArray = ReportService.RptModel.ReportBytes;
                 var rptMime = ReportService.RptModel.OutputReport.MimeType;
-                var rptFile = ReportService.RptModel.OutputReport.OutputFileName;
+                var rptFile = $"{MyModel.Record.Ref_No}_{MyModel.Record.TitleCustomer}";
                 await js.InvokeVoidAsync("downloadFile", rptFile, rptArray, rptMime);
             }
             catch (Exception error)
