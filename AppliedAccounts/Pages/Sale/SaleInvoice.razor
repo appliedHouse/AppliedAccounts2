@@ -53,7 +53,7 @@
             <div class="container-fluid">
                 <!-- Voucher master -->
                 <div class="container group1">
-                    <div class="row">
+                    <div class="row g-1">
                         <div class="col-md-3">
                             <div class="form-floating mb-1 txt">
                                 <InputText @bind-Value="@MyModel.MyVoucher.Master.Vou_No" class="form-control" id="txtVouNo" placeholder="Voucher No" readonly />
@@ -79,7 +79,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row g-1 p-1">
+                    <div class="row mt-1 g-1">
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
                                 <InputText @bind-Value="@MyModel.MyVoucher.Master.Inv_No" class="form-control" id="txtInvNo" placeholder="Invoice No" />
@@ -119,7 +119,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row g-1 p-1">
+                    <div class="row mt-1 g-1">
                         <div class="col-md-6">
                             <div class="form-floating mb-1">
 
@@ -139,7 +139,7 @@
 
                 <!-- Voucher Detail -->
                 <div class="container group2">
-                    <div class="row g-1 p-1">
+                    <div class="row g-1">
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
                                 <InputNumber id="txtSrNo" Step="1" class="form-control" @bind-Value="@MyModel.MyVoucher.Detail.Sr_No" placeholder="Serial No." />
@@ -179,30 +179,31 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row g-1 p-1">
+                    <div class="row mt-1 g-1">
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
-                                <FormatedInputNumber Value="@MyModel.MyVoucher.Detail.Qty"
-                                                     ValueChanged="@((val) => MyModel.MyVoucher.Detail.Qty = val)" />
-                                @* <InputNumber  id="txtBatch" Step=".0001" class="form-control" @bind-Value="@MyModel.MyVoucher.Detail.Qty" placeholder="Stock Quantity" /> *@
+                                <FormatedInputNumber Value="@MyModel.MyVoucher.Detail.Qty" ValueChanged="@((val) => MyModel.MyVoucher.Detail.Qty = val)" />
+                                @* <InputNumber id="txtBatch" Step=".0001" class="form-control right" @bind-Value="@MyModel.MyVoucher.Detail.Qty" placeholder="Stock Quantity" /> *@
                                 <label for="txtBatch">Quantity</label>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
-                                <InputNumber id="txtRate" Step=".0001" class="form-control" @bind-Value="@MyModel.MyVoucher.Detail.Rate" placeholder="Stock Rate" />
+                                <FormatedInputNumber Value="@MyModel.MyVoucher.Detail.Rate" ValueChanged="@((val) => MyModel.MyVoucher.Detail.Rate = val)" />
+                                @* <InputNumber id="txtRate" Step=".0001" class="form-control right" @bind-Value="@MyModel.MyVoucher.Detail.Rate" placeholder="Stock Rate" /> *@
                                 <label for="txtRate">Rate</label>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
-                                <InputNumber id="txtAmount" class="form-control" Value="@MyModel.MyVoucher.Detail.Gross" ValueExpression="(()=> MyModel.MyVoucher.Detail.Gross)" placeholder="Sale Price" />
+                                @* <FormatedInputNumber Value="@MyModel.GetGross()" /> *@
+                                <InputNumber id="txtAmount" class="form-control right" readonly Value="@MyModel.MyVoucher.Detail.Gross" ValueExpression="(()=> MyModel.MyVoucher.Detail.Gross)" placeholder="Sale Price" />
                                 <label for="txtAmount">Amount</label>
                             </div>
                         </div>
 
                     </div>
-                    <div class="row g-1 p-1">
+                    <div class="row mt-1 g-1">
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
                                 <InputSelect id="ddTaxID" class="form-select" TValue="int" Value="@MyModel.MyVoucher.Detail.TaxID" ValueExpression="@(() => MyModel.MyVoucher.Detail.TaxID)" ValueChanged="@((e) => TaxChanged(e))">
@@ -216,24 +217,26 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
-                                <InputNumber id="txtTaxRate" class="form-control" Value="@MyModel.MyVoucher.Detail.TaxRate" ValueExpression="(()=> MyModel.MyVoucher.Detail.TaxRate)" placeholder="Tax Rate %" />
+                                <FormatedInputNumber Value="@MyModel.MyVoucher.Detail.TaxRate" ValueChanged="@((val) => MyModel.MyVoucher.Detail.TaxRate = val)" />
+                                @* <InputNumber id="txtTaxRate" class="form-control" Value="@MyModel.MyVoucher.Detail.TaxRate" ValueExpression="(()=> MyModel.MyVoucher.Detail.TaxRate)" placeholder="Tax Rate %" /> *@
                                 <label for="txtTaxRate">Tax Rate %</label>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
-                                <InputNumber id="txtTaxAmount" class="form-control" Value="@MyModel.MyVoucher.Detail.TaxAmount" ValueExpression="(()=> MyModel.MyVoucher.Detail.TaxAmount)" placeholder="Tax Amount" />
+
+                                <InputNumber id="txtTaxAmount" class="form-control" readonly Value="@MyModel.MyVoucher.Detail.TaxAmount" ValueExpression="(()=> MyModel.MyVoucher.Detail.TaxAmount)" placeholder="Tax Amount" />
                                 <label for="txtTaxAmount">Tax Amount</label>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
-                                <InputNumber id="txtNetAmount" class="form-control" Value="@MyModel.MyVoucher.Detail.NetAmount" ValueExpression="(()=> MyModel.MyVoucher.Detail.NetAmount)" placeholder="Net Amount" />
+                                <InputNumber id="txtNetAmount" class="form-control" readonly Value="@MyModel.MyVoucher.Detail.NetAmount" ValueExpression="(()=> MyModel.MyVoucher.Detail.NetAmount)" placeholder="Net Amount" />
                                 <label for="txtNetAmount">Net Amount</label>
                             </div>
                         </div>
                     </div>
-                    <div class="row g-1 p-1">
+                    <div class="row mt-1 g-1">
                         <div class="col-md-12">
                             <div class="form-floating mb-1">
                                 <InputText id="txtComments" class="form-control" @bind-Value="@MyModel.MyVoucher.Detail.Description" placeholder="Comments" />
@@ -348,7 +351,7 @@
                                     <td class="amount-blue">@MyModel.ToAmount(@SaleRecord.TaxAmount)</td>
                                     <td class="amount-blue">@MyModel.ToAmount(@SaleRecord.NetAmount)</td>
                                     <td style="text-align:center">
-                                        <button type="button" id="si_btn_edit" class="btn btn-link btn-edit" title="Edit" @onclick="()=>MyModel.Edit(SaleRecord.Sr_No)">
+                                        <button type="button" id="si_btn_edit" class="btn btn-link btn-edit" title="Edit" @onclick="()=>MyModel.Edit(SaleRecord.ID2)">
                                             <i class="bi bi-pencil-fill"></i>
                                         </button>
 

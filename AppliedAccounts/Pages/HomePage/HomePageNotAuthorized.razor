@@ -4,29 +4,30 @@
 @using AppliedAccounts.Data;
 @using AppliedAccounts.Models;
 @inject IConfiguration Config;
+@inject NavigationManager NavManager;
 
 @code {
 
-    public Globals AppValues { get; set; }
+    public Globals AppGlobals { get; set; }
     public string? BusinessPic { get; set; }
 
     protected override void OnInitialized()
     {
-        AppValues = new(Config);
-        BusinessPic = Path.Combine(AppValues.ImagesPath,"Accounts3.jpg");
+        AppGlobals = new(Config, NavManager);
+        BusinessPic = Path.Combine(AppGlobals.AppPaths.ImagesPath, "Accounts3.jpg");
     }
 
-    string BasePath => AppValues.BasePath;
-    string CompanyName => AppValues.Author.Company;
-    string Address1 => AppValues.Author.Address1;
-    string Address2 => AppValues.Author.Address2;
-    string Country => AppValues.Author.City + ", " + AppValues.Author.Country;
-    string Email => AppValues.Author.Email;
-    string Contact => AppValues.Author.Contact;
-    string Url => AppValues.Author.Url;
-    string Url2 => AppValues.Author.Url2;
+    string BasePath => AppGlobals.AppPaths.BasePath;
+    string CompanyName => AppGlobals.Author.Company;
+    string Address1 => AppGlobals.Author.Address1;
+    string Address2 => AppGlobals.Author.Address2;
+    string Country => AppGlobals.Author.City + ", " + AppGlobals.Author.Country;
+    string Email => AppGlobals.Author.Email;
+    string Contact => AppGlobals.Author.Contact;
+    string Url => AppGlobals.Author.Url;
+    string Url2 => AppGlobals.Author.Url2;
 
-    string ImagePath => AppValues.ImagesPath;
+    string ImagePath => AppGlobals.AppPaths.ImagesPath;
     string btnLogo => $"{ImagePath}/Home/logo.png";
     string btnSignin => $"{ImagePath}/Home/loginBtnIcon.png";
     string btnSignup => $"{ImagePath}/Home/signupBtnIcon.png";

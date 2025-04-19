@@ -2,6 +2,7 @@
 
 @attribute [Authorize]
 @using System.Data
+@using AppliedAccounts.Services
 @using AppliedDB
 @using Microsoft.AspNetCore.Components.Forms
 
@@ -9,6 +10,7 @@
 @inject AuthenticationStateProvider authStateProvider;
 @inject NavigationManager NavManager;
 @inject IJSRuntime js
+@inject ToastService ToastService
 
 
 @code {
@@ -21,9 +23,10 @@
     {
         AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
 
-        stopwatch.Start();
-        MyMessage = new();
-        Model = new();
+        
+        Stopwatch.Start();
+        MsgClass = new();
+        MyModel = new();
         Source = new(AppUser);
 
     }
@@ -31,6 +34,12 @@
     private async Task TriggerFileInput()
     {
         await js.InvokeVoidAsync("triggerFileUpload");
+    }
+
+    private async Task SaveMessage()
+    {
+        await js.InvokeVoidAsync("showModol", "modalSave");
+        
     }
 }
 
@@ -41,22 +50,22 @@
 </style>
 
 
-@if (IsError)
+@if (MyModel.IsError)
 {
     <div class="alert alert-danger" role="alert">
-        @ErrorMessage
+        @MyModel.ErrorMessage
     </div>
 }
 else
 {
 
 
-    <EditForm Model="Model">
-        @if (Model.ShowData)
+    <EditForm Model="MyModel">
+        @if (MyModel.ShowImportedData)
         {
             <div class="container p-2 m-2">
                 <div class="row">
-                    <button class="btn btn-warning" @onclick="Post">POST</button>
+                    <button class="btn btn-warning" @onclick="SaveMessage">POST</button>
                 </div>
             </div>
             <!-- Show Imported Sale Invocies Data-->
@@ -76,7 +85,7 @@ else
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model.SaleInvoiceList)
+                            @foreach (var item in MyModel.SaleInvoiceList)
                             {
                                 var _IDate = ((DateTime)item["Vou_Date"]).ToString(Format.DDMMMYY);
                                 var _PDate = ((DateTime)item["Pay_Date"]).ToString(Format.DDMMMYY);
@@ -105,7 +114,6 @@ else
         else
         {
             <!-- Upload Excel File-->
-
             <div class="container">
                 <div class="d-flex flex-row mb-3">
                     <div class="p-2">
@@ -150,16 +158,16 @@ else
                     {
                         <div class="row justify-content-center">
                             <div class="col-6">
-                                <p>@SpinnerMessage</p>
-                                @if (IsProgress)
+                                <p>@MyModel.SpinnerMessage</p>
+                                @if (MyModel.IsProgressBar)
                                 {
                                     <div class="progress bg-success progress-bar-striped progress-bar-animated">
                                         <div class="progress-bar" role="progressbar"
-                                             style="width:@BarPercent%"
-                                             aria-valuenow="@Counter"
+                                             style="width:@MyModel.BarPercent%"
+                                             aria-valuenow="@MyModel.Counter"
                                              aria-valuemin="0"
-                                             aria-valuemax="@TotalRec">
-                                            @BarPercent.ToString("0.##")%
+                                             aria-valuemax="@MyModel.TotalRec">
+                                            @MyModel.BarPercent.ToString("0.##")%
                                         </div>
                                     </div>
                                 }
@@ -180,7 +188,7 @@ else
 
 
         <!-- Importing of Data process Completed.-->
-        @if (Model.ShowMessages)
+        @if (MyModel.ShowMessages)
         {
             <div class="container mt-2">
                 <div class="row mb-2">
@@ -199,10 +207,10 @@ else
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (string message in MyMessage)
+                            @foreach (var message in MsgClass.MessageList)
                             {
                                 <tr>
-                                    <td>@message</td>
+                                    <td>@message.MessageText</td>
                                 </tr>
                             }
                         </tbody>
@@ -224,24 +232,26 @@ else
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>@Voucher</p>
+                    <div class="alert alert-success" role="alert">
+                        @Voucher
+                    </div>
 
-                    @if (Model.SelectedSale != null && Model.SelectedSale.Count > 0)
+                    @if (MyModel.SelectedSale != null && MyModel.SelectedSale.Count > 0)
                     {
                         <table class="table-list">
                             <thead>
                                 <tr>
-                                    <th style="width:20%; text-align:left">Batch</th>
+                                    <th style="width:20%; text-align:left">SR #</th>
                                     <th style="width:50%; text-align:left">Stock</th>
                                     <th style="width:30%; text-align:right">Net Amount</th>
                                 </tr>
                             </thead>
 
                             <tbody>
-                                @foreach (var item in Model.SelectedSale)
+                                @foreach (var item in MyModel.SelectedSale)
                                 {
                                     <tr class="tb-body-row">
-                                        <td class="tb-col-center">@item.Batch</td>
+                                        <td class="tb-col-center">@item.SrNo</td>
                                         <td class="tb-col-left">@item.Inventory</td>
                                         <td class="amount">@item.Amount.ToString(Format.Digit)</td>
                                     </tr>
@@ -272,3 +282,22 @@ else
         </div>
     </div>
 }
+
+<!-- Modal -->
+<div class="modal fade" id="modalSave" tabindex="-1" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="saveModallabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure to post all sales invocies...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" @onclick="Post">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>

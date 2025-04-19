@@ -8,8 +8,8 @@
     public string? BusinessPic { get; set; }
     protected override void OnInitialized()
     {
-        AppGlobals = new(Config);
-        BusinessPic = $"{AppGlobals.ImagesPath}/Accounts3.jpg";
+        AppGlobals = new(Config,NavManager);
+        BusinessPic = $"{AppGlobals.AppPaths.ImagesPath}/Accounts3.jpg";
     }
 }
 <div class="HomeDiv">

@@ -1,11 +1,15 @@
 ﻿<InputText @bind-Value="_displayValue"
-           @onblur="FormatValue"
-           @oninput="OnInputChanged"
-           class="form-control" />
+@onblur="FormatValue"
+@oninput="OnInputChanged"
+@onfocusout="OnFocusOut"
+class="form-control right" />
 
 @code {
-    [Parameter] public decimal Value { get; set; }
-    [Parameter] public EventCallback<decimal> ValueChanged { get; set; }
+    [Parameter]
+    public decimal Value { get; set; }
+
+    [Parameter]
+    public EventCallback<decimal> ValueChanged { get; set; }
 
     private string _displayValue;
 
@@ -14,13 +18,23 @@
         _displayValue = FormatDecimal(Value);
     }
 
-    private void OnInputChanged(ChangeEventArgs e)
+    private async Task OnInputChanged(ChangeEventArgs e)
     {
         _displayValue = e.Value?.ToString() ?? "";
+
         if (decimal.TryParse(_displayValue, out var result))
         {
-            ValueChanged.InvokeAsync(result);
+            // Invoke the event callback to update the parent component
+            await ValueChanged.InvokeAsync(result);
+
+            // Force the component to re-render after the update
+            StateHasChanged();
         }
+    }
+
+    private async Task OnFocusOut()
+    {
+        await InvokeAsync(StateHasChanged);
     }
 
     private void FormatValue()
@@ -33,6 +47,6 @@
 
     private string FormatDecimal(decimal val)
     {
-        return val.ToString(Format.Digit); // customize as needed
+        return val.ToString(Format.Digit); // Customize the format as needed (e.g., two decimal places)
     }
 }

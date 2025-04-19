@@ -41,16 +41,16 @@ namespace AppliedAccounts.Pages.Users
                     LanguageID = LanguageID,
 
                     // Default Application Foler
-                    RootFolder = AppGlobals.RootPath ?? "wwwroot",
-                    ClientsFolder = AppGlobals.ClientPath ?? "SQLiteDB",
-                    UsersFolder = AppGlobals.UsersPath ?? "SQLiteDB",
-                    ReportFolder = AppGlobals.ReportPath ?? "Reports",
-                    LanguageFolder = AppGlobals.LanguagesPath ?? "Languages",
-                    MessageFolder = AppGlobals.MessagesPath ?? "Messages",
-                    ImageFolder = AppGlobals.ImagesPath ?? "Images",
-                    PDFFolder = AppGlobals.PDFPath ?? "PDFReport",
-                    SystemFolder = AppGlobals.SystemPath ?? "System",
-                    SessionFolder = AppGlobals.SessionPath ?? "Sessions",
+                    RootFolder = AppGlobals.AppPaths.RootPath ?? "wwwroot",
+                    ClientsFolder = AppGlobals.AppPaths.ClientPath ?? "SQLiteDB",
+                    UsersFolder = AppGlobals.AppPaths.UsersPath ?? "SQLiteDB",
+                    ReportFolder = AppGlobals.AppPaths.ReportPath ?? "Reports",
+                    LanguageFolder = AppGlobals.AppPaths.LanguagesPath ?? "Languages",
+                    MessageFolder = AppGlobals.AppPaths.MessagesPath ?? "Messages",
+                    ImageFolder = AppGlobals.AppPaths.ImagesPath ?? "Images",
+                    PDFFolder = AppGlobals.AppPaths.PDFPath ?? "PDFReport",
+                    SystemFolder = AppGlobals.AppPaths.SystemPath ?? "System",
+                    SessionFolder = AppGlobals.AppPaths.SessionPath ?? "Sessions",
 
                 });
 
@@ -86,8 +86,12 @@ namespace AppliedAccounts.Pages.Users
             var _UserID = _UserModel.UserID;
             if (_UserModel != null)
             {
+                
 
-                var UsersDBFile = Path.Combine(AppGlobals.BasePath, AppGlobals.RootPath, AppGlobals.UsersPath, "AppliedUsers2.db");
+                var UsersDBFile = Path.Combine(
+                    AppGlobals.AppPaths.FirstPath,
+                    AppGlobals.AppPaths.RootPath,
+                    AppGlobals.AppPaths.UsersPath, "AppliedUsers2.db");
 
                 var _CommandText = $"SELECT * FROM [Users] WHERE [UserID] = '{_UserID}'";
                 var _Connection = Connections.GetSQLiteConnection(UsersDBFile); _Connection?.Open();

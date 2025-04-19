@@ -1,4 +1,4 @@
-﻿@page "/Menu/Purchase"
+﻿@page "/Menu/MenuPurchase"
 @attribute [Authorize];
 @inject NavigationManager NavManager
 @using AppliedAccounts.Libs
@@ -15,7 +15,7 @@
 <div class="container">
     <div class="row">
         <div class="col-4">
-            <MenuCard Message="@PurchaseInvoiceText" NavTo="/Stock/PurchaseInvoiceList" PicPath="./images/Cards/COA.jpg" />
+            <MenuCard Message="@PurchaseInvoiceText" NavTo="/Purchase/PurchaseList" PicPath="./images/Cards/COA.jpg" />
         </div>
        
     </div>

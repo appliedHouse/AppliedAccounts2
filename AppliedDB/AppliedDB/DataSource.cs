@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Data.SQLite;
 using System.Text;
+
 using Tables = AppliedDB.Enums.Tables;
 using SQLQueries;
 using static AppliedDB.Enums;
@@ -30,14 +31,14 @@ namespace AppliedDB
 
         }
 
-        public DataSource(string _DBFile)
-        {
+        //public DataSource(string _DBFile)
+        //{
 
-            var _DBConnText = $"Data Source={_DBFile}";
-            var _Connection = new SQLiteConnection(_DBConnText);
-            MyConnection = _Connection;
+        //    var _DBConnText = $"Data Source={_DBFile}";
+        //    var _Connection = new SQLiteConnection(_DBConnText);
+        //    MyConnection = _Connection;
 
-        }
+        //}
 
         #endregion
 
@@ -160,9 +161,9 @@ namespace AppliedDB
                     {
                         if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
                         var _Command = new SQLiteCommand(_SQLQuery, MyConnection);
-                        using var _Adapter = new SQLiteDataAdapter(_Command);
-                        using var _DataSet = new DataSet();
-                        _Adapter.Fill(_DataSet, (new Guid()).ToString());
+                        var _Adapter = new SQLiteDataAdapter(_Command);
+                        var _DataSet = new DataSet();
+                        _Adapter.Fill(_DataSet, (Guid.NewGuid()).ToString());
                         if (MyConnection.State == ConnectionState.Open) { MyConnection.Close(); }
                         if (_DataSet.Tables.Count == 1)
                         {
@@ -174,7 +175,6 @@ namespace AppliedDB
             }
             catch (Exception)
             {
-
                 return new DataTable();
             }
         }

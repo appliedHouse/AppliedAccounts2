@@ -192,7 +192,6 @@ namespace AppliedAccounts.Pages.Sale
 
         }
         #endregion
-
        
 
         #region Home & Back Buttons

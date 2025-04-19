@@ -12,6 +12,7 @@
         public string PIN { get; set; } = string.Empty;
         public int LanguageID { get; set; }
         public Guid SessionGuid { get; set; }
+        public string AppPath { get; set; } = string.Empty;
         public string RootFolder { get; set; } = string.Empty;
         public string UsersFolder { get; set; } = string.Empty;
         public string ClientsFolder { get; set; } = string.Empty;

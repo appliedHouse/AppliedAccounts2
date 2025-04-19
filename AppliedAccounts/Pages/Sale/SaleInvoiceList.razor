@@ -8,8 +8,8 @@
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager NavManager
 @inject IJSRuntime js
-@inject Globals DIGlobal;
-@inject PrintService DIPrintReport;
+@inject Globals DIGlobal
+@inject PrintService DIPrintReport
 @inject HttpClient Http
 
 
@@ -23,8 +23,8 @@
         {
 
             AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
-            if (AppUser != null) { Model = new(AppUser); }
-            else { Model = new(); }
+            if (AppUser != null) { MyModel = new(AppUser); }
+            else { MyModel = new(); }
             IsDataLoad = true;
 
             MyGlobals = DIGlobal;
@@ -79,30 +79,30 @@
         <PageHeading Text="List of Sale Invoices" />
 
         @* Page Errors Show *@
-        @if (@Model.MsgClass.Count > 0)
+        @if (@MyModel.MsgClass.Count > 0)
         {
-            <PageErrors Messages="@Model.MsgClass"></PageErrors>
+            <PageErrors Messages="@MyModel.MsgClass"></PageErrors>
         }
 
-        <EditForm Model=@Model>
+        <EditForm Model=@MyModel>
 
             <div class="container mb-2">
                 <div class="d-flex flex-row mb-3 filter">
                     <div class="p-2">
-                        <InputText @bind-Value="@Model.SearchText" class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
+                        <InputText @bind-Value="@MyModel.SearchText" class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
                     </div>
                     <div class="p-2">
-                        <button type="button" class="btn btn-primary btn-sm" @onclick="()=>Model.Search()">Search</button>
+                        <button type="button" class="btn btn-primary btn-sm" @onclick="()=>MyModel.Search()">Search</button>
 
                     </div>
                     <div class="p-2">
-                        @if (Model.SearchText.Length > 0)
+                        @if (MyModel.SearchText.Length > 0)
                         {
-                            <button type="button" style="margin-top:5px; margin-left:5px" class="btn btn-primary btn-sm" @onclick="()=>Model.ClearText()">Clear</button>
+                            <button type="button" style="margin-top:5px; margin-left:5px" class="btn btn-primary btn-sm" @onclick="()=>MyModel.ClearText()">Clear</button>
                         }
                     </div>
                     <div class="p-2 mx-auto">
-                        @if (Model.Records.Count > 0)
+                        @if (MyModel.Records.Count > 0)
                         {
                             <button type="submit" class="btn-print" @onclick="(()=>PrintAll())"><i class="bi bi-printer-fill"></i> All</button>
                         }
@@ -137,10 +137,10 @@
                 </thead>
 
                 <tbody>
-                    @if (Model.Records.Count > 0)
+                    @if (MyModel.Records.Count > 0)
                     {
                         var SRNO = 0;
-                        @foreach (SalesRecord _Record in @Model.Records)
+                        @foreach (SalesRecord _Record in @MyModel.Records)
                         {
                             var _NavTo = $"/Sale/SaleInvoice/{_Record.Vou_No}";
                             SRNO++;
@@ -188,8 +188,8 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td class="amount">@Model.TotalAmount.ToString("###,###,##0.00")</td>
-                        @if (Model.Records.Count > 0)
+                        <td class="amount">@MyModel.TotalAmount.ToString("###,###,##0.00")</td>
+                        @if (MyModel.Records.Count > 0)
                         {
                             <td colspan="2" class="bg-light center-txt"><button type="submit" class="btn-print" @onclick="(()=>PrintAll())"><i class="bi bi-printer-fill"></i> All</button></td>
                         }

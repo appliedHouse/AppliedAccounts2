@@ -126,6 +126,7 @@ namespace AppliedDB
         public int LanguageID { get; set; } = 1;                // Default Language English.
 
 
+        public string BasePath { get; set; } = string.Empty;
         public string RootFolder { get; set; } = string.Empty;
         public string ClientFolder { get; set; } = string.Empty;
         public string UsersFolder { get; set; } = string.Empty;

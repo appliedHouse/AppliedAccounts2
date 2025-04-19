@@ -7,7 +7,7 @@ namespace AppliedAccounts.Models
 {
     public class SaleInvoiceListModel
     {
-        public AppUserModel? AppUser { get; set; }
+        public AppUserModel AppUser { get; set; }
         public DataSource? Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public SalesRecord Record { get; set; } = new();

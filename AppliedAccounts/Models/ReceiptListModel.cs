@@ -4,6 +4,7 @@ using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using AppReports;
+using Microsoft.AspNetCore.Components;
 using System.Data;
 using System.Text;
 using static AppliedDB.Enums;
@@ -25,6 +26,14 @@ namespace AppliedAccounts.Models
         public DateTime DT_End { get; set; }
         public bool PageIsValid { get; set; } = false;
         public PrintService ReportService { get; set; }
+        public AppUserModel? AppUser { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string DBFile { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public object Record { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public List<object> Records { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public decimal TotalAmount { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool SelectAll { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public NavigationManager NavManager { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         public ReceiptListModel(AppUserModel _AppUserModel)
         {
             UserProfile = _AppUserModel;
@@ -127,7 +136,7 @@ namespace AppliedAccounts.Models
             rptModel.InputReport.FilePath = UserProfile!.ReportFolder;
 
             rptModel.OutputReport.FileName = $"Receipt_{ID}";
-            rptModel.OutputReport.FileExtention = ".pdf";
+            //rptModel.OutputReport.FileExtention = ".pdf";
             rptModel.OutputReport.FilePath = UserProfile!.PDFFolder;
             rptModel.OutputReport.ReportType = ReportType.PDF;
 
@@ -137,6 +146,16 @@ namespace AppliedAccounts.Models
             rptModel.AddReportParameter("Footer", _ReportFooter);
 
             return rptModel;
+        }
+
+        public void Edit(int _ID)
+        {
+            throw new NotImplementedException();
+        }
+
+        List<object> IVoucherList.LoadData()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
