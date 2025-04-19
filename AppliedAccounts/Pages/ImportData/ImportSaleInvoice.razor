@@ -21,9 +21,9 @@
     {
         AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
 
-        stopwatch.Start();
+        Stopwatch.Start();
         MsgClass = new();
-        Model = new();
+        MyModel = new();
         Source = new(AppUser);
 
     }
@@ -41,53 +41,55 @@
 </style>
 
 
-<PageErrors Messages="@MsgClass"/>
+<PageErrors Messages="@MsgClass" />
 
-@if (IsError)
-{
-    <div class="alert alert-danger" role="alert">
-        @ErrorMessage
-    </div>
-}
-else
-{
-    @if (ShowSpinner)
+<EditForm Model="MyModel">
+    @if (MyModel.IsError)
     {
-        <!-- Spinner & Messages -->
-        <div class="container">
-            <div class="row mt-2">
-                <div class="row justify-content-center">
-                    <div class="col-6">
-                        <p>@SpinnerMessage</p>
-                        @if (IsProgress)
-                        {
-                            <div class="progress bg-success progress-bar-striped progress-bar-animated">
-                                <div class="progress-bar" role="progressbar"
-                                     style="width:@BarPercent%"
-                                     aria-valuenow="@Counter"
-                                     aria-valuemin="0"
-                                     aria-valuemax="@TotalRec">
-                                    @BarPercent.ToString("0.##")%
-                                </div>
-                            </div>
-                        }
-                        <p class="text-danger">This process may take some time, so please be patient.</p>
-                    </div>
-                    <div class="col-1 center-txt">
-                        <div class="spinner-border text-warning" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+        <div class="alert alert-danger" role="alert">
+            @MyModel.ErrorMessage
         </div>
     }
     else
     {
-        <EditForm Model="Model">
-            <!-- Show Imported Invoices before positng -->
-            @if (Model.ShowData)
+        @if (ShowSpinner)
+        {
+            <!-- Spinner & Messages -->
+            <div class="container">
+                <div class="row mt-2">
+                    <div class="row justify-content-center">
+                        <div class="col-6">
+                            <p>@MyModel.SpinnerMessage</p>
+
+                            @if (MyModel.IsProgressBar)
+                            {
+                                <div class="progress bg-success progress-bar-striped progress-bar-animated">
+                                    <div class="progress-bar" role="progressbar"
+                                         style="width:@MyModel.BarPercent%"
+                                         aria-valuenow="@MyModel.Counter"
+                                         aria-valuemin="0"
+                                         aria-valuemax="@MyModel.TotalRec">
+                                        @MyModel.BarPercent.ToString("0.##")%
+                                    </div>
+                                </div>
+                            }
+                            <p class="text-danger">This process may take some time, so please be patient.</p>
+                        </div>
+                        <div class="col-1 center-txt">
+                            <div class="spinner-border text-warning" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+        else
+        {
+
+            <!-- Step 3 ------- Show Imported Invoices before positng -->
+            @if (MyModel.ShowImportedData)
             {
                 <div class="container">
                     <div class="row m-1">
@@ -111,7 +113,7 @@ else
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var item in Model.SaleInvoiceList)
+                                @foreach (var item in MyModel.SaleInvoiceList)
                                 {
                                     var _IDate = ((DateTime)item["Vou_Date"]).ToString(Format.DDMMMYY);
                                     var _PDate = ((DateTime)item["Pay_Date"]).ToString(Format.DDMMMYY);
@@ -143,7 +145,7 @@ else
                 <div class="container">
                     <div class="d-flex flex-row mb-3">
                         <div class="p-2">
-                            <button class="btn btn-primary w1" 
+                            <button class="btn btn-primary w1"
                                     title="Upload Excel file" @onclick="TriggerFileInput">
                                 Upload Excel file
                             </button>
@@ -178,8 +180,8 @@ else
                 }
             }
 
-            <!-- Importing of Data process Completed.-->
-            @if (Model.ShowMessages)
+            <!-- Step 4 ---- Importing of Data process Completed.-->
+            @if (MyModel.ShowMessages)
             {
                 <div class="container mt-2">
                     <div class="row mb-2">
@@ -210,84 +212,89 @@ else
                 </div>
             }
 
-        </EditForm>
+
+        }
     }
-}
 
 
 
-@* Bootstrap 5 Modol *@
-<div class="modal fade" id="ModolSaleInvoice" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="ModalLabel">@ClientName</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>@Voucher</p>
 
-                @if (Model.SelectedSale != null && Model.SelectedSale.Count > 0)
-                {
-                    <table class="table-list">
-                        <thead>
-                            <tr>
-                                <th style="width:20%; text-align:left">Batch</th>
-                                <th style="width:50%; text-align:left">Stock</th>
-                                <th style="width:30%; text-align:right">Net Amount</th>
-                            </tr>
-                        </thead>
+    @* Bootstrap 5 Modol *@
+    <div class="modal fade" id="ModolSaleInvoice" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ModalLabel">@ClientName</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@Voucher</p>
 
-                        <tbody>
-                            @foreach (var item in Model.SelectedSale)
-                            {
-                                <tr class="tb-body-row">
-                                    <td class="tb-col-center">@item.Batch</td>
-                                    <td class="tb-col-left">@item.Inventory</td>
-                                    <td class="amount">@item.Amount.ToString(Format.Digit)</td>
+                    @if (MyModel.SelectedSale != null && MyModel.SelectedSale.Count > 0)
+                    {
+                        <table class="table-list">
+                            <thead>
+                                <tr>
+                                    <th style="width:20%; text-align:left">Batch</th>
+                                    <th style="width:50%; text-align:left">Stock</th>
+                                    <th style="width:30%; text-align:right">Net Amount</th>
                                 </tr>
+                            </thead>
 
-                            }
-                        </tbody>
+                            <tbody>
+                                @foreach (var item in MyModel.SelectedSale)
+                                {
+                                    <tr class="tb-body-row">
+                                        <td class="tb-col-center">@item.Batch</td>
+                                        <td class="tb-col-left">@item.Inventory</td>
+                                        <td class="amount">@item.Amount.ToString(Format.Digit)</td>
+                                    </tr>
 
-                        <tfoot>
-                            <tr>
-                                <td></td>
-                                <td>TOTAL</td>
-                                <td class="amount">@Totals.Tot_Amount.ToString(Format.Digit)</td>
-                            </tr>
-                        </tfoot>
+                                }
+                            </tbody>
 
-                    </table>
-                }
-                else
-                {
-                    <p>No Record....!</p>
-                }
+                            <tfoot>
+                                <tr>
+                                    <td></td>
+                                    <td>TOTAL</td>
+                                    <td class="amount">@Totals.Tot_Amount.ToString(Format.Digit)</td>
+                                </tr>
+                            </tfoot>
 
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn wd btn-primary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+                        </table>
+                    }
+                    else
+                    {
+                        <p>No Record....!</p>
+                    }
 
-<!-- Bootstrap 5 Model for Save confirmation-->
-<div class="modal fade" id="ModolSave" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="ModalLabel">Post</h2>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you <strong>SURE</strong> to post all imported Sales invoices.</p>
-                <button class="btn btn-warning" @onclick="Post">POST</button>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn wd btn-primary" data-bs-dismiss="modal">Close</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn wd btn-primary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Bootstrap 5 Model for Save confirmation-->
+    <div class="modal fade" id="ModolSave" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="ModalLabel">Post</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you <strong>SURE</strong> to post all imported Sales invoices.</p>
+                    <button class="btn btn-warning" @onclick="Post">POST</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn wd btn-primary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</EditForm>

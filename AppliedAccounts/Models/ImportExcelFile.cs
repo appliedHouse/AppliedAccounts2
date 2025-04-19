@@ -31,38 +31,35 @@ namespace AppliedAccounts.Models
         {
             try
             {
+                var _Directory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelFiles");
+                if (!Directory.Exists(_Directory)) { Directory.CreateDirectory(_Directory); }
 
-           
+                var _ExcelFile = Path.Combine(_Directory, ExcelFile.Name);
 
-            var _Directory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelFiles");
-            if (!Directory.Exists(_Directory)) { Directory.CreateDirectory(_Directory); }
+                if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
 
-            var _ExcelFile = Path.Combine(_Directory, ExcelFile.Name);
-
-            if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
-
-            using (FileStream fs = new(_ExcelFile, FileMode.Create, FileAccess.Write))
-            { await ExcelFile.OpenReadStream().CopyToAsync(fs); }
+                using (FileStream fs = new(_ExcelFile, FileMode.Create, FileAccess.ReadWrite))
+                { await ExcelFile.OpenReadStream().CopyToAsync(fs); }
 
 
-            using (var stream = File.Open(_ExcelFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (var reader = ExcelReaderFactory.CreateReader(stream))
-            {
-                ImportDataSet = reader.AsDataSet();
-
-                if (ImportDataSet is not null)
+                using (var stream = File.Open(_ExcelFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
                 {
-                    SaveInTable(ImportDataSet);
-                    IsImported = true;
+                    ImportDataSet = reader.AsDataSet();
+
+                    if (ImportDataSet is not null)
+                    {
+                        SaveInTable(ImportDataSet);
+                        IsImported = true;
+                    }
                 }
-            }
 
 
-            if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
+                if (File.Exists(_ExcelFile)) { File.Delete(_ExcelFile); }
             }
             catch (Exception error)
             {
-                var message = error.Message;
+                var _Message = error.Message;
                 throw;
             }
         }
