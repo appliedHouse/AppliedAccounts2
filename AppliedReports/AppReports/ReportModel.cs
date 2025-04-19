@@ -221,17 +221,29 @@ namespace AppReports
         public FileStream FileStream { get; set; }
         public bool IsFileExist => File.Exists(FileFullName);
         public string FileFullName => GetFullName();
-        
+        public string FileFolder => GetFileFolder();
+
         private string GetFullName()
         {
             var _Extention = GetFileExtention(ReportType);
 
             if (FilePath.Length > 0 && FileName.Length > 0 && _Extention.Length > 0)
             {
-                return Path.Combine(BasePath,RootPath,FilePath,FileName+FileExtention);
+                return Path.Combine(GetFileFolder(),FileName+FileExtention);
                 
             }
             return string.Empty;
+        }
+
+        public string GetFileFolder()
+        {
+            var _FileFolder = Path.Combine(BasePath, RootPath, FilePath);
+
+            if(!Directory.Exists(_FileFolder))
+            {
+                Directory.CreateDirectory(_FileFolder);
+            }
+            return _FileFolder;
         }
 
         public string GetFileLink()

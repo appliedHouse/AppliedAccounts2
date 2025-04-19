@@ -57,7 +57,7 @@ else
         {
             <div class="container p-2 m-2">
                 <div class="row">
-                    <button class="btn btn-warning" @onclick="Post">POST</button>
+                    <button class="btn btn-warning" @onclick="SaveMessage">POST</button>
                 </div>
             </div>
             <!-- Show Imported Sale Invocies Data-->
@@ -106,7 +106,6 @@ else
         else
         {
             <!-- Upload Excel File-->
-
             <div class="container">
                 <div class="d-flex flex-row mb-3">
                     <div class="p-2">
@@ -225,14 +224,16 @@ else
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>@Voucher</p>
+                    <div class="alert alert-success" role="alert">
+                        @Voucher
+                    </div>
 
                     @if (MyModel.SelectedSale != null && MyModel.SelectedSale.Count > 0)
                     {
                         <table class="table-list">
                             <thead>
                                 <tr>
-                                    <th style="width:20%; text-align:left">Batch</th>
+                                    <th style="width:20%; text-align:left">SR #</th>
                                     <th style="width:50%; text-align:left">Stock</th>
                                     <th style="width:30%; text-align:right">Net Amount</th>
                                 </tr>
@@ -242,7 +243,7 @@ else
                                 @foreach (var item in MyModel.SelectedSale)
                                 {
                                     <tr class="tb-body-row">
-                                        <td class="tb-col-center">@item.Batch</td>
+                                        <td class="tb-col-center">@item.SrNo</td>
                                         <td class="tb-col-left">@item.Inventory</td>
                                         <td class="amount">@item.Amount.ToString(Format.Digit)</td>
                                     </tr>
@@ -273,3 +274,22 @@ else
         </div>
     </div>
 }
+
+<!-- Modal -->
+<div class="modal fade" id="modalSave" tabindex="-1" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="saveModallabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure to post all sales invocies...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" @onclick="Post">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
