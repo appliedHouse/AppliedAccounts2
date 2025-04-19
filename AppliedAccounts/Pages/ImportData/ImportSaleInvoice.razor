@@ -21,6 +21,7 @@
     {
         AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
 
+        
         Stopwatch.Start();
         MsgClass = new();
         MyModel = new();
@@ -41,181 +42,177 @@
 </style>
 
 
-<PageErrors Messages="@MsgClass" />
+@if (MyModel.IsError)
+{
+    <div class="alert alert-danger" role="alert">
+        @MyModel.ErrorMessage
+    </div>
+}
+else
+{
 
-<EditForm Model="MyModel">
-    @if (MyModel.IsError)
-    {
-        <div class="alert alert-danger" role="alert">
-            @MyModel.ErrorMessage
-        </div>
-    }
-    else
-    {
-        @if (ShowSpinner)
+
+    <EditForm Model="MyModel">
+        @if (MyModel.ShowImportedData)
         {
+            <div class="container p-2 m-2">
+                <div class="row">
+                    <button class="btn btn-warning" @onclick="Post">POST</button>
+                </div>
+            </div>
+            <!-- Show Imported Sale Invocies Data-->
+            if (SalesData?.Rows.Count > 0)
+            {
+                <div class="table-container" id="tableContainer">
+                    <table class="table-list">
+                        <thead>
+                            <tr>
+                                <th style="width:10%" class="tb-col-center">Vou No</th>
+                                <th style="width:10%" class="tb-col-center">Vou Date</th>
+                                <th style="width:10%" class="tb-col-center">Due Date</th>
+                                <th style="width:10%" class="tb-col-center">Ref No.</th>
+                                <th style="width:35%" class="tb-col-left">Company Name</th>
+                                <th style="width:15%" class="tb-col-center">Amount</th>
+                                <th style="width:10%" class="tb-col-center">View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in MyModel.SaleInvoiceList)
+                            {
+                                var _IDate = ((DateTime)item["Vou_Date"]).ToString(Format.DDMMMYY);
+                                var _PDate = ((DateTime)item["Pay_Date"]).ToString(Format.DDMMMYY);
+                                var _Amount = ((decimal)item["Amount"]).ToString(Format.Digit);
+                                int _ID = (int)item["ID"];
+
+                                <tr class="tb-body-row">
+                                    <td class="tb-col-Center">@item["Vou_No"]</td>
+                                    <td class="tb-col-Center">@_IDate</td>
+                                    <td class="tb-col-Center">@_PDate</td>
+                                    <td class="tb-col-Center">@item["Ref_No"]</td>
+                                    <td class="tb-col-left">@item["Description"]</td>
+                                    <td class="amount-blue">@_Amount</td>
+                                    <td>
+                                        <button type="button" class="btn" @onclick="(()=>ShowInvoiceModol(_ID))">
+                                            <i class="bi bi-stack-overflow"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+        else
+        {
+            <!-- Upload Excel File-->
+
+            <div class="container">
+                <div class="d-flex flex-row mb-3">
+                    <div class="p-2">
+                        <button class="btn btn-primary w1" disabled="@(IsExcelLoaded ? true : ShowSpinner)"
+                                title="Upload Excel file" @onclick="TriggerFileInput">
+                            Upload Excel file
+                        </button>
+                        <InputFile id="inputFile" class="d-none" OnChange="GetExcelFile" />
+
+
+                    </div>
+                    <div class="p-2">
+                        <label>@ExcelFileName</label>
+                    </div>
+                    @if (IsExcelLoaded)
+                    {
+                        <div class="p-2">
+                            <label>Excel File has been loaded successfully.</label>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+            <!-- Import Data from Excel file.-->
+            @if (IsExcelLoaded)
+            {
+                <div class="container">
+                    <div class="d-flex flex-row mb-3">
+                        <div class="p-2">
+                            <button class="btn btn-primary w1" id="btnImport" disabled="@ShowSpinner" @onclick="(()=>GetImportDataAsync())">Generate Invoices</button>
+                        </div>
+
+                    </div>
+                </div>
+            }
+
             <!-- Spinner & Messages -->
             <div class="container">
                 <div class="row mt-2">
-                    <div class="row justify-content-center">
-                        <div class="col-6">
-                            <p>@MyModel.SpinnerMessage</p>
-
-                            @if (MyModel.IsProgressBar)
-                            {
-                                <div class="progress bg-success progress-bar-striped progress-bar-animated">
-                                    <div class="progress-bar" role="progressbar"
-                                         style="width:@MyModel.BarPercent%"
-                                         aria-valuenow="@MyModel.Counter"
-                                         aria-valuemin="0"
-                                         aria-valuemax="@MyModel.TotalRec">
-                                        @MyModel.BarPercent.ToString("0.##")%
+                    @if (ShowSpinner)
+                    {
+                        <div class="row justify-content-center">
+                            <div class="col-6">
+                                <p>@MyModel.SpinnerMessage</p>
+                                @if (MyModel.IsProgressBar)
+                                {
+                                    <div class="progress bg-success progress-bar-striped progress-bar-animated">
+                                        <div class="progress-bar" role="progressbar"
+                                             style="width:@MyModel.BarPercent%"
+                                             aria-valuenow="@MyModel.Counter"
+                                             aria-valuemin="0"
+                                             aria-valuemax="@MyModel.TotalRec">
+                                            @MyModel.BarPercent.ToString("0.##")%
+                                        </div>
                                     </div>
+                                }
+                                <p class="text-danger">This process may take some time, so please be patient.</p>
+                            </div>
+                            <div class="col-1 center-txt">
+                                <div class="spinner-border text-warning" role="status">
+                                    <span class="visually-hidden">Loading...</span>
                                 </div>
-                            }
-                            <p class="text-danger">This process may take some time, so please be patient.</p>
-                        </div>
-                        <div class="col-1 center-txt">
-                            <div class="spinner-border text-warning" role="status">
-                                <span class="visually-hidden">Loading...</span>
                             </div>
                         </div>
-                    </div>
+                    }
+
                 </div>
 
             </div>
         }
-        else
+
+
+        <!-- Importing of Data process Completed.-->
+        @if (MyModel.ShowMessages)
         {
-
-            <!-- Step 3 ------- Show Imported Invoices before positng -->
-            @if (MyModel.ShowImportedData)
-            {
-                <div class="container">
-                    <div class="row m-1">
-                        <button class="btn btn-warning" @onclick="PostModol">POST</button>
+            <div class="container mt-2">
+                <div class="row mb-2">
+                    <div class="col-10">
+                        <label id="lblMessahe">Sale Invoices generating process is completed...</label>
+                    </div>
+                    <div class="col-2">
+                        <button type="submit" class="btn btn-warning" @onclick="ShowInvoices">Next <i class="bi bi-arrow-right-square"></i></button>
                     </div>
                 </div>
-                <!-- Show Imported Sale Invocies Data-->
-                if (SalesData?.Rows.Count > 0)
-                {
-                    <div class="table-container" id="tableContainer">
-                        <table class="table-list">
-                            <thead>
+                <div class="row">
+                    <table class="table-message">
+                        <thead>
+                            <tr>
+                                <th>Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var message in MsgClass.MessageList)
+                            {
                                 <tr>
-                                    <th style="width:10%" class="tb-col-center">Vou No</th>
-                                    <th style="width:10%" class="tb-col-center">Vou Date</th>
-                                    <th style="width:10%" class="tb-col-center">Due Date</th>
-                                    <th style="width:10%" class="tb-col-center">Ref No.</th>
-                                    <th style="width:35%" class="tb-col-left">Company Name</th>
-                                    <th style="width:15%" class="tb-col-center">Amount</th>
-                                    <th style="width:10%" class="tb-col-center">View</th>
+                                    <td>@message.MessageText</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in MyModel.SaleInvoiceList)
-                                {
-                                    var _IDate = ((DateTime)item["Vou_Date"]).ToString(Format.DDMMMYY);
-                                    var _PDate = ((DateTime)item["Pay_Date"]).ToString(Format.DDMMMYY);
-                                    var _Amount = ((decimal)item["Amount"]).ToString(Format.Digit);
-                                    int _ID = (int)item["ID"];
-
-                                    <tr class="tb-body-row">
-                                        <td class="tb-col-Center">@item["Vou_No"]</td>
-                                        <td class="tb-col-Center">@_IDate</td>
-                                        <td class="tb-col-Center">@_PDate</td>
-                                        <td class="tb-col-Center">@item["Ref_No"]</td>
-                                        <td class="tb-col-left">@item["Description"]</td>
-                                        <td class="amount-blue">@_Amount</td>
-                                        <td>
-                                            <button type="button" class="btn" @onclick="(()=>ShowInvoiceModol(_ID))">
-                                                <i class="bi bi-stack-overflow"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-            }
-            else
-            {
-                <!-- Upload Excel File-->
-                <div class="container">
-                    <div class="d-flex flex-row mb-3">
-                        <div class="p-2">
-                            <button class="btn btn-primary w1"
-                                    title="Upload Excel file" @onclick="TriggerFileInput">
-                                Upload Excel file
-                            </button>
-                            <InputFile id="inputFile" class="d-none" OnChange="GetExcelFile" />
-
-
-                        </div>
-                        <div class="p-2">
-                            <label>@ExcelFileName</label>
-                        </div>
-                        @if (IsExcelLoaded)
-                        {
-                            <div class="p-2">
-                                <label>Excel File has been loaded successfully.</label>
-                            </div>
-                        }
-
-                    </div>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-
-                <!-- Import Data from Excel file.-->
-                @if (IsExcelLoaded)
-                {
-                    <div class="container">
-                        <div class="d-flex flex-row mb-3">
-                            <div class="p-2">
-                                <button class="btn btn-primary w1" id="btnImport" @onclick="(()=>GetImportDataAsync())">Generate Invoices</button>
-                            </div>
-
-                        </div>
-                    </div>
-                }
-            }
-
-            <!-- Step 4 ---- Importing of Data process Completed.-->
-            @if (MyModel.ShowMessages)
-            {
-                <div class="container mt-2">
-                    <div class="row mb-2">
-                        <div class="col-10">
-                            <label id="lblMessahe">Sale Invoices generating process is completed...</label>
-                        </div>
-                        <div class="col-2">
-                            <button type="submit" class="btn btn-warning" @onclick="ShowInvoices">Next <i class="bi bi-arrow-right-square"></i></button>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <table class="table-message">
-                            <thead>
-                                <tr>
-                                    <th>Message</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var message in MsgClass.MessageList)
-                                {
-                                    <tr>
-                                        <td>@message.MessageText</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            }
-
-
+            </div>
         }
-    }
 
+    </EditForm>
 
 
 
@@ -275,26 +272,4 @@
             </div>
         </div>
     </div>
-
-    <!-- Bootstrap 5 Model for Save confirmation-->
-    <div class="modal fade" id="ModolSave" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title" id="ModalLabel">Post</h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you <strong>SURE</strong> to post all imported Sales invoices.</p>
-                    <button class="btn btn-warning" @onclick="Post">POST</button>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn wd btn-primary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
-</EditForm>
+}
