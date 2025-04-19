@@ -8,6 +8,7 @@ using Microsoft.JSInterop;
 using AppMessages;
 using Tables = AppliedDB.Enums.Tables;
 using AppliedAccounts.Pages.Menu;
+using AppliedAccounts.Services;
 
 namespace AppliedAccounts.Pages.ImportData
 {
@@ -55,7 +56,7 @@ namespace AppliedAccounts.Pages.ImportData
         {
             MyModel = new();
             AppUser = _AppUser;
-            MyModel.IsClientUpdate = true;
+            MyModel.IsClientUpdate = true;             // true if client info update in DB
 
 
         }
@@ -534,10 +535,7 @@ namespace AppliedAccounts.Pages.ImportData
             await InvokeAsync(StateHasChanged);
         }
 
-        private async Task SaveMessage()
-        {
-            await js.InvokeVoidAsync("showModol", "modalSave");
-        }
+        
 
         private async Task SaveAsync()
         {
@@ -570,6 +568,8 @@ namespace AppliedAccounts.Pages.ImportData
                     MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} Serial # {Row["Sr_No"]}  is {Validated} validated");
                 }
 
+
+
                 if (Validated)
                 {
                     MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} validated for post / save... ");
@@ -590,6 +590,8 @@ namespace AppliedAccounts.Pages.ImportData
                         });
 
                         MsgClass.Add($"{DateTime.Now} Serial # {Row["Sr_No"]} is saved ---> {IsSaved} ");
+
+                        ToastService.ShowToast(ToastClass.SaveToast, $"Save | {master["Vou_No"]}"); // show the toast
                     }
                 }
                 else
@@ -597,6 +599,7 @@ namespace AppliedAccounts.Pages.ImportData
                     MsgClass.Add($"{DateTime.Now} ERROR : Sales Date is not valided to post...");
                 }
             }
+            
         }
         #endregion
 

@@ -222,6 +222,7 @@ namespace AppReports
         public bool IsFileExist => File.Exists(FileFullName);
         public string FileFullName => GetFullName();
         public string FileFolder => GetFileFolder();
+        public string OutputFileName => GetFileName();
 
         private string GetFullName()
         {
@@ -235,6 +236,17 @@ namespace AppReports
             return string.Empty;
         }
 
+        private string GetFileName()
+        {
+            var _Extention = GetFileExtention(ReportType);
+
+            if (FilePath.Length > 0 && FileName.Length > 0 && _Extention.Length > 0)
+            {
+                return Path.Combine(FileName + FileExtention);
+
+            }
+            return string.Empty;
+        }
         public string GetFileFolder()
         {
             var _FileFolder = Path.Combine(BasePath, RootPath, FilePath);

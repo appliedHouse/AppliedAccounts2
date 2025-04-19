@@ -55,8 +55,8 @@ function DisplayPDF(byteArray) {
 }
 
 
-// Download a  exited file PDF, Excel, Word, HTML, Image
-window.downloadFile = function (fileUrl) {
+// Download a  existed file PDF, Excel, Word, HTML, Image
+window.OpenLink = function (fileUrl) {
     const link = document.createElement('a');
     link.href = fileUrl;
     link.download = fileUrl.split('/').pop(); // Set download attribute to the filename

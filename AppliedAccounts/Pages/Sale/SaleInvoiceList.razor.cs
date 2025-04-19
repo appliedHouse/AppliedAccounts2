@@ -81,7 +81,7 @@ namespace AppliedAccounts.Pages.Sale
                 {
                     PrintingMessage = $"Sales invoice for {MyModel.Record.TitleCustomer} is being printed.";
                     await InvokeAsync(StateHasChanged);
-                    await Print(item.Id);
+                    await DownLoadPrint(item.Id);
                 }
             }
             IsPrinting = false;
@@ -110,6 +110,30 @@ namespace AppliedAccounts.Pages.Sale
                 MyModel.MsgClass.Add(error.Message);
             }
 
+        }
+
+        public async Task DownLoadPrint(int ID)
+        {
+            try
+            {
+                MyModel.Record = MyModel.Records.Where(row => row.Id == ID).First();
+                var _Batch = MyModel.Record.Ref_No;
+                var _Title = MyModel.Record.TitleCustomer.Replace(".", "_"); // Replace dot with _ for file name correction.
+                var _FileName = $"{_Batch}_{_Title}";
+
+                ReportService.RptData = GetReportData(ID);              // always generate Data for report
+                ReportService.RptModel = CreateReportModel(ID);         // and then generate report parameters
+                ReportService.RptType = ReportType.Preview;
+                var ReportList = ReportService.GetReportLink();
+                var rptArray = ReportService.RptModel.ReportBytes;
+                var rptMime = ReportService.RptModel.OutputReport.MimeType;
+                var rptFile = ReportService.RptModel.OutputReport.OutputFileName;
+                await js.InvokeVoidAsync("downloadFile", rptFile, rptArray, rptMime);
+            }
+            catch (Exception error)
+            {
+                MyModel.MsgClass.Add(error.Message);
+            }
         }
 
         private ReportData GetReportData(int ID)
