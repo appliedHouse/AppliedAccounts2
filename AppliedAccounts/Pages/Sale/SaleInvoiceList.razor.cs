@@ -147,8 +147,7 @@ namespace AppliedAccounts.Pages.Sale
 
             return _Result;
         }
-
-
+        
         private ReportModel CreateReportModel(int _ID)
         {
 
