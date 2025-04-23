@@ -143,39 +143,19 @@
 </style>
 
 @code {
-    public class UserModel
-{
-    public string UserID { get; set; }
-    public string Password { get; set; }
-    public bool IsSaved { get; set; }
-    public string DataFile { get; set; }
-    public string Designation { get; set; }
-    public string Company { get; set; }
-}
 
     protected override void OnInitialized()
     {
-        
+        AppGlobals = _Global;
+
         Model.UserID = "";
         Model.Password = "";
         Model.IsSaved = false;
         Model.DataFile = "";
         Model.Designation = "";
         Model.Company = "";
+
     }
 
-    private UserModel Model = new UserModel();
 
-    private void Submit()
-    {
-        // Implement login logic
-        IsLogin = true; // or false based on authentication
-    }
-
-    private void ReLoad()
-    {
-        NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
-    }
-
-    private bool IsLogin = true; // Replace with your actual logic
 }
