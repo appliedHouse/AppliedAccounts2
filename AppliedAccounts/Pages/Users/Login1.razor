@@ -1,13 +1,14 @@
 ﻿@layout LoginLayout
 @page "/Users/Login1"
 @using AppliedAccounts.Data;
+@using AppliedAccounts.Services;
 @using AppliedDB;
 @using System.Data.SQLite;
 @using System.Data;
 
 @inject NavigationManager NavManager;
 @inject AuthenticationStateProvider authStateProvider;
-@inject Globals _Global;
+@inject GlobalService _Global;
 
 <EditForm Model="@Model" OnValidSubmit="@Submit">
     <DataAnnotationsValidator />

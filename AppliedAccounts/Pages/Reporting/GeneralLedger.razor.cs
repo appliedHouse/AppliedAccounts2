@@ -3,17 +3,16 @@ using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using AppReports;
-using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Data;
-using Windows.Services.Maps;
-using static AppliedAccounts.Pages.Users.Login1;
 using MESSAGES = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Pages.Reporting
 {
     public partial class GeneralLedger
     {
-        public IConfiguration Config { get; set; }
+        public GlobalService Globals { get; set; }
         public AppUserModel UserModel { get; set; }
         public DataSource Source { get; set; }
         public PrintService ReportService { get; set; }
@@ -24,12 +23,16 @@ namespace AppliedAccounts.Pages.Reporting
         public string SortBy { get; set; }
         public string DBFile { get; set; }
         public bool IsPageValid { get; set; }
+        public bool IsPrinting { get; set; }
         string IsPageValidMessage { get; set; } = "Page has some error. Consult to Administrator";
+        NavigationManager NavManager => Globals.NavManager;
 
         public List<CodeTitle> Accounts { get; set; }
 
         public GeneralLedger()
         {
+
+
             COAID = 0;
             SortBy = "";
             DBFile = "";
@@ -45,13 +48,15 @@ namespace AppliedAccounts.Pages.Reporting
 
         public void Start(AppUserModel _UserModel)
         {
+            MsgClass = new();
             UserModel = _UserModel;
             Source = new(UserModel);
             ReportSeervice = new();
+            DBFile = UserModel.DataFile;
 
             Accounts = Source.GetAccounts();
 
-           
+
         }
 
         public void BackPage()
@@ -61,24 +66,40 @@ namespace AppliedAccounts.Pages.Reporting
 
 
         #region Print
-        public void Print(ReportType PrintType)
+        public async void Print(ReportType PrintType)
         {
-            Print(COAID, PrintType);
+            
+            if (COAID > 0)
+            {
+                await Print(COAID, PrintType);
+            }
+            else
+            { MsgClass.Add(MESSAGES.COAIsNull); }
         }
 
-
-        public void Print(int ID, ReportType PrintType)
+        public async Task Print(int ID, ReportType PrintType)
         {
+            IsPrinting = true;
+            await InvokeAsync(StateHasChanged);
+
             Start(UserModel);
             AppRegistry.SetKey(DBFile, "GL_COA", COAID, KeyType.Number, "General Ledger ID,From,To,Sort");
             AppRegistry.SetKey(DBFile, "GL_COA", Date_From, KeyType.From);
             AppRegistry.SetKey(DBFile, "GL_COA", Date_To, KeyType.To);
             AppRegistry.SetKey(DBFile, "GL_COA", SortBy, KeyType.Text);
 
-            ReportService = new();
-            ReportService.RptType = PrintType;
-            ReportService.RptData = GetReportData(ID);
-            ReportService.RptModel = CreateReportModel(ID);
+            await Task.Run(() =>
+            {
+                ReportService = new(GlobalService); ;
+                ReportService.JS = js;
+                ReportService.RptType = PrintType;
+                ReportService.RptData = GetReportData(ID);
+                ReportService.RptModel = CreateReportModel(ID);
+            });
+
+            await ReportService.Print();
+            IsPrinting = false;
+            await InvokeAsync(StateHasChanged);
         }
 
         private ReportData GetReportData(int ID)
@@ -91,7 +112,7 @@ namespace AppliedAccounts.Pages.Reporting
             var _Filter = $"[COA] = {COAID} AND (Date([Vou_Date]) BETWEEN Date('{_DateFrom}') AND Date('{_DateTo}'))";
             var _GroupBy = "[COA]";
             var _SortBy = "[Vou_date], [Vou_no]";
-            var _Query = SQLQueries.Quries.GeneralLedger(_OBDate, _FilterOB, _Filter, _GroupBy, _SortBy);
+            var _Query = SQLQueries.Quries.GeneralLedger(_OBDate, _FilterOB, _GroupBy, _Filter,  _SortBy);
 
             DataTable _Table = Source.GetTable(_Query);
 
@@ -101,25 +122,26 @@ namespace AppliedAccounts.Pages.Reporting
                 return new();
             }
 
-            ReportData _ReportData = new ReportData();
-            _ReportData.ReportTable = _Table;
-            _ReportData.DataSetName = "dsname_Ledger";
+            ReportData _ReportData = new()
+            {
+                ReportTable = _Table,
+                DataSetName = "dsname_Ledger"
+            };
             return _ReportData;
         }
 
         private ReportModel CreateReportModel(int _ID)
         {
             ReportModel Report = new ReportModel();
-
-            var _InvoiceNo = "INV-Testing";
-            var _Heading1 = "Sales Invoice";
-            var _Heading2 = $"Invoice No. {_InvoiceNo}";
+            
+            var _Heading1 = $"General Ledger " + Source.SeekTitle(AppliedDB.Enums.Tables.COA, COAID);
+            var _Heading2 = $"[{Date_From.ToString(Format.DDMMMYY)}] to [{Date_To.ToString(Format.DDMMMYY)}] "; 
 
             Report.ReportUrl = NavManager.BaseUri;
 
             Report.InputReport.FilePath = UserModel.ReportFolder;
             Report.InputReport.FileName = "Ledger";
-            Report.InputReport.FileExtention = ".rdl";
+            Report.InputReport.FileExtention = "rdl";
 
             Report.OutputReport.FilePath = UserModel.PDFFolder;
             Report.OutputReport.FileName = "Ledger_" + "CompanyName";
@@ -129,11 +151,7 @@ namespace AppliedAccounts.Pages.Reporting
             Report.AddReportParameter("CompanyName", UserModel.Company);
             Report.AddReportParameter("Heading1", _Heading1);
             Report.AddReportParameter("Heading2", _Heading2);
-            Report.AddReportParameter("Footer", AppFunctions.ReportFooter() );
-            
-            Report.ReportRender();
-
-
+            Report.AddReportParameter("Footer", AppFunctions.ReportFooter());
 
             return Report;
         }

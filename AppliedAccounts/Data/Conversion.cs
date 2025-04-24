@@ -1,4 +1,6 @@
-﻿namespace AppliedAccounts.Data
+﻿using AppliedAccounts.Services;
+
+namespace AppliedAccounts.Data
 {
     public class Conversion
     {

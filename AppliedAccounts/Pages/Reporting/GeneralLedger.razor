@@ -8,18 +8,17 @@
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Services;
 
-@inject NavigationManager NavManager
-@inject IConfiguration _Config
 @inject AuthenticationStateProvider Authorized
 @inject ToastService ToastService
 @inject PrintService ReportSeervice
 @inject IJSRuntime js
+@inject GlobalService GlobalService
 
 @code {
     protected override void OnInitialized()
     {
         var AppUser = ((UserAuthonticationStateProvider)Authorized).AppUser;
-        Config = _Config;
+        Globals = GlobalService;
 
         Start(AppUser);
 
@@ -29,6 +28,16 @@
 
 
     }
+}
+
+@if (IsPrinting)
+{
+    <div class="alert alert-primary d-flex align-items-center" role="alert">
+        <div class="spinner-border text-primary me-2" role="status" aria-hidden="true"></div>
+        <div>
+            Loading data, please wait...
+        </div>
+    </div>
 }
 
 
@@ -64,19 +73,39 @@
                     </div>
                 </div>
             </div>
-            <div class="row p-2 g-2">
-                <div class="col-6">
-                    <button class="btn btn-primary" @onclick="(()=>{Print(ReportType.Print);})">Print</button>
-                    <button class="btn btn-primary" @onclick="(()=>{Print(ReportType.Preview);})">Preview</button>
-                    <button class="btn btn-primary" @onclick="(()=>{Print(ReportType.Excel);})">Excel</button>
-                    <button class="btn btn-primary" @onclick="(()=>{Print(ReportType.Word);})">Word</button>
-                    <button class="btn btn-primary" @onclick="(()=>{Print(ReportType.HTML);})">HTML</button>
-                    <button class="btn btn-primary" @onclick="(()=>{Print(ReportType.Image);})">Image</button>
-                    <button class="btn btn-primary" @onclick="BackPage">Back</button>
+
+            @if (!IsPrinting)
+            {
+                <div class="container control-buttons">
+                    <div class="btn-group" role="group" aria-label="Navigation Buttons" id="printBtns">
+                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Print);})">
+                            <i class="bi bi-printer"></i>
+                        </button>
+
+                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Preview);})">
+                            <i class="bi bi-search"></i>
+                        </button>
+                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.PDF);})">
+                            <i class="bi bi-file-pdf"></i>
+                        </button>
+                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Excel);})">
+                            <i class="bi bi-file-earmark-excel"></i>
+                        </button>
+                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Word);})">
+                            <i class="bi bi-file-earmark-word"></i>
+                        </button>
+                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.HTML);})">
+                            <i class="bi bi-filetype-html"></i>
+                        </button>
+                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Image);})">
+                            <i class="bi bi-file-earmark-image"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     </div>
+
 
 }
 else

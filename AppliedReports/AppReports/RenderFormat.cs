@@ -4,6 +4,7 @@
     {
         public static string GetRenderFormat(ReportType _ReportType)
         {
+            if (_ReportType == ReportType.Print) { return "PDF"; }
             if (_ReportType == ReportType.Preview) { return "PDF"; }
             if (_ReportType == ReportType.PDF) { return "PDF"; }
             if (_ReportType == ReportType.HTML) { return "HTML5"; }

@@ -1,6 +1,7 @@
 ﻿@layout LoginLayout
 @page "/Users/Login"
 @using AppliedAccounts.Data;
+@using AppliedAccounts.Services;
 @using AppliedDB;
 @using System.Data.SQLite;
 @using System.Data;
@@ -8,7 +9,7 @@
 @inject NavigationManager NavManager;
 @inject AuthenticationStateProvider authStateProvider;
 
-@inject Globals _Global;
+@inject GlobalService _Global;
 
 <EditForm Model="@Model" OnValidSubmit="@Submit">
     <DataAnnotationsValidator />
@@ -17,7 +18,7 @@
     <div class="login-wrapper">
         <div class="login-box">
             <div class="login-left">
-                <img src="/images/ASH.jpg" alt="Logo" />
+                <img src="/images/Logo/Logo500_1.png" alt="Logo" />
                 <h2>APPLIED ACCOUNTS</h2>
                 <p>ACCOUNTING SOFTWARE</p>
             </div>

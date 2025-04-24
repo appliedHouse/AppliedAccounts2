@@ -3,21 +3,22 @@
 @using AppliedLanguage;
 @using AppliedAccounts.Data;
 @using AppliedAccounts.Models;
-@inject IConfiguration Config;
+@using AppliedAccounts.Services;
+@inject GlobalService GlobalService;
 @inject NavigationManager NavManager;
 
 @code {
 
-    public Globals AppGlobals { get; set; }
+    public GlobalService AppGlobals { get; set; }
     public string? BusinessPic { get; set; }
 
     protected override void OnInitialized()
     {
-        AppGlobals = new(Config, NavManager);
+        AppGlobals = GlobalService;
         BusinessPic = Path.Combine(AppGlobals.AppPaths.ImagesPath, "Accounts3.jpg");
     }
 
-    string BasePath => AppGlobals.AppPaths.BasePath;
+    string BasePath => AppGlobals.AppPaths.BaseUri;
     string CompanyName => AppGlobals.Author.Company;
     string Address1 => AppGlobals.Author.Address1;
     string Address2 => AppGlobals.Author.Address2;

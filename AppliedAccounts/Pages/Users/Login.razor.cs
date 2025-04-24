@@ -2,14 +2,13 @@
 using AppliedDB;
 using System.Data.SQLite;
 using System.Data;
-using AppliedAccounts.Data;
-using System.Data.Entity;
+using AppliedAccounts.Services;
 
 namespace AppliedAccounts.Pages.Users
 {
     public partial class Login
     {
-        Globals AppGlobals { get; set; } = new();
+        GlobalService AppGlobals { get; set; } = new();
         private AppUserModel Model = new();
         string NavToHome { get; set; } = string.Empty;
         bool IsLogin { get; set; } = true;

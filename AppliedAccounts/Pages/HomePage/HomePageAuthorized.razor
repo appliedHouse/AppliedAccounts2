@@ -1,14 +1,15 @@
 ﻿@attribute [Authorize]
 @inject NavigationManager NavManager;
 @using AppliedAccounts.Data
-@inject IConfiguration Config;
+@using AppliedAccounts.Services
+@inject GlobalService GlobalService;
 
 @code {
-    public Globals? AppGlobals { get; set; }
+    public GlobalService AppGlobals { get; set; }
     public string? BusinessPic { get; set; }
     protected override void OnInitialized()
     {
-        AppGlobals = new(Config,NavManager);
+        AppGlobals = GlobalService;
         BusinessPic = $"{AppGlobals.AppPaths.ImagesPath}/Accounts3.jpg";
     }
 }
