@@ -1,0 +1,87 @@
+﻿@page "/Reporting/GL"
+@attribute [Authorize]
+
+@using AppReports
+@using AppliedDB;
+@using AppliedAccounts.Data;
+@using AppliedAccounts.Models;
+@using AppliedAccounts.Libs;
+@using AppliedAccounts.Services;
+
+@inject NavigationManager NavManager
+@inject IConfiguration _Config
+@inject AuthenticationStateProvider Authorized
+@inject ToastService ToastService
+@inject PrintService ReportSeervice
+@inject IJSRuntime js
+
+@code {
+    protected override void OnInitialized()
+    {
+        var AppUser = ((UserAuthonticationStateProvider)Authorized).AppUser;
+        Config = _Config;
+
+        Start(AppUser);
+
+        IsPageValid = true;
+        if (Source is null) { IsPageValid = false; IsPageValidMessage += " Source is null"; }
+        //if (ReportService is null) { IsPageValid = false; IsPageValidMessage += " Report Service is null"; }
+
+
+    }
+}
+
+
+@if (IsPageValid)
+{
+    <div class="container d-flex justify-content-center">
+        <div class="w-100">
+            <div class="row g-2 p-1">
+                <div class="col-3">
+                    <div class="form-floating">
+                        <InputDate id="DateFrom" class="form-control" @bind-Value="Date_From"></InputDate>
+                        <label for="DateFrom">From</label>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="form-floating">
+                        <InputDate id="DateTo" class="form-control" @bind-Value="Date_To"></InputDate>
+                        <label for="DateFrom">To</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-2 p-1">
+                <div class="col-6">
+                    <div class="form-floating">
+
+                        <InputSelect id="coa_nature" @bind-Value="@COAID" class="form-control">
+                            @foreach (var item in Accounts)
+                            {
+                                <option value=@item.ID>@item.Title</option>
+                            }
+                        </InputSelect>
+                        <label for="coa_nature">Account Head</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row p-2 g-2">
+                <div class="col-6">
+                    <button class="btn btn-primary" @onclick="(()=>{Print(ReportType.Print);})">Print</button>
+                    <button class="btn btn-primary" @onclick="(()=>{Print(ReportType.Preview);})">Preview</button>
+                    <button class="btn btn-primary" @onclick="(()=>{Print(ReportType.Excel);})">Excel</button>
+                    <button class="btn btn-primary" @onclick="(()=>{Print(ReportType.Word);})">Word</button>
+                    <button class="btn btn-primary" @onclick="(()=>{Print(ReportType.HTML);})">HTML</button>
+                    <button class="btn btn-primary" @onclick="(()=>{Print(ReportType.Image);})">Image</button>
+                    <button class="btn btn-primary" @onclick="BackPage">Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+else
+{
+    <div class="alert alert-danger" role="alert">
+        <string>@IsPageValidMessage</string>
+    </div>
+}

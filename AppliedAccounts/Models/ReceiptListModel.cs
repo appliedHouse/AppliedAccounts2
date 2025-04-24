@@ -136,7 +136,7 @@ namespace AppliedAccounts.Models
             rptModel.InputReport.FilePath = UserProfile!.ReportFolder;
 
             rptModel.OutputReport.FileName = $"Receipt_{ID}";
-            rptModel.OutputReport.FileExtention = ".pdf";
+            //rptModel.OutputReport.FileExtention = ".pdf";
             rptModel.OutputReport.FilePath = UserProfile!.PDFFolder;
             rptModel.OutputReport.ReportType = ReportType.PDF;
 

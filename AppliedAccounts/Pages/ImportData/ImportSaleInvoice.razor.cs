@@ -5,6 +5,10 @@ using AppliedAccounts.Models;
 using AppliedAccounts.Data;
 using System.Diagnostics;
 using Microsoft.JSInterop;
+using AppMessages;
+using Tables = AppliedDB.Enums.Tables;
+using AppliedAccounts.Pages.Menu;
+using AppliedAccounts.Services;
 
 namespace AppliedAccounts.Pages.ImportData
 {
@@ -13,9 +17,9 @@ namespace AppliedAccounts.Pages.ImportData
 
         #region Variables
         public AppUserModel AppUser { get; set; }
-        public ImportSaleInvoiceModel Model { get; set; }
+        public ImportSaleInvoiceModel MyModel { get; set; }
         public ImportExcelFile ImportExcel { get; set; }
-        public List<string> MyMessage { get; set; }
+        public MessageClass MsgClass { get; set; }
         public DataSet? ExcelDataSet { get; set; }
         public DataTable? ClientData { get; private set; }
         public DataTable? SalesData { get; set; }
@@ -24,31 +28,20 @@ namespace AppliedAccounts.Pages.ImportData
         public DataTable Sale1 { get; set; }
         public DataTable Sale2 { get; set; }
         public DataSource Source { get; set; }
-        public Stopwatch stopwatch { get; set; } = new();
-
-
+        public Stopwatch Stopwatch { get; set; } = new();
+        
         public bool IsExcelLoaded { get; set; } = false;
         public bool ShowSpinner { get; set; } = false;
         public bool ShowImportButton { get; set; } = true;
         public string ExcelFileName { get; set; } = "";
-        public string SpinnerMessage { get; set; } = "";
-        public string ErrorMessage { get; set; } = "";
-        public int Counter { get; set; }
-        public int TotalRec { get; set; }
-        public double BarPercent { get; set; }
-        public bool IsProgress { get; set; } = false;
-        public bool IsError { get; set; }
-        public bool IsBatch { get; set; }
-        public bool IsClientUpdate { get; set; }
-
-
+        
+        
+        
         DateTime Inv_Date = DateTime.Now;
         DateTime Due_Date = DateTime.Now;
         string RefNo = string.Empty;
         string Batch = string.Empty;
         string Inv_No = string.Empty;
-
-
 
         int Error = 0;
         int Skip = 0;
@@ -61,8 +54,9 @@ namespace AppliedAccounts.Pages.ImportData
 
         public ImportSaleInvoice(AppUserModel _AppUser)
         {
+            MyModel = new();
             AppUser = _AppUser;
-            IsClientUpdate = true;
+            MyModel.IsClientUpdate = true;             // true if client info update in DB
 
 
         }
@@ -76,7 +70,7 @@ namespace AppliedAccounts.Pages.ImportData
         {
             try
             {
-                SpinnerMessage = "Excel file is being loaded.  Wait for some while";
+                MyModel.SpinnerMessage = "Excel file is being loaded.  Wait for some while";
                 ShowSpinner = true;
                 ExcelFileName = e.File.Name;
                 await InvokeAsync(StateHasChanged);
@@ -85,12 +79,12 @@ namespace AppliedAccounts.Pages.ImportData
                 ImportExcel = new(e.File, AppUser);
                 await ImportExcel.ImportDataAsync();            // ImportExcelFile.cs Function
                 IsExcelLoaded = true;                           // Excel file has been loaded successfully.
-                MyMessage.Add($"{DateTime.Now} Excel File loaded.... OK");
+                MsgClass.Add($"{DateTime.Now} Excel File loaded.... OK");
             }
             catch (Exception)
             {
-
-                MyMessage.Add($"{DateTime.Now} ERROR: Excel file not loaded.... ");
+                MyModel.IsError = true;
+                MsgClass.Add($"{DateTime.Now} ERROR: Excel file not loaded.... ");
             }
             finally
             {
@@ -107,32 +101,32 @@ namespace AppliedAccounts.Pages.ImportData
         {
             if (IsExcelLoaded)
             {
-                SpinnerMessage = "Sales invoice data is being Process...";
+                MyModel.SpinnerMessage = "Sales invoice data is being Process...";
 
                 ShowSpinner = true;
                 ShowImportButton = false;
-                stopwatch.Restart(); // Restart instead of Start to reset time
+                Stopwatch.Restart(); // Restart instead of Start to reset time
 
                 await InvokeAsync(StateHasChanged);
 
                 try
                 {
-                    if (!IsError)
+                    if (!MyModel.IsError)
                     {
                         await GetExcelSheetDataAsync(); // Ensure this is awaited if async
                         await InvokeAsync(StateHasChanged);
                     }
 
-                    if (IsClientUpdate)
+                    if (MyModel.IsClientUpdate)
                     {
-                        if (!IsError)
+                        if (!MyModel.IsError)
                         {
                             await UpdateClientListAsync();  // Ensure all the client has been update in DB.
                             await InvokeAsync(StateHasChanged);
                         }
                     }
 
-                    if (!IsError)
+                    if (!MyModel.IsError)
                     {
                         await GenerateSalesInvoiceAsync();      // Fixed method name
                         await InvokeAsync(StateHasChanged);
@@ -140,12 +134,12 @@ namespace AppliedAccounts.Pages.ImportData
                 }
                 finally
                 {
-                    stopwatch.Stop();
-                    var ts = stopwatch.Elapsed;
-                    MyMessage.Add($"{DateTime.Now} Total time spent in process: {ts.TotalSeconds} seconds");
+                    Stopwatch.Stop();
+                    var ts = Stopwatch.Elapsed;
+                    MsgClass.Add($"{DateTime.Now} Total time spent in process: {ts.TotalSeconds} seconds");
 
                     ShowSpinner = false;
-                    Model.ShowData = true;     // display all imported sales invoices after process complete
+                    MyModel.ShowImportedData = true;     // display all imported sales invoices after process complete
 
                     await InvokeAsync(StateHasChanged);
                 }
@@ -157,7 +151,7 @@ namespace AppliedAccounts.Pages.ImportData
         #region Get from Temp SQLiet DB file  to Data Tables
         private async Task GetExcelSheetDataAsync()
         {
-            SpinnerMessage = "Sales invoice data is being Process... Gathering Data sheets";
+            MyModel.SpinnerMessage = "Sales invoice data is being Process... Gathering Data sheets";
             string _TempGUID = AppRegistry.GetText(AppUser.DataFile, "ExcelImport");
             TempDB _TempDB = new(_TempGUID + ".db");
             ClientData = await _TempDB.GetTempTableAsync("Clients List");
@@ -167,11 +161,12 @@ namespace AppliedAccounts.Pages.ImportData
 
 
             // Validate the Batch is exist in Data Table Bill Receivable
-            IsError = await BatchValidaed();
+            MyModel.IsError = await BatchValidaed();
             await InvokeAsync(StateHasChanged);
 
         }
 
+        // Check the Batch is already exist in Bill Receivable table.
         private async Task<bool> BatchValidaed()
         {
             var ExcelBatch = string.Empty;
@@ -190,7 +185,7 @@ namespace AppliedAccounts.Pages.ImportData
             if (_Table.Rows.Count > 0)
             {
 
-                ErrorMessage = $"Batch {ExcelBatch} number is already exist in Sale Invoice. Assign an unique number";
+                MyModel.ErrorMessage = $"Batch {ExcelBatch} number is already exist in Sale Invoice. Assign an unique number";
                 return true;   // pass value to IsError; Error found.
             }
             return false;      // No error found.   
@@ -202,20 +197,20 @@ namespace AppliedAccounts.Pages.ImportData
         private async Task UpdateClientListAsync()
         {
             var Log = new Dictionary<string, bool>();
-            IsProgress = true;
+            MyModel.IsProgressBar = true;
 
             try
             {
                 if (ClientData != null && Source != null)
                 {
-                    SpinnerMessage = "Sales invoice data is being Process... Customer Data Updating..";
-                    var tb_Client = Source.GetTable(Enums.Tables.Customers);
+                    MyModel.SpinnerMessage = "Sales invoice data is being Process... Customer Data Updating..";
+                    var tb_Client = Source.GetTable(Tables.Customers);
                     var tb_ClientList = tb_Client.AsEnumerable().ToList();
                     var ExcelColumn = "BP Name";
                     var DataColumn = "Title";
 
-                    TotalRec = ClientData.Rows.Count;
-                    Counter = 0;
+                    MyModel.TotalRec = ClientData.Rows.Count;
+                    MyModel.Counter = 0;
 
                     foreach (DataRow Row in ClientData.Rows)
                     {
@@ -233,10 +228,12 @@ namespace AppliedAccounts.Pages.ImportData
                             Log.Add(_Title, true);
                         }
 
-                        Counter++;
-                        double _Counter = double.Parse(Counter.ToString());
-                        double _TotalRec = double.Parse(TotalRec.ToString());
-                        BarPercent = Math.Round((_Counter / _TotalRec) * 100, 2);
+
+                        // Process Bar Claculation
+                        MyModel.Counter++;
+                        double _Counter = double.Parse(MyModel.Counter.ToString());
+                        double _TotalRec = double.Parse(MyModel.TotalRec.ToString());
+                        MyModel.BarPercent = Math.Round((_Counter / _TotalRec) * 100, 2);
                         await UpdateClient(Row, _RowID);
                         await InvokeAsync(StateHasChanged);
                     }
@@ -245,9 +242,9 @@ namespace AppliedAccounts.Pages.ImportData
             }
             catch (Exception error)
             {
-                IsError = true;
-                ErrorMessage = error.Message;
-                MyMessage.Append(error.Message);
+                MyModel.IsError = true;
+                MyModel.ErrorMessage = error.Message;
+                MsgClass.Add(error.Message);
             }
 
         }
@@ -256,7 +253,7 @@ namespace AppliedAccounts.Pages.ImportData
         {
             try
             {
-                var _ClientRow = Source.GetNewRow(Enums.Tables.Customers);
+                var _ClientRow = Source.GetNewRow(Tables.Customers);
                 _ClientRow["ID"] = _RowID;
                 _ClientRow["Code"] = _Row["BP Code"];
                 _ClientRow["Title"] = _Row["BP Name"];
@@ -273,13 +270,13 @@ namespace AppliedAccounts.Pages.ImportData
                 await Task.Run(() =>
                 {
                     Commands.SaveChanges();
-                    SpinnerMessage = $"{_ClientRow["Title"]} is being updated..";
+                    MyModel.SpinnerMessage = $"{_ClientRow["Title"]} is being updated..";
                 });
 
             }
             catch (Exception error)
             {
-                MyMessage.Append(error.Message);
+                MsgClass.Add(error.Message);
             }
 
 
@@ -294,17 +291,17 @@ namespace AppliedAccounts.Pages.ImportData
 
         public async Task<ImportSaleInvoiceModel> GenerateSalesInvoiceAsync()
         {
-            SpinnerMessage = "Sales invoice data is being Process... Gatting Data table";
+            MyModel.SpinnerMessage = "Sales invoice data is being Process... Gatting Data table";
             ImportSaleInvoiceModel _Result = new();
             _Result.DBFile = AppUser.DataFile;
-            IsProgress = true;
-            Counter = 0;
+            MyModel.IsProgressBar = true;
+            MyModel.Counter = 0;
             await GenerateInvoice();
             await InvokeAsync(StateHasChanged);
 
-            MyMessage.Add($"{DateTime.Now} Task Completed.");
+            MsgClass.Add($"{DateTime.Now} Task Completed.");
 
-            Model.ShowData = true;
+            MyModel.ShowImportedData = true;
 
             if (Sale1 != null)
             {
@@ -322,7 +319,7 @@ namespace AppliedAccounts.Pages.ImportData
                 }
 
             }
-            Model = _Result;
+            MyModel = _Result;
             return _Result;
 
         }
@@ -333,53 +330,53 @@ namespace AppliedAccounts.Pages.ImportData
         public async Task GenerateInvoice()
         {
 
-            MyMessage.Add($"{DateTime.Now} Start Process for Generate Invoice");
+            MsgClass.Add($"{DateTime.Now} Start Process for Generate Invoice");
             #region Error Message
             if (InvData is null || SalesData is null || SalesSchema is null)
             {
-                MyMessage.Add($"{DateTime.Now} Date is not available to proceed...");
+                MsgClass.Add($"{DateTime.Now} Date is not available to proceed...");
                 return;
             }
             #endregion
 
-            Sale1 = DataSource.CloneTable(AppUser.DataFile, Enums.Tables.BillReceivable);
-            Sale2 = DataSource.CloneTable(AppUser.DataFile, Enums.Tables.BillReceivable2);
+            Sale1 = DataSource.CloneTable(AppUser.DataFile, Tables.BillReceivable);
+            Sale2 = DataSource.CloneTable(AppUser.DataFile, Tables.BillReceivable2);
 
-            TotalRec = SalesData.Rows.Count;
+            MyModel.TotalRec = SalesData.Rows.Count;
 
             GetInvoiceData();          // Gather data from excel sheet schema for creating voucher Data parameters.
-            MyMessage.Append("");
+            MsgClass.Add($"{DateTime.Now} GetInvoiceData() Completed");
 
-            Model.ShowData = true;
-            IsProgress = true;
+            MyModel.ShowImportedData = true;
+            MyModel.IsProgressBar = true;
             CommandClass _CommandClass = new CommandClass();
             foreach (DataRow Row in SalesData.Rows)                 // Loop main sale invocies records. per record per invoice.
             {
                 //SpinnerMessage = $"Sales invoice data is being Process... Generating Invoices {Counter}";
-                Counter++;
-                double _Counter = double.Parse(Counter.ToString());
-                double _TotalRec = double.Parse(TotalRec.ToString());
-                BarPercent = Math.Round((_Counter / _TotalRec) * 100, 2);
+                MyModel.Counter++;
+                double _Counter = double.Parse(MyModel.Counter.ToString());
+                double _TotalRec = double.Parse(MyModel.TotalRec.ToString());
+                MyModel.BarPercent = Math.Round((_Counter / _TotalRec) * 100, 2);
 
                 if (string.IsNullOrEmpty(Row["Code"].ToString())) { Error++; continue; }
                 if ((string)Row["Active"] != "1") { Skip++; continue; }
-                if (Counter == 1) { continue; }     // Skip record of Heading in Excel File. 
+                if (MyModel.Counter == 1) { continue; }     // Skip record of Heading in Excel File. 
 
 
                 DataRow _Row1 = Sale1.NewRow();
-                int _CompanyID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Customers, (string)Row["Code"]);
-                int _EmployeeID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Employees, (string)Row["Employee"]);
+                int _CompanyID = AppliedDB.Functions.Code2Int(AppUser.DataFile, Tables.Customers, (string)Row["Code"]);
+                int _EmployeeID = AppliedDB.Functions.Code2Int(AppUser.DataFile, Tables.Employees, (string)Row["Employee"]);
                 decimal _Total = Conversion.ToDecimal(Row["Total"]);
 
                 if (_Total > 0)     // if Invoice amount is zero, skip this...
                 {
-                    _Row1["ID"] = Counter;
-                    _Row1["Vou_No"] = string.Concat(Batch, Counter.ToString("0000"));
+                    _Row1["ID"] = MyModel.Counter;
+                    _Row1["Vou_No"] = string.Concat(Batch, MyModel.Counter.ToString("0000"));
                     _Row1["Vou_Date"] = Inv_Date;
                     _Row1["Company"] = _CompanyID;
                     _Row1["Employee"] = _EmployeeID;
                     _Row1["Ref_No"] = Batch;                // Ref No. will be save as batch
-                    _Row1["Inv_No"] = string.Concat(Inv_No, Counter.ToString("0000")); ;
+                    _Row1["Inv_No"] = string.Concat(Inv_No, MyModel.Counter.ToString("0000")); ;
                     _Row1["Inv_Date"] = Inv_Date;
                     _Row1["Pay_Date"] = Due_Date;
                     _Row1["Amount"] = _Total;
@@ -388,21 +385,21 @@ namespace AppliedAccounts.Pages.ImportData
                     _Row1["Status"] = "Submitted";
 
                     Sale1.Rows.Add(_Row1);
-                    Model.SaleInvoiceList.Add(_Row1);
-                    Model.ShowData = false;
+                    MyModel.SaleInvoiceList.Add(_Row1);
+                    MyModel.ShowImportedData = false;
 
-                    MyMessage.Add($" # {Counter}");
+                    MsgClass.Add($" # {MyModel.Counter}");
 
-                    SpinnerMessage = $"{Row["CompanyName"]} is being generated.";
+                    MyModel.SpinnerMessage = $"{Row["CompanyName"]} is being generated.";
                     await GetInvoiceDetails(Row);   // Generates detail record of sale invocies.
                     await InvokeAsync(StateHasChanged);
                 }
                 else
                 {
-                    Model.RejectedList.Add(Row);
+                    MyModel.RejectedList.Add(Row);
                 }
             }
-            MyMessage.Add($"{DateTime.Now} End Sales Invoice details process..");
+            MsgClass.Add($"{DateTime.Now} End Sales Invoice details process..");
         }
         #endregion
 
@@ -411,7 +408,7 @@ namespace AppliedAccounts.Pages.ImportData
         {
             await Task.Run(() =>
             {
-                MyMessage.Add($"{DateTime.Now} Working of Sale Invoice details.");
+                MsgClass.Add($"{DateTime.Now} Working of Sale Invoice details.");
                 var Counter2 = 0;
                 var Sr_No = 0;
                 if (SalesSchema is not null)
@@ -428,10 +425,10 @@ namespace AppliedAccounts.Pages.ImportData
                             DataRow _Row2 = Sale2.NewRow();
                             _Row2["ID"] = Counter2;
                             _Row2["Sr_No"] = Sr_No;
-                            _Row2["TranID"] = Counter;
+                            _Row2["TranID"] = MyModel.Counter;
                             _Row2["Batch"] = Batch;
 
-                            int _Inventory = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Inventory, (string)Scheme["Code"]);
+                            int _Inventory = AppliedDB.Functions.Code2Int(AppUser.DataFile, Tables.Inventory, (string)Scheme["Code"]);
                             _Row2["Inventory"] = _Inventory;
                             _Row2["Batch"] = Batch;
 
@@ -446,15 +443,15 @@ namespace AppliedAccounts.Pages.ImportData
                                 _Row2["Rate"] = Conversion.ToDecimal(Row[(string)Scheme["Rate"]]);
                             }
 
-                            decimal _TaxID = Functions.Code2Int(AppUser.DataFile, Enums.Tables.Taxes, (string)Scheme["STax"]);
+                            decimal _TaxID = AppliedDB.Functions.Code2Int(AppUser.DataFile, Tables.Taxes, (string)Scheme["STax"]);
                             _Row2["Tax"] = _TaxID;
-                            _Row2["Tax_Rate"] = Functions.Code2Rate(AppUser.DataFile, (int)_Row2["Tax"]);
+                            _Row2["Tax_Rate"] = AppliedDB.Functions.Code2Rate(AppUser.DataFile, (int)_Row2["Tax"]);
                             _Row2["Description"] = Row[(string)Scheme["Remarks Code"]];
                             int.TryParse(Row["Project"].ToString(), out int _projectID);
                             _Row2["Project"] = _projectID;
 
                             Sale2.Rows.Add(_Row2);
-                            Model.SaleDetailsList.Add(_Row2);
+                            MyModel.SaleDetailsList.Add(_Row2);
                         }
                     }
                 }
@@ -468,7 +465,7 @@ namespace AppliedAccounts.Pages.ImportData
         // 
         public void GetInvoiceData()
         {
-            MyMessage.Add($"{DateTime.Now} Gathering Invoice Data");
+            MsgClass.Add($"{DateTime.Now} Gathering Invoice Data");
             #region Get Invoice Date
 
             if (InvData != null)
@@ -502,12 +499,12 @@ namespace AppliedAccounts.Pages.ImportData
         private async Task ShowInvoiceModol(int ID)
         {
 
-            Model.GetSelectedSale(ID);
-            ClientName = Model.SelectedSale.First().Company;
-            Voucher = $"{Model.SelectedSale.First().Vou_No} : {Model.SelectedSale.First().Vou_Date.ToString(Format.DDMMYY)}";
+            MyModel.GetSelectedSale(ID);
+            ClientName = MyModel.SelectedSale.First().Company;
+            Voucher = $"{MyModel.SelectedSale.First().Vou_No} : {MyModel.SelectedSale.First().Vou_Date.ToString(Format.DDMMYY)}";
 
             Totals = new();
-            foreach (var item in Model.SelectedSale)
+            foreach (var item in MyModel.SelectedSale)
             {
                 Totals.Tot_Qty += item.Qty;
                 Totals.Tot_Amount += item.Amount;
@@ -523,37 +520,42 @@ namespace AppliedAccounts.Pages.ImportData
         // Step 4.  Posting of Sales Invoices generated by Process
 
         #region Post / Save invoices to Database
-
-        private async void Post()
+        
+        private async Task Post()
         {
-            SpinnerMessage = "Sale invoices are being posted in General Ledger";
+            MyModel.IsProgressBar = true;
+            MyModel.SpinnerMessage = "Sale invoices are being posted in General Ledger";
             ShowSpinner = true;
+            await InvokeAsync(StateHasChanged);
+            
             await SaveAsync();
             ShowSpinner = false;
-            Model.ShowData = false;
-            Model.ShowMessages = true;
+            MyModel.ShowImportedData = false;
+            MyModel.ShowMessages = true;
             await InvokeAsync(StateHasChanged);
         }
 
+        
+
         private async Task SaveAsync()
         {
-            MyMessage.Clear();
+            MsgClass = new();
             Source = new(AppUser);
-            var BillRec1 = Source.GetTable(Enums.Tables.BillReceivable);
-            var BillRec2 = Source.GetTable(Enums.Tables.BillReceivable2);
+            var BillRec1 = Source.GetTable(Tables.BillReceivable);
+            var BillRec2 = Source.GetTable(Tables.BillReceivable2);
             var master = BillRec1.NewRow();
             var details = new List<DataRow>();
             var Validated = true;
 
-            foreach (var Invoice in Model.SaleInvoiceList)
+            foreach (var Invoice in MyModel.SaleInvoiceList)
             {
-                MyMessage.Add($"{DateTime.Now} Invoice {master["Vou_No"]} is processing...");
+                MsgClass.Add($"{DateTime.Now} Invoice {master["Vou_No"]} is processing...");
                 master = Invoice;
-                details = Model.SaleDetailsList.Where(row => (int)row["TranID"] == (int)master["ID"]).ToList();
+                details = MyModel.SaleDetailsList.Where(row => (int)row["TranID"] == (int)master["ID"]).ToList();
 
-                MyMessage.Add($"{DateTime.Now} {details.Count} records found in invoice {master["Vou_No"]}");
+                MsgClass.Add($"{DateTime.Now} {details.Count} records found in invoice {master["Vou_No"]}");
                 Validated = Validation(master);
-                MyMessage.Add($"{DateTime.Now} {master["Vou_No"]} is {Validated} validated");
+                MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} is {Validated} validated");
 
                 foreach (var Row in details)
                 {
@@ -563,16 +565,18 @@ namespace AppliedAccounts.Pages.ImportData
                     {
                         break;
                     }
-                    MyMessage.Add($"{DateTime.Now} {master["Vou_No"]} Serial # {Row["Sr_No"]}  is {Validated} validated");
+                    MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} Serial # {Row["Sr_No"]}  is {Validated} validated");
                 }
+
+
 
                 if (Validated)
                 {
-                    MyMessage.Add($"{DateTime.Now} {master["Vou_No"]} validated for post / save... ");
+                    MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} validated for post / save... ");
                     master["ID"] = 0;           // Set a Datarow for insert command
                     CommandClass _Commands = new(master, AppUser.DataFile);
                     var IsSaved = _Commands.SaveChanges();
-                    MyMessage.Add($"{DateTime.Now} {master["Vou_No"]} saved ---> {IsSaved} ");
+                    MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} saved ---> {IsSaved} ");
                     var _TranID = (int)master["ID"];        // Get ID after save row in SQLite Data Table.
                     foreach (var Row in details)
                     {
@@ -581,24 +585,28 @@ namespace AppliedAccounts.Pages.ImportData
                         _Commands = new(Row, AppUser.DataFile);
                         await Task.Run(() =>
                         {
-                            SpinnerMessage = $"{master["Vou_No"]} is being saved.";
+                            MyModel.SpinnerMessage = $"{master["Vou_No"]} is being saved.";
                             _Commands.SaveChanges();
                         });
 
-                        MyMessage.Add($"{DateTime.Now} Serial # {Row["Sr_No"]} is saved ---> {IsSaved} ");
+                        MsgClass.Add($"{DateTime.Now} Serial # {Row["Sr_No"]} is saved ---> {IsSaved} ");
+
+                        ToastService.ShowToast(ToastClass.SaveToast, $"Save | {master["Vou_No"]}"); // show the toast
                     }
                 }
                 else
                 {
-                    MyMessage.Add($"{DateTime.Now} ERROR : Sales Date is not valided to post...");
+                    MsgClass.Add($"{DateTime.Now} ERROR : Sales Date is not valided to post...");
                 }
             }
+            
         }
         #endregion
 
         #region Validation of Sale Invoice Record ---- Pending
         private bool Validation(DataRow _Row)
         {
+            if ( _Row == null ) {  return false; }
             return true;
         }
         #endregion
@@ -624,9 +632,21 @@ namespace AppliedAccounts.Pages.ImportData
         public List<DataRow> SaleDetailsList { get; set; } = new();
         public List<SelectedSaleInvoice> SelectedSale { get; set; } = new();
 
-        public bool ShowData { get; set; } = false;
+        public bool ShowImportedData { get; set; } = false;
         public bool ShowMessages { get; set; } = false;
         public bool PostData { get; set; } = false;
+        public bool IsSpinner { get; set; } = false;
+        public string SpinnerMessage { get; set; } = string.Empty;
+        public bool IsError { get; set; } = false;
+        public string ErrorMessage { get; set; } = string.Empty;
+        public bool IsProgressBar { get; set; } = false;
+
+        public int Counter { get; set; }
+        public int TotalRec { get; set; }
+        public double BarPercent { get; set; }
+        public bool IsBatch { get; set; }
+        public bool IsClientUpdate { get; set; }
+
 
         public ImportSaleInvoiceModel() { }
         public ImportSaleInvoiceModel(DataTable _SalesTable1, DataTable _SaleTable2)
@@ -650,12 +670,13 @@ namespace AppliedAccounts.Pages.ImportData
                 SelectedSale.Clear();
                 foreach (var Item in _detail)
                 {
-                    decimal _TaxRate = Functions.GetTaxRate(DBFile, (int)Item["Tax"]);
+                    decimal _TaxRate = AppliedDB.Functions.GetTaxRate(DBFile, (int)Item["Tax"]);
                     SelectedSaleInvoice _SaleInvoice = new(); ;
+                    _SaleInvoice.SrNo = (int)Item["Sr_No"];
                     _SaleInvoice.Company = (string)_master["Description"];   //Functions.GetTitle(DBFile, Enums.Tables.Customers, (int)_master["Company"]);
                     _SaleInvoice.Vou_No = (string)_master["Vou_No"];
                     _SaleInvoice.Vou_Date = (DateTime)_master["Vou_Date"];
-                    _SaleInvoice.Inventory = Functions.GetTitle(DBFile, Enums.Tables.Inventory, (int)Item["Inventory"]);
+                    _SaleInvoice.Inventory = AppliedDB.Functions.GetTitle(DBFile, Tables.Inventory, (int)Item["Inventory"]);
                     _SaleInvoice.Batch = (string)Item["Batch"];
                     _SaleInvoice.Qty = (decimal)Item["Qty"];
                     _SaleInvoice.Rate = (decimal)Item["Rate"];
@@ -671,6 +692,7 @@ namespace AppliedAccounts.Pages.ImportData
 
     public class SelectedSaleInvoice
     {
+        public int SrNo { get; set; }
         public string Company { get; set; } = string.Empty;
         public string Vou_No { get; set; } = string.Empty;
         public DateTime Vou_Date { get; set; }

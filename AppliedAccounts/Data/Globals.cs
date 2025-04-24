@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.Reporting.NETCore;
+using System.Buffers.Text;
+using System.Reflection.Metadata;
 
 namespace AppliedAccounts.Data
 {
@@ -35,17 +38,6 @@ namespace AppliedAccounts.Data
             AppPaths.DBTempPath = Config.GetValue<string>("Paths:DBTempPath") ?? "SQLiteTemp";
             AppPaths.SessionPath = Config.GetValue<string>("Paths:SessionPath") ?? "Sessions";
 
-            //AppPaths.SystemPath = Path.Combine(BasePath, RootPath, SystemPath);
-            ////ImagesPath = Path.Combine(BasePath, RootPath, ImagesPath);
-            //AppPaths.ReportPath = Path.Combine(BasePath, RootPath, ReportPath);
-            //AppPaths.LanguagesPath = Path.Combine(BasePath, RootPath, LanguagesPath);
-            //AppPaths.MessagesPath = Path.Combine(BasePath, RootPath, MessagesPath);
-            //AppPaths.PDFPath = Path.Combine(BasePath, RootPath, PDFPath);
-            //AppPaths.UsersPath = Path.Combine(BasePath, RootPath, UsersPath);
-            //AppPaths.DBTempPath = Path.Combine(BasePath, RootPath, DBTempPath);
-            //AppPaths.SessionPath = Path.Combine(BasePath, RootPath, SessionPath);
-            //AppPaths.ClientPath = Path.Combine(BasePath, RootPath, ClientPath);
-
             Author = new()
             {
                 Company = Config.GetValue<string>("Author:Company") ?? "",
@@ -73,6 +65,8 @@ namespace AppliedAccounts.Data
                 Title = Config.GetValue<string>("Currency:Title"),
                 Format = Config.GetValue<string>("Currency:Format"),
             };
+
+            
         }
     }
 
@@ -149,5 +143,12 @@ namespace AppliedAccounts.Data
     }
     #endregion
 
+    public class PrintReports
+    {
+        public string BaseUrl { get; set; }
+        public string ReportFooter { get; set; }
+        public string ReportTitle { get; set; }
+        public string ReportLogo { get; set; }
+    }
 }
 

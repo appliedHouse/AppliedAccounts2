@@ -171,6 +171,33 @@ namespace AppliedAccounts.Data
             }
             return Dates;
         }
+
+        public static DateTime GetFrom(string DataFile, string Key)
+        {
+            if (DataFile == null || DataFile == string.Empty) { return DateTime.Now; }
+            
+            DataView VW_Registry = GetRegistryView(DataFile);
+            VW_Registry.RowFilter = string.Concat($"Code='{Key}'");
+            if (VW_Registry.Count == 1)
+            {
+                return (DateTime)VW_Registry[0]["From"];
+            }
+            return DateTime.Now;
+        }
+
+        public static DateTime GetTo(string DataFile, string Key)
+        {
+            if (DataFile == null || DataFile == string.Empty) { return DateTime.Now; }
+
+            DataView VW_Registry = GetRegistryView(DataFile);
+            VW_Registry.RowFilter = string.Concat($"Code='{Key}'");
+            if (VW_Registry.Count == 1)
+            {
+                return (DateTime)VW_Registry[0]["From"];
+            }
+            return DateTime.Now;
+        }
+
         public static bool SetKey(string DataFile, string _Key, object KeyValue, KeyType _KeyType)
         {
             if (DataFile == null || DataFile == string.Empty) { return false; ; }
@@ -226,10 +253,9 @@ namespace AppliedAccounts.Data
                 default:
                     break;
             }
-           
 
-            if (SQLAction == "Insert") { var cmd = AppliedDB.Commands.Insert(CurrentRow, DataFile); cmd.Connection.Open(); cmd.ExecuteNonQuery(); cmd.Connection.Close(); return true; }
-            if (SQLAction == "Update") { var cmd = AppliedDB.Commands.UpDate(CurrentRow, DataFile); cmd.Connection.Open();  cmd.ExecuteNonQuery(); cmd.Connection.Close(); return true; }
+            if (SQLAction == "Insert") { var cmd = AppliedDB.Commands.Insert(CurrentRow, DataFile); cmd?.Connection.Open(); cmd?.ExecuteNonQuery(); cmd?.Connection.Close(); return true; }
+            if (SQLAction == "Update") { var cmd = AppliedDB.Commands.UpDate(CurrentRow, DataFile); cmd?.Connection.Open();  cmd?.ExecuteNonQuery(); cmd?.Connection.Close(); return true; }
             return false;
         }
         public static int ExpDays(string DataFile)
@@ -279,7 +305,7 @@ namespace AppliedAccounts.Data
         UserName,
         From,
         To,
-        FromTo,
+        FromTo
     }
 
 }

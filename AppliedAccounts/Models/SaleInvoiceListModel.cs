@@ -1,5 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedDB;
+using AppMessages;
 using AppReports;
 using System.Data;
 
@@ -14,7 +15,7 @@ namespace AppliedAccounts.Models
         public List<SalesRecord> Records { get; set; } = new();
         public List<DataRow> Data { get; set; } = new();
         public string SearchText { get; set; } = string.Empty;
-        public AppMessages.MessageClass MsgClass { get; set; } = new();
+        public MessageClass MsgClass { get; set; } = new();
         public decimal TotalAmount { get; set; } = 0.00M;
         public bool SelectAll { get; set; }
         
@@ -26,7 +27,7 @@ namespace AppliedAccounts.Models
             AppUser = UserProfile;
             DBFile = AppUser.DataFile;
             Source = new(AppUser);
-            Data = Source.GetList(Enums.Query.SaleInvoiceList);
+            Data = Source.GetList(AppliedDB.Enums.Query.SaleInvoiceList);
             Records = GetFilterRecords();
         }
         #endregion
