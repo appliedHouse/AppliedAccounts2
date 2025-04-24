@@ -2,7 +2,6 @@
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppReports;
-using BlazorJS;
 using Microsoft.JSInterop;
 using System.Data;
 
@@ -22,7 +21,7 @@ namespace AppliedAccounts.Pages.Sale
         private bool IsPrinting { get; set; } = false;
         private List<string> PrintedReports { get; set; } = new();
         public PrintService ReportService { get; set; }
-        public Globals MyGlobals { get; set; }
+        public GlobalService MyGlobals { get; set; }
         public string PrintingMessage { get; set; }
 
         public SaleInvoiceList()

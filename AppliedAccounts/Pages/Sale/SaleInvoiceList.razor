@@ -8,7 +8,7 @@
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager NavManager
 @inject IJSRuntime js
-@inject Globals DIGlobal
+@inject GlobalService GlobalService
 @inject PrintService DIPrintReport
 @inject HttpClient Http
 
@@ -27,7 +27,7 @@
             else { MyModel = new(); }
             IsDataLoad = true;
 
-            MyGlobals = DIGlobal;
+            MyGlobals = GlobalService;
             ReportService = new();
         }
         catch (Exception)

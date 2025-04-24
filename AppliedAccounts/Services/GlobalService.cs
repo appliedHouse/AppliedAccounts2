@@ -1,15 +1,13 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.Reporting.NETCore;
-using System.Buffers.Text;
-using System.Reflection.Metadata;
+using Microsoft.JSInterop;
 
-namespace AppliedAccounts.Data
+namespace AppliedAccounts.Services
 {
-    public class Globals
+    public class GlobalService
     {
-       
         public readonly IConfiguration Config;
         public readonly NavigationManager NavManager;
+        public readonly IJSRuntime JS;
 
         public AppPath AppPaths { get; set; } = new();
         public AuthorClass Author { get; set; } = new();
@@ -17,14 +15,15 @@ namespace AppliedAccounts.Data
         public CurrencyClass Currency { get; set; } = new();
         public Format AppFormat { get; set; } = new();
 
-        public Globals() { }
+        public GlobalService() { }
 
-        public Globals(IConfiguration _Config, NavigationManager _NavManager)
+        public GlobalService(IConfiguration _Config, NavigationManager _NavManager, IJSRuntime _JS)
         {
             Config = _Config;
             NavManager = _NavManager;
+            JS = _JS;
 
-            AppPaths.BasePath = NavManager.BaseUri;
+            AppPaths.BaseUri = NavManager.BaseUri;
             AppPaths.FirstPath = Directory.GetCurrentDirectory();
             AppPaths.RootPath = Config.GetValue<string>("Paths:RootPath") ?? "wwwroot";
             AppPaths.SystemPath = Config.GetValue<string>("Paths:SystemPath") ?? "System";
@@ -66,13 +65,13 @@ namespace AppliedAccounts.Data
                 Format = Config.GetValue<string>("Currency:Format"),
             };
 
-            
+
         }
     }
 
     public class AppPath
     {
-        public string BasePath { get; set; } = string.Empty;
+        public string BaseUri { get; set; } = string.Empty;
         public string FirstPath { get; set; } = string.Empty;
         public string RootPath { get; set; } = string.Empty;
         public string ReportPath { get; set; } = string.Empty;
@@ -143,6 +142,7 @@ namespace AppliedAccounts.Data
     }
     #endregion
 
+    #region Printing Reports
     public class PrintReports
     {
         public string BaseUrl { get; set; }
@@ -150,5 +150,6 @@ namespace AppliedAccounts.Data
         public string ReportTitle { get; set; }
         public string ReportLogo { get; set; }
     }
+    #endregion
 }
 

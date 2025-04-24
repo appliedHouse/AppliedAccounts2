@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using AppliedAccounts.Data;
 using AppliedAccounts.Authentication;
 using AppliedAccounts.Services;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 
 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
@@ -17,12 +19,27 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<AppUserModel>();
 builder.Services.AddSingleton<UserProfile>();
-builder.Services.AddScoped<Globals>();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthonticationStateProvider>();
 builder.Services.AddScoped<ToastService>();
 builder.Services.AddScoped<PrintService>();
 builder.Services.AddHttpClient();
+
+builder.Services.AddScoped<GlobalService>(sp =>
+{
+    // Access configuration and navigation manager
+    var config = sp.GetRequiredService<IConfiguration>();
+    var navManager = sp.GetRequiredService<NavigationManager>();
+    var JSRuntime = sp.GetRequiredService<IJSRuntime>();
+
+    // Initialize GlobalService with dependencies
+    var globalService = new GlobalService(config, navManager, JSRuntime);
+
+    // Set the Language.ID value here
+    globalService.Language.ID = 1; // Example: Setting ID to 1
+
+    return globalService;
+});
 
 var app = builder.Build();
 

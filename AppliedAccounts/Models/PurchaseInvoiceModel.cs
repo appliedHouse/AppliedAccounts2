@@ -1,5 +1,6 @@
 ﻿using AppliedAccounts.Authentication;
 using AppliedAccounts.Data;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppReports;
 using System.Data;
@@ -500,7 +501,7 @@ namespace AppliedAccounts.Models
             {
                 // Generate / Obtain Report Data from Temp Table....
                 var _DBFile = UserProfile.DataFile;
-                var _Globals = new Globals();
+                var _Globals = new GlobalService();
                 //var _TempTable = GetText(_DBFile, "stkLedData");
                 //var _SourceTable = new DataTable();
                 var _ReportFile = GetText(_DBFile, _ReportFileKey);

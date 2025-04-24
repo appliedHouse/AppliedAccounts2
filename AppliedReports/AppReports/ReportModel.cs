@@ -50,6 +50,7 @@ namespace AppReports
         #region Report Render
         public bool ReportRender(ReportType rptType)
         {
+            
             OutputReport.ReportType = rptType;
             return ReportRender();
         }

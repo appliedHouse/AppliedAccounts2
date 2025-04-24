@@ -1,14 +1,18 @@
 ﻿@page "/Menu/Accounts"
 @attribute [Authorize];
-@inject NavigationManager NavManager;
-@inject Globals _Global;
+
 @using AppliedAccounts.Models;
+@using AppliedAccounts.Services;
 @using ExcelDataReader
 @using System.Data
 
 
+@inject NavigationManager NavManager;
+@inject GlobalService GlobalService;
+
+
 @code {
-    public Globals? AppValues { get; set; }
+    public GlobalService AppValues { get; set; }
     public MenuCardModel? CardMenuModel { get; set; }
     public string COAText = "A chart of accounts is a documents that list all the transactions.";
     public string ClassText = "Classification of accounts are groups of chart of accounts.";
@@ -23,7 +27,7 @@
 
     protected override void OnInitialized()
     {
-        AppValues = _Global;
+        AppValues = GlobalService;
         CardMenuModel = new() { TextMsg = "", NavTo = "", PicPath = "" };
     }
 

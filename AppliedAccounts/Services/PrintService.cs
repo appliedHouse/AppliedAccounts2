@@ -6,21 +6,32 @@ namespace AppliedAccounts.Services
 {
     public class PrintService
     {
+        
         public ReportData RptData { get; set; }
         public ReportModel RptModel { get; set; }
         public ReportType RptType { get; set; }
         public string RptUrl { get; set; }
         public string JSOption { get; set; }
         public IJSRuntime JS { get; set; }
+        public GlobalService Config { get; set; }
         public NavigationManager NavManager { get; set; }
-        public string DownLoadPath = "PDFReports";
+        
+        public string ReportUrl { get; set; } = string.Empty;
+
+        public PrintService(GlobalService _Config)
+        {
+            Config = _Config;
+            NavManager = Config.NavManager;
+            JS = Config.JS;
+            ReportUrl = $"{Config.AppPaths.BaseUri}{Config.AppPaths.PDFPath}";
+        }
 
         public PrintService()
         {
         }
-
         public byte[] Generate()
         {
+            
             RptModel.ReportData = RptData;          // Set Report Data to print in report.
             if (RptModel.ReportData != null)
             {
@@ -60,6 +71,13 @@ namespace AppliedAccounts.Services
             return RptUrl;
         }
 
+        public async Task Print()
+        {
+            RptModel.ReportData = RptData;
+            RptModel.ReportRender(ReportType.Print);
+            string rptBytes64 = Convert.ToBase64String(RptModel.ReportBytes);
+            await JS.InvokeVoidAsync("printer", rptBytes64);
+        }
 
         public void Preview()
         {
@@ -77,7 +95,7 @@ namespace AppliedAccounts.Services
         {
             RptModel.ReportRender(ReportType.Excel);
 
-            var FileLink = $"{NavManager.BaseUri}{DownLoadPath}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
+            var FileLink = $"{ReportUrl}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
             NavManager.NavigateTo(FileLink, forceLoad: true);
         }
 
@@ -85,14 +103,14 @@ namespace AppliedAccounts.Services
         {
             RptModel.ReportRender(ReportType.Word);
 
-            var FileLink = $"{NavManager.BaseUri}{DownLoadPath}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
+            var FileLink = $"{ReportUrl}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
             NavManager.NavigateTo(FileLink, forceLoad: true);
         }
 
         internal void Image()
         {
             RptModel.ReportRender(ReportType.Image);
-            var FileLink = $"{NavManager.BaseUri}{DownLoadPath}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
+            var FileLink = $"{ReportUrl}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
             NavManager.NavigateTo(FileLink, forceLoad: true);
             //JS.InvokeVoidAsync("open", FileLink, "_blank");
         }
@@ -100,7 +118,7 @@ namespace AppliedAccounts.Services
         internal void HTML()
         {
             RptModel.ReportRender(ReportType.HTML);
-            var FileLink = $"{NavManager.BaseUri}{DownLoadPath}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
+            var FileLink = $"{ReportUrl}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
             JS.InvokeVoidAsync("open", FileLink, "_blank");
         }
     }
