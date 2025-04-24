@@ -3,13 +3,17 @@ using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using AppReports;
+using Microsoft.AspNetCore.Components.Routing;
 using System.Data;
+using Windows.Services.Maps;
+using static AppliedAccounts.Pages.Users.Login1;
 using MESSAGES = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Pages.Reporting
 {
     public partial class GeneralLedger
     {
+        public IConfiguration Config { get; set; }
         public AppUserModel UserModel { get; set; }
         public DataSource Source { get; set; }
         public PrintService ReportService { get; set; }
@@ -19,6 +23,10 @@ namespace AppliedAccounts.Pages.Reporting
         public DateTime Date_To { get; set; }
         public string SortBy { get; set; }
         public string DBFile { get; set; }
+        public bool IsPageValid { get; set; }
+        string IsPageValidMessage { get; set; } = "Page has some error. Consult to Administrator";
+
+        public List<CodeTitle> Accounts { get; set; }
 
         public GeneralLedger()
         {
@@ -31,12 +39,31 @@ namespace AppliedAccounts.Pages.Reporting
             Date_From = AppRegistry.GetFrom(DBFile, "GL_COA");
             Date_To = AppRegistry.GetTo(DBFile, "GL_COA");
             SortBy = AppRegistry.GetText(DBFile, "GL_COA");
+
+
         }
 
         public void Start(AppUserModel _UserModel)
         {
             UserModel = _UserModel;
             Source = new(UserModel);
+            ReportSeervice = new();
+
+            Accounts = Source.GetAccounts();
+
+           
+        }
+
+        public void BackPage()
+        {
+            NavManager.NavigateTo("/Menu/Accounts");
+        }
+
+
+        #region Print
+        public void Print(ReportType PrintType)
+        {
+            Print(COAID, PrintType);
         }
 
 
@@ -77,23 +104,53 @@ namespace AppliedAccounts.Pages.Reporting
             ReportData _ReportData = new ReportData();
             _ReportData.ReportTable = _Table;
             _ReportData.DataSetName = "dsname_Ledger";
-
-            ReportData reportData = new ReportData();
-            return reportData;
+            return _ReportData;
         }
 
         private ReportModel CreateReportModel(int _ID)
         {
             ReportModel Report = new ReportModel();
 
-            Report.InputReport.FileName = "Ledger";
-            Report.InputReport.FileExtention = "rdl";
+            var _InvoiceNo = "INV-Testing";
+            var _Heading1 = "Sales Invoice";
+            var _Heading2 = $"Invoice No. {_InvoiceNo}";
 
+            Report.ReportUrl = NavManager.BaseUri;
+
+            Report.InputReport.FilePath = UserModel.ReportFolder;
+            Report.InputReport.FileName = "Ledger";
+            Report.InputReport.FileExtention = ".rdl";
+
+            Report.OutputReport.FilePath = UserModel.PDFFolder;
             Report.OutputReport.FileName = "Ledger_" + "CompanyName";
             Report.OutputReport.ReportType = ReportType.Print;
+            Report.OutputReport.ReportUrl = Report.ReportUrl;
+
+            Report.AddReportParameter("CompanyName", UserModel.Company);
+            Report.AddReportParameter("Heading1", _Heading1);
+            Report.AddReportParameter("Heading2", _Heading2);
+            Report.AddReportParameter("Footer", AppFunctions.ReportFooter() );
+            
+            Report.ReportRender();
+
 
 
             return Report;
         }
+        #endregion
+    }
+
+    public class GLModel
+    {
+        public int BookID { get; set; }
+        public int COAID { get; set; }
+        public int CompanyID { get; set; }
+        public int ProjectID { get; set; }
+        public int EmployeeId { get; set; }
+
+        public DateTime DateFrom { get; set; }
+        public DateTime DateTo { get; set; }
+        public string SortBy { get; set; }
+
     }
 }

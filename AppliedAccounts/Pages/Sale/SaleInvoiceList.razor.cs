@@ -172,7 +172,6 @@ namespace AppliedAccounts.Pages.Sale
                 // output Parameters (like pdf, excel, word, html, tiff)
                 _Reportmodel.OutputReport.FilePath = AppUser.PDFFolder;
                 _Reportmodel.OutputReport.FileName = "SaleInvoice_" + _ID.ToString("0000");
-                _Reportmodel.OutputReport.ReportType = ReportType.Preview;
                 _Reportmodel.OutputReport.ReportType = _ReportOption;
                 _Reportmodel.OutputReport.ReportUrl = _Reportmodel.ReportUrl;
                 // Reports Parameters
