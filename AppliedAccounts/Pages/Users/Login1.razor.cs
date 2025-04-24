@@ -78,7 +78,6 @@ namespace AppliedAccounts.Pages.Users
             return;
         }
 
-
         private UserProfile GetUserProfile(AppUserModel _UserModel)
         {
             var _UserProfile = new UserProfile();
@@ -86,8 +85,6 @@ namespace AppliedAccounts.Pages.Users
             var _UserID = _UserModel.UserID;
             if (_UserModel != null)
             {
-                
-
                 var UsersDBFile = Path.Combine(
                     AppGlobals.AppPaths.FirstPath,
                     AppGlobals.AppPaths.RootPath,
