@@ -9,7 +9,7 @@
       <am:Name>MSRB</am:Name>
       <am:Version>15.0.20283.0</am:Version>
     </am:UpdatedBy>
-    <am:LastModifiedTimestamp>2024-10-05T13:01:06.5446441Z</am:LastModifiedTimestamp>
+    <am:LastModifiedTimestamp>2025-04-25T08:52:23.8111246Z</am:LastModifiedTimestamp>
   </am:AuthoringMetadata>
   <df:DefaultFontFamily>Segoe UI</df:DefaultFontFamily>
   <AutoRefresh>0</AutoRefresh>
@@ -903,7 +903,7 @@ LEFT JOIN[Project] [P] ON[P].[ID] = [B2].[Project] LEFT JOIN[Inventory] [I] ON[I
       <Width>7.02232in</Width>
       <Page>
         <PageHeader>
-          <Height>1.96528in</Height>
+          <Height>1.82361in</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -924,7 +924,7 @@ LEFT JOIN[Project] [P] ON[P].[ID] = [B2].[Project] LEFT JOIN[Inventory] [I] ON[I
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox14</rd:DefaultName>
-              <Top>1.6in</Top>
+              <Top>1.475in</Top>
               <Left>0.06949in</Left>
               <Height>0.2in</Height>
               <Width>0.85in</Width>
@@ -958,7 +958,7 @@ LEFT JOIN[Project] [P] ON[P].[ID] = [B2].[Project] LEFT JOIN[Inventory] [I] ON[I
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox14</rd:DefaultName>
-              <Top>1.6in</Top>
+              <Top>1.475in</Top>
               <Left>0.98893in</Left>
               <Height>0.2in</Height>
               <Width>1in</Width>
@@ -995,7 +995,7 @@ LEFT JOIN[Project] [P] ON[P].[ID] = [B2].[Project] LEFT JOIN[Inventory] [I] ON[I
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox14</rd:DefaultName>
-              <Top>1.6in</Top>
+              <Top>1.475in</Top>
               <Left>2.05838in</Left>
               <Height>0.2in</Height>
               <Width>0.85in</Width>
@@ -1031,7 +1031,7 @@ LEFT JOIN[Project] [P] ON[P].[ID] = [B2].[Project] LEFT JOIN[Inventory] [I] ON[I
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox14</rd:DefaultName>
-              <Top>1.6in</Top>
+              <Top>1.475in</Top>
               <Left>2.9329in</Left>
               <Height>0.2in</Height>
               <Width>1in</Width>
@@ -1068,7 +1068,7 @@ LEFT JOIN[Project] [P] ON[P].[ID] = [B2].[Project] LEFT JOIN[Inventory] [I] ON[I
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox14</rd:DefaultName>
-              <Top>1.6in</Top>
+              <Top>1.475in</Top>
               <Left>4.0579in</Left>
               <Height>0.2in</Height>
               <Width>0.85in</Width>
@@ -1104,7 +1104,7 @@ LEFT JOIN[Project] [P] ON[P].[ID] = [B2].[Project] LEFT JOIN[Inventory] [I] ON[I
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox14</rd:DefaultName>
-              <Top>1.6in</Top>
+              <Top>1.475in</Top>
               <Left>4.99938in</Left>
               <Height>0.2in</Height>
               <Width>1in</Width>
@@ -1141,7 +1141,7 @@ LEFT JOIN[Project] [P] ON[P].[ID] = [B2].[Project] LEFT JOIN[Inventory] [I] ON[I
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox2</rd:DefaultName>
-              <Top>1.31806in</Top>
+              <Top>1.19306in</Top>
               <Left>0.06949in</Left>
               <Height>0.2in</Height>
               <Width>0.85in</Width>
@@ -1175,7 +1175,7 @@ LEFT JOIN[Project] [P] ON[P].[ID] = [B2].[Project] LEFT JOIN[Inventory] [I] ON[I
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox2</rd:DefaultName>
-              <Top>1.31806in</Top>
+              <Top>1.19306in</Top>
               <Left>0.98893in</Left>
               <Height>0.2in</Height>
               <Width>5.01045in</Width>
@@ -1196,7 +1196,7 @@ LEFT JOIN[Project] [P] ON[P].[ID] = [B2].[Project] LEFT JOIN[Inventory] [I] ON[I
               </Style>
             </Textbox>
             <Line Name="Line1">
-              <Top>1.88833in</Top>
+              <Top>1.76333in</Top>
               <Height>0in</Height>
               <Width>7.02232in</Width>
               <ZIndex>8</ZIndex>
@@ -1227,7 +1227,7 @@ LEFT JOIN[Project] [P] ON[P].[ID] = [B2].[Project] LEFT JOIN[Inventory] [I] ON[I
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox2</rd:DefaultName>
-              <Top>0.91736in</Top>
+              <Top>0.79236in</Top>
               <Left>0.06949in</Left>
               <Height>0.2764in</Height>
               <Width>6.92911in</Width>
@@ -1244,73 +1244,15 @@ LEFT JOIN[Project] [P] ON[P].[ID] = [B2].[Project] LEFT JOIN[Inventory] [I] ON[I
                 <PaddingBottom>2pt</PaddingBottom>
               </Style>
             </Textbox>
-            <Textbox Name="Textbox8">
-              <CanGrow>true</CanGrow>
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>CDC SHARE REGISTRAR SERVICES LIMITED</Value>
-                      <Style>
-                        <FontSize>9pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                        <TextDecoration>Underline</TextDecoration>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value />
-                      <Style>
-                        <FontSize>8pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                        <TextDecoration>Underline</TextDecoration>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value />
-                      <Style>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>Textbox8</rd:DefaultName>
-              <Top>0.10417in</Top>
-              <Left>4.30743in</Left>
-              <Height>0.26458in</Height>
-              <Width>2.71489in</Width>
-              <ZIndex>10</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-                <PaddingLeft>2pt</PaddingLeft>
-                <PaddingRight>2pt</PaddingRight>
-                <PaddingTop>2pt</PaddingTop>
-                <PaddingBottom>2pt</PaddingBottom>
-              </Style>
-            </Textbox>
             <Image Name="Image1">
               <Source>Embedded</Source>
               <Value>CDCLogo</Value>
               <Sizing>FitProportional</Sizing>
-              <Top>0.10417in</Top>
-              <Left>0.06949in</Left>
-              <Height>0.74792in</Height>
+              <Top>0.07917in</Top>
+              <Left>5.16949in</Left>
+              <Height>0.62292in</Height>
               <Width>1.79444in</Width>
-              <ZIndex>11</ZIndex>
+              <ZIndex>10</ZIndex>
               <Bookmark>https://www.cdcsrsl.com/en/</Bookmark>
               <Style>
                 <Border>
@@ -1326,73 +1268,9 @@ LEFT JOIN[Project] [P] ON[P].[ID] = [B2].[Project] LEFT JOIN[Inventory] [I] ON[I
           </Style>
         </PageHeader>
         <PageFooter>
-          <Height>1.63889in</Height>
+          <Height>0.62222in</Height>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
-            <Textbox Name="Textbox49">
-              <CanGrow>true</CanGrow>
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>Remarks :</Value>
-                      <Style>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>Textbox35</rd:DefaultName>
-              <Top>0.27778in</Top>
-              <Height>0.25in</Height>
-              <Width>0.73593in</Width>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-                <VerticalAlign>Middle</VerticalAlign>
-                <PaddingLeft>2pt</PaddingLeft>
-                <PaddingRight>2pt</PaddingRight>
-                <PaddingTop>2pt</PaddingTop>
-                <PaddingBottom>2pt</PaddingBottom>
-              </Style>
-            </Textbox>
-            <Textbox Name="Textbox50">
-              <CanGrow>true</CanGrow>
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=First(Fields!Description.Value, "ds_SaleInvoice")</Value>
-                      <Style>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>Textbox36</rd:DefaultName>
-              <Top>0.27778in</Top>
-              <Left>0.80537in</Left>
-              <Height>0.25in</Height>
-              <Width>3.12753in</Width>
-              <ZIndex>1</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-                <VerticalAlign>Middle</VerticalAlign>
-                <PaddingLeft>2pt</PaddingLeft>
-                <PaddingRight>2pt</PaddingRight>
-                <PaddingTop>2pt</PaddingTop>
-                <PaddingBottom>2pt</PaddingBottom>
-              </Style>
-            </Textbox>
             <Textbox Name="Textbox1">
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
@@ -1419,7 +1297,6 @@ LEFT JOIN[Project] [P] ON[P].[ID] = [B2].[Project] LEFT JOIN[Inventory] [I] ON[I
               <Left>4.05743in</Left>
               <Height>0.25in</Height>
               <Width>2.9565in</Width>
-              <ZIndex>2</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>

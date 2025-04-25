@@ -196,7 +196,10 @@ namespace AppliedAccounts.Models
         {
             try
             {
-                var VoucherData = Source.GetSalesInvoice(SaleInvoiceID).AsEnumerable().ToList();
+                var _Filter = $"[ID]={SaleInvoiceID}";
+                var _Query = Quries.BillReceivable(_Filter);
+
+                var VoucherData = Source.GetTable(_Query).AsEnumerable().ToList(); // Get Data 
 
                 if (VoucherData != null)
                 {
@@ -205,7 +208,6 @@ namespace AppliedAccounts.Models
 
                         MyVoucher.Master = VoucherData!.Select(first => new Master()
                         {
-
                             ID1 = first.Field<int>("ID1"),
                             Vou_No = first.Field<string>("Vou_No") ?? "",
                             Vou_Date = first.Field<DateTime>("Vou_Date"),
@@ -216,9 +218,13 @@ namespace AppliedAccounts.Models
                             Inv_Date = first.Field<DateTime>("Inv_Date"),
                             Pay_Date = first.Field<DateTime>("Pay_Date"),
                             Amount = first.Field<decimal>("Amount"),
-                            Remarks = first.Field<string>("Description") ?? "",
+                            Remarks = first.Field<string>("Remarks") ?? "",
                             Comments = first.Field<string>("Comments") ?? "",
                             Status = first.Field<string>("Status") ?? "",
+
+                            TitleCompany = first.Field<string>("TitleSupplier") ?? "",
+                            TitleEmployee = first.Field<string>("TitleEmployee") ?? "",
+
                         }).First() ?? new();
 
                         MyVoucher.Details = [.. VoucherData.Select(row => new Detail()
@@ -228,18 +234,18 @@ namespace AppliedAccounts.Models
                             Sr_No = row.Field<int>("Sr_No"),
                             Inventory = row.Field<int>("Inventory"),
                             Batch = row.Field<string>("Batch") ?? "",
+                            Unit = row.Field<int>("Unit"),
                             Qty = row.Field<decimal>("Qty"),
                             Rate = row.Field<decimal>("Rate"),
                             TaxID = row.Field<int>("Tax"),
                             TaxRate = row.Field<decimal>("Tax_Rate"),
-                            Description = row.Field<string>("Description2") ?? "",
+                            Description = row.Field<string>("Description") ?? "",
                             Project = row.Field<int>("Project"),
-                            Unit = row.Field<int>("Unit"),
 
-                            TitleInventory = Source.SeekTitle(Tables.Inventory, row.Field<int>("Inventory")),
-                            TitleProject = Source.SeekTitle(Tables.Project, row.Field<int>("Project")),
-                            TitleTaxID = Source.SeekTitle(Tables.Taxes, row.Field<int>("Tax")),
-                            TitleUnit = Source.SeekTitle(Tables.Inv_UOM, row.Field<int>("Unit")),
+                            TitleInventory = row.Field<string>("TitleStock") ?? "",
+                            TitleProject = row.Field < string >("TitleProject") ?? "",
+                            TitleTaxID = row.Field < string >("TitleTax") ?? "",
+                            TitleUnit = row.Field < string >("TitleUnit") ?? "",
 
                             })];
 

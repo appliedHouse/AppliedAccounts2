@@ -83,101 +83,15 @@ namespace AppliedAccounts.Pages.Sale
         }
         #endregion
 
-        #region New Sale Invoice
-        //public void New()
-        //{
-        //    MyRecord = new SaleInvoiceRecord();
-        //    if (MyModel.SaleInvoiceRecords.Count > 0)
-        //    {
-        //        var _FirstRecord = Model.SaleInvoiceRecords[0];
-        //        var _MaxSrNo = Model.SaleInvoiceRecords.Max(e => e.Sr_No) + 1;
-
-        //        Record = new();
-        //        {
-        //            Record.ID1 = _FirstRecord.ID1;
-        //            Record.Vou_No = _FirstRecord.Vou_No;
-        //            Record.Vou_Date = _FirstRecord.Vou_Date;
-        //            Record.Company = _FirstRecord.Company;
-        //            Record.Employee = _FirstRecord.Employee;
-        //            Record.Ref_No = _FirstRecord.Ref_No;
-        //            Record.Inv_No = _FirstRecord.Inv_No;
-        //            Record.Inv_Date = _FirstRecord.Vou_Date;
-        //            Record.Pay_Date = _FirstRecord.Pay_Date;
-        //            Record.Remarks = _FirstRecord.Remarks;
-        //            Record.Comments = _FirstRecord.Comments;
-        //            Record.Status = "Insert";
-
-        //            Record.ID2 = 0;
-        //            Record.Sr_No = _MaxSrNo;
-        //            Record.Inventory = 0;
-        //            Record.Batch = "";
-        //            Record.Qty = 0.00M;
-        //            Record.Rate = 0.00M;
-        //            Record.TaxID = 0;
-        //            Record.TaxRate = 0.00M;
-        //            Record.Description = "";
-        //            Record.Project = 0;
-        //        }
-
-        //    }
-        //    else
-        //    {
-        //        Record = new SaleInvoiceRecord();;
-        //        Record.ID1 = 0;
-        //        Record.Vou_No = "NEW";
-        //        Record.Vou_Date = DateTime.Now;
-        //        Record.Company = 0;
-        //        Record.Employee = 0;
-        //        Record.Ref_No = string.Empty;
-        //        Record.Inv_No = string.Empty;
-        //        Record.Inv_Date = DateTime.Now;
-        //        Record.Pay_Date = DateTime.Now;
-        //        //Record.Amount = 0.00M;
-        //        Record.Remarks = string.Empty;
-        //        Record.Comments = string.Empty;
-        //        Record.Status = string.Empty;
-
-        //        Record.ID2 = 0;
-        //        Record.Sr_No = 1;
-        //        Record.Inventory = 0;
-        //        Record.Batch = "";
-        //        Record.Qty = 0.00M;
-        //        Record.Rate = 0.00M;
-        //        Record.TaxID = 0;
-        //        Record.TaxRate = 0.00M;
-        //        Record.Description = "";
-        //        Record.Project = 0;
-        //    }
-        //}
-
-        //public void Edit(int _Sr_No)
-        //{
-        //    foreach (SaleInvoiceRecord _Record in Model.SaleInvoiceRecords)
-        //    {
-        //        if (_Record.Sr_No == _Sr_No)
-        //        {
-        //            Record = _Record;
-        //            break;
-        //        }
-        //    }
-        //}
-        #endregion
+      
 
       
-        #region Save / Update
-        //public void Update()
-        //{
-        //    //Model.NewRecord(Record);
-
-        //}
-
         public void SaveAll()
         {
             //Model.Save();
             //Record = Model.SaleInvoiceRecord;
             //Printmodel.ReportData.ReportTable = Model.SaleInvoiceRecords.ToDataTable();
         }
-        #endregion
 
         #region Delete
         public void Delete(int _Sr_No)
