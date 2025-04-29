@@ -22,6 +22,7 @@ namespace AppliedAccounts.Models
         public AppUserModel? UserProfile { get; set; }
         public DataSource Source { get; set; }
         public Voucher MyVoucher { get; set; } = new();
+        public List<Detail> Deleted { get; set; }
         public Total Totals { get; set; } = new();
 
         public List<CodeTitle> Companies { get; set; }
@@ -42,6 +43,7 @@ namespace AppliedAccounts.Models
         public decimal Tot_CR { get; set; }             // Total CR of Voucher in DB
         public bool IsWaiting { get; set; }             // Page is wait for completion of process like save or data load
         public int Count => MyVoucher.Details.Count;    // total records in detail list.
+        public int ListType { get; set; }               // List type for display in View Table at page
 
 
         #endregion
@@ -138,26 +140,6 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-        #region Save
-        public void Save()
-        {
-            if (IsVoucherValidated())
-            {
-                var IsSrNo = MyVoucher.Details.Where(e => e.Sr_No == MyVoucher.Detail.Sr_No).Any();
-                if (!IsSrNo)
-                {
-                    MyVoucher.Detail.Action = "save";
-                    MyVoucher.Details.Add(MyVoucher.Detail);
-                }
-            }
-            else
-            {
-                MsgClass.Add(MESSAGE.RecordNotValidated);
-            }
-            CalculateTotal();
-
-        }
-        #endregion
 
         #region Get Report table
         //public DataTable GetReportTable()
@@ -374,14 +356,81 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
+        public List<Detail> GetDisplayList(bool _Deleted)
+        {
+
+            if (_Deleted)
+            {
+                return Deleted;
+            }
+            return MyVoucher.Details;
+        }
+
+
         #region Remove
         public void Remove()
         {
-            throw new NotImplementedException();
+            if (MyVoucher.Detail is not null)
+            {
+                // Delete from List and do not save in deleted list if voucher is NEW
+                if (MyVoucher.Master.Vou_No.ToUpper().Equals("NEW"))
+                {
+                    MyVoucher.Details.Remove(MyVoucher.Detail);
+                    MyVoucher.Detail = NewDetail();
+                }
+                else
+                {
+                    Deleted ??= [];
+                    // Delete from List and save in deleted list, if Voucher is already in DB , would be deleted from DB when Save All.
+                    if (Deleted.Count > 0)
+                    {
+                        var IsAlreadyDeleted = Deleted.Where(e => e.Sr_No == MyVoucher.Detail.Sr_No).Any();
+                        if (!IsAlreadyDeleted)
+                        {
+                            // show Message already deleted. not can npot be deleted.
+                        }
+                    }
+                    Deleted.Add(MyVoucher.Detail);
+                    MyVoucher.Details.Remove(MyVoucher.Detail);
+                    if (MyVoucher.Details.Count > 0)
+                    {
+                        MyVoucher.Detail = MyVoucher.Details.First();
+                    }
+                    else
+                    {
+                        MyVoucher.Detail = NewDetail();
+                    }
+
+                }
+                CalculateTotal();
+            }
         }
         #endregion
 
-        #region Save All
+        #region Save & Save All
+
+
+        public void Save()
+        {
+            if (IsVoucherValidated())
+            {
+                var IsSrNo = MyVoucher.Details.Where(e => e.Sr_No == MyVoucher.Detail.Sr_No).Any();
+                if (!IsSrNo)
+                {
+                    MyVoucher.Detail.Action = "save";
+                    MyVoucher.Details.Add(MyVoucher.Detail);
+                }
+            }
+            else
+            {
+                MsgClass.Add(MESSAGE.RecordNotValidated);
+            }
+            CalculateTotal();
+
+        }
+
+
+
         public Task<bool> SaveAllAsync()
         {
             throw new NotImplementedException();

@@ -5,6 +5,7 @@ using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using AppReports;
+using Microsoft.Reporting.Map.WebForms.BingMaps;
 
 //using AppliedReports;
 
@@ -96,14 +97,13 @@ namespace AppliedAccounts.Pages.Sale
         #region Delete
         public void Delete(int _Sr_No)
         {
-            //foreach (SaleInvoiceRecord _Record in Model.SaleInvoiceRecords)
-            //{
-            //    if (_Record.Sr_No == _Sr_No)
-            //    {
-            //        _Record.Sr_No = _Record.Sr_No * -1;
-            //    }
-            //}
-            //Model.SetTotals();
+            MyModel.MyVoucher.Detail = MyModel.MyVoucher.Details.Where(row => row.Sr_No==_Sr_No).First();
+            if (MyModel.MyVoucher.Detail is not null)
+            {
+                MyModel.Deleted.Add(MyModel.MyVoucher.Detail);                  // Save in deleted list
+                MyModel.MyVoucher.Details.Remove(MyModel.MyVoucher.Detail);     // remove from detail list
+                MyModel.MsgClass.Add(AppMessages.Enums.Messages.RowDeleted);    // Set message to display after deleted.
+            }
 
         }
         #endregion
