@@ -9,7 +9,6 @@ using static AppliedAccounts.Data.AppRegistry;
 using MESSAGE = AppMessages.Enums.Messages;
 using Tables = AppliedDB.Enums.Tables;
 using static AppliedDB.Enums.Status;
-using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using AppliedAccounts.Services;
 using SQLQueries;
 
@@ -104,40 +103,38 @@ namespace AppliedAccounts.Models
 
         private Voucher NewVoucher()
         {
-            var _MyVoucher = new Voucher();
-            _MyVoucher.Master.ID1 = 0;
-            _MyVoucher.Master.Vou_No = "NEW";
-            _MyVoucher.Master.Vou_Date = DateTime.Now;
-            _MyVoucher.Master.Company = 0;
-            _MyVoucher.Master.Employee = 0;
-            _MyVoucher.Master.Ref_No = "";
-            _MyVoucher.Master.Inv_No = "";
-            _MyVoucher.Master.Inv_Date = DateTime.Now;
-            _MyVoucher.Master.Pay_Date = DateTime.Now;
-            _MyVoucher.Master.Remarks = "";
-            _MyVoucher.Master.Comments = "";
-            _MyVoucher.Master.Status = Submitted.ToString();
-            _MyVoucher.Master.TitleCompany = "";
-            _MyVoucher.Master.TitleEmployee = "";
+                var _MyVoucher = new Voucher();
+                _MyVoucher.Master.ID1 = 0;
+                _MyVoucher.Master.Vou_No = "NEW";
+                _MyVoucher.Master.Vou_Date = DateTime.Now;
+                _MyVoucher.Master.Company = 0;
+                _MyVoucher.Master.Employee = 0;
+                _MyVoucher.Master.Ref_No = "";
+                _MyVoucher.Master.Inv_No = "";
+                _MyVoucher.Master.Inv_Date = DateTime.Now;
+                _MyVoucher.Master.Pay_Date = DateTime.Now;
+                _MyVoucher.Master.Remarks = "";
+                _MyVoucher.Master.Comments = "";
+                _MyVoucher.Master.Status = Submitted.ToString();
+                _MyVoucher.Master.TitleCompany = "";
+                _MyVoucher.Master.TitleEmployee = "";
 
 
-            _MyVoucher.Detail.ID2 = 0;
-            _MyVoucher.Detail.Sr_No = 1;
-            _MyVoucher.Detail.Inventory = 0;
-            _MyVoucher.Detail.Batch = "";
-            _MyVoucher.Detail.Qty = 0.00M;
-            _MyVoucher.Detail.Rate = 0.00M;
-            _MyVoucher.Detail.TaxID = 0;
-            _MyVoucher.Detail.TaxRate = 0.00M;
-            _MyVoucher.Detail.Description = "";
-            _MyVoucher.Detail.Project = 0;
-            _MyVoucher.Detail.TitleInventory = "";
-            _MyVoucher.Detail.TitleProject = "";
-            _MyVoucher.Detail.TitleTaxID = "";
+                _MyVoucher.Detail.ID2 = 0;
+                _MyVoucher.Detail.Sr_No = 1;
+                _MyVoucher.Detail.Inventory = 0;
+                _MyVoucher.Detail.Batch = "";
+                _MyVoucher.Detail.Qty = 0.00M;
+                _MyVoucher.Detail.Rate = 0.00M;
+                _MyVoucher.Detail.TaxID = 0;
+                _MyVoucher.Detail.TaxRate = 0.00M;
+                _MyVoucher.Detail.Description = "";
+                _MyVoucher.Detail.Project = 0;
+                _MyVoucher.Detail.TitleInventory = "";
+                _MyVoucher.Detail.TitleProject = "";
+                _MyVoucher.Detail.TitleTaxID = "";
 
-            return _MyVoucher;
-
-
+                return _MyVoucher;
         }
         #endregion
 
@@ -267,7 +264,7 @@ namespace AppliedAccounts.Models
             if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgClass.Add(MESSAGE.VouDateLess); }
             if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgClass.Add(MESSAGE.VouDateMore); }
             if (MyVoucher.Master.Company == 0) { MsgClass.Add(MESSAGE.Row_CompanyIDZero); }
-            if (MyVoucher.Master.Employee == 0) { MsgClass.Add(MESSAGE.Row_EmployeeIDZero); }
+            //if (MyVoucher.Master.Employee == 0) { MsgClass.Add(MESSAGE.Row_EmployeeIDZero); }
             if (MyVoucher.Master.Remarks.Length == 0) { MsgClass.Add(MESSAGE.Row_NoRemarks); }
             if (MyVoucher.Master.Status.Length == 0) { MsgClass.Add(MESSAGE.Row_NoStatus); }
 
@@ -436,23 +433,15 @@ namespace AppliedAccounts.Models
 
         }
 
-
-
         public async Task<bool> SaveAllAsync()
         {
             MsgClass = new();
-            if (!IsAmountEqual())
-            {
-                MsgClass.Add(MESSAGE.AmountNotEqual);
-                return false;
-            }
-
+            
 
             var IsSaved = true;
             if (!IsWaiting)
             {
                 IsWaiting = true;
-
 
                 await Task.Run(() =>
                 {
@@ -528,7 +517,7 @@ namespace AppliedAccounts.Models
 
                             foreach (var item in MyVoucher.Details)
                             {
-                                DataRow RowDetail = Source.GetNewRow(Tables.Receipt2);
+                                DataRow RowDetail = Source.GetNewRow(Tables.BillReceivable2);
                                 RowDetail["ID"] = item.ID2;
                                 RowDetail["TranID"] = SaleInvoiceID;
                                 RowDetail["SR_NO"] = item.Sr_No;
@@ -538,7 +527,7 @@ namespace AppliedAccounts.Models
                                 RowDetail["Qty"] = item.Qty;
                                 RowDetail["Rate"] = item.Rate;
                                 RowDetail["Tax"] = item.TaxID;
-                                RowDetail["TaxRate"] = item.TaxRate;
+                                RowDetail["Tax_Rate"] = item.TaxRate;
                                 RowDetail["Description"] = item.Description;
                                 RowDetail["Project"] = item.Project;
 
@@ -581,19 +570,6 @@ namespace AppliedAccounts.Models
         
 
         #region Calculations
-        public bool IsAmountEqual()
-        {
-
-            decimal _Amount1 = MyVoucher.Master.Amount;
-            decimal _Amount2 = CalculateNetAmount();
-
-            if (_Amount1 != _Amount2)
-            {
-                return false;
-            }
-
-            return true;
-        }
 
         private decimal CalculateNetAmount()
         {
@@ -646,7 +622,7 @@ namespace AppliedAccounts.Models
             rptModel.InputReport.FileExtention = ".rdl";
             rptModel.InputReport.FilePath = UserProfile!.ReportFolder;
 
-            rptModel.OutputReport.FileName = $"Receipt_{_ID}";
+            rptModel.OutputReport.FileName = $"SalesInvoice_{_ID}";
             rptModel.OutputReport.FilePath = UserProfile!.PDFFolder;
 
             rptModel.AddReportParameter("CompanyName", _CompanyName);

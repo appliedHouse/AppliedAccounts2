@@ -8,7 +8,7 @@ namespace AppliedAccounts.Data
     public class AppRegistry : IAppRegistry
     {
         public static readonly DateTime MinDate = new(2020, 01, 01);
-        public static readonly DateTime MinVouDate = new(2024, 06, 01);
+        public static readonly DateTime MinVouDate = new(2020, 06, 01);
         public static readonly DateTime MaxVouDate = new(2030, 01, 01);
 
         public static string GetFormatCurrency(string DataFile)
