@@ -122,7 +122,7 @@ namespace AppliedAccounts.Models
 
 
             _MyVoucher.Detail.ID2 = 0;
-            _MyVoucher.Detail.Sr_No = 0;
+            _MyVoucher.Detail.Sr_No = 1;
             _MyVoucher.Detail.Inventory = 0;
             _MyVoucher.Detail.Batch = "";
             _MyVoucher.Detail.Qty = 0.00M;
@@ -134,6 +134,7 @@ namespace AppliedAccounts.Models
             _MyVoucher.Detail.TitleInventory = "";
             _MyVoucher.Detail.TitleProject = "";
             _MyVoucher.Detail.TitleTaxID = "";
+
             return _MyVoucher;
 
 
@@ -302,9 +303,15 @@ namespace AppliedAccounts.Models
         {
             MyVoucher.Details ??= [];           // Construct new if found null;
 
+            var _SrNo = 1;
+            if(MyVoucher.Details.Count > 0)
+            {
+                _SrNo = MyVoucher.Details.Max(x => x.Sr_No) + 1;
+            }
+
             var _Detail = new Detail(); ;
             _Detail.ID2 = 0;
-            _Detail.Sr_No = MyVoucher.Details.Max(x => x.Sr_No) + 1;
+            _Detail.Sr_No = _SrNo;
             _Detail.Inventory = 0;
             _Detail.Batch = "";
             _Detail.Qty = 0.00M;
@@ -431,10 +438,176 @@ namespace AppliedAccounts.Models
 
 
 
-        public Task<bool> SaveAllAsync()
+        public async Task<bool> SaveAllAsync()
         {
-            throw new NotImplementedException();
+            MsgClass = new();
+            if (!IsAmountEqual())
+            {
+                MsgClass.Add(MESSAGE.AmountNotEqual);
+                return false;
+            }
+
+
+            var IsSaved = true;
+            if (!IsWaiting)
+            {
+                IsWaiting = true;
+
+
+                await Task.Run(() =>
+                {
+                    DataRow NewRow1 = Source.GetNewRow(Tables.BillReceivable);
+
+                    if (MyVoucher.Master.Vou_No.ToUpper().Equals("NEW"))
+                    {
+                        MyVoucher.Master.Vou_No = NewVoucherNo.GetNewVoucherNo(Source.DBFile, Tables.BillReceivable, "BR");
+                    }
+
+                    NewRow1["ID"] = MyVoucher.Master.ID1;
+                    NewRow1["Vou_No"] = MyVoucher.Master.Vou_No;
+                    NewRow1["Vou_Date"] = MyVoucher.Master.Vou_Date;
+                    NewRow1["Company"] = MyVoucher.Master.Company;
+                    NewRow1["Employee"] = MyVoucher.Master.Employee;
+                    NewRow1["Inv_No"] = MyVoucher.Master.Inv_No;
+                    NewRow1["Inv_Date"] = MyVoucher.Master.Inv_Date;
+                    NewRow1["Pay_Date"] = MyVoucher.Master.Pay_Date;
+                    NewRow1["Amount"] = CalculateNetAmount();
+                    NewRow1["Description"] = MyVoucher.Master.Remarks;
+                    NewRow1["Comments"] = MyVoucher.Master.Comments;
+                    NewRow1["Status"] = Submitted.ToString();
+
+                    if (Validate_Master(NewRow1))
+                    {
+                        CommandClass _Command = new(NewRow1, Source.DBFile);
+                        if (!_Command.SaveChanges())
+                        {
+                            IsSaved = false;
+                            MsgClass.Add(MESSAGE.RowNotUpdated);
+                        }
+
+                        if (IsSaved)         // If master record saved successfully.
+                        {
+                            Deleted ??= [];
+                            if (Deleted.Count > 0)
+                            {
+                                foreach (var item in Deleted)
+                                {
+                                    DataRow RowDeleted = Source.GetNewRow(Tables.BillReceivable2);
+                                    RowDeleted["ID"] = item.ID2;
+                                    RowDeleted["TranID"] = SaleInvoiceID;
+                                    RowDeleted["SR_NO"] = item.Sr_No;
+                                    RowDeleted["Inventory"] = item.Inventory;
+                                    RowDeleted["Batch"] = item.Batch;
+                                    RowDeleted["Unit"] = item.Unit;
+                                    RowDeleted["Qty"] = item.Qty;
+                                    RowDeleted["Rate"] = item.Rate;
+                                    RowDeleted["Tax"] = item.TaxID;
+                                    RowDeleted["TaxRate"] = item.TaxRate;
+                                    RowDeleted["Description"] = item.Description;
+                                    RowDeleted["Project"] = item.Project;
+
+                                    _Command = new(RowDeleted, Source.DBFile);
+                                    if (!_Command.DeleteRow())
+                                    {
+                                        MsgClass.Add(MESSAGE.RowNotDeleted);
+                                    }
+                                }
+
+                                int _SRNO = 1;
+                                foreach (var item in MyVoucher.Details)
+                                {
+                                    item.Sr_No = _SRNO++;        // Reset Serial No after deleted row process 
+                                }
+                            }
+
+                            if (MyVoucher.Master.ID1 == 0)
+                            {
+                                MyVoucher.Master.ID1 = _Command.PrimaryKeyID;
+                                SaleInvoiceID = MyVoucher.Master.ID1;
+                            }
+
+                            foreach (var item in MyVoucher.Details)
+                            {
+                                DataRow RowDetail = Source.GetNewRow(Tables.Receipt2);
+                                RowDetail["ID"] = item.ID2;
+                                RowDetail["TranID"] = SaleInvoiceID;
+                                RowDetail["SR_NO"] = item.Sr_No;
+                                RowDetail["Inventory"] = item.Inventory;
+                                RowDetail["Batch"] = item.Batch;
+                                RowDetail["Unit"] = item.Unit;
+                                RowDetail["Qty"] = item.Qty;
+                                RowDetail["Rate"] = item.Rate;
+                                RowDetail["Tax"] = item.TaxID;
+                                RowDetail["TaxRate"] = item.TaxRate;
+                                RowDetail["Description"] = item.Description;
+                                RowDetail["Project"] = item.Project;
+
+
+                                if (Validate_Detail(RowDetail))
+                                {
+                                    _Command = new(RowDetail, Source.DBFile);
+                                    if (!_Command.SaveChanges())
+                                    {
+                                        IsSaved = false;
+                                        MsgClass.Add(MESSAGE.RowNotUpdated);
+                                        IsWaiting = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            CalculateTotal();
+                            LoadData();
+                        }
+                    }
+                });
+
+                IsWaiting = false;
+            }
+            return IsSaved;
         }
+        #endregion
+
+        #region Validation
+        private bool Validate_Detail(DataRow rowDetail)
+        {
+            return true;
+        }
+
+        private bool Validate_Master(DataRow newRow1)
+        {
+            return true;
+        }
+        #endregion
+        
+
+        #region Calculations
+        public bool IsAmountEqual()
+        {
+
+            decimal _Amount1 = MyVoucher.Master.Amount;
+            decimal _Amount2 = CalculateNetAmount();
+
+            if (_Amount1 != _Amount2)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private decimal CalculateNetAmount()
+        {
+            decimal _NetAmount = 0.00M;
+            if (MyVoucher.Details.Count > 0)
+            {
+                foreach (var item in MyVoucher.Details)
+                {
+                    _NetAmount += item.NetAmount;
+                }
+            }
+            return _NetAmount;
+        }
+
 
         #endregion
 

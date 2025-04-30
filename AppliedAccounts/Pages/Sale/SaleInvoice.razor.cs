@@ -1,11 +1,6 @@
-﻿using AppliedAccounts.Data;
-using AppliedAccounts.Models;
-using AppliedAccounts.Models.Interface;
+﻿using AppliedAccounts.Models;
 using AppliedAccounts.Services;
-using AppliedDB;
-using AppMessages;
 using AppReports;
-using Microsoft.Reporting.Map.WebForms.BingMaps;
 
 //using AppliedReports;
 
@@ -57,7 +52,7 @@ namespace AppliedAccounts.Pages.Sale
         public void UnitChanged(int _NewValue)
         {
             MyModel.MyVoucher.Detail.Unit = _NewValue;
-            MyModel.MyVoucher.Detail.TitleUnit = MyModel.Taxes.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
+            MyModel.MyVoucher.Detail.TitleUnit = MyModel.Units.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
         }
         #endregion
 
@@ -83,15 +78,18 @@ namespace AppliedAccounts.Pages.Sale
             //MyModel.CalculateTotal();
         }
         #endregion
-
       
-
-      
-        public void SaveAll()
+        public async void SaveAll()
         {
-            //Model.Save();
-            //Record = Model.SaleInvoiceRecord;
-            //Printmodel.ReportData.ReportTable = Model.SaleInvoiceRecords.ToDataTable();
+            var IsSaved = await MyModel.SaveAllAsync();
+
+            await InvokeAsync(StateHasChanged);
+
+            if (IsSaved)
+            {
+                ToastService.ShowToast(ToastClass.SaveToast, $"Save | {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
+                NavManager.NavigateTo($"/Accounts/Receipt/{MyModel.MyVoucher.Master.ID1}");
+            }
         }
 
         #region Delete

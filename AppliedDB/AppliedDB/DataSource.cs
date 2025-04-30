@@ -1,9 +1,7 @@
 ﻿using System.Data;
 using System.Data.SQLite;
 using System.Text;
-
 using Tables = AppliedDB.Enums.Tables;
-using SQLQueries;
 using static AppliedDB.Enums;
 
 namespace AppliedDB
@@ -22,7 +20,7 @@ namespace AppliedDB
         {
             UserProfile = _UserProfile;
             var _Connection = new Connections(_UserProfile);
-            MyConnection = _Connection!.GetSQLiteClient();               // Get a connection of Client
+            MyConnection = _Connection.GetSQLiteClient()!;               // Get a connection of Client
 
             if (MyConnection is not null)
             {
@@ -722,7 +720,6 @@ namespace AppliedDB
             return new();
 
         }
-
         public List<CodeTitle> GetInvoices()
         {
             // Generate Unpaid invoices to show in Receipt Page..... it is pending now.
@@ -1081,22 +1078,6 @@ namespace AppliedDB
             return _Table;
         }
 
-        #endregion
-
-        #region Get Sales Invoice
-        //public DataTable GetSalesInvoice(int SaleInvoiceID)
-        //{
-        //    if (SaleInvoiceID > 0)
-        //    {
-        //        var QueryText = $"SELECT * FROM [view_BillReceivable] WHERE [TranID] = {SaleInvoiceID}";
-        //        using var _Table = GetDataTable(DBFile, QueryText, "view_BillReceivable");
-        //        if (_Table != null && _Table.Columns.Count > 0)
-        //        {
-        //            return _Table;
-        //        }
-        //    }
-        //    return new DataTable();
-        //}
         #endregion
 
     }
