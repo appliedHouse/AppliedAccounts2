@@ -103,7 +103,7 @@ namespace AppliedAccounts.Models
 
             };
             ReportService.RptType = ReportType.Preview;
-            var ReportList = ReportService.GetReportLink();
+            //var ReportList = ReportService.GetReportLink();
             //await js.InvokeVoidAsync("downloadPDF", _FileName, ReportService.RptModel.ReportBytes);
 
         }

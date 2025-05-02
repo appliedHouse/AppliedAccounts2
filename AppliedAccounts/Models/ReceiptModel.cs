@@ -589,7 +589,7 @@ namespace AppliedAccounts.Models
                 RptData = GetReportData(_ID),              // always generate Data for report
                 RptModel = CreateReportModel(_ID),         // and then generate report parameters
             };
-            ReportService.Generate();                       // Generate Report & Create reports byte[]
+            //ReportService.Generate();                       // Generate Report & Create reports byte[]
 
         }
 

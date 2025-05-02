@@ -145,10 +145,9 @@ namespace SQLQueries
         #endregion
 
         #region General Ledger
-        public static string GeneralLedger(string OBDate, string FilterOB, string GroupBy, string Filter, string OrderBy)
+        public static string GeneralLedger(int COAID, string OBDate, string FilterOB, string GroupBy, string Filter, string OrderBy)
         {
             var _Text = new StringBuilder();
-
             var _Text1 = new StringBuilder();           // Opening Balance
             var _Text2 = new StringBuilder();           // Ledger
             var _Text3 = new StringBuilder();           // Combine Opening and Ledger
@@ -160,7 +159,7 @@ namespace SQLQueries
             _Text1.AppendLine("IIF([BAL] > 0, [BAL], 0) AS[DR],");
             _Text1.AppendLine("IIF([BAL] < 0, ABS([BAL]), 0) AS[CR],");
             _Text1.AppendLine("'Opening Balance...' AS[Description],");
-            _Text1.AppendLine("0 AS[COA],");
+            _Text1.AppendLine($"{COAID} AS[COA],");
             _Text1.AppendLine("0 AS[Customer],");
             _Text1.AppendLine("0 AS[Project],");
             _Text1.AppendLine("0 AS[Employee],");
@@ -185,16 +184,16 @@ namespace SQLQueries
             _Text2.AppendLine("[Ledger].[Project],");
             _Text2.AppendLine("[Ledger].[Employee],");
             _Text2.AppendLine("[Ledger].[Inventory]");
-            _Text2.AppendLine("FROM[Ledger]");
+            _Text2.AppendLine("FROM [Ledger]");
             _Text2.AppendLine($"WHERE {Filter} ");
 
 
-            _Text3.AppendLine("SELECT[L].*,");
-            _Text3.AppendLine("[A].[TITLE] AS[AccountTitle],");
-            _Text3.AppendLine("[C].[TITLE] AS[CompanyName],");
-            _Text3.AppendLine("[E].[TITLE] AS[EmployeeName],");
-            _Text3.AppendLine("[P].[TITLE] AS[ProjectTitle],");
-            _Text3.AppendLine("[I].[TITLE] AS[StockTitle]");
+            _Text3.AppendLine("SELECT [L].*,");
+            _Text3.AppendLine("[A].[TITLE] AS [AccountTitle],");
+            _Text3.AppendLine("[C].[TITLE] AS [CompanyName],");
+            _Text3.AppendLine("[E].[TITLE] AS [EmployeeName],");
+            _Text3.AppendLine("[P].[TITLE] AS [ProjectTitle],");
+            _Text3.AppendLine("[I].[TITLE] AS [StockTitle]");
             _Text3.AppendLine($"FROM(");
 
             _Text3.AppendLine(_Text1.ToString());
@@ -202,21 +201,15 @@ namespace SQLQueries
             _Text3.AppendLine(_Text2.ToString());
 
 
-            _Text3.AppendLine(") AS[L]");
-            _Text3.AppendLine("LEFT JOIN[COA]       [A] ON[A].[ID] = [L].[COA]");
-            _Text3.AppendLine("LEFT JOIN[Customers] [C] ON[C].[ID] = [L].[CUSTOMER]");
-            _Text3.AppendLine("LEFT JOIN[Employees] [E] ON[E].[ID] = [L].[EMPLOYEE]");
-            _Text3.AppendLine("LEFT JOIN[Project]   [P] ON[P].[ID] = [L].[PROJECT]");
-            _Text3.AppendLine("LEFT JOIN[Inventory] [I] ON[I].[ID] = [L].[INVENTORY]");
+            _Text3.AppendLine(") AS [L]");
+            _Text3.AppendLine("LEFT JOIN [COA]       [A] ON [A].[ID] = [L].[COA]");
+            _Text3.AppendLine("LEFT JOIN [Customers] [C] ON [C].[ID] = [L].[CUSTOMER]");
+            _Text3.AppendLine("LEFT JOIN [Employees] [E] ON [E].[ID] = [L].[EMPLOYEE]");
+            _Text3.AppendLine("LEFT JOIN [Project]   [P] ON [P].[ID] = [L].[PROJECT]");
+            _Text3.AppendLine("LEFT JOIN [Inventory] [I] ON [I].[ID] = [L].[INVENTORY]");
             if (OrderBy.Length > 0) { _Text3.AppendLine($"ORDER BY {OrderBy}"); }
 
             return _Text3.ToString();
-
-
-
-
-            return _Text.ToString();
-
         }
 
         #endregion
@@ -268,7 +261,7 @@ namespace SQLQueries
             _Text.AppendLine("LEFT JOIN [Project]        [P]  ON  [P].[ID] = [B2].[Project]");
             _Text.AppendLine("LEFT JOIN [Taxes]          [T]  ON  [T].[ID] = [B2].[Tax]");
             _Text.AppendLine(") AS [SalesInvoice]");
-            if(Filter.Length > 0)
+            if (Filter.Length > 0)
             {
                 _Text.AppendLine($"WHERE {Filter}");
             }

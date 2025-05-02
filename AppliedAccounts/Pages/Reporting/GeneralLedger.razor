@@ -7,6 +7,7 @@
 @using AppliedAccounts.Models;
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Services;
+@using System.Data
 
 @inject AuthenticationStateProvider Authorized
 @inject ToastService ToastService
@@ -15,6 +16,10 @@
 @inject GlobalService GlobalService
 
 @code {
+    decimal LedgerBalance;
+    decimal TotalDR;
+    decimal TotalCR;
+
     protected override void OnInitialized()
     {
         var AppUser = ((UserAuthonticationStateProvider)Authorized).AppUser;
@@ -26,7 +31,19 @@
         if (Source is null) { IsPageValid = false; IsPageValidMessage += " Source is null"; }
         //if (ReportService is null) { IsPageValid = false; IsPageValidMessage += " Report Service is null"; }
 
+        decimal LedgerBalance = 0.00M;
+        decimal TotalDR = 0.00M;
+        decimal TotalCR = 0.00M;
 
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        LedgerBalance = 0.00M;
+        if(firstRender)
+        {
+          
+        }
     }
 }
 
@@ -73,6 +90,9 @@
                     </div>
                 </div>
             </div>
+            <div class="row g-2 p1-">
+                <button class="btn btn-primary" @onclick="Refresh">Refresh</button>
+            </div>
 
             @if (!IsPrinting)
             {
@@ -104,6 +124,64 @@
                 </div>
             }
         </div>
+    </div>
+    <div class="table-container">
+        @if (Ledger is not null)
+        {
+            <table class="table-list">
+                <thead>
+                    <tr>
+                        <th style="width:8%">Date</th>
+                        <th style="width:8%">Voucher</th>
+                        <th style="width:20%">Vendor / Client</th>
+                        <th style="width:30%">Remarks</th>
+                        <th style="width:10%">Debit</th>
+                        <th style="width:10%">Credit</th>
+                        <th style="width:10%">Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DataRow Row in Ledger.Rows)
+                    {
+                       
+                        TotalDR += (decimal)Row["DR"];
+                        TotalCR += (decimal)Row["CR"];
+                        LedgerBalance += ((decimal)Row["DR"] - (decimal)Row["CR"]);
+                        
+                        string Debit = ((decimal)Row["DR"]).ToString(Format.Digit);
+                        string Credit = ((decimal)Row["CR"]).ToString(Format.Digit);
+                        string Balance = LedgerBalance.ToString(Format.Digit);
+                        string VouDate = ((DateTime)Row["Vou_Date"]).ToString(Format.DDMMMYY);
+
+                        <tr>
+                            <td>@Conversion.Row2Date(Row["Vou_Date"],Format.DDMMMYYYY)</td>
+                            <td>@Row["Vou_no"].ToString()</td>
+                            
+                            <td>@Row["CompanyName"].ToString()</td>
+                            <td class="left">@Row["Description"].ToString()</td>
+                            <td class="amount">@Debit</td>
+                            <td class="amount">@Credit</td>
+                            <td class="amount-blue">@Balance</td>
+                        </tr>
+                    }
+
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>TOTAL</td>
+                        <td class="amount">@TotalDR</td>
+                        <td class="amount">@TotalCR</td>
+                        <td class ="amount-blue">@LedgerBalance</td>
+                    </tr>
+                </tfoot>
+
+            </table>
+        }
+
+
     </div>
 
 

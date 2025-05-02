@@ -68,6 +68,47 @@ namespace AppliedAccounts.Pages.Sale
 
         #region Sales Invoice report print -- Print -- Print All - 
 
+        public async void PrintOnePDF()
+        {
+            IsPrinting = true;
+            await InvokeAsync(StateHasChanged);
+            PrintingMessage = "Priting Start.";
+            List<int> SaleInvoiceIDList = new List<int>();
+
+
+            foreach (var item in MyModel.Records)
+            {
+                if (item.IsSelected) { SaleInvoiceIDList.Add(item.Id); }
+            }
+            if (SaleInvoiceIDList.Count > 0)
+            {
+                try
+                {
+                    var _Text = DateTime.Now.ToString(Format.YMD);
+                    var _RandomNo = (new Random()).Next(1000, 9999);
+                    var _FileName = $"SalesInvoice_{_Text}_{_RandomNo}";
+
+                    ReportService.RptData = GetReportDataOnePDF(SaleInvoiceIDList);              // always generate Data for report
+                    ReportService.RptModel = CreateReportModelOnePDF();                          // and then generate report parameters
+                    ReportService.RptType = ReportType.Preview;
+                    //var ReportList = ReportService.GetReportLink();
+                    var rptArray = ReportService.RptModel.ReportBytes;
+                    var rptMime = ReportService.RptModel.OutputReport.MimeType;
+                    var rptFile = $"{MyModel.Record.Ref_No}_{MyModel.Record.TitleCustomer}";
+                    await js.InvokeVoidAsync("downloadFile", _FileName, rptArray, rptMime);
+                }
+                catch (Exception error)
+                {
+                    MyModel.MsgClass.Add(error.Message);
+                }
+            }
+
+
+
+            IsPrinting = false;
+            await InvokeAsync(StateHasChanged);
+        }
+
         public async void PrintAll()
         {
             IsPrinting = true;
@@ -99,7 +140,7 @@ namespace AppliedAccounts.Pages.Sale
                 ReportService.RptData = GetReportData(ID);              // always generate Data for report
                 ReportService.RptModel = CreateReportModel(ID);         // and then generate report parameters
                 ReportService.RptType = ReportType.Preview;
-                var ReportList = ReportService.GetReportLink();
+                //var ReportList = ReportService.GetReportLink();
                 string rptBytes64 = Convert.ToBase64String(ReportService.RptModel.ReportBytes);
 
                 await js.InvokeVoidAsync("printer", rptBytes64);
@@ -123,7 +164,7 @@ namespace AppliedAccounts.Pages.Sale
                 ReportService.RptData = GetReportData(ID);              // always generate Data for report
                 ReportService.RptModel = CreateReportModel(ID);         // and then generate report parameters
                 ReportService.RptType = ReportType.Preview;
-                var ReportList = ReportService.GetReportLink();
+                //var ReportList = ReportService.GetReportLink();
                 var rptArray = ReportService.RptModel.ReportBytes;
                 var rptMime = ReportService.RptModel.OutputReport.MimeType;
                 var rptFile = $"{MyModel.Record.Ref_No}_{MyModel.Record.TitleCustomer}";
@@ -134,6 +175,7 @@ namespace AppliedAccounts.Pages.Sale
                 MyModel.MsgClass.Add(error.Message);
             }
         }
+
 
         private ReportData GetReportData(int ID)
         {
@@ -146,7 +188,21 @@ namespace AppliedAccounts.Pages.Sale
 
             return _Result;
         }
-        
+
+        private ReportData GetReportDataOnePDF(List<int> _SaleInvoiceIDList)
+        {
+            ReportData _Result = new();
+            var _Filter = string.Join(",", _SaleInvoiceIDList);
+
+            string _Query = ReportQuery.SaleInvoiceQuery($"[TranID] in ({_Filter})");
+            var _DataTable = DataSource.GetDataTable(AppUser.DataFile, _Query, "ReportData");
+
+            _Result.ReportTable = _DataTable;
+            _Result.DataSetName = "ds_SaleInvoice";
+
+            return _Result;
+        }
+
         private ReportModel CreateReportModel(int _ID)
         {
 
@@ -179,8 +235,47 @@ namespace AppliedAccounts.Pages.Sale
                 _Reportmodel.AddReportParameter("Heading2", _Heading2);
                 _Reportmodel.AddReportParameter("Footer", _ReportFooter);
 
-                //var _SaveAs = _Reportmodel.OutputReport.FileFullName;
-                //_ReportMyModel.OutputReport.FileName = _SaveAs;
+            }
+            catch (Exception)
+            {
+                MyModel.MsgClass.Add(MESSAGE.Default);
+            }
+
+            return _Reportmodel;
+        }
+
+        private ReportModel CreateReportModelOnePDF()
+        {
+
+            ReportModel _Reportmodel = new();
+            try
+            {
+                var _InvoiceNo = "INV-Testing";
+                var _Heading1 = "Sales Invoice";
+                var _Heading2 = $"Invoice No. {_InvoiceNo}";
+                var _ReportPath = AppUser.ReportFolder;
+                var _ReportOption = ReportType.Excel;
+                var _CompanyName = AppUser.Company;
+                var _ReportFooter = AppFunctions.ReportFooter();
+
+                _Reportmodel.ReportUrl = NavManager.BaseUri;
+
+                // Input Parameters  (.rdl report file)
+                _Reportmodel.InputReport.FilePath = _ReportPath;
+                _Reportmodel.InputReport.FileName = "CDCInvOnePDF";
+                _Reportmodel.InputReport.FileExtention = "rdl";
+
+                // output Parameters (like pdf, excel, word, html, tiff)
+                _Reportmodel.OutputReport.FilePath = AppUser.PDFFolder;
+                _Reportmodel.OutputReport.FileName = "SaleInvoice_" + (new Random()).Next(1000,9999).ToString();
+                _Reportmodel.OutputReport.ReportType = _ReportOption;
+                _Reportmodel.OutputReport.ReportUrl = _Reportmodel.ReportUrl;
+                // Reports Parameters
+                _Reportmodel.AddReportParameter("CompanyName", _CompanyName);
+                _Reportmodel.AddReportParameter("Heading1", _Heading1);
+                _Reportmodel.AddReportParameter("Heading2", _Heading2);
+                _Reportmodel.AddReportParameter("Footer", _ReportFooter);
+
             }
             catch (Exception)
             {

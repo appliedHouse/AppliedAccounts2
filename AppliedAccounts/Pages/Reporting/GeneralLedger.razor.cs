@@ -4,7 +4,6 @@ using AppliedDB;
 using AppMessages;
 using AppReports;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using System.Data;
 using MESSAGES = AppMessages.Enums.Messages;
 
@@ -15,6 +14,7 @@ namespace AppliedAccounts.Pages.Reporting
         public GlobalService Globals { get; set; }
         public AppUserModel UserModel { get; set; }
         public DataSource Source { get; set; }
+        public DataTable Ledger { get; set; }
         public PrintService ReportService { get; set; }
         public MessageClass MsgClass { get; set; }
         public int COAID { get; set; }
@@ -31,18 +31,11 @@ namespace AppliedAccounts.Pages.Reporting
 
         public GeneralLedger()
         {
-
-
             COAID = 0;
             SortBy = "";
             DBFile = "";
 
-            // Only One DataRow ID=GL_COA for enough for all info.
-            COAID = AppRegistry.GetNumber(DBFile, "GL_COA");
-            Date_From = AppRegistry.GetFrom(DBFile, "GL_COA");
-            Date_To = AppRegistry.GetTo(DBFile, "GL_COA");
-            SortBy = AppRegistry.GetText(DBFile, "GL_COA");
-
+           
 
         }
 
@@ -56,7 +49,21 @@ namespace AppliedAccounts.Pages.Reporting
 
             Accounts = Source.GetAccounts();
 
+            // Only One DataRow ID=GL_COA for enough for all info.
+            COAID = AppRegistry.GetNumber(DBFile, "GL_COA");
+            Date_From = AppRegistry.GetFrom(DBFile, "GL_COA");
+            Date_To = AppRegistry.GetTo(DBFile, "GL_COA");
+            SortBy = AppRegistry.GetText(DBFile, "GL_COA");
 
+        }
+
+        public void Refresh()
+        {
+            ReportData _ReportData = GetReportData();
+            if (_ReportData.ReportTable != null)
+            {
+                Ledger = _ReportData.ReportTable;
+            }
         }
 
         public void BackPage()
@@ -93,16 +100,16 @@ namespace AppliedAccounts.Pages.Reporting
                 ReportService = new(GlobalService); ;
                 ReportService.JS = js;
                 ReportService.RptType = PrintType;
-                ReportService.RptData = GetReportData(ID);
-                ReportService.RptModel = CreateReportModel(ID);
+                ReportService.RptData = GetReportData();
+                ReportService.RptModel = CreateReportModel();
+                ReportService.Print();
             });
-
-            await ReportService.Print();
+            
             IsPrinting = false;
             await InvokeAsync(StateHasChanged);
         }
 
-        private ReportData GetReportData(int ID)
+        private ReportData GetReportData()
         {
             var _OBDate = Date_From.AddDays(-1).ToString(Format.YMD);
             var _DateFrom = Date_From.ToString(Format.YMD);
@@ -112,7 +119,7 @@ namespace AppliedAccounts.Pages.Reporting
             var _Filter = $"[COA] = {COAID} AND (Date([Vou_Date]) BETWEEN Date('{_DateFrom}') AND Date('{_DateTo}'))";
             var _GroupBy = "[COA]";
             var _SortBy = "[Vou_date], [Vou_no]";
-            var _Query = SQLQueries.Quries.GeneralLedger(_OBDate, _FilterOB, _GroupBy, _Filter,  _SortBy);
+            var _Query = SQLQueries.Quries.GeneralLedger(COAID, _OBDate, _FilterOB, _GroupBy, _Filter,  _SortBy);
 
             DataTable _Table = Source.GetTable(_Query);
 
@@ -130,7 +137,7 @@ namespace AppliedAccounts.Pages.Reporting
             return _ReportData;
         }
 
-        private ReportModel CreateReportModel(int _ID)
+        private ReportModel CreateReportModel()
         {
             ReportModel Report = new ReportModel();
             
@@ -143,9 +150,11 @@ namespace AppliedAccounts.Pages.Reporting
             Report.InputReport.FileName = "Ledger";
             Report.InputReport.FileExtention = "rdl";
 
+            Report.PrintData = ReportService.RptData;                   // Load Reporting Data to Report Model
+
             Report.OutputReport.FilePath = UserModel.PDFFolder;
             Report.OutputReport.FileName = "Ledger_" + "CompanyName";
-            Report.OutputReport.ReportType = ReportType.Print;
+            Report.OutputReport.ReportType = ReportService.RptType;
             Report.OutputReport.ReportUrl = Report.ReportUrl;
 
             Report.AddReportParameter("CompanyName", UserModel.Company);

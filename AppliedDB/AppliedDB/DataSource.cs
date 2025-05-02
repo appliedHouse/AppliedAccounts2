@@ -29,15 +29,6 @@ namespace AppliedDB
 
         }
 
-        //public DataSource(string _DBFile)
-        //{
-
-        //    var _DBConnText = $"Data Source={_DBFile}";
-        //    var _Connection = new SQLiteConnection(_DBConnText);
-        //    MyConnection = _Connection;
-
-        //}
-
         #endregion
 
         #region Get Table

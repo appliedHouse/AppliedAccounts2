@@ -23,7 +23,7 @@
 .table-list {
     display: table;
     overflow-x: auto;
-    width: 100%; /* Adjust width as needed */
+    width: 99%; /* Adjust width as needed */
     border: 2px solid green;
     border-collapse: collapse;
 }

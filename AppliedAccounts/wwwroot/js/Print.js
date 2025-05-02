@@ -42,7 +42,6 @@ function downloadFile(fileName, byteArray, mimeType) {
     URL.revokeObjectURL(link.href); // Clean up the object URL
 }
 
-
 function DisplayPDF(byteArray) {
     const bytes = new Uint8Array(byteArray);
     const blob = new Blob([bytes], { type: "application/pdf" });

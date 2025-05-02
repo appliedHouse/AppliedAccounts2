@@ -9,7 +9,7 @@
       <am:Name>MSRB</am:Name>
       <am:Version>15.0.20283.0</am:Version>
     </am:UpdatedBy>
-    <am:LastModifiedTimestamp>2024-11-25T09:01:34.4463082Z</am:LastModifiedTimestamp>
+    <am:LastModifiedTimestamp>2025-05-02T13:59:11.6409683Z</am:LastModifiedTimestamp>
   </am:AuthoringMetadata>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -26,36 +26,57 @@
     <DataSet Name="dsname_Ledger">
       <Query>
         <DataSourceName>ds_Ledger</DataSourceName>
-        <CommandText>SELECT * FROM (SELECT 
-[L].*,
-[A].[TITLE] AS [AccountTitle], 
-[C].[TITLE] AS [CompanyName], 
-[E].[TITLE] AS [EmployeeName], 
-[P].[TITLE] AS [ProjectTitle], 
-[I].[TITLE]  AS [StockTitle] 
-FROM [Ledger] [L] 
-LEFT JOIN [COA]       [A] ON [A].[ID] = [L].[COA] 
-LEFT JOIN [Customers] [C] ON [C].[ID] = [L].[CUSTOMER] 
-LEFT JOIN [Employees] [E] ON [E].[ID] = [L].[EMPLOYEE] 
-LEFT JOIN [Project]   [P] ON [P].[ID] = [L].[PROJECT] 
+        <CommandText>SELECT [L].*,
+[A].[TITLE] AS [AccountTitle],
+[C].[TITLE] AS [CompanyName],
+[E].[TITLE] AS [EmployeeName],
+[P].[TITLE] AS [ProjectTitle],
+[I].[TITLE] AS [StockTitle]
+FROM(
+SELECT
+0 AS[Vou_No],
+Date('2024-12-31') AS[Vou_Date],
+IIF([BAL] &gt; 0, [BAL], 0) AS[DR],
+IIF([BAL] &lt; 0, ABS([BAL]), 0) AS[CR],
+'Opening Balance...' AS[Description],
+100 AS[COA],
+0 AS[Customer],
+0 AS[Project],
+0 AS[Employee],
+0 AS[Inventory]
+FROM(SELECT
+SUM([DR]) AS[DR],
+SUM([CR]) AS[CR],
+SUM([DR] - [CR]) AS[BAL]
+FROM [Ledger]
+WHERE [COA] = 100 AND Date([Vou_Date]) &lt; Date('2024-12-31')) 
+GROUP BY [COA] 
+
+UNION ALL
+SELECT
+[Ledger].[Vou_No],
+[Ledger].[Vou_Date],
+[Ledger].[DR],
+[Ledger].[CR],
+[Ledger].[Description],
+[Ledger].[COA],
+[Ledger].[Customer],
+[Ledger].[Project],
+[Ledger].[Employee],
+[Ledger].[Inventory]
+FROM [Ledger]
+WHERE [COA] = 100 AND (Date([Vou_Date]) BETWEEN Date('2025-01-01') AND Date('2025-05-02')) 
+
+) AS [L]
+LEFT JOIN [COA]       [A] ON [A].[ID] = [L].[COA]
+LEFT JOIN [Customers] [C] ON [C].[ID] = [L].[CUSTOMER]
+LEFT JOIN [Employees] [E] ON [E].[ID] = [L].[EMPLOYEE]
+LEFT JOIN [Project]   [P] ON [P].[ID] = [L].[PROJECT]
 LEFT JOIN [Inventory] [I] ON [I].[ID] = [L].[INVENTORY]
-) AS [Ledger]
-WHERE [COA] = 2</CommandText>
+ORDER BY [Vou_date], [Vou_no]</CommandText>
         <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
       </Query>
       <Fields>
-        <Field Name="ID">
-          <DataField>ID</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="TranID">
-          <DataField>TranID</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="Vou_Type">
-          <DataField>Vou_Type</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
         <Field Name="Vou_Date">
           <DataField>Vou_Date</DataField>
           <rd:TypeName>System.DateTime</rd:TypeName>
@@ -63,18 +84,6 @@ WHERE [COA] = 2</CommandText>
         <Field Name="Vou_No">
           <DataField>Vou_No</DataField>
           <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="SR_NO">
-          <DataField>SR_NO</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="Ref_No">
-          <DataField>Ref_No</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="BookID">
-          <DataField>BookID</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
         <Field Name="COA">
           <DataField>COA</DataField>
@@ -89,31 +98,23 @@ WHERE [COA] = 2</CommandText>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="CUSTOMER">
-          <DataField>CUSTOMER</DataField>
+          <DataField>Customer</DataField>
           <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
         <Field Name="EMPLOYEE">
-          <DataField>EMPLOYEE</DataField>
+          <DataField>Employee</DataField>
           <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
         <Field Name="INVENTORY">
-          <DataField>INVENTORY</DataField>
+          <DataField>Inventory</DataField>
           <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
         <Field Name="PROJECT">
-          <DataField>PROJECT</DataField>
+          <DataField>Project</DataField>
           <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
         <Field Name="Description">
           <DataField>Description</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Comments">
-          <DataField>Comments</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Status">
-          <DataField>Status</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="AccountTitle">

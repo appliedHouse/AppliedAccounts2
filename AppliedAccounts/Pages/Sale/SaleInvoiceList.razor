@@ -105,6 +105,7 @@
                         @if (MyModel.Records.Count > 0)
                         {
                             <button type="submit" class="btn-print" @onclick="(()=>PrintAll())"><i class="bi bi-printer-fill"></i> All</button>
+                            <button type="submit" class="btn-print" @onclick="(()=>PrintOnePDF())"><i class="bi bi-printer-fill"></i> All</button>
                         }
                     </div>
                 </div>

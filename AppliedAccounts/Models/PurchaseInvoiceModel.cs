@@ -158,7 +158,7 @@ namespace AppliedAccounts.Models
         public void GetPurchaseInvoice(string _InvoiceNo)
         {
             PurchaseInvoiceRecords = SetPurchaseInvoice(_InvoiceNo);
-            Report.ReportData.ReportTable = PurchaseInvoiceRecords.ToDataTable();
+            Report.PrintData.ReportTable = PurchaseInvoiceRecords.ToDataTable();
             SetTotals();
         }
         public List<PurchaseInvoiceRecord> SetPurchaseInvoice(string _InvoiceNo)
@@ -305,7 +305,7 @@ namespace AppliedAccounts.Models
 
                 View_PurchaseInvoice = Source.GetTable(Enums.Tables.view_BillPayable);
                 PurchaseInvoiceRecords = SetPurchaseInvoice(InvoiceNo);
-                Report.ReportData.ReportTable = GetReportTable();
+                Report.PrintData.ReportTable = GetReportTable();
 
                 #endregion
             }
@@ -525,7 +525,7 @@ namespace AppliedAccounts.Models
                 Reportmodel.AddReportParameter("Heading2", _Heading2);
                 Reportmodel.AddReportParameter("Footer", "Power by Applied Software House");
 
-                Reportmodel.ReportData.DataSetName = _DataSetName;
+                Reportmodel.PrintData.DataSetName = _DataSetName;
                 
             }
             catch (Exception)

@@ -12,6 +12,8 @@ namespace AppliedAccounts.Pages.Users
         private AppUserModel Model = new();
         string NavToHome { get; set; } = string.Empty;
         bool IsLogin { get; set; } = true;
+        bool IsError { get; set; } = false;
+        string ErrorMessage { get; set; }
         int LanguageID { get; set; } = 1;                       // Default Language is 1 = English
 
         public async void Submit()
@@ -81,53 +83,60 @@ namespace AppliedAccounts.Pages.Users
         private UserProfile GetUserProfile(AppUserModel _UserModel)
         {
             var _UserProfile = new UserProfile();
-            var _Profile = new AppUserModel();
-            var _UserID = _UserModel.UserID;
-            if (_UserModel != null)
+            try
             {
-                
-
-                var UsersDBFile = Path.Combine(
-                    AppGlobals.AppPaths.FirstPath,
-                    AppGlobals.AppPaths.RootPath,
-                    AppGlobals.AppPaths.UsersPath, "AppliedUsers2.db");
-
-                var _CommandText = $"SELECT * FROM [Users] WHERE [UserID] = '{_UserID}'";
-                var _Connection = Connections.GetSQLiteConnection(UsersDBFile); _Connection?.Open();
-                SQLiteCommand _Command = new(_CommandText, _Connection);
-                SQLiteDataAdapter _Adapter = new(_Command);
-                DataSet _DataSet = new();
-                _Adapter.Fill(_DataSet, "Users");
-                _Connection?.Close();
-
-                if (_DataSet.Tables.Count == 1)
+                var _Profile = new AppUserModel();
+                var _UserID = _UserModel.UserID;
+                if (_UserModel != null)
                 {
-                    if (_DataSet.Tables[0].Rows.Count > 0)
+                    var UsersDBFile = Path.Combine(
+                        AppGlobals.AppPaths.FirstPath,
+                        AppGlobals.AppPaths.RootPath,
+                        AppGlobals.AppPaths.UsersPath, "AppliedUsers2.db");
+
+                    var _CommandText = $"SELECT * FROM [Users] WHERE [UserID] = '{_UserID}'";
+                    var _Connection = Connections.GetSQLiteConnection(UsersDBFile); _Connection?.Open();
+                    SQLiteCommand _Command = new(_CommandText, _Connection);
+                    SQLiteDataAdapter _Adapter = new(_Command);
+                    DataSet _DataSet = new();
+                    _Adapter.Fill(_DataSet, "Users");
+                    _Connection?.Close();
+
+                    if (_DataSet.Tables.Count == 1)
                     {
-                        var _UserData = _DataSet.Tables[0].Rows[0];
-                        if ((DataRow)_UserData != null)
+                        if (_DataSet.Tables[0].Rows.Count > 0)
                         {
-                            _UserProfile.Profile = new()
+                            var _UserData = _DataSet.Tables[0].Rows[0];
+                            if ((DataRow)_UserData != null)
                             {
-                                UserID = _UserData["UserID"].ToString() ?? "",
-                                Password = _UserData["Password"].ToString() ?? "",
-                                DisplayName = _UserData["DisplayName"].ToString() ?? "",
-                                Designation = _UserData["Designation"].ToString() ?? "",
-                                UserEmail = _UserData["UserEmail"].ToString() ?? "",
-                                Role = _UserData["Role"].ToString() ?? "",
-                                LastLogin = _UserData["LastLogin"].ToString() ?? "",
-                                Session = Guid.NewGuid().ToString(),
-                                DataFile = _UserData["DataFile"].ToString() ?? "",
-                                Company = _UserData["Company"].ToString() ?? "",
-                            };
+                                _UserProfile.Profile = new()
+                                {
+                                    UserID = _UserData["UserID"].ToString() ?? "",
+                                    Password = _UserData["Password"].ToString() ?? "",
+                                    DisplayName = _UserData["DisplayName"].ToString() ?? "",
+                                    Designation = _UserData["Designation"].ToString() ?? "",
+                                    UserEmail = _UserData["UserEmail"].ToString() ?? "",
+                                    Role = _UserData["Role"].ToString() ?? "",
+                                    LastLogin = _UserData["LastLogin"].ToString() ?? "",
+                                    Session = Guid.NewGuid().ToString(),
+                                    DataFile = _UserData["DataFile"].ToString() ?? "",
+                                    Company = _UserData["Company"].ToString() ?? "",
+                                };
+                            }
                         }
-                    }
-                    else
-                    {
-                        NavManager.NavigateTo("/AppError");
+                        else
+                        {
+                            NavManager.NavigateTo("/AppError");
+                        }
                     }
                 }
             }
+            catch (Exception error)
+            {
+                IsError = true;
+                ErrorMessage = error.Message;
+            }
+
 
             return _UserProfile;
         }

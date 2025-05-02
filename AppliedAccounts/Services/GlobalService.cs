@@ -26,6 +26,7 @@ namespace AppliedAccounts.Services
             AppPaths.BaseUri = NavManager.BaseUri;
             AppPaths.FirstPath = Directory.GetCurrentDirectory();
             AppPaths.RootPath = Config.GetValue<string>("Paths:RootPath") ?? "wwwroot";
+            
             AppPaths.SystemPath = Config.GetValue<string>("Paths:SystemPath") ?? "System";
             AppPaths.ImagesPath = Config.GetValue<string>("Paths:ImagesPath") ?? "Images";
             AppPaths.ReportPath = Config.GetValue<string>("Paths:ReportPath") ?? "Reports";

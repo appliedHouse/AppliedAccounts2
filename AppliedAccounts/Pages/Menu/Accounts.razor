@@ -46,6 +46,20 @@
     }
 }
 
+<style>
+    .fixed-background {
+        background-image: url('/images/TypeWriter.jpg');
+        background: cover; /* Ensures the image fills the div */
+        background-position: center; /* Centers the image */
+        background-repeat: no-repeat; /* Prevents tiling */
+        position: relative; /* Keeps the div positioned within the document flow */
+        width: 100%; /* Set the div's width */
+        height: 100vh; /* Set the div's height */
+        overflow: hidden; /* Ensures content within the div stays visible */
+    }
+</style>
+
+<div class="fixed-background">
 <div class="container-fluid mt-1">
     <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
         <div class="btn-group" role="group">
@@ -97,6 +111,7 @@
             <MenuCard Message=@ReceiptText NavTo="/Accounts/ReceiptList" PicPath="./Images/Cards/Receipt.jpg" />
         </div>
     </div>
+</div>
 </div>
 
 

@@ -21,8 +21,8 @@
         #region Errors / Validation of Print Report (return id this condition found....)
         if (PrintingModel.InputReport.FileFullName.Length == 0) { return; } // Report name not mention to print return here.
         if (PrintingModel.OutputReport.FileFullName.Length == 0) { return; } // Report name not mention to print return here.
-        if (PrintingModel.ReportData.ReportTable is null) { return; } 
-        if (PrintingModel.ReportData.ReportTable.Rows.Count ==0) { return; } 
+        if (PrintingModel.PrintData.ReportTable is null) { return; } 
+        if (PrintingModel.PrintData.ReportTable.Rows.Count ==0) { return; } 
         #endregion
 
         #region Printing a report

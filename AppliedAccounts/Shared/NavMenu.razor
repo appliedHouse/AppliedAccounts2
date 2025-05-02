@@ -1,6 +1,7 @@
 ﻿@* @using AppliedAccounts.Authentication; *@
-@inject NavigationManager NavManager;
-@inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager NavManager
+@inject AuthenticationStateProvider authStateProvider
+@inject IJSRuntime js
 @using AppliedDB;
 
 
@@ -16,6 +17,11 @@
         {
             IsAdmin = true;
         }
+    }
+
+    private async Task Beep()
+    {
+        await js.InvokeVoidAsync("playBeep");
     }
 
     public async Task Logout()
@@ -54,7 +60,7 @@
             }
             else
             {
-                <button type="submit" class="btn-Menu" id="btn-account" @onclick="Accounts">Accounts</button>
+                <button type="submit" class="btn-Menu" id="btn-account" @onclick="async () => { await Beep(); Accounts(); }">Accounts</button>
                 <button type="submit" class="btn-Menu" id="btn-Sale" @onclick="Sale">Sale</button>
                 <button type="submit" class="btn-Menu" id="btn-Purchase" @onclick="Purchase">Purchase</button>
                 <button type="submit" class="btn-Menu" id="btn-Stock" @onclick="Inventory">Stock</button>
@@ -81,3 +87,9 @@
 </div>
 
 
+<script>
+    function playBeep() {
+        const audio = new Audio('/Sound/beep.mp3');
+        audio.play();
+    }
+</script>

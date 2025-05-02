@@ -194,7 +194,7 @@ namespace AppliedAccounts.Data
             VW_Registry.RowFilter = string.Concat($"Code='{Key}'");
             if (VW_Registry.Count == 1)
             {
-                return (DateTime)VW_Registry[0]["From"];
+                return (DateTime)VW_Registry[0]["To"];
             }
             return DateTime.Now;
         }
