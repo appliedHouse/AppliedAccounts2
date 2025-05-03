@@ -38,11 +38,20 @@
     protected override void OnAfterRender(bool firstRender)
     {
         LedgerBalance = 0.00M;
-        if(firstRender)
+        if (firstRender)
         {
 
         }
     }
+
+    // private void ReportTypeSelected(ReportType reportType)
+    // {
+
+
+    //     ReportService.RptType = reportType;
+    //     Print();
+
+    // }
 }
 
 @if (IsPrinting)
@@ -55,9 +64,9 @@
     </div>
 }
 
-@if(MsgClass.Count > 0)
+@if (MsgClass.Count > 0)
 {
-    <PageErrors Messages="MsgClass"/>
+    <PageErrors Messages="MsgClass" />
 }
 
 
@@ -100,29 +109,8 @@
             @if (!IsPrinting)
             {
                 <div class="container control-buttons">
-                    <div class="btn-group" role="group" aria-label="Navigation Buttons" id="printBtns">
-                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Print);})">
-                            <i class="bi bi-printer"></i>
-                        </button>
-
-                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Preview);})">
-                            <i class="bi bi-search"></i>
-                        </button>
-                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.PDF);})">
-                            <i class="bi bi-file-pdf"></i>
-                        </button>
-                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Excel);})">
-                            <i class="bi bi-file-earmark-excel"></i>
-                        </button>
-                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Word);})">
-                            <i class="bi bi-file-earmark-word"></i>
-                        </button>
-                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.HTML);})">
-                            <i class="bi bi-filetype-html"></i>
-                        </button>
-                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Image);})">
-                            <i class="bi bi-file-earmark-image"></i>
-                        </button>
+                    <div>
+                        <ReportingButtons ReturnValue="Print" />
                     </div>
                 </div>
             }
@@ -146,20 +134,20 @@
                 <tbody>
                     @foreach (DataRow Row in MyModel.Ledger.Rows)
                     {
-                       
+
                         TotalDR += (decimal)Row["DR"];
                         TotalCR += (decimal)Row["CR"];
                         LedgerBalance += ((decimal)Row["DR"] - (decimal)Row["CR"]);
-                        
+
                         string Debit = ((decimal)Row["DR"]).ToString(Format.Digit);
                         string Credit = ((decimal)Row["CR"]).ToString(Format.Digit);
                         string Balance = LedgerBalance.ToString(Format.Digit);
                         string VouDate = ((DateTime)Row["Vou_Date"]).ToString(Format.DDMMMYY);
 
                         <tr>
-                            <td>@Conversion.Row2Date(Row["Vou_Date"],Format.DDMMMYYYY)</td>
+                            <td>@Conversion.Row2Date(Row["Vou_Date"], Format.DDMMMYYYY)</td>
                             <td>@Row["Vou_no"].ToString()</td>
-                            
+
                             <td>@Row["CompanyName"].ToString()</td>
                             <td class="left">@Row["Description"].ToString()</td>
                             <td class="amount">@Debit</td>
@@ -177,7 +165,7 @@
                         <td>TOTAL</td>
                         <td class="amount">@TotalDR</td>
                         <td class="amount">@TotalCR</td>
-                        <td class ="amount-blue">@LedgerBalance</td>
+                        <td class="amount-blue">@LedgerBalance</td>
                     </tr>
                 </tfoot>
 

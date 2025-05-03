@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Models.Interface;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
@@ -9,7 +10,7 @@ using MESSAGES = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Pages.Reporting
 {
-    public partial class GeneralLedger
+    public partial class GeneralLedger : IPrint
     {
         public AppUserModel UserModel { get; set; }
         public DataSource Source { get; set; }
@@ -50,6 +51,8 @@ namespace AppliedAccounts.Pages.Reporting
             GetKeys();
         }
 
+
+        #region Get & Set Registry Keys 
         private void GetKeys()
         {
             MyModel.COAID = AppRegistry.GetNumber(DBFile, "GL_COA");
@@ -58,10 +61,18 @@ namespace AppliedAccounts.Pages.Reporting
             MyModel.SortBy = AppRegistry.GetText(DBFile, "GL_COA");
         }
 
-
+        private void SetKeys()
+        {
+            AppRegistry.SetKey(DBFile, "GL_COA", MyModel.COAID, KeyType.Number, "General Ledger ID,From,To,Sort");
+            AppRegistry.SetKey(DBFile, "GL_COA", MyModel.Date_From, KeyType.From);
+            AppRegistry.SetKey(DBFile, "GL_COA", MyModel.Date_To, KeyType.To);
+            AppRegistry.SetKey(DBFile, "GL_COA", MyModel.SortBy, KeyType.Text);
+        }
+        #endregion
 
         public void Refresh()
         {
+            SetKeys();
             ReportData _ReportData = GetReportData();
             if (_ReportData.ReportTable != null)
             {
@@ -81,27 +92,21 @@ namespace AppliedAccounts.Pages.Reporting
             
             if (MyModel.COAID > 0)
             {
-                await Print(MyModel.COAID, PrintType);
+                await PrintLedger(MyModel.COAID, PrintType);
             }
             else
             { MsgClass.Add(MESSAGES.COAIsNull); }
         }
 
-        public async Task Print(int ID, ReportType PrintType)
+        public async Task PrintLedger(int ID, ReportType PrintType)
         {
             IsPrinting = true;
             await InvokeAsync(StateHasChanged);
 
-            //Start(UserModel);
-            AppRegistry.SetKey(DBFile, "GL_COA", MyModel.COAID, KeyType.Number, "General Ledger ID,From,To,Sort");
-            AppRegistry.SetKey(DBFile, "GL_COA", MyModel.Date_From, KeyType.From);
-            AppRegistry.SetKey(DBFile, "GL_COA", MyModel.Date_To, KeyType.To);
-            AppRegistry.SetKey(DBFile, "GL_COA", MyModel.SortBy, KeyType.Text);
-
+            SetKeys();
             await Task.Run(() =>
             {
                 ReportService = new(AppGlobals); ;
-                //ReportService.JS = js;
                 ReportService.RptType = PrintType;
                 ReportService.RptData = GetReportData();
                 ReportService.RptModel = CreateReportModel();
@@ -123,7 +128,7 @@ namespace AppliedAccounts.Pages.Reporting
             await InvokeAsync(StateHasChanged);
         }
 
-        private ReportData GetReportData()
+        public ReportData GetReportData()
         {
             var _OBDate = MyModel.Date_From.AddDays(-1).ToString(Format.YMD);
             var _DateFrom = MyModel.Date_From.ToString(Format.YMD);
@@ -151,7 +156,7 @@ namespace AppliedAccounts.Pages.Reporting
             return _ReportData;
         }
 
-        private ReportModel CreateReportModel()
+        public ReportModel CreateReportModel()
         {
             ReportModel Report = new ReportModel();
             

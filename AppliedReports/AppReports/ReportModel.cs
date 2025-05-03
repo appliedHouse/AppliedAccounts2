@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.Reporting.NETCore;
+﻿using Microsoft.Reporting.NETCore;
 using System.Data;
-
-
 
 namespace AppReports
 {
@@ -107,8 +104,8 @@ namespace AppReports
                     if (OutputReport.ReportType != ReportType.Print)
                     {
 
-                        if (ReportBytes.Length > 0) 
-                        { 
+                        if (ReportBytes.Length > 0)
+                        {
                             //SaveReport(); 
                         }
                         else
@@ -170,9 +167,6 @@ namespace AppReports
                     OutputReport.FileStream = fstream;
                     Messages.Add($"{DateTimeNow}: Report saved sucessfully");
                     Messages.Add($"{DateTimeNow}: Created a file {_FileName}");
-
-                    //ReportUrl = $"{OutputReport.FilePath}/{OutputReport.FileName}{OutputReport.FileExtention}";
-
                 }
             }
             else
@@ -185,15 +179,17 @@ namespace AppReports
         #endregion
 
 
+        #region Add Parameters
         public void AddReportParameter(string Key, string Value)
         {
             var _Parameter = new ReportParameter(Key, Value);
             ReportParameters.Add(_Parameter);
             Messages.Add($"{DateTimeNow}: Report Parameter add {Key} => {Value}");
         }
-
+        #endregion
     }
 
+    #region Report Models
     public class InputReport
     {
         public string FilePath { get; set; } = string.Empty;            // Path after wwwroot
@@ -306,5 +302,6 @@ namespace AppReports
             return new ReportDataSource();
         }
     }
+    #endregion
 
 }

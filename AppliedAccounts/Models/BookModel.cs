@@ -46,7 +46,7 @@ namespace AppliedAccounts.Models
         public decimal Tot_CR { get; set; }
         public bool IsWaiting { get; set; }
         public bool IsSaved { get; set; }
-        public NavigationManager NavManager { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public NavigationManager NavManager  => AppGlobals.NavManager; 
         public PrintService ReportService { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public GlobalService AppGlobals { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 

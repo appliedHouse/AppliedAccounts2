@@ -1,55 +1,30 @@
 ﻿@using AppMessages
 @using AppReports;
+@using AppliedAccounts.Services;
 @inject NavigationManager NavManager;
 @using MESSAGE = AppMessages.Enums.Messages;
 
 @code {
     [Parameter]
-    public ReportModel PrintingModel { get; set; } = new();
+    public PrintService ReportService { get; set; }
     public MessageClass MsgClass { get; set; } = new();
 
-    public bool IsPrintModelAssigned { get; set; } = true;
+    public bool IsPageValid { get; set; }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if (PrintingModel == null)
-        {
-            IsPrintModelAssigned = false;
-        }
+        if (ReportService == null) { IsPageValid = false; } else { IsPageValid = true; }
     }
 
     public void Print(ReportType _ReportType)
     {
-        #region Errors / Validation of Print Report (return id this condition found....)
-        if (PrintingModel.InputReport.FileFullName.Length == 0) { MsgClass.Add(MESSAGE.rptRDLCNotExist); return; } // Report name not mention to print return here.
-        if (PrintingModel.OutputReport.FileFullName.Length == 0) { MsgClass.Add(MESSAGE.rptOutputFileIsZero); return; } // Report name not mention to print return here.
-        if (PrintingModel.ReportDataSource.ReportTable is null) { MsgClass.Add(MESSAGE.rptDataTableIsNull); return; }
-        if (PrintingModel.ReportDataSource.ReportTable.Rows.Count == 0) { MsgClass.Add(MESSAGE.rptDataRowIsZero); return; }
-        #endregion
-
-        #region Printing a report
-
-        if (PrintingModel.ReportRender())         // Render a report for preview or download...
-        {
-            if (PrintingModel.OutputReport.ReportType == ReportType.HTML || PrintingModel.OutputReport.ReportType == ReportType.Preview)
-            {
-                var ReportLink = PrintingModel.OutputReport.GetFileLink();
-                NavManager.NavigateTo(ReportLink, true);
-            }
-            else
-            {
-                var FileName = $"{PrintingModel.OutputReport.FileName}{PrintingModel.OutputReport.FileExtention}";
-              
-                
-            }
-        }
-        #endregion
-
+        ReportService.RptType = _ReportType;
+        ReportService.Print();
     }
 }
 
-@if (IsPrintModelAssigned)
+@if (IsPageValid)
 {
     <div class="dropdown">
         <button type="button" title="Print" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
@@ -61,6 +36,7 @@
             <li><button type="submit" id="print-3" class="btn btn-link border-0" @onclick="() => Print(AppReports.ReportType.Excel)">Excel</button></li>
             <li><button type="submit" id="print-4" class="btn btn-link border-0" @onclick="() => Print(AppReports.ReportType.Word)">Word</button></li>
             <li><button type="submit" id="print-5" class="btn btn-link border-0" @onclick="() => Print(AppReports.ReportType.HTML)">HTML</button></li>
+            <li><button type="submit" id="print-5" class="btn btn-link border-0" @onclick="() => Print(AppReports.ReportType.Image)">HTML</button></li>
         </ul>
     </div>
 }
