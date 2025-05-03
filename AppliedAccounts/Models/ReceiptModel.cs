@@ -8,7 +8,6 @@ using MESSAGE = AppMessages.Enums.Messages;
 using static AppliedDB.Enums;
 using AppliedAccounts.Services;
 using AppReports;
-using Microsoft.AspNetCore.Components;
 
 namespace AppliedAccounts.Models
 {
@@ -43,8 +42,8 @@ namespace AppliedAccounts.Models
 
         public bool IsWaiting { get; set; } = false;
         public ReportType rptType { get; set; }
-        public NavigationManager NavManager { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        public GlobalService AppGlobals { get; set; }
 
 
         #endregion
@@ -582,20 +581,31 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Print
-        public void Print(int _ID)
+        public async Task Print(ReportType rptType)
         {
-            ReportService = new()
+            await Task.Run(() =>
             {
-                RptData = GetReportData(_ID),              // always generate Data for report
-                RptModel = CreateReportModel(_ID),         // and then generate report parameters
-            };
-            //ReportService.Generate();                       // Generate Report & Create reports byte[]
+                ReportService = new(AppGlobals); ;
+                ReportService.RptType = rptType;
+                ReportService.RptData = GetReportData();
+                ReportService.RptModel = CreateReportModel();
 
+            });
+
+            try
+            {
+                ReportService.Print();
+            }
+            catch (Exception)
+            {
+                ReportService.MyMessage = "Error....";
+                MsgClass.Add(ReportService.MyMessage);
+            }
         }
 
-        public ReportData GetReportData(int ID)
+        public ReportData GetReportData()
         {
-            var _Query = Quries.Receipt(ID);
+            var _Query = Quries.Receipt(ReceiptID);
             var _Table = Source.GetTable(_Query);
             var _ReportData = new ReportData();
 
@@ -605,7 +615,7 @@ namespace AppliedAccounts.Models
             return _ReportData;
         }
 
-        public ReportModel CreateReportModel(int ID)
+        public ReportModel CreateReportModel()
         {
             var _InvoiceNo = "Receipt";
             var _Heading1 = "Receipt";
@@ -620,8 +630,8 @@ namespace AppliedAccounts.Models
             rptModel.InputReport.FileExtention = "rdl";
             rptModel.InputReport.FilePath = UserProfile!.ReportFolder;
 
-            rptModel.OutputReport.FileName = $"Receipt_{ID}";
-            //rptModel.OutputReport.FileExtention = ".pdf";
+            rptModel.PrintData = RptData;
+            rptModel.OutputReport.FileName = $"Receipt_{ReceiptID}";
             rptModel.OutputReport.FilePath = UserProfile!.PDFFolder;
             rptModel.OutputReport.ReportType = ReportType.PDF;
 
@@ -664,7 +674,6 @@ namespace AppliedAccounts.Models
             }
             return _NetAmount;
         }
-
 
 
         #endregion

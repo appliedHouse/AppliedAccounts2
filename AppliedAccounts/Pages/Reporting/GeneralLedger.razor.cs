@@ -15,7 +15,7 @@ namespace AppliedAccounts.Pages.Reporting
         public AppUserModel UserModel { get; set; }
         public DataSource Source { get; set; }
         public DataTable Ledger { get; set; }
-        public PrintService ReportService { get; set; }
+        //public PrintService ReportService { get; set; }
         public MessageClass MsgClass { get; set; }
         public int COAID { get; set; }
         public DateTime Date_From { get; set; }
@@ -44,7 +44,7 @@ namespace AppliedAccounts.Pages.Reporting
             MsgClass = new();
             UserModel = _UserModel;
             Source = new(UserModel);
-            ReportSeervice = new();
+            //ReportService = new();
             DBFile = UserModel.DataFile;
 
             Accounts = Source.GetAccounts();
@@ -102,9 +102,21 @@ namespace AppliedAccounts.Pages.Reporting
                 ReportService.RptType = PrintType;
                 ReportService.RptData = GetReportData();
                 ReportService.RptModel = CreateReportModel();
-                ReportService.Print();
+                
             });
+
+            try
+            {
+                ReportService.Print();
+            }
+            catch (Exception)
+            {
+                ReportService.MyMessage = "Error....";
+                MsgClass.Add(ReportService.MyMessage);
+                
+            }
             
+
             IsPrinting = false;
             await InvokeAsync(StateHasChanged);
         }

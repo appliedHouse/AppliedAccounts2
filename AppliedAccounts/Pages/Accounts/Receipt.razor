@@ -13,7 +13,8 @@
 @inject NavigationManager NavManager
 @inject IJSRuntime js
 @inject ToastService ToastService
-@inject PrintService PrintService
+@inject PrintService ReportService
+@inject GlobalService GlobalService
 
 @code {
     [Parameter] public int ID { get; set; }
@@ -32,6 +33,7 @@
         if (MyModel.MyVoucher == null) { IsPageValid = false; }
 
         MyModel.RecordFound = true;
+     
 
         //ToastService.OnShowToast += ShowToast;
     }
@@ -58,12 +60,6 @@
         Console.WriteLine($"Value updated in parent: {OutputValue}");
     }
     
-    public async void Print()
-    {
-        string url = "PDFREports/Test.pdf";
-        await js.InvokeVoidAsync("printPDF", url); // Path to your PDF
-    }
-
 }
 
 <style>

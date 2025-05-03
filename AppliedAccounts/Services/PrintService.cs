@@ -17,6 +17,7 @@ namespace AppliedAccounts.Services
         public NavigationManager NavManager { get; set; }
         public string MyMessage { get; set; }
         public string ReportUrl { get; set; } = string.Empty;
+        public bool IsError { get; set; } = false;
 
         public PrintService(GlobalService _Config)
         {
@@ -75,6 +76,7 @@ namespace AppliedAccounts.Services
         #endregion
         public async void Print()
         {
+
             switch (RptType)
             {
                 case ReportType.Print: await Printer(); break;
@@ -86,6 +88,8 @@ namespace AppliedAccounts.Services
                 case ReportType.HTML: await HTML(); break;
                 default: await Preview(); break;
             }
+
+
         }
 
 
@@ -93,107 +97,158 @@ namespace AppliedAccounts.Services
         #region Option (Type) of Printing Of reports. Print,Preview,PDF, Excel.... 
         public async Task Printer()
         {
-            RptModel.PrintData = RptData;
-            bool IsRendered = RptModel.ReportRender(ReportType.Print);
-            if (IsRendered)
+            try
             {
-                string rptBytes64 = Convert.ToBase64String(RptModel.ReportBytes);
-                await JS.InvokeVoidAsync("printer", rptBytes64);
+
+
+                RptModel.PrintData = RptData;
+                bool IsRendered = RptModel.ReportRender(ReportType.Print);
+                if (IsRendered)
+                {
+                    string rptBytes64 = Convert.ToBase64String(RptModel.ReportBytes);
+                    await JS.InvokeVoidAsync("printer", rptBytes64);
+                }
+                else
+                {
+                    MyMessage = "Report has some error";
+                }
             }
-            else
+            catch (Exception error)
             {
-                MyMessage = "Report has some error";
+
+                IsError = true;
+                MyMessage = error.Message;
             }
+
 
         }
         public async Task Preview()
         {
-            if(RptModel.ReportRender(ReportType.Preview))
+            try
             {
-                await JS.InvokeVoidAsync("DisplayPDF", RptModel.ReportBytes);
+                if (RptModel.ReportRender(ReportType.Preview))
+                {
+                    await JS.InvokeVoidAsync("DisplayPDF", RptModel.ReportBytes);
+                }
+                else
+                {
+                    MyMessage = RptModel.Messages.Last();
+                }
             }
-            else
+            catch (Exception error)
             {
-                MyMessage = RptModel.Messages.Last();
+
+                IsError = true;
+                MyMessage = error.Message;
             }
         }
         public async Task PDF()
         {
-            if (RptModel.ReportRender(ReportType.PDF))
+            try
             {
-                await JS.InvokeVoidAsync("downloadFile", 
-                      RptModel.OutputReport.FileName, 
-                      RptModel.ReportBytes,
-                      RptModel.OutputReport.MimeType);
+                if (RptModel.ReportRender(ReportType.PDF))
+                {
+                    await JS.InvokeVoidAsync("downloadFile",
+                          RptModel.OutputReport.FileName,
+                          RptModel.ReportBytes,
+                          RptModel.OutputReport.MimeType);
+                }
+                else
+                {
+                    MyMessage = RptModel.Messages.Last();
+                }
             }
-            else
+            catch (Exception error)
             {
-                MyMessage = RptModel.Messages.Last();
+
+                IsError = true;
+                MyMessage = error.Message;
             }
         }
         public async Task Excel()
         {
-            if (RptModel.ReportRender(ReportType.Excel))
+            try
             {
-                await JS.InvokeVoidAsync("downloadFile",
-                      RptModel.OutputReport.FileName,
-                      RptModel.ReportBytes,
-                      RptModel.OutputReport.MimeType);
+                if (RptModel.ReportRender(ReportType.Excel))
+                {
+                    await JS.InvokeVoidAsync("downloadFile",
+                          RptModel.OutputReport.FileName,
+                          RptModel.ReportBytes,
+                          RptModel.OutputReport.MimeType);
+                }
+                else
+                {
+                    MyMessage = RptModel.Messages.Last();
+                }
             }
-            else
+            catch (Exception error)
             {
-                MyMessage = RptModel.Messages.Last();
+
+                IsError = true;
+                MyMessage = error.Message;
             }
         }
         public async Task Word()
         {
-            if (RptModel.ReportRender(ReportType.Word))
+            try
             {
-                await JS.InvokeVoidAsync("downloadFile",
-                      RptModel.OutputReport.FileName,
-                      RptModel.ReportBytes,
-                      RptModel.OutputReport.MimeType);
+                if (RptModel.ReportRender(ReportType.Word))
+                {
+                    await JS.InvokeVoidAsync("downloadFile",
+                          RptModel.OutputReport.FileName,
+                          RptModel.ReportBytes,
+                          RptModel.OutputReport.MimeType);
+                }
+                else
+                {
+                    MyMessage = RptModel.Messages.Last();
+                }
             }
-            else
+            catch (Exception error)
             {
-                MyMessage = RptModel.Messages.Last();
+
+                IsError = true;
+                MyMessage = error.Message;
             }
         }
         public async Task Image()
         {
-            if (RptModel.ReportRender(ReportType.Image))
-            {
-                await JS.InvokeVoidAsync("downloadFile",
-                      RptModel.OutputReport.FileName,
-                      RptModel.ReportBytes,
-                      RptModel.OutputReport.MimeType);
-            }
-            else
-            {
-                MyMessage = RptModel.Messages.Last();
-            }
-
-
-            //var FileLink = $"{ReportUrl}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
-            //NavManager.NavigateTo(FileLink, forceLoad: true);
-            //JS.InvokeVoidAsync("open", FileLink, "_blank");
+            
+                if (RptModel.ReportRender(ReportType.Image))
+                {
+                    await JS.InvokeVoidAsync("DisplayFile",
+                        RptModel.ReportBytes,
+                        RptModel.OutputReport.MimeType);
+                }
+                else
+                {
+                    MyMessage = RptModel.Messages.Last();
+                }
+            
         }
         public async Task HTML()
         {
-            if (RptModel.ReportRender(ReportType.HTML))
+            try
             {
-                await JS.InvokeVoidAsync("downloadFile",
-                      RptModel.OutputReport.FileName,
-                      RptModel.ReportBytes,
-                      RptModel.OutputReport.MimeType);
+                if (RptModel.ReportRender(ReportType.HTML))
+                {
+                    await JS.InvokeVoidAsync("downloadFile",
+                          RptModel.OutputReport.FileName,
+                          RptModel.ReportBytes,
+                          RptModel.OutputReport.MimeType);
+                }
+                else
+                {
+                    MyMessage = RptModel.Messages.Last();
+                }
             }
-            else
+            catch (Exception error)
             {
-                MyMessage = RptModel.Messages.Last();
+
+                IsError = true;
+                MyMessage = error.Message;
             }
 
-            //var FileLink = $"{ReportUrl}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
-            //JS.InvokeVoidAsync("open", FileLink, "_blank");
         }
         #endregion
     }

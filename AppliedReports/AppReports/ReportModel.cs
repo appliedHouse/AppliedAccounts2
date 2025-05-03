@@ -10,6 +10,7 @@ namespace AppReports
     {
         #region Variables
         public List<string> Messages { get; set; } = new();
+
         public InputReport InputReport { get; set; }
         public OutputReport OutputReport { get; set; }
         public ReportData PrintData { get; set; }

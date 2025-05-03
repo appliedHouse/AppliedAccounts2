@@ -27,7 +27,7 @@ namespace AppliedAccounts.Models.Interface
 
         bool IsWaiting { get; set; }
 
-        NavigationManager NavManager { get; set; }
+        GlobalService AppGlobals { get; set; }
 
 
         void CalculateTotal();
@@ -65,9 +65,9 @@ namespace AppliedAccounts.Models.Interface
         #endregion
 
         #region Print
-        void Print(int _ID);
-        ReportData GetReportData(int ID);
-        ReportModel CreateReportModel(int ID);
+        void Print(ReportType _rptType);
+        ReportData GetReportData();
+        ReportModel CreateReportModel();
 
         #endregion
     }

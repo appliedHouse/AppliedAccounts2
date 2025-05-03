@@ -11,7 +11,7 @@
 
 @inject AuthenticationStateProvider Authorized
 @inject ToastService ToastService
-@inject PrintService ReportSeervice
+@inject PrintService ReportService
 @inject IJSRuntime js
 @inject GlobalService GlobalService
 
@@ -42,7 +42,7 @@
         LedgerBalance = 0.00M;
         if(firstRender)
         {
-          
+
         }
     }
 }
@@ -55,6 +55,11 @@
             Loading data, please wait...
         </div>
     </div>
+}
+
+@if(MsgClass.Count > 0)
+{
+    <PageErrors Messages="MsgClass"/>
 }
 
 
