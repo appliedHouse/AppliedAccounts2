@@ -630,7 +630,7 @@ namespace AppliedAccounts.Models
             rptModel.InputReport.FileExtention = "rdl";
             rptModel.InputReport.FilePath = UserProfile!.ReportFolder;
 
-            rptModel.PrintData = RptData;
+            rptModel.ReportDataSource = ReportService.RptData;
             rptModel.OutputReport.FileName = $"Receipt_{ReceiptID}";
             rptModel.OutputReport.FilePath = UserProfile!.PDFFolder;
             rptModel.OutputReport.ReportType = ReportType.PDF;
@@ -673,6 +673,11 @@ namespace AppliedAccounts.Models
                 }
             }
             return _NetAmount;
+        }
+
+        void IVoucher.Print(ReportType _rptType)
+        {
+            throw new NotImplementedException();
         }
 
 

@@ -99,9 +99,7 @@ namespace AppliedAccounts.Services
         {
             try
             {
-
-
-                RptModel.PrintData = RptData;
+                RptModel.ReportDataSource = RptData;
                 bool IsRendered = RptModel.ReportRender(ReportType.Print);
                 if (IsRendered)
                 {
@@ -213,18 +211,18 @@ namespace AppliedAccounts.Services
         }
         public async Task Image()
         {
-            
-                if (RptModel.ReportRender(ReportType.Image))
-                {
-                    await JS.InvokeVoidAsync("DisplayFile",
-                        RptModel.ReportBytes,
-                        RptModel.OutputReport.MimeType);
-                }
-                else
-                {
-                    MyMessage = RptModel.Messages.Last();
-                }
-            
+
+            if (RptModel.ReportRender(ReportType.Image))
+            {
+                await JS.InvokeVoidAsync("DisplayFile",
+                    RptModel.ReportBytes,
+                    RptModel.OutputReport.MimeType);
+            }
+            else
+            {
+                MyMessage = RptModel.Messages.Last();
+            }
+
         }
         public async Task HTML()
         {

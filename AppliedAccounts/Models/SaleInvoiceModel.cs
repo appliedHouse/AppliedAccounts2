@@ -43,6 +43,7 @@ namespace AppliedAccounts.Models
         public bool IsWaiting { get; set; }             // Page is wait for completion of process like save or data load
         public int Count => MyVoucher.Details.Count;    // total records in detail list.
         public int ListType { get; set; }               // List type for display in View Table at page
+        public GlobalService AppGlobals { get; set; }
 
 
         #endregion
@@ -588,18 +589,30 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Print
-        public void Print(int _ID)
+        public async void Print(ReportType _rptType)
         {
-            ReportService = new()
+            await Task.Run(() =>
             {
-                RptData = GetReportData(_ID),              // always generate Data for report
-                RptModel = CreateReportModel(_ID),         // and then generate report parameters
-            };
-            //ReportService.Generate();                       // Generate Report & Create reports byte[]
+                ReportService = new(AppGlobals); ;
+                ReportService.RptType = _rptType;
+                ReportService.RptData = GetReportData();
+                ReportService.RptModel = CreateReportModel();
+
+            });
+
+            try
+            {
+                ReportService.Print();
+            }
+            catch (Exception)
+            {
+                ReportService.MyMessage = "Error....";
+                MsgClass.Add(ReportService.MyMessage);
+            }
         }
-        public ReportData GetReportData(int ID)
+        public ReportData GetReportData()
         {
-            var _Query = Quries.SaleInvoice(ID);
+            var _Query = Quries.SaleInvoice(SaleInvoiceID);
             var _Table = Source.GetTable(_Query);
             var _ReportData = new ReportData()
             {
@@ -608,7 +621,7 @@ namespace AppliedAccounts.Models
             };
             return _ReportData;
         }
-        public ReportModel CreateReportModel(int _ID)
+        public ReportModel CreateReportModel()
         {
             var _Heading1 = "Sale Invoice";
             var _Heading2 = $"{_Heading1} [{MyVoucher.Master.Vou_No}]";
@@ -622,7 +635,7 @@ namespace AppliedAccounts.Models
             rptModel.InputReport.FileExtention = ".rdl";
             rptModel.InputReport.FilePath = UserProfile!.ReportFolder;
 
-            rptModel.OutputReport.FileName = $"SalesInvoice_{_ID}";
+            rptModel.OutputReport.FileName = $"SalesInvoice_{SaleInvoiceID}";
             rptModel.OutputReport.FilePath = UserProfile!.PDFFolder;
 
             rptModel.AddReportParameter("CompanyName", _CompanyName);
@@ -633,6 +646,9 @@ namespace AppliedAccounts.Models
             return rptModel;
         }
 
+       
+
+        
         #endregion
 
         #region Model

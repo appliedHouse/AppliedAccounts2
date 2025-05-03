@@ -13,7 +13,7 @@ namespace AppReports
 
         public InputReport InputReport { get; set; }
         public OutputReport OutputReport { get; set; }
-        public ReportData PrintData { get; set; }
+        public ReportData ReportDataSource { get; set; }
         public byte[] ReportBytes { get; set; }
         public bool IsReportRendered { get; set; } = false;
         public string ReportUrl { get; set; } = string.Empty;
@@ -32,7 +32,7 @@ namespace AppReports
             Messages = [];
             InputReport = new InputReport();
             OutputReport = new OutputReport();
-            PrintData = new ReportData();
+            ReportDataSource = new ReportData();
             ReportParameters = [];
             ReportBytes = [];
 
@@ -83,8 +83,8 @@ namespace AppReports
                     //OutputReport.FileLink = GetFileLink();
                     Messages.Add($"{DateTimeNow}: Report File Full Name is {OutputReport.FileFullName}");
                     Messages.Add($"{DateTimeNow}: Report File download link is {OutputReport.FileLink}");
-                    Messages.Add($"{DateTimeNow}: Report DataSet Name is {PrintData.DataSetName}");
-                    Messages.Add($"{DateTimeNow}: Report DataSet Name is {PrintData.DataSource.Name}");
+                    Messages.Add($"{DateTimeNow}: Report DataSet Name is {ReportDataSource.DataSetName}");
+                    Messages.Add($"{DateTimeNow}: Report DataSet Name is {ReportDataSource.DataSource.Name}");
 
                     var _ReportFile = InputReport.FileFullName;
                     var _FileType = RenderFormat.GetRenderFormat(_ReportType);
@@ -96,7 +96,7 @@ namespace AppReports
                     report.ReportEmbeddedResource = report.ReportPath;
 
                     report.LoadReportDefinition(_ReportStream);
-                    report.DataSources.Add(PrintData.DataSource);
+                    report.DataSources.Add(ReportDataSource.DataSource);
                     report.SetParameters(ReportParameters);
 
                     ReportBytes = report.Render(_FileType);

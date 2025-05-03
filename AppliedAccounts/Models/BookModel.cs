@@ -48,6 +48,7 @@ namespace AppliedAccounts.Models
         public bool IsSaved { get; set; }
         public NavigationManager NavManager { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public PrintService ReportService { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public GlobalService AppGlobals { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         private int CashNatureID = 0;
         private int BankNatureID = 0;
@@ -445,11 +446,7 @@ namespace AppliedAccounts.Models
             if (MyVoucher.Details.Count > 0)
             { MyVoucher.Detail = MyVoucher.Details.Last(); }
         }
-
-        public void Print()
-        {
-
-        }
+          
 
         public void CalculateTotal()
         {
@@ -460,18 +457,21 @@ namespace AppliedAccounts.Models
                 Tot_CR = MyVoucher.Details.Sum(e => e.CR);
             }
         }
+        #endregion
 
-        public void Print(int _ID)
+        #region Print
+
+        public void Print(ReportType _rptType)
         {
             throw new NotImplementedException();
         }
 
-        public ReportData GetReportData(int ID)
+        public ReportData GetReportData()
         {
             throw new NotImplementedException();
         }
 
-        public ReportModel CreateReportModel(int ID)
+        public ReportModel CreateReportModel()
         {
             throw new NotImplementedException();
         }

@@ -12,8 +12,7 @@
 @inject AuthenticationStateProvider Authorized
 @inject ToastService ToastService
 @inject PrintService ReportService
-@inject IJSRuntime js
-@inject GlobalService GlobalService
+@inject GlobalService AppGlobals
 
 @code {
     decimal LedgerBalance;
@@ -23,7 +22,6 @@
     protected override void OnInitialized()
     {
         var AppUser = ((UserAuthonticationStateProvider)Authorized).AppUser;
-        Globals = GlobalService;
 
         Start(AppUser);
 
@@ -70,13 +68,13 @@
             <div class="row g-2 p-1">
                 <div class="col-3">
                     <div class="form-floating">
-                        <InputDate id="DateFrom" class="form-control" @bind-Value="Date_From"></InputDate>
+                        <InputDate id="DateFrom" class="form-control" @bind-Value="MyModel.Date_From"></InputDate>
                         <label for="DateFrom">From</label>
                     </div>
                 </div>
                 <div class="col-3">
                     <div class="form-floating">
-                        <InputDate id="DateTo" class="form-control" @bind-Value="Date_To"></InputDate>
+                        <InputDate id="DateTo" class="form-control" @bind-Value="MyModel.Date_To"></InputDate>
                         <label for="DateFrom">To</label>
                     </div>
                 </div>
@@ -85,7 +83,7 @@
                 <div class="col-6">
                     <div class="form-floating">
 
-                        <InputSelect id="coa_nature" @bind-Value="@COAID" class="form-control">
+                        <InputSelect id="coa_nature" @bind-Value="@MyModel.COAID" class="form-control">
                             @foreach (var item in Accounts)
                             {
                                 <option value=@item.ID>@item.Title</option>
@@ -131,7 +129,7 @@
         </div>
     </div>
     <div class="table-container">
-        @if (Ledger is not null)
+        @if (MyModel.Ledger is not null)
         {
             <table class="table-list">
                 <thead>
@@ -146,7 +144,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (DataRow Row in Ledger.Rows)
+                    @foreach (DataRow Row in MyModel.Ledger.Rows)
                     {
                        
                         TotalDR += (decimal)Row["DR"];

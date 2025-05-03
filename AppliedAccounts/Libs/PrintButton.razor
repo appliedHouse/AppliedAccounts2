@@ -1,9 +1,12 @@
-﻿@using AppReports;
+﻿@using AppMessages
+@using AppReports;
 @inject NavigationManager NavManager;
+@using MESSAGE = AppMessages.Enums.Messages;
 
 @code {
     [Parameter]
     public ReportModel PrintingModel { get; set; } = new();
+    public MessageClass MsgClass { get; set; } = new();
 
     public bool IsPrintModelAssigned { get; set; } = true;
 
@@ -19,10 +22,10 @@
     public void Print(ReportType _ReportType)
     {
         #region Errors / Validation of Print Report (return id this condition found....)
-        if (PrintingModel.InputReport.FileFullName.Length == 0) { return; } // Report name not mention to print return here.
-        if (PrintingModel.OutputReport.FileFullName.Length == 0) { return; } // Report name not mention to print return here.
-        if (PrintingModel.PrintData.ReportTable is null) { return; } 
-        if (PrintingModel.PrintData.ReportTable.Rows.Count ==0) { return; } 
+        if (PrintingModel.InputReport.FileFullName.Length == 0) { MsgClass.Add(MESSAGE.rptRDLCNotExist); return; } // Report name not mention to print return here.
+        if (PrintingModel.OutputReport.FileFullName.Length == 0) { MsgClass.Add(MESSAGE.rptOutputFileIsZero); return; } // Report name not mention to print return here.
+        if (PrintingModel.ReportDataSource.ReportTable is null) { MsgClass.Add(MESSAGE.rptDataTableIsNull); return; }
+        if (PrintingModel.ReportDataSource.ReportTable.Rows.Count == 0) { MsgClass.Add(MESSAGE.rptDataRowIsZero); return; }
         #endregion
 
         #region Printing a report
@@ -38,7 +41,7 @@
             {
                 var FileName = $"{PrintingModel.OutputReport.FileName}{PrintingModel.OutputReport.FileExtention}";
               
-                //return File(PrintingModel.ReportBytes, PrintingModel.OutputReport.MimeType, FileName);
+                
             }
         }
         #endregion

@@ -20,7 +20,11 @@
             RowNotDeleted = 58,
 
             // Reports
-            prtReportError = 61,
+            prtReportError = 600101,
+            rptRDLCNotExist= 600102,
+            rptOutputFileIsZero = 600103,
+            rptDataTableIsNull = 600104,
+            rptDataRowIsZero = 600105,
 
             // Row and column
             Row_QtyZero = 30,
