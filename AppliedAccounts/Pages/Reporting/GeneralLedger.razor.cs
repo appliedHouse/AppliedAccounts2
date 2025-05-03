@@ -37,9 +37,9 @@ namespace AppliedAccounts.Pages.Reporting
                 UserModel = _UserModel;
                 Source = new(UserModel);
                 DBFile = UserModel.DataFile;
-                Accounts = Source.GetAccounts();
+                Accounts = Source.GetAccounts();            // Get List of Accounts
 
-                
+
             }
             else
             {

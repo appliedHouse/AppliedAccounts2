@@ -2,15 +2,16 @@
 {
     public static class ReportMime
     {
-        public static string GetReportMime(ReportType _ReportType)
+        public static string GetReportMime(ReportType reportType) => reportType switch
         {
-            if (_ReportType == ReportType.PDF) { return "application/pdf"; }
-            if (_ReportType == ReportType.HTML) { return "text/html"; }
-            if (_ReportType == ReportType.Word) { return "application/vnd.openxmlformats-officedocument.wordprocessingml.doc.ument"; }
-            if (_ReportType == ReportType.Excel) { return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"; }
-            if (_ReportType == ReportType.Image) { return "image/tiff"; }
-            return "application/pdf";
-        }
+            ReportType.PDF => "application/pdf",
+            ReportType.HTML => "text/html",
+            ReportType.Word => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ReportType.Excel => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            ReportType.Image => "image/tiff",
+            _ => "application/pdf"
+        };
+
 
     }
 }

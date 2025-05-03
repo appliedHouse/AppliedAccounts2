@@ -5,7 +5,6 @@ using AppReports;
 using Microsoft.JSInterop;
 using System.Data;
 
-//using static AppliedAccounts.Services.PrintService;
 using MESSAGE = AppMessages.Enums.Messages;
 
 

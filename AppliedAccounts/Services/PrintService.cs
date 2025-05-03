@@ -74,6 +74,8 @@ namespace AppliedAccounts.Services
         //    return RptUrl;
         //}
         #endregion
+
+        #region Print a Report
         public async void Print()
         {
 
@@ -88,11 +90,8 @@ namespace AppliedAccounts.Services
                 case ReportType.HTML: await HTML(); break;
                 default: await Preview(); break;
             }
-
-
         }
-
-
+        #endregion
 
         #region Option (Type) of Printing Of reports. Print,Preview,PDF, Excel.... 
         public async Task Printer()

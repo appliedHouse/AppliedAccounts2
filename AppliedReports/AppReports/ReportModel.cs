@@ -43,6 +43,8 @@ namespace AppReports
             InputReport.BasePath = Directory.GetCurrentDirectory();
             OutputReport.ReportUrl = ReportUrl;
 
+            Messages.Add($"{DateTimeNow}: Base Path {InputReport.BasePath}");
+            Messages.Add($"{DateTimeNow}: Report Url {OutputReport.ReportUrl}");
         }
 
 
