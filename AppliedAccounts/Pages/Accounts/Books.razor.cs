@@ -128,13 +128,22 @@ namespace AppliedAccounts.Pages.Accounts
         public ReportModel CreateReportModel()
         {
             ReportModel reportModel = new();
-            reportModel.InputReport.FileName = "Book";
+            reportModel.InputReport.FileName = "CashBankBook";
             reportModel.InputReport.FileExtention = "rdl";
             reportModel.InputReport.FilePath = AppGlobals.AppPaths.ReportPath;
 
             reportModel.OutputReport.FilePath = AppGlobals.AppPaths.PDFPath;
             reportModel.OutputReport.FileName = "Book";
-            reportModel.ReportParameters.AddDefaultParameters();
+
+            string _CompanyName = AppGlobals.Author.Country;
+            string _Heading1 = MyModel.BookNatureTitle;
+            string _Heading2 = $"Voucher {MyModel.MyVoucher.Master.Vou_No}";
+            string _Footer = AppGlobals.Pri;
+
+
+            reportModel.AddDefaultParameters("","","",AppGlobals.PrintReport);
+
+            return reportModel;
         }
         #endregion
 

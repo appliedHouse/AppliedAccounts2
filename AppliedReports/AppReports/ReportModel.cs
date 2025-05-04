@@ -1,5 +1,6 @@
 ﻿using Microsoft.Reporting.NETCore;
 using System.Data;
+using System.Reflection.Metadata;
 
 namespace AppReports
 {
@@ -194,6 +195,16 @@ namespace AppReports
             AddReportParameter("Heading2", reportParameter.Heading2);
             AddReportParameter("Footer", reportParameter.Footer);
         }
+
+        public void AddDefaultParameters(string _Company, string _Heading1, string _Heading2, string _Footer)
+        {
+            AddReportParameter("Company", _Company);
+            AddReportParameter("Heading1", _Heading1);
+            AddReportParameter("Heading2", _Heading2);
+            AddReportParameter("Footer", _Footer);
+        }
+
+
         #endregion
     }
 

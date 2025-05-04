@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using AppliedAccounts.Libs;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Reflection.Metadata;
 
 namespace AppliedAccounts.Services
 {
@@ -14,6 +16,7 @@ namespace AppliedAccounts.Services
         public LanguageClass Language { get; set; } = new();
         public CurrencyClass Currency { get; set; } = new();
         public Format AppFormat { get; set; } = new();
+        public PrintReport Reporting { get; set; } = new();
 
         public GlobalService() { }
 
@@ -65,6 +68,15 @@ namespace AppliedAccounts.Services
                 Title = Config.GetValue<string>("Currency:Title"),
                 Format = Config.GetValue<string>("Currency:Format"),
             };
+
+            Reporting = new()
+            {
+                ReportFooter = Config.GetValue<string>("Report:ReportFooter") ?? "",
+                ReportTitle = Config.GetValue<string>("Report:ReportTitle") ?? "",
+                ReportLogo = Config.GetValue<string>("Report:ReportLogo") ?? "",
+            };
+
+
 
 
         }
@@ -144,12 +156,11 @@ namespace AppliedAccounts.Services
     #endregion
 
     #region Printing Reports
-    public class PrintReports
+    public class PrintReport
     {
-        public string BaseUrl { get; set; }
         public string ReportFooter { get; set; }
         public string ReportTitle { get; set; }
-        public string ReportLogo { get; set; }
+        public string ReportLogo { get; set; }          // Link of logi file   jpg, png, bmp etc
     }
     #endregion
 }
