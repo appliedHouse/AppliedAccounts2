@@ -186,6 +186,14 @@ namespace AppReports
             ReportParameters.Add(_Parameter);
             Messages.Add($"{DateTimeNow}: Report Parameter add {Key} => {Value}");
         }
+
+        public void AddDefaultParameters(RDLCParameters reportParameter)
+        {
+            AddReportParameter("Company", reportParameter.Company);
+            AddReportParameter("Heading1", reportParameter.Heading1);
+            AddReportParameter("Heading2", reportParameter.Heading2);
+            AddReportParameter("Footer", reportParameter.Footer);
+        }
         #endregion
     }
 
@@ -301,6 +309,14 @@ namespace AppReports
             }
             return new ReportDataSource();
         }
+    }
+
+    public class RDLCParameters
+    {
+        public string Company { get; set; } = string.Empty;
+        public string Heading1 { get; set; } = string.Empty;
+        public string Heading2 { get; set; } = string.Empty;
+        public string Footer { get; set; } = string.Empty;
     }
     #endregion
 

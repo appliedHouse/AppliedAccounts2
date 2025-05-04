@@ -1,5 +1,6 @@
 ﻿@page "/Reporting/GL"
 @attribute [Authorize]
+@layout PageLayout
 
 @using AppReports
 @using AppliedDB;
@@ -44,14 +45,7 @@
         }
     }
 
-    // private void ReportTypeSelected(ReportType reportType)
-    // {
-
-
-    //     ReportService.RptType = reportType;
-    //     Print();
-
-    // }
+ 
 }
 
 @if (IsPrinting)

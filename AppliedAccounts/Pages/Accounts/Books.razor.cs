@@ -1,14 +1,17 @@
 ﻿using AppliedAccounts.Models;
+using AppliedAccounts.Models.Interface;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
+using AppReports;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Data;
 
 
 namespace AppliedAccounts.Pages.Accounts
 {
-    public partial class Books
+    public partial class Books : IPrint
     {
         [Parameter] public int ID { get; set; }
         //[Parameter] public int NatureID { get; set; }
@@ -104,7 +107,36 @@ namespace AppliedAccounts.Pages.Accounts
         public void BackPage() { NavManager.NavigateTo("/Accounts/BooksList");}
         #endregion
 
+        #region Print
+        public async void Print(ReportType _ReportType)
+        {
+            await Task.Delay(100);
+            ReportService = new();
+            
+            
+        }
 
+        public ReportData GetReportData()
+        {
+            ReportData reportData = new ReportData();
+            reportData.ReportTable = new DataTable();
+            reportData.DataSetName = "ds_Book";
+            
+            return reportData;
+        }
+
+        public ReportModel CreateReportModel()
+        {
+            ReportModel reportModel = new();
+            reportModel.InputReport.FileName = "Book";
+            reportModel.InputReport.FileExtention = "rdl";
+            reportModel.InputReport.FilePath = AppGlobals.AppPaths.ReportPath;
+
+            reportModel.OutputReport.FilePath = AppGlobals.AppPaths.PDFPath;
+            reportModel.OutputReport.FileName = "Book";
+            reportModel.ReportParameters.AddDefaultParameters();
+        }
+        #endregion
 
 
     }
