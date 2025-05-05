@@ -10,48 +10,30 @@
 }
 
 <style>
-    
-    .ctrl{
-        color:darkblue;
+
+    .ctrl {
+        color: darkblue;
         background-color: #EBE5C2;
-        padding-top:2px;
-        padding-bottom:2px;
-        padding-left:5px;
-        padding-right:5px;
-        margin:2px;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        padding-left: 5px;
+        padding-right: 5px;
+        margin: 2px;
     }
-    .ctrl:hover{
-        color:red;
+
+        .ctrl:hover {
+            color: red;
             background-color: #ded59c;
-    }
+        }
 
 </style>
 
-
-
-
-    <div class="btn-group" role="group" aria-label="Navigation Buttons" id="printBtns">
-    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{NotifyParent(ReportType.Print);})">
-            <i class="bi bi-printer"></i>
-        </button>
-    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{NotifyParent(ReportType.Preview);})">
-            <i class="bi bi-search"></i>
-        </button>
-    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{NotifyParent(ReportType.PDF);})">
-            <i class="bi bi-file-pdf"></i>
-        </button>
-    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{NotifyParent(ReportType.Excel);})">
-            <i class="bi bi-file-earmark-excel"></i>
-        </button>
-    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{NotifyParent(ReportType.Word);})">
-            <i class="bi bi-file-earmark-word"></i>
-        </button>
-    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{NotifyParent(ReportType.HTML);})">
-            <i class="bi bi-filetype-html"></i>
-        </button>
-    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{NotifyParent(ReportType.Image);})">
-            <i class="bi bi-file-earmark-image"></i>
-        </button>
-    
+<div class="btn-group" role="group" aria-label="Navigation Buttons" id="printBtns">
+    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{NotifyParent(ReportType.Print);})">   <i class="bi bi-printer"></i>            </button>
+    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{NotifyParent(ReportType.Preview);})"> <i class="bi bi-search"></i>             </button>
+    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{NotifyParent(ReportType.PDF);})">     <i class="bi bi-file-pdf"></i>           </button>
+    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{NotifyParent(ReportType.Excel);})">   <i class="bi bi-file-earmark-excel"></i> </button>
+    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{NotifyParent(ReportType.Word);})">    <i class="bi bi-file-earmark-word"></i>  </button>
+    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{NotifyParent(ReportType.HTML);})">    <i class="bi bi-filetype-html"></i>      </button>
+    <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{NotifyParent(ReportType.Image);})">   <i class="bi bi-file-earmark-image"></i> </button>
 </div>
-

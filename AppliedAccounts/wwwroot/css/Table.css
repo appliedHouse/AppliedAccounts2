@@ -5,17 +5,19 @@
     --greenMedium: #AAB99A;
     --greenLight: #D0DDD0;
     --greenLow: #F0F0D7;
+    --greenSolid: green;
     --HeadText: white;
     --BodyText: darkblue;
     --FootText: white;
-    --Border: #96D4D4
+    --Border: #96D4D4;
+    --accent: #F6C1C7;
 }
 
 
 .table-container {
     width: 100%;
     overflow: auto; /* Enables scrolling */
-    border: 1px solid #ccc; /* Optional border */
+    border: 1px solid var(--Border); /* Optional border */
     margin-left: 15px;
     margin-right: 15px;
 }
@@ -24,8 +26,11 @@
     display: table;
     overflow-x: auto;
     width: 99%; /* Adjust width as needed */
-    border: 2px solid green;
     border-collapse: collapse;
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: small;
+    font-family: 'Nunito Sans', sans-serif;
 }
 
 
@@ -46,23 +51,50 @@
                 border-color: var(--Border)
             }
 
+        .table-list thead th #btnAdd {
+            background-color: var(--greenMedium);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+            .table-list thead th #btnAdd:hover {
+                background-color: var(--greenDark);
+            }
+
     .table-list tbody {
         background-color: var(--greenLow);
         color: var(--BodyText);
-        font-size: small;
+        padding: 8px;
+        border: 1px solid;
+        border-color: var(--Border);
         text-align: center;
     }
 
         .table-list tbody tr {
             height: 40px;
+            border-radius: 4px;
+            background-color: var(--greenLow);
+            border: 1px solid;
+            border-color: var(--Border);
+            
         }
 
-            .table-list tbody tr td {
-                background-color: var(--greenLow);
-                padding: 8px;
-                border: 1px solid;
-                border-color: var(--Border) 
+            .table-list tbody tr:hover {
+                background-color: var(--accent);
+                transition: background-color 0.3s ease;
             }
+
+                .table-list tbody tr:hover td {
+                    background-color: var(--greenMedium);
+                    border: 1px solid;
+                    border-color: var(--Border);
+                    
+                }
 
     .table-list tfoot {
         background-color: var(--greenMedium);

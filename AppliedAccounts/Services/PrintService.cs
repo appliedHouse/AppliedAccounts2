@@ -31,50 +31,6 @@ namespace AppliedAccounts.Services
         {
         }
 
-        #region Temp
-        //public byte[] Generate()
-        //{
-
-        //    RptModel.ReportData = RptData;          // Set Report Data to print in report.
-        //    if (RptModel.ReportData != null)
-        //    {
-        //        if (RptModel.ReportRender())
-        //        {
-        //            // In the Process of ReportRender, ReportBytes are generated.
-        //            return RptModel.ReportBytes;
-        //        }
-        //    }
-        //    return [];
-        //}
-
-
-        //private string RenderReport()
-        //{
-        //    RptModel.ReportData = RptData;          // Set Report Data to print in report.
-
-        //    if (RptModel.ReportData != null)
-        //    {
-        //        if (RptModel.ReportRender())
-        //        {
-        //            if (RptType == ReportType.Preview)
-        //            { JSOption = "displayPDF"; }
-        //            else
-        //            { JSOption = "downloadFile"; }
-        //            return JSOption;
-        //        }
-        //    }
-        //    return "";
-        //}
-
-        //public string GetReportLink()
-        //{
-        //    RptModel.OutputReport.ReportType = RptType;
-        //    JSOption = RenderReport();
-        //    RptUrl = string.Concat(RptModel.OutputReport.FileLink);
-        //    return RptUrl;
-        //}
-        #endregion
-
         #region Print a Report
         public async void Print()
         {
@@ -90,6 +46,12 @@ namespace AppliedAccounts.Services
                 case ReportType.HTML: await HTML(); break;
                 default: await Preview(); break;
             }
+        }
+
+        public void Print(ReportType reportType)
+        {
+            RptType = reportType;
+            Print();
         }
         #endregion
 

@@ -1,46 +1,16 @@
-﻿@using AppMessages
-@using AppReports;
-@using AppliedAccounts.Services;
-@inject NavigationManager NavManager;
-@using MESSAGE = AppMessages.Enums.Messages;
+﻿@using AppReports;
+@using AppliedAccounts.Data;
 
 @code {
-    [Parameter]
-    public PrintService ReportService { get; set; }
-    public MessageClass MsgClass { get; set; } = new();
+    [Parameter] public EventCallback<ReportActionClass> ReturnValue { get; set; }
+    [Parameter] public int VoucherID { get; set; }
 
-    public bool IsPageValid { get; set; }
-
-    protected override void OnInitialized()
+    private void NotifyParent(ReportType reportType)
     {
-        base.OnInitialized();
-        if (ReportService == null) { IsPageValid = false; } else { IsPageValid = true; }
-    }
-
-    public void Print(ReportType _ReportType)
-    {
-        ReportService.RptType = _ReportType;
-        ReportService.Print();
+        var action = new ReportActionClass { PrintType = reportType, VoucherID = VoucherID, Vou_No=string.Empty };
+        ReturnValue.InvokeAsync(action);
     }
 }
 
-@if (IsPageValid)
-{
-    <div class="dropdown">
-        <button type="button" title="Print" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
-            <i class="bi bi-printer"></i>
-        </button>
-        <ul class="dropdown-menu">
-            <li><button type="submit" id="print-1" class="btn btn-link border-0" @onclick="() => Print(AppReports.ReportType.Preview)">Preview</button></li>
-            <li><button type="submit" id="print-2" class="btn btn-link border-0" @onclick="() => Print(AppReports.ReportType.PDF)">PDF</button></li>
-            <li><button type="submit" id="print-3" class="btn btn-link border-0" @onclick="() => Print(AppReports.ReportType.Excel)">Excel</button></li>
-            <li><button type="submit" id="print-4" class="btn btn-link border-0" @onclick="() => Print(AppReports.ReportType.Word)">Word</button></li>
-            <li><button type="submit" id="print-5" class="btn btn-link border-0" @onclick="() => Print(AppReports.ReportType.HTML)">HTML</button></li>
-            <li><button type="submit" id="print-5" class="btn btn-link border-0" @onclick="() => Print(AppReports.ReportType.Image)">HTML</button></li>
-        </ul>
-    </div>
-}
-else
-{
-    <button type="submit" id="print-error" class="btn btn-link border-0"><i class="bi bi-question-circle"></i></button>
-}
+
+<button class="btn ctrl ctrl-print" @onclick="((e)=> NotifyParent(ReportType.Print))"> <i class="bi bi-printer"></i> </button>

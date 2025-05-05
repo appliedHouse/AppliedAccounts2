@@ -1,4 +1,5 @@
-﻿using AppliedAccounts.Models;
+﻿using AppliedAccounts.Data;
+using AppliedAccounts.Models;
 using AppliedAccounts.Models.Interface;
 using AppliedAccounts.Services;
 using AppliedDB;

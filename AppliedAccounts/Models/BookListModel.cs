@@ -1,40 +1,33 @@
 ﻿using AppliedDB;
 using Messages = AppMessages.Enums.Messages;
-using AppliedAccounts.Models.Interface;
 using System.Data;
 using AppliedAccounts.Services;
-using Microsoft.AspNetCore.Components;
 using AppliedAccounts.Data;
+using AppliedAccounts.Pages.Accounts;
+using AppReports;
 
 namespace AppliedAccounts.Models
 {
     public class BookListModel  // : IVoucherList
     {
+        public GlobalService AppGlobals { get; set; }
         public List<CodeTitle> BookList { get; set; }
         public List<CodeTitle> NatureAccountsList { get; set; }
         public DataSource Source { get; set; }
         public AppUserModel? UserProfile { get; set; }
         public AppMessages.MessageClass MsgClass { get; set; }
+        public PrintService ReportService { get; set; }
 
         public int BookID { get; set; }
         public int BookNatureID { get; set; }
-        public int SelectedVoucherID { get; set; }
+        public int VoucherID { get; set; }
         public DateTime DT_Start { get; set; }
         public DateTime DT_End { get; set; }
         public string SearchText { get; set; }
-        public string BookTitle = "Book Title";
+        public string BookNatureTitle = "Book Title";
+        public List<BookView> BookRecords { get; set; }
         public bool PageIsValid { get; set; } = false;
-        public List<DataRow> DataList { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Enums.Tables Table { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public PrintService Printer { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public AppUserModel? AppUser { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         
-        public object Record { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public List<object> Records { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public decimal TotalAmount { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool SelectAll { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public NavigationManager NavManager { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
         public BookListModel() { }
         public BookListModel(int _BookID, AppUserModel _AppUserProfile)
         {
@@ -45,18 +38,16 @@ namespace AppliedAccounts.Models
 
             try
             {
+
                 if (_BookID == 0) { BookID = 1; } else { BookID = _BookID; }
 
+
+                // Get a Nature of Book.  It is Cash Book  or Bank book...
                 var result = Source?.SeekValue(Enums.Tables.COA, BookID, "Nature") ?? 0;
                 BookNatureID = (int)result;
 
                 BookID = _BookID;
                 UserProfile = _AppUserProfile;
-                if (UserProfile != null)
-                {
-                    Source = new(UserProfile);
-
-                }
                 
                 NatureAccountsList =
                 [
@@ -64,7 +55,7 @@ namespace AppliedAccounts.Models
                     new() { ID = 2, Code = "02", Title = "Bank" },
                 ];
 
-                PageIsValid = true;
+                PageIsValid = LoadData(); 
             }
             catch (Exception)
             {
@@ -72,25 +63,133 @@ namespace AppliedAccounts.Models
             }
         }
 
-        public List<DataRow> LoadData() { return []; }
 
+        public bool LoadData()
+        {
+            try
+            {
+                BookRecords = LoadBookRecords(BookID);
+                return true;
+            }
+            catch (Exception)
+            {
+                MsgClass.Add(Messages.DataLoadFailed);
+                return false;
+            }
+        }
+
+
+        public List<BookView> LoadBookRecords(int _BookID)     // Load List of Cash / Bank Book record in Table
+        {
+            var _List = new List<BookView>();
+            var _Data = Source.GetBookList(_BookID);
+
+            if (_Data != null)
+            {
+                decimal _Bal = 0.00M;
+                decimal _DR = 0.00M;
+                decimal _CR = 0.00M;
+
+                foreach (DataRow Row in _Data.Rows)
+                {
+                    _DR = Row.Field<decimal>("DR");
+                    _CR = Row.Field<decimal>("CR");
+                    _Bal += _CR - _DR;
+
+                    var _Record = new BookView()
+                    {
+                        ID = Row.Field<int>("ID1"),
+                        Vou_No = Row.Field<string>("Vou_No") ?? "---",
+                        Vou_Date = Row.Field<DateTime>("Vou_Date"),
+                        Recevied = _CR,
+                        Paid = _DR,
+                        Balance = _Bal,
+                        Description = Row.Field<string>("Description") ?? "",
+
+                        TReceived = _CR.ToString(Format.Digit),
+                        TPaid = _DR.ToString(Format.Digit),
+                        TBalance = _Bal.ToString(Format.Digit)
+                    };
+
+                    _List.Add(_Record);
+                }
+                return _List;
+            }
+            return [];
+        }
+
+
+        #region Filter on Data List showing in table
         public string GetFilterText()
         {
             throw new NotImplementedException();
         }
+        #endregion
 
-        public void Print(int _ID)
+        #region Print
+        public async void Print(ReportType _ReportType)
         {
-            SetKeys();
-            throw new NotImplementedException();
+            await Task.Run(() =>
+            {
+                ReportService = new(AppGlobals);
+                ReportService.RptType = _ReportType;
+                ReportService.RptData = GetReportData();
+                ReportService.RptModel = CreateReportModel();
+            });
+
+            try
+            {
+                ReportService.Print();
+            }
+            catch (Exception)
+            {
+                ReportService.MyMessage = "Error....";
+                MsgClass.Add(ReportService.MyMessage);
+            }
+
         }
 
+        public ReportData GetReportData()
+        {
+            ReportData reportData = new(); ;
+            reportData.ReportTable = Source.GetBookVoucher(VoucherID);
+            reportData.DataSetName = "ds_Book";
+
+            return reportData;
+        }
+
+        public ReportModel CreateReportModel()
+        {
+            string VoucherNo = "Voucher No";
+
+
+            ReportModel reportModel = new();
+            reportModel.InputReport.FileName = "CashBankBook";
+            reportModel.InputReport.FileExtention = "rdl";
+            reportModel.InputReport.FilePath = AppGlobals.AppPaths.ReportPath;
+
+            reportModel.ReportDataSource = ReportService.RptData;
+            reportModel.OutputReport.FilePath = AppGlobals.AppPaths.PDFPath;
+            reportModel.OutputReport.FileName = "Book";
+
+            string _CompanyName = AppGlobals.Author.Country;
+            string _Heading1 = BookNatureTitle;
+            string _Heading2 = $"Voucher {VoucherNo}";
+            string _Footer = AppGlobals.Reporting.ReportFooter;
+
+            reportModel.AddDefaultParameters(_CompanyName, _Heading1, _Heading2, _Footer);
+
+            return reportModel;
+        }
+        #endregion
+
+        #region Edit Book Voucher Re-direct to Book Page
         public void Edit(int _ID)
         {
             SetKeys();
-            NavManager.NavigateTo($"/Accounts/Books/{BookID}/{BookNatureID}");
+            AppGlobals.NavManager.NavigateTo($"/Accounts/Books/{BookID}/{BookNatureID}");
         }
-
+        #endregion
 
 
 
