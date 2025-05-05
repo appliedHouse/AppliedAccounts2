@@ -11,7 +11,7 @@ using AppReports;
 
 namespace AppliedAccounts.Models
 {
-    public class BookModel : IVoucher
+    public class BookModel : IVoucher, IPrint
     {
 
         #region Variables
@@ -46,9 +46,9 @@ namespace AppliedAccounts.Models
         public decimal Tot_CR { get; set; }
         public bool IsWaiting { get; set; }
         public bool IsSaved { get; set; }
-        public NavigationManager NavManager  => AppGlobals.NavManager; 
-        public PrintService ReportService { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public GlobalService AppGlobals { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public NavigationManager NavManager => AppGlobals.NavManager;
+        public PrintService ReportService { get; set; }
+        public GlobalService AppGlobals { get; set; }
 
         private int CashNatureID = 0;
         private int BankNatureID = 0;
@@ -324,14 +324,15 @@ namespace AppliedAccounts.Models
                         CommandClass cmdClass1 = new(Row1, Source.MyConnection);
                         cmdClass1.SaveChanges();
 
-                        Row1["ID"] = cmdClass1.PrimaryKeyID;                // Get a new Id of record after save / insert.
+                        VoucherID = cmdClass1.PrimaryKeyID;
+                        Row1["ID"] = VoucherID;                // Get a new Id of record after save / insert.
 
                         var Row2 = Source.GetNewRow(Tables.Book2);
 
                         foreach (var item in MyVoucher.Details)
                         {
                             Row2["ID"] = item.ID2;
-                            Row2["TranID"] = Row1["ID"];
+                            Row2["TranID"] = VoucherID;
                             Row2["SR_NO"] = item.Sr_No;
                             Row2["COA"] = item.COA;
                             Row2["Company"] = item.Company;
@@ -344,8 +345,6 @@ namespace AppliedAccounts.Models
 
                             CommandClass cmdClass2 = new(Row2, Source.MyConnection);
                             cmdClass2.SaveChanges();
-
-
                         }
 
                         IsWaiting = false;
@@ -446,7 +445,7 @@ namespace AppliedAccounts.Models
             if (MyVoucher.Details.Count > 0)
             { MyVoucher.Detail = MyVoucher.Details.Last(); }
         }
-          
+
 
         public void CalculateTotal()
         {
@@ -460,20 +459,56 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Print
-
-        public void Print(ReportType _rptType)
+        public async void Print(ReportType _ReportType)
         {
-            throw new NotImplementedException();
+            await Task.Run(() =>
+            {
+                ReportService = new(AppGlobals);
+                ReportService.RptType = _ReportType;
+                ReportService.RptData = GetReportData();
+                ReportService.RptModel = CreateReportModel();
+            });
+
+            try
+            {
+                ReportService.Print();
+            }
+            catch (Exception)
+            {
+                ReportService.MyMessage = "Error....";
+                MsgClass.Add(ReportService.MyMessage);
+            }
+
         }
 
         public ReportData GetReportData()
         {
-            throw new NotImplementedException();
+            ReportData reportData = new(); ;
+            reportData.ReportTable = Source.GetBookVoucher(VoucherID);
+            reportData.DataSetName = "ds_Book";
+
+            return reportData;
         }
 
         public ReportModel CreateReportModel()
         {
-            throw new NotImplementedException();
+            ReportModel reportModel = new();
+            reportModel.InputReport.FileName = "CashBankBook";
+            reportModel.InputReport.FileExtention = "rdl";
+            reportModel.InputReport.FilePath = AppGlobals.AppPaths.ReportPath;
+
+            reportModel.ReportDataSource = ReportService.RptData;
+            reportModel.OutputReport.FilePath = AppGlobals.AppPaths.PDFPath;
+            reportModel.OutputReport.FileName = "Book";
+
+            string _CompanyName = AppGlobals.Author.Country;
+            string _Heading1 = BookNatureTitle;
+            string _Heading2 = $"Voucher {MyVoucher.Master.Vou_No}";
+            string _Footer = AppGlobals.Reporting.ReportFooter;
+
+            reportModel.AddDefaultParameters(_CompanyName, _Heading1, _Heading2, _Footer);
+
+            return reportModel;
         }
         #endregion
 

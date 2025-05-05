@@ -64,11 +64,11 @@ namespace AppliedAccounts.Models.Interface
         Task<bool> SaveAllAsync();
         #endregion
 
-        #region Print
-        void Print(ReportType _rptType);
-        ReportData GetReportData();
-        ReportModel CreateReportModel();
+        //#region Print
+        //void Print(ReportType _rptType);
+        //ReportData GetReportData();
+        //ReportModel CreateReportModel();
 
-        #endregion
+        //#endregion
     }
 }

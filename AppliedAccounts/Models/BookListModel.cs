@@ -4,10 +4,11 @@ using AppliedAccounts.Models.Interface;
 using System.Data;
 using AppliedAccounts.Services;
 using Microsoft.AspNetCore.Components;
+using AppliedAccounts.Data;
 
 namespace AppliedAccounts.Models
 {
-    public class BookListModel : IVoucherList
+    public class BookListModel  // : IVoucherList
     {
         public List<CodeTitle> BookList { get; set; }
         public List<CodeTitle> NatureAccountsList { get; set; }
@@ -27,7 +28,7 @@ namespace AppliedAccounts.Models
         public Enums.Tables Table { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public PrintService Printer { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public AppUserModel? AppUser { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string DBFile { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        
         public object Record { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public List<object> Records { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public decimal TotalAmount { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -38,6 +39,9 @@ namespace AppliedAccounts.Models
         public BookListModel(int _BookID, AppUserModel _AppUserProfile)
         {
             MsgClass = new();
+            UserProfile = _AppUserProfile;
+            Source = new(UserProfile);
+            GetKeys();
 
             try
             {
@@ -77,18 +81,46 @@ namespace AppliedAccounts.Models
 
         public void Print(int _ID)
         {
+            SetKeys();
             throw new NotImplementedException();
         }
 
         public void Edit(int _ID)
         {
-            throw new NotImplementedException();
+            SetKeys();
+            NavManager.NavigateTo($"/Accounts/Books/{BookID}/{BookNatureID}");
         }
 
-        List<object> IVoucherList.LoadData()
+
+
+
+        #region Get & Set Keys
+        internal void SetKeys()
         {
-            throw new NotImplementedException();
+            if (!string.IsNullOrEmpty(Source.DBFile))
+            {
+                AppRegistry.SetKey(Source.DBFile, "BkNatureID", BookNatureID, KeyType.Number);
+                AppRegistry.SetKey(Source.DBFile, "BkBook", BookID, KeyType.Number, "Cash / Bank BooK");
+                AppRegistry.SetKey(Source.DBFile, "BkBook", DT_Start, KeyType.From);
+                AppRegistry.SetKey(Source.DBFile, "BkBook", DT_End, KeyType.To);
+                AppRegistry.SetKey(Source.DBFile, "BkBook", SearchText, KeyType.Text);
+            }
         }
+
+        internal void GetKeys()
+        {
+            if (!string.IsNullOrEmpty(Source.DBFile))
+            {
+                BookNatureID = AppRegistry.GetNumber(Source.DBFile, "BKNatureID");
+                BookID = AppRegistry.GetNumber(Source.DBFile, "BKbook");
+                DT_Start = AppRegistry.GetFrom(Source.DBFile, "BKbook");
+                DT_End = AppRegistry.GetTo(Source.DBFile, "BKbook");
+                SearchText = AppRegistry.GetText(Source.DBFile, "BKBook");
+            }
+        }
+        #endregion
+
+
     }           // END
 }
 

@@ -70,6 +70,8 @@ namespace AppliedAccounts.Pages.Reporting
         }
         #endregion
 
+        #region Refresh and BackPage
+
         public void Refresh()
         {
             SetKeys();
@@ -84,7 +86,7 @@ namespace AppliedAccounts.Pages.Reporting
         {
             NavManager.NavigateTo("/Menu/Accounts");
         }
-
+        #endregion
 
         #region Print
         public async void Print(ReportType PrintType)

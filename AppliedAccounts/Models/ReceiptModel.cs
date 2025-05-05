@@ -675,11 +675,6 @@ namespace AppliedAccounts.Models
             return _NetAmount;
         }
 
-        void IVoucher.Print(ReportType _rptType)
-        {
-            throw new NotImplementedException();
-        }
-
 
         #endregion
 

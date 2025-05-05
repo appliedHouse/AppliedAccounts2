@@ -11,7 +11,7 @@ using System.Data;
 
 namespace AppliedAccounts.Pages.Accounts
 {
-    public partial class Books : IPrint
+    public partial class Books 
     {
         [Parameter] public int ID { get; set; }
         //[Parameter] public int NatureID { get; set; }
@@ -37,7 +37,9 @@ namespace AppliedAccounts.Pages.Accounts
         {
             MsgClass = new();
             MyToastClass = new();
-            MyModel = new(ID,BookID, UserProfile);
+            MyModel = new(ID,BookID, UserProfile); ;
+            MyModel.AppGlobals = AppGlobals;
+            MyModel.ReportService = ReportService;
 
             if (MyModel == null) { IsPageValid = false; MsgClass.Add("Model is null"); return; }
             if (MyModel?.MyVoucher == null) { IsPageValid = false; MsgClass.Add("Voucher is null"); return; }
@@ -97,55 +99,22 @@ namespace AppliedAccounts.Pages.Accounts
 
             if (IsSaved)
             {
-                ToastService.ShowToast(ToastClass.SaveToast);
+                ToastService.ShowToast(ToastClass.SaveToast, MyModel.MyVoucher.Master.Vou_No);
             }
         }
         #endregion
-
 
         #region BackPage
         public void BackPage() { NavManager.NavigateTo("/Accounts/BooksList");}
         #endregion
 
         #region Print
-        public async void Print(ReportType _ReportType)
+        private void Print(ReportType reportType)
         {
-            await Task.Delay(100);
-            ReportService = new();
-            
-            
-        }
-
-        public ReportData GetReportData()
-        {
-            ReportData reportData = new ReportData();
-            reportData.ReportTable = new DataTable();
-            reportData.DataSetName = "ds_Book";
-            
-            return reportData;
-        }
-
-        public ReportModel CreateReportModel()
-        {
-            ReportModel reportModel = new();
-            reportModel.InputReport.FileName = "CashBankBook";
-            reportModel.InputReport.FileExtention = "rdl";
-            reportModel.InputReport.FilePath = AppGlobals.AppPaths.ReportPath;
-
-            reportModel.OutputReport.FilePath = AppGlobals.AppPaths.PDFPath;
-            reportModel.OutputReport.FileName = "Book";
-
-            string _CompanyName = AppGlobals.Author.Country;
-            string _Heading1 = MyModel.BookNatureTitle;
-            string _Heading2 = $"Voucher {MyModel.MyVoucher.Master.Vou_No}";
-            string _Footer = AppGlobals.Pri;
-
-
-            reportModel.AddDefaultParameters("","","",AppGlobals.PrintReport);
-
-            return reportModel;
+            MyModel.Print(reportType);
         }
         #endregion
+
 
 
     }

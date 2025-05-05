@@ -1,5 +1,4 @@
-﻿using AppliedAccounts.Data;
-using AppliedAccounts.Models;
+﻿using AppliedAccounts.Models;
 using AppliedAccounts.Services;
 using AppliedDB;
 using System.Data;
@@ -16,10 +15,11 @@ namespace AppliedAccounts.Pages.Accounts
 
         public BooksList()
         {
-            MyModel = new(0, UserProfile ?? new());
+            //MyModel = new(0, UserProfile ?? new());
+           
         }
 
-        List<BookView> LoadBookRecords(int _BookID)     // Load Lost of Cash / Bank Book record in Table
+        List<BookView> LoadBookRecords(int _BookID)     // Load List of Cash / Bank Book record in Table
         {
             var _List = new List<BookView>();
             var _Data = MyModel.Source.GetBookList(_BookID);
@@ -77,7 +77,7 @@ namespace AppliedAccounts.Pages.Accounts
 
         public void Refresh()
         {
-
+            MyModel.SetKeys();
         }
 
         #region Debit and Credit Amount format

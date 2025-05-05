@@ -188,13 +188,6 @@ namespace AppReports
             Messages.Add($"{DateTimeNow}: Report Parameter add {Key} => {Value}");
         }
 
-        public void AddDefaultParameters(RDLCParameters reportParameter)
-        {
-            AddReportParameter("Company", reportParameter.Company);
-            AddReportParameter("Heading1", reportParameter.Heading1);
-            AddReportParameter("Heading2", reportParameter.Heading2);
-            AddReportParameter("Footer", reportParameter.Footer);
-        }
 
         public void AddDefaultParameters(string _Company, string _Heading1, string _Heading2, string _Footer)
         {
@@ -236,7 +229,7 @@ namespace AppReports
             return string.Empty;
         }
     }
-    public class OutputReport
+    public class OutputReport 
     {
         public string ReportUrl { get; set; }       // like http://localhist:xxx/
         public string BasePath { get; set; } = Directory.GetCurrentDirectory();
@@ -307,7 +300,6 @@ namespace AppReports
     }
     public class ReportData
     {
-        //public string SQLQuery { get; set; } = string.Empty;
         public DataTable ReportTable { get; set; } = new();
         public string DataSetName { get; set; } = string.Empty;
         public ReportDataSource DataSource => GetReportDataSource();
@@ -322,13 +314,7 @@ namespace AppReports
         }
     }
 
-    public class RDLCParameters
-    {
-        public string Company { get; set; } = string.Empty;
-        public string Heading1 { get; set; } = string.Empty;
-        public string Heading2 { get; set; } = string.Empty;
-        public string Footer { get; set; } = string.Empty;
-    }
+
     #endregion
 
 }

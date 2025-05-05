@@ -27,6 +27,7 @@
         UserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
         MyModel = new(0, UserProfile);   // BookID and UserProfile.
         MyModel.Source = new(UserProfile);
+        MyModel.GetKeys();
     }
 
 
@@ -69,10 +70,10 @@
         </div>
         <div class="p-2">
             <InputSelect id="ddBook" class="item-height"
-                         TValue="int"
-                         Value="@MyModel.BookID"
-                         ValueExpression="@(()=> MyModel.BookID)"
-                         ValueChanged="@((e)=>BookListChanged(e))">
+            TValue="int"
+            Value="@MyModel.BookID"
+            ValueExpression="@(()=> MyModel.BookID)"
+            ValueChanged="@((e)=>BookListChanged(e))">
 
                 @foreach (var item in MyModel.Source.GetBookAccounts(MyModel.BookNatureID))
                 {
@@ -93,8 +94,8 @@
         <div class="p-2 search-btn">
             <label for="floatingInput">
                 <InputText id="txtSearch" class="item-height" placeholder="Filter list"
-                           @bind-Value="MyModel.SearchText"
-                           @onclick="Refresh">
+                @bind-Value="MyModel.SearchText"
+                @onclick="Refresh">
                 </InputText>
             </label>
         </div>
@@ -120,11 +121,15 @@
                         <th>Received</th>
                         <th>Paid</th>
                         <th>Balance</th>
+                        <th>
+                            <button class="btn btn-Add"><i class="bi bi-pencil-fill"></i></button>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (BookView Record in LoadBookRecords(MyModel.BookID))
                     {
+                        string _NavTo = $"/Accounts/Books/{Record.ID}/{MyModel.BookID}";
                         <tr>
                             <td>@Record.Vou_No</td>
                             <td>@Record.Vou_Date.ToString(Format.DDMMMYY)</td>
@@ -132,6 +137,7 @@
                             <td class="amount">@Record.TReceived</td>
                             <td class="amount">@Record.TPaid</td>
                             <td class="amount">@Record.TBalance</td>
+                            <td><EditButton NavTo=@_NavTo Title="Edit Voucher"/></td>
                         </tr>
                     }
                 </tbody>
