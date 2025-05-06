@@ -29,6 +29,7 @@ namespace AppliedAccounts.Services
             Config = _Config;
             NavManager = Config.NavManager;
             JS = Config.JS;
+            MsgClass = new();
 
             Model = new();
 
@@ -88,7 +89,7 @@ namespace AppliedAccounts.Services
                 }
                 else
                 {
-                    MyMessage = "Report has some error";
+                    MyMessage = Model.ErrorMessage;
                 }
             }
             catch (Exception error)
@@ -100,7 +101,7 @@ namespace AppliedAccounts.Services
 
             if(Model.ErrorMessage.Length > 0)
             {
-                MsgClass.Danger(Model.ErrorMessage);
+                MsgClass.Add(Model.ErrorMessage);
             }
 
 

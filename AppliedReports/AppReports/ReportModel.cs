@@ -6,8 +6,7 @@ namespace AppReports
     public class ReportModel
     {
         #region Variables
-        public List<string> Messages { get; set; } 
-        public object AppPaths { get; set; }
+        public List<string> Messages { get; set; }
         public InputReport InputReport { get; set; }
         public OutputReport OutputReport { get; set; }
         public ReportData ReportDataSource { get; set; }
@@ -17,26 +16,24 @@ namespace AppReports
         public string ReportTitle { get; set; } = string.Empty;
 
         public List<ReportParameter> ReportParameters { get; set; }
-        //public bool Render => ReportRender();
-        private readonly string DateTimeFormat = "yyyy-MM-dd [hh:mm:ss]";
-        private string DateTimeNow => DateTime.Now.ToString(DateTimeFormat);
+        private string DateTimeNow => DateTime.Now.ToString("yyyy-MM-dd [hh:mm:ss]");
 
         #endregion
 
         #region Constructor
         public ReportModel()
         {
-            
+
             InputReport = new InputReport();
             OutputReport = new OutputReport();
             ReportDataSource = new ReportData();
-            
+
             Messages = [];
             ReportParameters = [];
             ReportBytes = [];
 
             Messages.Add($"{DateTimeNow}: Report Class Started.");
-           
+
             InputReport.BasePath = Directory.GetCurrentDirectory();
             OutputReport.BasePath = Directory.GetCurrentDirectory();
 
@@ -48,14 +45,14 @@ namespace AppReports
         #endregion
 
         #region Report Render
-        
+
         public bool ReportRender(ReportType rptType)
         {
             Messages.Add($"{DateTimeNow}: Report rendering started");
 
             OutputReport.ReportType = rptType;
             IsReportRendered = false;
-            
+
             try
             {
                 Messages.Add($"{DateTimeNow} Input Base Path {InputReport.BasePath}");
@@ -63,7 +60,7 @@ namespace AppReports
                 Messages.Add($"{DateTimeNow} Input File Path {InputReport.FilePath}");
                 Messages.Add($"{DateTimeNow} Input Full Name {InputReport.FileFullName}");
                 Messages.Add($"{DateTimeNow} Input File Found {InputReport.IsFileExist}");
-                                
+
                 Messages.Add($"{DateTimeNow}: Output Report URL {OutputReport.ReportUrl}");
                 Messages.Add($"{DateTimeNow}: Output Report Path {OutputReport.FilePath}");
                 Messages.Add($"{DateTimeNow}: Output File Full Name is {OutputReport.FileFullName}");
@@ -76,21 +73,27 @@ namespace AppReports
                 Messages.Add($"{DateTimeNow}: Report DataSet Name is {ReportDataSource.DataSource.Name}");
 
                 Messages.Add($"{DateTimeNow}: Report Parameters Count {ReportParameters.Count}");
-               
-                if (ReportParameters.Count == 0) 
+                foreach (var _Parameter in ReportParameters)
+                {
+                    Messages.Add($"{DateTimeNow}: Report Parameter {_Parameter.Name} => {_Parameter.Values}");
+                }
+
+
+
+                if (ReportParameters.Count == 0)
                 {
                     Messages.Add("Report Parameters found zero.");
-                    
+
                 }
                 if (InputReport.IsFileExist)
                 {
-                    
+
                     Messages.Add($"{DateTimeNow}: Report Type is {OutputReport.ReportType}");
 
                     OutputReport.MimeType = ReportMime.Get(OutputReport.ReportType);
                     //var _FileType = RenderFormat.Get(OutputReport.ReportType);
                     var _ReportFile = InputReport.FileFullName;
-                    
+
                     var _ReportStream = new StreamReader(InputReport.FileFullName);
                     Messages.Add($"{DateTimeNow}: {InputReport.FileFullName} is read as stream.");
 
@@ -173,6 +176,6 @@ namespace AppReports
         #endregion
     }
 
-   
+
 
 }

@@ -45,20 +45,13 @@ namespace AppliedAccounts.Pages.Accounts
             {
                 MyModel.VoucherID = reportAction.VoucherID;
                 MyModel.Print(reportAction.PrintType);
-                
-                //MyModel.ReportService.Data = MyModel.GetReportData();
-                //MyModel.ReportService.Model = MyModel.CreateReportModel();
-                //MyModel.ReportService.Print(reportAction.PrintType);
             }
             catch (Exception)
             {
                 MyModel.MsgClass.Add(AppMessages.Enums.Messages.prtReportError);
 
             }
-
-            
         }
-              
     }
 
 

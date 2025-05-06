@@ -51,6 +51,12 @@
     <h2>@MyModel.BookNatureTitle</h2>
 </div>
 
+@if(MyModel.MsgClass.Count > 0)
+{
+    <ShowMessages MsgClass="MyModel.MsgClass"/>
+}
+
+
 
 <EditForm Model="@MyModel">
     <div class="d-flex flex-row mb-3 filter">

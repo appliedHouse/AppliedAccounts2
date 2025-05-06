@@ -157,7 +157,7 @@ namespace AppliedAccounts.Models
         {
             ReportData reportData = new(); ;
             reportData.ReportTable = Source.GetBookVoucher(VoucherID);
-            reportData.DataSetName = "ds_Book";   // ds_CashBank
+            reportData.DataSetName = "ds_CashBank";   // ds_CashBank
 
             return reportData;
         }
@@ -177,6 +177,7 @@ namespace AppliedAccounts.Models
 
             ReportService.Model.AddReportParameter("Heading1", _Heading1);
             ReportService.Model.AddReportParameter("Heading2", _Heading2);
+            ReportService.Model.AddReportParameter("InWords", "Words");
 
         }
         #endregion
