@@ -1,21 +1,20 @@
 ﻿using Microsoft.Reporting.NETCore;
 using System.Data;
-using System.Reflection.Metadata;
 
 namespace AppReports
 {
     public class ReportModel
     {
         #region Variables
-        public List<string> Messages { get; set; } = new();
-
+        public List<string> Messages { get; set; } 
+        public object AppPaths { get; set; }
         public InputReport InputReport { get; set; }
         public OutputReport OutputReport { get; set; }
         public ReportData ReportDataSource { get; set; }
         public byte[] ReportBytes { get; set; }
         public bool IsReportRendered { get; set; } = false;
-        public string ReportUrl { get; set; } = string.Empty;
-        public string ReportPath { get; set; } = string.Empty;
+        public string ErrorMessage { get; set; } = string.Empty;
+        public string ReportTitle { get; set; } = string.Empty;
 
         public List<ReportParameter> ReportParameters { get; set; }
         //public bool Render => ReportRender();
@@ -27,122 +26,104 @@ namespace AppReports
         #region Constructor
         public ReportModel()
         {
-            Messages = [];
+            
             InputReport = new InputReport();
             OutputReport = new OutputReport();
             ReportDataSource = new ReportData();
+            
+            Messages = [];
             ReportParameters = [];
             ReportBytes = [];
 
             Messages.Add($"{DateTimeNow}: Report Class Started.");
-            ReportPath ??= "PDFReports";
-            ReportUrl ??= "http://localhost/";
-
+           
             InputReport.BasePath = Directory.GetCurrentDirectory();
-            OutputReport.ReportUrl = ReportUrl;
+            OutputReport.BasePath = Directory.GetCurrentDirectory();
 
-            Messages.Add($"{DateTimeNow}: Base Path {InputReport.BasePath}");
-            Messages.Add($"{DateTimeNow}: Report Url {OutputReport.ReportUrl}");
+            Messages.Add($"{DateTimeNow}: InputReport.BasePath {InputReport.BasePath}");
+            Messages.Add($"{DateTimeNow}: OutputReport.BasePath {OutputReport.ReportUrl}");
         }
 
 
         #endregion
 
         #region Report Render
+        
         public bool ReportRender(ReportType rptType)
         {
+            Messages.Add($"{DateTimeNow}: Report rendering started");
+
             OutputReport.ReportType = rptType;
-            return ReportRender();
-        }
-
-
-        public bool ReportRender()
-        {
             IsReportRendered = false;
+            
             try
             {
-                Messages.Add($"{DateTimeNow}: Report rendering started");
-                Messages.Add($"{DateTimeNow}: Report Base URL {ReportUrl}");
-                Messages.Add($"{DateTimeNow}: Report ReportPath {ReportPath}");
+                Messages.Add($"{DateTimeNow} Input Base Path {InputReport.BasePath}");
+                Messages.Add($"{DateTimeNow} Input Root Path {InputReport.RootPath}");
+                Messages.Add($"{DateTimeNow} Input File Path {InputReport.FilePath}");
+                Messages.Add($"{DateTimeNow} Input Full Name {InputReport.FileFullName}");
+                Messages.Add($"{DateTimeNow} Input File Found {InputReport.IsFileExist}");
+                                
+                Messages.Add($"{DateTimeNow}: Output Report URL {OutputReport.ReportUrl}");
+                Messages.Add($"{DateTimeNow}: Output Report Path {OutputReport.FilePath}");
+                Messages.Add($"{DateTimeNow}: Output File Full Name is {OutputReport.FileFullName}");
+                Messages.Add($"{DateTimeNow}: Output File download link is {OutputReport.FileLink}");
+                Messages.Add($"{DateTimeNow}: OutPut MimeType is {OutputReport.MimeType}");
+                Messages.Add($"{DateTimeNow}: OutPut File Extention is {OutputReport.FileExt}");
+                Messages.Add($"{DateTimeNow}: OutPut Report Type {OutputReport.ReportType}");
 
-                if (ReportParameters.Count == 0) { DefaultParameters.GetDefaultParameters(); }
+                Messages.Add($"{DateTimeNow}: Report DataSet Name is {ReportDataSource.DataSetName}");
+                Messages.Add($"{DateTimeNow}: Report DataSet Name is {ReportDataSource.DataSource.Name}");
+
+                Messages.Add($"{DateTimeNow}: Report Parameters Count {ReportParameters.Count}");
+               
+                if (ReportParameters.Count == 0) 
+                {
+                    Messages.Add("Report Parameters found zero.");
+                    
+                }
                 if (InputReport.IsFileExist)
                 {
-                    Messages.Add($"{DateTimeNow}: Report file found {InputReport.FileFullName}");
-
-                    var _ReportType = OutputReport.ReportType;
+                    
                     Messages.Add($"{DateTimeNow}: Report Type is {OutputReport.ReportType}");
 
-                    OutputReport.MimeType = ReportMime.GetReportMime(_ReportType);
-                    Messages.Add($"{DateTimeNow}: Report MimeType is {OutputReport.MimeType}");
-
-                    //OutputReport.FileExtention = OutputReport.GetFileExtention(_ReportType);
-                    Messages.Add($"{DateTimeNow}: Report File Extention is {OutputReport.FileExtention}");
-
-                    //string lastPart = Path.GetFileName(Path.GetDirectoryName(OutputReport.FilePath)) ?? "OutputPath";
-                    //OutputReport.FileLink = GetFileLink();
-                    Messages.Add($"{DateTimeNow}: Report File Full Name is {OutputReport.FileFullName}");
-                    Messages.Add($"{DateTimeNow}: Report File download link is {OutputReport.FileLink}");
-                    Messages.Add($"{DateTimeNow}: Report DataSet Name is {ReportDataSource.DataSetName}");
-                    Messages.Add($"{DateTimeNow}: Report DataSet Name is {ReportDataSource.DataSource.Name}");
-
+                    OutputReport.MimeType = ReportMime.Get(OutputReport.ReportType);
+                    //var _FileType = RenderFormat.Get(OutputReport.ReportType);
                     var _ReportFile = InputReport.FileFullName;
-                    var _FileType = RenderFormat.GetRenderFormat(_ReportType);
-                    var _ReportStream = new StreamReader(_ReportFile);
-                    Messages.Add($"{DateTimeNow}: {_ReportFile} is read as stream.");
+                    
+                    var _ReportStream = new StreamReader(InputReport.FileFullName);
+                    Messages.Add($"{DateTimeNow}: {InputReport.FileFullName} is read as stream.");
 
-                    LocalReport report = new();
-                    report.ReportPath = _ReportFile;
-                    report.ReportEmbeddedResource = report.ReportPath;
 
+                    // Report Generating.....
+                    LocalReport report = new(); ;
+                    report.ReportEmbeddedResource = InputReport.FileFullName;
                     report.LoadReportDefinition(_ReportStream);
                     report.DataSources.Add(ReportDataSource.DataSource);
                     report.SetParameters(ReportParameters);
 
-                    ReportBytes = report.Render(_FileType);
-                    Messages.Add($"{DateTimeNow}: Report Render bytes are {ReportBytes.Count()}");
-
-                    if (OutputReport.ReportType != ReportType.Print)
-                    {
-
-                        if (ReportBytes.Length > 0)
-                        {
-                            //SaveReport(); 
-                        }
-                        else
-                        {
-                            Messages.Add($"{DateTimeNow}: ERROR: Report length is reporting zero");
-                        }
-
-                    }
+                    // Report Rendering ....
+                    ReportBytes = report.Render(OutputReport.ReportType.ToString()) ?? [];
+                    Messages.Add($"{DateTimeNow}: Report Render bytes are {ReportBytes.Length}");
                     Messages.Add($"{DateTimeNow}: Report rendering completed at {DateTimeNow}");
                     IsReportRendered = true;
                 }
                 else
                 {
-                    Messages.Add($"{DateTimeNow}: Report file NOT found {InputReport.FileFullName}");
+                    ErrorMessage = $"{DateTimeNow}: Report file NOT found {InputReport.FileFullName}";
+                    Messages.Add(ErrorMessage);
                 }
 
             }
-            catch (Exception)
+            catch (Exception error)
             {
+                ErrorMessage = error.Message;
                 IsReportRendered = false;
 
             }
             return IsReportRendered;
         }
 
-
-
-        public async Task<bool> ReportRenderAsync()
-        {
-            IsReportRendered = false;
-            await Task.Run(() =>
-            {
-                IsReportRendered = ReportRender();
-            });
-            return IsReportRendered;
-        }
         #endregion
 
         #region Report Save / Stream 
@@ -189,132 +170,9 @@ namespace AppReports
         }
 
 
-        public void AddDefaultParameters(string _Company, string _Heading1, string _Heading2, string _Footer)
-        {
-            AddReportParameter("Company", _Company);
-            AddReportParameter("Heading1", _Heading1);
-            AddReportParameter("Heading2", _Heading2);
-            AddReportParameter("Footer", _Footer);
-        }
-
-
         #endregion
     }
 
-    #region Report Models
-    public class InputReport
-    {
-        public string FilePath { get; set; } = string.Empty;            // Path after wwwroot
-        public string FileName { get; set; } = string.Empty;            // File name
-        public string FileExtention { get; set; } = string.Empty;       // Extention without dot
-        public string BasePath { get; set; } = Directory.GetCurrentDirectory();
-        public string RootPath { get; set; } = "wwwroot";
-
-        public string FileFullName => GetFullName();
-        public bool IsFileExist => GetFileExist();
-
-
-        private bool GetFileExist()
-        {
-            if (File.Exists(FileFullName)) { return true; }
-            { return false; }
-        }
-
-        private string GetFullName()
-        {
-            if (FilePath.Length > 0 && FileName.Length > 0 && FileExtention.Length > 0)
-            {
-                return Path.Combine(BasePath, RootPath, FilePath, FileName + "." + FileExtention);
-            }
-            return string.Empty;
-        }
-    }
-    public class OutputReport 
-    {
-        public string ReportUrl { get; set; }       // like http://localhist:xxx/
-        public string BasePath { get; set; } = Directory.GetCurrentDirectory();
-        public string RootPath { get; set; } = "wwwroot";
-        public string FilePath { get; set; } = string.Empty;            // file path after wwwroot
-        public string FileName { get; set; } = string.Empty;            // file Name
-        public string FileExtention => GetFileExtention(ReportType);       // File Extention get dynamically
-        public string FileLink => GetFileLink();                         // Create a lick to display file         
-        public ReportType ReportType { get; set; } = ReportType.Preview;
-        public string MimeType { get; set; } = string.Empty;
-        public FileStream FileStream { get; set; }
-        public bool IsFileExist => File.Exists(FileFullName);
-        public string FileFullName => GetFullName();
-        public string FileFolder => GetFileFolder();
-        public string OutputFileName => GetFileName();
-
-        private string GetFullName()
-        {
-            var _Extention = GetFileExtention(ReportType);
-
-            if (FilePath.Length > 0 && FileName.Length > 0 && _Extention.Length > 0)
-            {
-                return Path.Combine(GetFileFolder(), FileName + FileExtention);
-
-            }
-            return string.Empty;
-        }
-
-        private string GetFileName()
-        {
-            var _Extention = GetFileExtention(ReportType);
-
-            if (FilePath.Length > 0 && FileName.Length > 0 && _Extention.Length > 0)
-            {
-                return Path.Combine(FileName + FileExtention);
-
-            }
-            return string.Empty;
-        }
-        public string GetFileFolder()
-        {
-            var _FileFolder = Path.Combine(BasePath, RootPath, FilePath);
-
-            if (!Directory.Exists(_FileFolder))
-            {
-                Directory.CreateDirectory(_FileFolder);
-            }
-            return _FileFolder;
-        }
-
-        public string GetFileLink()
-        {
-            return $"{ReportUrl}/{FilePath}/{FileName}{FileExtention}";
-        }
-
-
-        public static string GetFileExtention(ReportType _ReportType)
-        {
-            if (_ReportType == ReportType.Preview) { return ".pdf"; }
-            if (_ReportType == ReportType.PDF) { return ".pdf"; }
-            if (_ReportType == ReportType.HTML) { return ".html"; }
-            if (_ReportType == ReportType.Word) { return ".docx"; }
-            if (_ReportType == ReportType.Excel) { return ".xlsx"; }
-            if (_ReportType == ReportType.Image) { return ".tiff"; }
-            return "";
-        }
-
-    }
-    public class ReportData
-    {
-        public DataTable ReportTable { get; set; } = new();
-        public string DataSetName { get; set; } = string.Empty;
-        public ReportDataSource DataSource => GetReportDataSource();
-
-        private ReportDataSource GetReportDataSource()
-        {
-            if (DataSetName.Length > 0 && ReportTable != null)
-            {
-                return new ReportDataSource(DataSetName, ReportTable);
-            }
-            return new ReportDataSource();
-        }
-    }
-
-
-    #endregion
+   
 
 }

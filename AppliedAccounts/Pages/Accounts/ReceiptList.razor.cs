@@ -33,7 +33,7 @@ namespace AppliedAccounts.Pages.Accounts
                     MyModel.ReportService.NavManager = NavManager;              // Inject NavManager into Print Service
                 });
 
-                var reportModel = MyModel.ReportService.RptModel;
+                var reportModel = MyModel.ReportService.Model;
 
                 if (reportModel?.ReportBytes?.Length > 0)
                 {

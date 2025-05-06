@@ -464,9 +464,9 @@ namespace AppliedAccounts.Models
             await Task.Run(() =>
             {
                 ReportService = new(AppGlobals);
-                ReportService.RptType = _ReportType;
-                ReportService.RptData = GetReportData();
-                ReportService.RptModel = CreateReportModel();
+                ReportService.ReportType = _ReportType;
+                ReportService.Data = GetReportData();
+                ReportService.Model = CreateReportModel();
             });
 
             try
@@ -493,12 +493,10 @@ namespace AppliedAccounts.Models
         public ReportModel CreateReportModel()
         {
             ReportModel reportModel = new();
-            reportModel.InputReport.FileName = "CashBankBook";
-            reportModel.InputReport.FileExtention = "rdl";
+            reportModel.InputReport.FileName = "CashBankBook.rdl";
             reportModel.InputReport.FilePath = AppGlobals.AppPaths.ReportPath;
 
-            reportModel.ReportDataSource = ReportService.RptData;
-            reportModel.OutputReport.FilePath = AppGlobals.AppPaths.PDFPath;
+            reportModel.ReportDataSource = ReportService.Data;
             reportModel.OutputReport.FileName = "Book";
 
             string _CompanyName = AppGlobals.Author.Country;
@@ -506,7 +504,10 @@ namespace AppliedAccounts.Models
             string _Heading2 = $"Voucher {MyVoucher.Master.Vou_No}";
             string _Footer = AppGlobals.Reporting.ReportFooter;
 
-            reportModel.AddDefaultParameters(_CompanyName, _Heading1, _Heading2, _Footer);
+            reportModel.AddReportParameter("Company", _CompanyName);
+            reportModel.AddReportParameter("Heading1", _Heading1);
+            reportModel.AddReportParameter("Heading2", _Heading2);
+            reportModel.AddReportParameter("Footer", _Footer);
 
             return reportModel;
         }

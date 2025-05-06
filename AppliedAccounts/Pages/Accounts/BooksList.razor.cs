@@ -1,8 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
-using AppliedAccounts.Models.Interface;
 using AppliedDB;
-using AppReports;
 using Microsoft.AspNetCore.Components;
 using System.Data;
 
@@ -45,11 +43,12 @@ namespace AppliedAccounts.Pages.Accounts
         {
             try
             {
-                MyModel.ReportService = new();
                 MyModel.VoucherID = reportAction.VoucherID;
-                MyModel.ReportService.RptData = MyModel.GetReportData();
-                MyModel.ReportService.RptModel = MyModel.CreateReportModel();
-                MyModel.ReportService.Print(reportAction.PrintType);
+                MyModel.Print(reportAction.PrintType);
+                
+                //MyModel.ReportService.Data = MyModel.GetReportData();
+                //MyModel.ReportService.Model = MyModel.CreateReportModel();
+                //MyModel.ReportService.Print(reportAction.PrintType);
             }
             catch (Exception)
             {

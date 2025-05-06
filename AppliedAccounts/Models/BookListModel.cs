@@ -5,6 +5,7 @@ using AppliedAccounts.Services;
 using AppliedAccounts.Data;
 using AppliedAccounts.Pages.Accounts;
 using AppReports;
+using Windows.Services.Maps;
 
 namespace AppliedAccounts.Models
 {
@@ -27,7 +28,7 @@ namespace AppliedAccounts.Models
         public string BookNatureTitle = "Book Title";
         public List<BookView> BookRecords { get; set; }
         public bool PageIsValid { get; set; } = false;
-        
+
         public BookListModel() { }
         public BookListModel(int _BookID, AppUserModel _AppUserProfile)
         {
@@ -48,14 +49,14 @@ namespace AppliedAccounts.Models
 
                 BookID = _BookID;
                 UserProfile = _AppUserProfile;
-                
+
                 NatureAccountsList =
                 [
                     new() { ID = 1, Code = "01", Title = "Cash" },
                     new() { ID = 2, Code = "02", Title = "Bank" },
                 ];
 
-                PageIsValid = LoadData(); 
+                PageIsValid = LoadData();
             }
             catch (Exception)
             {
@@ -127,19 +128,22 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Print
-        public async void Print(ReportType _ReportType)
+        public void Print(ReportType _ReportType)
         {
-            await Task.Run(() =>
-            {
-                ReportService = new(AppGlobals);
-                ReportService.RptType = _ReportType;
-                ReportService.RptData = GetReportData();
-                ReportService.RptModel = CreateReportModel();
-            });
-
+            
             try
             {
+                ReportService = new(AppGlobals);
+                ReportService.ReportType = _ReportType;
+                ReportService.Data = GetReportData();
+                ReportModel();                              // Add / update Report model data.
+
                 ReportService.Print();
+
+                MsgClass.Add(ReportService.Model.ErrorMessage);
+
+
+
             }
             catch (Exception)
             {
@@ -153,33 +157,27 @@ namespace AppliedAccounts.Models
         {
             ReportData reportData = new(); ;
             reportData.ReportTable = Source.GetBookVoucher(VoucherID);
-            reportData.DataSetName = "ds_Book";
+            reportData.DataSetName = "ds_Book";   // ds_CashBank
 
             return reportData;
         }
 
-        public ReportModel CreateReportModel()
+        public void ReportModel()
         {
-            string VoucherNo = "Voucher No";
+            var _VoucherNo = BookRecords.Where(x => x.ID == VoucherID).Select(x => x.Vou_No).FirstOrDefault();
+            var _Heading1 = $"General Ledger {BookNatureTitle}";
+            var _Heading2 = $"Voucher {_VoucherNo}";
 
+            ReportService.Model.ReportDataSource = ReportService.Data;                   // Load Reporting Data to Report Model
 
-            ReportModel reportModel = new();
-            reportModel.InputReport.FileName = "CashBankBook";
-            reportModel.InputReport.FileExtention = "rdl";
-            reportModel.InputReport.FilePath = AppGlobals.AppPaths.ReportPath;
+            ReportService.Model.InputReport.FileName = "CashBankBook.rdl";
 
-            reportModel.ReportDataSource = ReportService.RptData;
-            reportModel.OutputReport.FilePath = AppGlobals.AppPaths.PDFPath;
-            reportModel.OutputReport.FileName = "Book";
+            ReportService.Model.OutputReport.FileName = $"Book_{_VoucherNo}";          // without Extention
+            ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
 
-            string _CompanyName = AppGlobals.Author.Country;
-            string _Heading1 = BookNatureTitle;
-            string _Heading2 = $"Voucher {VoucherNo}";
-            string _Footer = AppGlobals.Reporting.ReportFooter;
+            ReportService.Model.AddReportParameter("Heading1", _Heading1);
+            ReportService.Model.AddReportParameter("Heading2", _Heading2);
 
-            reportModel.AddDefaultParameters(_CompanyName, _Heading1, _Heading2, _Footer);
-
-            return reportModel;
         }
         #endregion
 

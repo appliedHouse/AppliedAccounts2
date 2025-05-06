@@ -97,14 +97,14 @@ namespace AppliedAccounts.Models
         {
             ReportService = new()
             {
-                RptData = GetReportData(_ID),              // always generate Data for report
-                RptModel = CreateReportModel(_ID),         // and then generate report parameters
+                Data = GetReportData(_ID),              // always generate Data for report
+                Model = CreateReportModel(_ID),         // and then generate report parameters
                
 
             };
-            ReportService.RptType = ReportType.Preview;
+            ReportService.ReportType = ReportType.Preview;
             //var ReportList = ReportService.GetReportLink();
-            //await js.InvokeVoidAsync("downloadPDF", _FileName, ReportService.RptModel.ReportBytes);
+            //await js.InvokeVoidAsync("downloadPDF", _FileName, ReportService.Model.ReportBytes);
 
         }
 
@@ -132,18 +132,12 @@ namespace AppliedAccounts.Models
             ReportModel rptModel = new();
 
             rptModel.InputReport.FileName = $"Receipt";
-            rptModel.InputReport.FileExtention = "rdl";
-            rptModel.InputReport.FilePath = UserProfile!.ReportFolder;
 
             rptModel.OutputReport.FileName = $"Receipt_{ID}";
-            //rptModel.OutputReport.FileExtention = ".pdf";
-            rptModel.OutputReport.FilePath = UserProfile!.PDFFolder;
             rptModel.OutputReport.ReportType = ReportType.PDF;
 
-            rptModel.AddReportParameter("CompanyName", _CompanyName);
             rptModel.AddReportParameter("Heading1", _Heading1);
             rptModel.AddReportParameter("Heading2", _Heading2);
-            rptModel.AddReportParameter("Footer", _ReportFooter);
 
             return rptModel;
         }

@@ -1,0 +1,33 @@
+
+
+Report Service
+
+Dependency Injuction
+	Report Service
+
+	1.	Report Type
+	2.	Report Data (Data Source)
+	3.	Report Model
+			Input Class  (RDLC File Details)
+			OutPut Class (Output File i.e. PDF, Excel, Word... Details)
+
+
+In Blazor Component i.e Receipt, Sales Invoice, Purchase Invoice, Cash or Bank Book
+
+	When the Report Service will constructed, the path of input and output assign from configuration file data.
+
+	Supply Input file Name with Extention and File Path
+	Supply Output file Name without Extention.
+		Extention will be assign by the Output Report Type.
+
+
+		1.	InputFile = Receipt.rdl
+		2.	OutPutFile = Receipt_xxxx.xxx  i.e. .pdf, .xls, .doc, .html or .tiff
+
+
+
+
+		Class
+		Default Parameters
+		Report Mime
+		Report Types

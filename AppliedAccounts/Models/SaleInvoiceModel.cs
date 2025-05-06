@@ -594,9 +594,9 @@ namespace AppliedAccounts.Models
             await Task.Run(() =>
             {
                 ReportService = new(AppGlobals); ;
-                ReportService.RptType = _rptType;
-                ReportService.RptData = GetReportData();
-                ReportService.RptModel = CreateReportModel();
+                ReportService.ReportType = _rptType;
+                ReportService.Data = GetReportData();
+                ReportService.Model = CreateReportModel();
 
             });
 
@@ -632,11 +632,8 @@ namespace AppliedAccounts.Models
             ReportModel rptModel = new();
 
             rptModel.InputReport.FileName = $"SalesInvoice";
-            rptModel.InputReport.FileExtention = ".rdl";
-            rptModel.InputReport.FilePath = UserProfile!.ReportFolder;
 
             rptModel.OutputReport.FileName = $"SalesInvoice_{SaleInvoiceID}";
-            rptModel.OutputReport.FilePath = UserProfile!.PDFFolder;
 
             rptModel.AddReportParameter("CompanyName", _CompanyName);
             rptModel.AddReportParameter("Heading1", _Heading1);

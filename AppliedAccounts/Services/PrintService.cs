@@ -1,30 +1,49 @@
-﻿using AppReports;
+﻿using AppliedDB;
+using AppMessages;
+using AppReports;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Microsoft.Reporting.NETCore;
 
 namespace AppliedAccounts.Services
 {
     public class PrintService
     {
-
-        public ReportData RptData { get; set; }
-        public ReportModel RptModel { get; set; }
-        public ReportType RptType { get; set; }
-        public string RptUrl { get; set; }
-        public string JSOption { get; set; }
         public IJSRuntime JS { get; set; }
         public GlobalService Config { get; set; }
         public NavigationManager NavManager { get; set; }
-        public string MyMessage { get; set; }
-        public string ReportUrl { get; set; } = string.Empty;
+        public AppUserModel? UserProfile { get; set; }
+
+
+        public ReportData Data { get; set; }
+        public ReportModel Model { get; set; }
+        public ReportType ReportType { get; set; }
+        
+        
+        public MessageClass MsgClass { get; set; }
         public bool IsError { get; set; } = false;
+        public string MyMessage { get; set; }
 
         public PrintService(GlobalService _Config)
         {
             Config = _Config;
             NavManager = Config.NavManager;
             JS = Config.JS;
-            ReportUrl = $"{Config.AppPaths.BaseUri}{Config.AppPaths.PDFPath}";
+
+            Model = new();
+
+            Model.InputReport.RootPath = Config.AppPaths.RootPath;
+            Model.InputReport.FilePath = Config.AppPaths.ReportPath;
+            
+            Model.OutputReport.BasePath = NavManager.BaseUri;
+            Model.OutputReport.RootPath = Config.AppPaths.RootPath;
+            Model.OutputReport.FilePath = Config.AppPaths.PDFPath;
+
+            Model.ReportParameters =
+            [
+                new ReportParameter("CompanyName", Config.Reporting.ReportTitle ),
+                new ReportParameter("Footer", Config.Reporting.ReportFooter)
+            ];
         }
 
         public PrintService()
@@ -35,7 +54,7 @@ namespace AppliedAccounts.Services
         public async void Print()
         {
 
-            switch (RptType)
+            switch (Model.OutputReport.ReportType)
             {
                 case ReportType.Print: await Printer(); break;
                 case ReportType.Preview: await Preview(); break;
@@ -50,7 +69,7 @@ namespace AppliedAccounts.Services
 
         public void Print(ReportType reportType)
         {
-            RptType = reportType;
+            Model.OutputReport.ReportType = reportType;
             Print();
         }
         #endregion
@@ -60,11 +79,11 @@ namespace AppliedAccounts.Services
         {
             try
             {
-                RptModel.ReportDataSource = RptData;
-                bool IsRendered = RptModel.ReportRender(ReportType.Print);
+                Model.ReportDataSource = Data;
+                bool IsRendered = Model.ReportRender(ReportType.Print);
                 if (IsRendered)
                 {
-                    string rptBytes64 = Convert.ToBase64String(RptModel.ReportBytes);
+                    string rptBytes64 = Convert.ToBase64String(Model.ReportBytes);
                     await JS.InvokeVoidAsync("printer", rptBytes64);
                 }
                 else
@@ -79,19 +98,24 @@ namespace AppliedAccounts.Services
                 MyMessage = error.Message;
             }
 
+            if(Model.ErrorMessage.Length > 0)
+            {
+                MsgClass.Danger(Model.ErrorMessage);
+            }
+
 
         }
         public async Task Preview()
         {
             try
             {
-                if (RptModel.ReportRender(ReportType.Preview))
+                if (Model.ReportRender(ReportType.Preview))
                 {
-                    await JS.InvokeVoidAsync("DisplayPDF", RptModel.ReportBytes);
+                    await JS.InvokeVoidAsync("DisplayPDF", Model.ReportBytes);
                 }
                 else
                 {
-                    MyMessage = RptModel.Messages.Last();
+                    MyMessage = Model.Messages.Last();
                 }
             }
             catch (Exception error)
@@ -105,16 +129,16 @@ namespace AppliedAccounts.Services
         {
             try
             {
-                if (RptModel.ReportRender(ReportType.PDF))
+                if (Model.ReportRender(ReportType.PDF))
                 {
                     await JS.InvokeVoidAsync("downloadFile",
-                          RptModel.OutputReport.FileName,
-                          RptModel.ReportBytes,
-                          RptModel.OutputReport.MimeType);
+                          Model.OutputReport.FileName,
+                          Model.ReportBytes,
+                          Model.OutputReport.MimeType);
                 }
                 else
                 {
-                    MyMessage = RptModel.Messages.Last();
+                    MyMessage = Model.Messages.Last();
                 }
             }
             catch (Exception error)
@@ -128,16 +152,16 @@ namespace AppliedAccounts.Services
         {
             try
             {
-                if (RptModel.ReportRender(ReportType.Excel))
+                if (Model.ReportRender(ReportType.Excel))
                 {
                     await JS.InvokeVoidAsync("downloadFile",
-                          RptModel.OutputReport.FileName,
-                          RptModel.ReportBytes,
-                          RptModel.OutputReport.MimeType);
+                          Model.OutputReport.FileName,
+                          Model.ReportBytes,
+                          Model.OutputReport.MimeType);
                 }
                 else
                 {
-                    MyMessage = RptModel.Messages.Last();
+                    MyMessage = Model.Messages.Last();
                 }
             }
             catch (Exception error)
@@ -151,16 +175,16 @@ namespace AppliedAccounts.Services
         {
             try
             {
-                if (RptModel.ReportRender(ReportType.Word))
+                if (Model.ReportRender(ReportType.Word))
                 {
                     await JS.InvokeVoidAsync("downloadFile",
-                          RptModel.OutputReport.FileName,
-                          RptModel.ReportBytes,
-                          RptModel.OutputReport.MimeType);
+                          Model.OutputReport.FileName,
+                          Model.ReportBytes,
+                          Model.OutputReport.MimeType);
                 }
                 else
                 {
-                    MyMessage = RptModel.Messages.Last();
+                    MyMessage = Model.Messages.Last();
                 }
             }
             catch (Exception error)
@@ -173,15 +197,15 @@ namespace AppliedAccounts.Services
         public async Task Image()
         {
 
-            if (RptModel.ReportRender(ReportType.Image))
+            if (Model.ReportRender(ReportType.Image))
             {
                 await JS.InvokeVoidAsync("DisplayFile",
-                    RptModel.ReportBytes,
-                    RptModel.OutputReport.MimeType);
+                    Model.ReportBytes,
+                    Model.OutputReport.MimeType);
             }
             else
             {
-                MyMessage = RptModel.Messages.Last();
+                MyMessage = Model.Messages.Last();
             }
 
         }
@@ -189,16 +213,16 @@ namespace AppliedAccounts.Services
         {
             try
             {
-                if (RptModel.ReportRender(ReportType.HTML))
+                if (Model.ReportRender(ReportType.HTML))
                 {
                     await JS.InvokeVoidAsync("downloadFile",
-                          RptModel.OutputReport.FileName,
-                          RptModel.ReportBytes,
-                          RptModel.OutputReport.MimeType);
+                          Model.OutputReport.FileName,
+                          Model.ReportBytes,
+                          Model.OutputReport.MimeType);
                 }
                 else
                 {
-                    MyMessage = RptModel.Messages.Last();
+                    MyMessage = Model.Messages.Last();
                 }
             }
             catch (Exception error)

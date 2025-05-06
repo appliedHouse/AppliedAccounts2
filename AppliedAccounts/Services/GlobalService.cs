@@ -17,6 +17,7 @@ namespace AppliedAccounts.Services
         public CurrencyClass Currency { get; set; } = new();
         public Format AppFormat { get; set; } = new();
         public PrintReport Reporting { get; set; } = new();
+        
 
         public GlobalService() { }
 
@@ -158,8 +159,8 @@ namespace AppliedAccounts.Services
     #region Printing Reports
     public class PrintReport
     {
-        public string ReportFooter { get; set; }
         public string ReportTitle { get; set; }
+        public string ReportFooter { get; set; }
         public string ReportLogo { get; set; }          // Link of logi file   jpg, png, bmp etc
     }
     #endregion

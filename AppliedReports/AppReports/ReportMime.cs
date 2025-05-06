@@ -2,7 +2,7 @@
 {
     public static class ReportMime
     {
-        public static string GetReportMime(ReportType reportType) => reportType switch
+        public static string Get(ReportType reportType) => reportType switch
         {
             ReportType.PDF => "application/pdf",
             ReportType.HTML => "text/html",

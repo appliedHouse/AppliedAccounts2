@@ -109,9 +109,9 @@ namespace AppliedAccounts.Pages.Reporting
             await Task.Run(() =>
             {
                 ReportService = new(AppGlobals); ;
-                ReportService.RptType = PrintType;
-                ReportService.RptData = GetReportData();
-                ReportService.RptModel = CreateReportModel();
+                ReportService.ReportType = PrintType;
+                ReportService.Data = GetReportData();
+                ReportService.Model = CreateReportModel();
                 
             });
 
@@ -165,23 +165,16 @@ namespace AppliedAccounts.Pages.Reporting
             var _Heading1 = $"General Ledger " + Source.SeekTitle(AppliedDB.Enums.Tables.COA, MyModel.COAID);
             var _Heading2 = $"[{MyModel.Date_From.ToString(Format.DDMMMYY)}] to [{MyModel.Date_To.ToString(Format.DDMMMYY)}] "; 
 
-            Report.ReportUrl = NavManager.BaseUri;
 
-            Report.InputReport.FilePath = UserModel.ReportFolder;
-            Report.InputReport.FileName = "Ledger";
-            Report.InputReport.FileExtention = "rdl";
+            Report.InputReport.FileName = "Ledger.rdl";
 
-            Report.ReportDataSource = ReportService.RptData;                   // Load Reporting Data to Report Model
+            Report.ReportDataSource = ReportService.Data;                   // Load Reporting Data to Report Model
 
-            Report.OutputReport.FilePath = UserModel.PDFFolder;
             Report.OutputReport.FileName = "Ledger_" + "CompanyName";
-            Report.OutputReport.ReportType = ReportService.RptType;
-            Report.OutputReport.ReportUrl = Report.ReportUrl;
+            Report.OutputReport.ReportType = ReportService.ReportType;
 
-            Report.AddReportParameter("CompanyName", UserModel.Company);
             Report.AddReportParameter("Heading1", _Heading1);
             Report.AddReportParameter("Heading2", _Heading2);
-            Report.AddReportParameter("Footer", AppFunctions.ReportFooter());
 
             return Report;
         }
