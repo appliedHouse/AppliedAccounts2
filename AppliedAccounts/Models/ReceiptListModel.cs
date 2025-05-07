@@ -1,38 +1,35 @@
-﻿using AppliedAccounts.Data;
+﻿using Applied_WebApplication.Data;
+using AppliedAccounts.Data;
 using AppliedAccounts.Models.Interface;
+using AppliedAccounts.Pages.Accounts;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using AppReports;
-using Microsoft.AspNetCore.Components;
+using SQLQueries;
 using System.Data;
 using System.Text;
 using static AppliedDB.Enums;
+using MESSAGES = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Models
 {
-    public class ReceiptListModel : IVoucherList
+    public class ReceiptListModel
     {
+        public GlobalService AppGlobals { get; set; }
         public AppUserModel? UserProfile { get; set; }
         public DataSource Source { get; set; }
         public List<DataRow> DataList { get; set; }
         public List<CodeTitle> PayerList { get; set; }
+        public int ReceiptID { get; set; }
         public int PayerID { get; set; }
         public Tables Table { get; set; }
         public string SearchText { get; set; }
         public MessageClass MsgClass { get; set; }
-        public PrintService Printer { get; set; }
         public DateTime DT_Start { get; set; }
         public DateTime DT_End { get; set; }
         public bool PageIsValid { get; set; } = false;
         public PrintService ReportService { get; set; }
-        public AppUserModel? AppUser { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string DBFile { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public object Record { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public List<object> Records { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public decimal TotalAmount { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool SelectAll { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public NavigationManager NavManager { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public ReceiptListModel(AppUserModel _AppUserModel)
         {
@@ -45,7 +42,7 @@ namespace AppliedAccounts.Models
             SearchText = AppRegistry.GetText(Source.DBFile, "rcptSearch");
             PayerList = Source.GetCustomers();
             DataList = LoadData();
-            Printer = new();
+
 
         }
 
@@ -93,34 +90,34 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Print
-        public void Print(int _ID)
+        public async Task Print(ReportActionClass reportAction)
         {
-            ReportService = new()
+            ReceiptID = reportAction.VoucherID;
+            ReportService = new(AppGlobals); ;
+            ReportService.ReportType = reportAction.PrintType;
+            GetReportData();
+            UpdateReportModel();
+
+            try
             {
-                Data = GetReportData(_ID),              // always generate Data for report
-                Model = CreateReportModel(_ID),         // and then generate report parameters
-               
-
-            };
-            ReportService.ReportType = ReportType.Preview;
-            //var ReportList = ReportService.GetReportLink();
-            //await js.InvokeVoidAsync("downloadPDF", _FileName, ReportService.Model.ReportBytes);
-
+                ReportService.Print();
+            }
+            catch (Exception error)
+            {
+                MsgClass.Add(error.Message);
+            }
         }
 
-        public ReportData GetReportData(int ID)
+        public void GetReportData()
         {
-            var _Query = SQLQueries.Quries.Receipt(ID);
+            var _Query = Quries.Receipt(ReceiptID);
             var _Table = Source.GetTable(_Query);
-            var _ReportData = new ReportData();
 
-            _ReportData.ReportTable = _Table;
-            _ReportData.DataSetName = "ds_receipt";
-
-            return _ReportData;
+            ReportService.Data.ReportTable = _Table;
+            ReportService.Data.DataSetName = "ds_receipt";
         }
 
-        private ReportModel CreateReportModel(int ID)
+        public void UpdateReportModel()
         {
             var _InvoiceNo = "Receipt";
             var _Heading1 = "Receipt";
@@ -129,30 +126,37 @@ namespace AppliedAccounts.Models
             var _CompanyName = UserProfile.Company;
             var _ReportFooter = AppFunctions.ReportFooter();
 
-            ReportModel rptModel = new();
+            var _Amount = (decimal)ReportService.Data.ReportTable.Rows[0]["Amount"];
+            var _NumInWords = new NumInWords();
+            var _AmountinWord = _NumInWords.ChangeCurrencyToWords(_Amount, "SAR", "...");
+            var ShowImage = false;
 
-            rptModel.InputReport.FileName = $"Receipt";
+            ReportService.Model.InputReport.FileName = $"Receipt.rdl";
+            ReportService.Model.InputReport.FilePath = UserProfile!.ReportFolder;
+            ReportService.Model.ReportDataSource = ReportService.Data;
+            ReportService.Model.OutputReport.FileName = $"Receipt_{ReceiptID}";
+            ReportService.Model.OutputReport.FilePath = UserProfile!.PDFFolder;
+            ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
 
-            rptModel.OutputReport.FileName = $"Receipt_{ID}";
-            rptModel.OutputReport.ReportType = ReportType.PDF;
+            ReportExtractor reportExtractor = new(ReportService.Model.InputReport.FileFullName);
 
-            rptModel.AddReportParameter("Heading1", _Heading1);
-            rptModel.AddReportParameter("Heading2", _Heading2);
-
-            return rptModel;
+            ReportService.Model.AddReportParameter("Heading1", _Heading1);
+            ReportService.Model.AddReportParameter("Heading2", _Heading2);
+            ReportService.Model.AddReportParameter("InWord", _AmountinWord);
+            ReportService.Model.AddReportParameter("CurrencySign", AppGlobals.Currency.Sign ?? "$");
+            ReportService.Model.AddReportParameter("PayerTitle", "Donor");
+            ReportService.Model.AddReportParameter("ShowImages", ShowImage.ToString());
         }
+        #endregion
 
+        #region Edit
         public void Edit(int _ID)
         {
-            throw new NotImplementedException();
+            AppGlobals.NavManager.NavigateTo($"/Accounts/Receipt/{ReceiptID}");
         }
-
-        List<object> IVoucherList.LoadData()
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion
+
+
 
     }
 }

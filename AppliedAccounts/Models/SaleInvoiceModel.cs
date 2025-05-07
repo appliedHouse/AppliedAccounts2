@@ -11,6 +11,7 @@ using Tables = AppliedDB.Enums.Tables;
 using static AppliedDB.Enums.Status;
 using AppliedAccounts.Services;
 using SQLQueries;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AppliedAccounts.Models
 {
@@ -604,10 +605,9 @@ namespace AppliedAccounts.Models
             {
                 ReportService.Print();
             }
-            catch (Exception)
+            catch (Exception error)
             {
-                ReportService.MyMessage = "Error....";
-                MsgClass.Add(ReportService.MyMessage);
+                MsgClass.Add(error.Message);
             }
         }
         public ReportData GetReportData()

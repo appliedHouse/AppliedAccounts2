@@ -145,10 +145,9 @@ namespace AppliedAccounts.Models
 
 
             }
-            catch (Exception)
+            catch (Exception error)
             {
-                ReportService.MyMessage = "Error....";
-                MsgClass.Add(ReportService.MyMessage);
+                MsgClass.Add(error.Message);
             }
 
         }
@@ -164,7 +163,9 @@ namespace AppliedAccounts.Models
 
         public void ReportModel()
         {
-            var _VoucherNo = BookRecords.Where(x => x.ID == VoucherID).Select(x => x.Vou_No).FirstOrDefault();
+
+            
+            var _VoucherNo = ReportService.Data.ReportTable.Rows[0]["Vou_No"].ToString();
             var _Heading1 = $"General Ledger {BookNatureTitle}";
             var _Heading2 = $"Voucher {_VoucherNo}";
 
@@ -172,12 +173,15 @@ namespace AppliedAccounts.Models
 
             ReportService.Model.InputReport.FileName = "CashBankBook.rdl";
 
-            ReportService.Model.OutputReport.FileName = $"Book_{_VoucherNo}";          // without Extention
             ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
-
+            ReportService.Model.OutputReport.FileName = $"Book_{_VoucherNo}" +
+                $"{ReportService.Model.OutputReport.FileExt}";          // without Extention
+            
             ReportService.Model.AddReportParameter("Heading1", _Heading1);
             ReportService.Model.AddReportParameter("Heading2", _Heading2);
             ReportService.Model.AddReportParameter("InWords", "Words");
+            ReportService.Model.AddReportParameter("CurrencySign", "SAR");
+            ReportService.Model.AddReportParameter("ShowImages", true.ToString());
 
         }
         #endregion

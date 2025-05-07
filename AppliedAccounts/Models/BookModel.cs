@@ -473,10 +473,9 @@ namespace AppliedAccounts.Models
             {
                 ReportService.Print();
             }
-            catch (Exception)
+            catch (Exception error)
             {
-                ReportService.MyMessage = "Error....";
-                MsgClass.Add(ReportService.MyMessage);
+                MsgClass.Add(error.Message);
             }
 
         }

@@ -8,6 +8,8 @@ using MESSAGE = AppMessages.Enums.Messages;
 using static AppliedDB.Enums;
 using AppliedAccounts.Services;
 using AppReports;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using Applied_WebApplication.Data;
 
 namespace AppliedAccounts.Models
 {
@@ -587,35 +589,30 @@ namespace AppliedAccounts.Models
             {
                 ReportService = new(AppGlobals); ;
                 ReportService.ReportType = rptType;
-                ReportService.Data = GetReportData();
-                ReportService.Model = CreateReportModel();
-
+                GetReportData();
+                UpdateReportModel();
             });
 
             try
             {
                 ReportService.Print();
             }
-            catch (Exception)
+            catch (Exception error)
             {
-                ReportService.MyMessage = "Error....";
-                MsgClass.Add(ReportService.MyMessage);
+                MsgClass.Add(error.Message);
             }
         }
 
-        public ReportData GetReportData()
+        public void GetReportData()
         {
             var _Query = Quries.Receipt(ReceiptID);
             var _Table = Source.GetTable(_Query);
-            var _ReportData = new ReportData();
 
-            _ReportData.ReportTable = _Table;
-            _ReportData.DataSetName = "ds_receipt";
-
-            return _ReportData;
+            ReportService.Data.ReportTable = _Table;
+            ReportService.Data.DataSetName = "ds_receipt";
         }
 
-        public ReportModel CreateReportModel()
+        public void UpdateReportModel()
         {
             var _InvoiceNo = "Receipt";
             var _Heading1 = "Receipt";
@@ -624,22 +621,27 @@ namespace AppliedAccounts.Models
             var _CompanyName = UserProfile.Company;
             var _ReportFooter = AppFunctions.ReportFooter();
 
+            var _Amount = (decimal)ReportService.Data.ReportTable.Rows[0]["Amount"];
+            var _NumInWords = new NumInWords();
+            var _AmountinWord = _NumInWords.ChangeCurrencyToWords(_Amount, "SAR", "...");
+            var ShowImage = false;
+
             ReportModel rptModel = new();
 
-            rptModel.InputReport.FileName = $"Receipt";
-            rptModel.InputReport.FilePath = UserProfile!.ReportFolder;
+            ReportService.Model.InputReport.FileName = $"Receipt.rdl";
+            ReportService.Model.InputReport.FilePath = UserProfile!.ReportFolder;
+            ReportService.Model.ReportDataSource = ReportService.Data;
+            ReportService.Model.OutputReport.FileName = $"Receipt_{ReceiptID}";
+            ReportService.Model.OutputReport.FilePath = UserProfile!.PDFFolder;
+            ReportService.Model.OutputReport.ReportType = ReportType.PDF;
 
-            rptModel.ReportDataSource = ReportService.Data;
-            rptModel.OutputReport.FileName = $"Receipt_{ReceiptID}";
-            rptModel.OutputReport.FilePath = UserProfile!.PDFFolder;
-            rptModel.OutputReport.ReportType = ReportType.PDF;
+            ReportExtractor reportExtractor = new(ReportService.Model.InputReport.FileFullName);
 
-            rptModel.AddReportParameter("CompanyName", _CompanyName);
-            rptModel.AddReportParameter("Heading1", _Heading1);
-            rptModel.AddReportParameter("Heading2", _Heading2);
-            rptModel.AddReportParameter("Footer", _ReportFooter);
-
-            return rptModel;
+            ReportService.Model.AddReportParameter("Heading1", _Heading1);
+            ReportService.Model.AddReportParameter("Heading2", _Heading2);
+            ReportService.Model.AddReportParameter("InWord", _AmountinWord);
+            ReportService.Model.AddReportParameter("PayerTitle", "Donor");
+            ReportService.Model.AddReportParameter("ShowImages", ShowImage.ToString());
         }
         #endregion
 

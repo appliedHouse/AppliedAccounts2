@@ -14,6 +14,7 @@ namespace AppReports
         public bool IsReportRendered { get; set; } = false;
         public string ErrorMessage { get; set; } = string.Empty;
         public string ReportTitle { get; set; } = string.Empty;
+        public ReportExtractor Extractor { get; set; }
 
         public List<ReportParameter> ReportParameters { get; set; }
         private string DateTimeNow => DateTime.Now.ToString("yyyy-MM-dd [hh:mm:ss]");
@@ -75,7 +76,7 @@ namespace AppReports
                 Messages.Add($"{DateTimeNow}: Report Parameters Count {ReportParameters.Count}");
                 foreach (var _Parameter in ReportParameters)
                 {
-                    Messages.Add($"{DateTimeNow}: Report Parameter {_Parameter.Name} => {_Parameter.Values}");
+                    Messages.Add($"{DateTimeNow}: Report Parameter {_Parameter.Name} => {_Parameter.Values[0]}");
                 }
 
 
@@ -91,25 +92,41 @@ namespace AppReports
                     Messages.Add($"{DateTimeNow}: Report Type is {OutputReport.ReportType}");
 
                     OutputReport.MimeType = ReportMime.Get(OutputReport.ReportType);
-                    //var _FileType = RenderFormat.Get(OutputReport.ReportType);
+                    
                     var _ReportFile = InputReport.FileFullName;
-
-                    var _ReportStream = new StreamReader(InputReport.FileFullName);
-                    Messages.Add($"{DateTimeNow}: {InputReport.FileFullName} is read as stream.");
-
+                    var _DataSource = ReportDataSource.DataSource;
+                    var _ReportStream = new StreamReader(_ReportFile);
+                    var _Parameters = ReportParameters;
+                    Messages.Add($"{DateTimeNow}: {_ReportFile} is read as stream.");
 
                     // Report Generating.....
                     LocalReport report = new(); ;
-                    report.ReportEmbeddedResource = InputReport.FileFullName;
+                    report.ReportEmbeddedResource = _ReportFile;
                     report.LoadReportDefinition(_ReportStream);
-                    report.DataSources.Add(ReportDataSource.DataSource);
-                    report.SetParameters(ReportParameters);
+                    report.DataSources.Add(_DataSource);
+                    report.DisplayName = OutputReport.FileName;
+                    if (IsParametersValid())
+                    {
+                        report.SetParameters(_Parameters);
+                        report.Refresh();
 
-                    // Report Rendering ....
-                    ReportBytes = report.Render(OutputReport.ReportType.ToString()) ?? [];
-                    Messages.Add($"{DateTimeNow}: Report Render bytes are {ReportBytes.Length}");
-                    Messages.Add($"{DateTimeNow}: Report rendering completed at {DateTimeNow}");
-                    IsReportRendered = true;
+                        // Report Rendering ....
+                        ReportBytes = report.Render(OutputReport.ReportType.ToString()) ?? [];
+                        Messages.Add($"{DateTimeNow}: Report Render bytes are {ReportBytes.Length}");
+                        Messages.Add($"{DateTimeNow}: Report rendering completed at {DateTimeNow}");
+                        IsReportRendered = true;
+                    }
+                    else
+                    {
+                        if(!ReportParameters.Equals(Extractor.MyParameters.Count))
+                        {
+                            Messages.Add($"{DateTimeNow}: Parameters {ReportParameters.Count} != {Extractor.MyParameters.Count} ");
+                        }
+
+                        Messages.Add($"{DateTimeNow}: Report {ReportParameters.Count} Parameters are not valid");
+                    }
+
+
                 }
                 else
                 {
@@ -167,9 +184,31 @@ namespace AppReports
         #region Add Parameters
         public void AddReportParameter(string Key, string Value)
         {
-            var _Parameter = new ReportParameter(Key, Value);
-            ReportParameters.Add(_Parameter);
-            Messages.Add($"{DateTimeNow}: Report Parameter add {Key} => {Value}");
+            if (InputReport.IsFileExist)
+            {
+                Extractor ??= new(InputReport.FileFullName);
+                var _Parameter = new ReportParameter(Key, Value);
+                if (Extractor.IsExist(Key))
+                {
+                    ReportParameters.Add(_Parameter);
+                    Messages.Add($"{DateTimeNow}: Report Parameter add {Key} => {Value}");
+                }
+                else
+                {
+                    Messages.Add($"{DateTimeNow}: Report Parameter {Key} => {Value} is not part of RDL report ");
+                }
+            }
+        }
+
+        public bool IsParametersValid()
+        {
+            // Check all the variable are generated for the report, if not match send false;
+
+            if (Extractor.MyParameters.Count != ReportParameters.Count)
+                return false;
+
+            return Extractor.MyParameters.All(myParam => ReportParameters.Any(reportParam =>
+            string.Equals(myParam.Name, reportParam.Name, StringComparison.OrdinalIgnoreCase)));
         }
 
 

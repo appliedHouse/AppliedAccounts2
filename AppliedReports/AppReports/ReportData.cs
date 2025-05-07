@@ -17,11 +17,13 @@ namespace AppReports
     {
         public DataTable ReportTable { get; set; } = new();
         public string DataSetName { get; set; } = string.Empty;
+        public int Count => ReportTable.Rows.Count;
+
         public ReportDataSource DataSource => GetReportDataSource();
 
 
         public ReportData() { }
-        public ReportData(DataTable _Table, string _DataSet) 
+        public ReportData(DataTable _Table, string _DataSet)
         {
             ReportTable = _Table;
             DataSetName = _DataSet;

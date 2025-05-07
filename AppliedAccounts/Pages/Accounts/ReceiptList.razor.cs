@@ -1,4 +1,5 @@
-﻿using AppliedAccounts.Models;
+﻿using AppliedAccounts.Data;
+using AppliedAccounts.Models;
 using AppliedDB;
 using Microsoft.JSInterop;
 
@@ -19,8 +20,9 @@ namespace AppliedAccounts.Pages.Accounts
             IsWaiting = false;
         }
 
-        public async Task Print(int ID)
+        public async Task Print(ReportActionClass reportAction)
         {
+            // this redirect to model print.... do not delete this method
             try
             {
                 SpinnerMessage = "Report is being generated.  Wait for some while.";
@@ -28,26 +30,13 @@ namespace AppliedAccounts.Pages.Accounts
 
                 await Task.Run(() =>
                 {
-                    MyModel.Print(ID);
-                    MyModel.ReportService.JS = js;                              // Inject js into Print Servce
-                    MyModel.ReportService.NavManager = NavManager;              // Inject NavManager into Print Service
+                    MyModel.Print(reportAction);
                 });
 
-                var reportModel = MyModel.ReportService.Model;
-
-                if (reportModel?.ReportBytes?.Length > 0)
-                {
-                    //var reportName = reportModel.OutputReport.FileName + ID.ToString();
-                    var base64 = Convert.ToBase64String(reportModel.ReportBytes);
-                    await js.InvokeVoidAsync("printer", base64);
-
-                    //await js.InvokeVoidAsync("downloadPDF", reportName, reportBytes);
-                }
             }
-            catch (Exception ex)
+            catch (Exception error)
             {
-                // Log or display error
-                Console.WriteLine($"Print error: {ex.Message}");
+                MyModel.MsgClass.Danger(error.Message);
             }
             finally
             {
@@ -56,27 +45,7 @@ namespace AppliedAccounts.Pages.Accounts
             }
         }
 
-        public async void PrintPreview(int ID)
-        {
-            try
-            {
-                SpinnerMessage = "Report is being generated.  Wait for some while.";
-                IsWaiting = true;
-                await Task.Run(() => { MyModel.Print(ID); }); // Generate Report
-                
-            }
-            catch (Exception ex)
-            {
-                // Log or display error
-                Console.WriteLine($"Print error: {ex.Message}");
-            }
-            finally
-            {
-                IsWaiting = false;
-                await InvokeAsync(StateHasChanged);
-                PrintService.Preview();
-            }
-        }
+        
 
     }
 }

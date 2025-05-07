@@ -14,23 +14,24 @@ namespace AppliedAccounts.Services
         public NavigationManager NavManager { get; set; }
         public AppUserModel? UserProfile { get; set; }
 
-
         public ReportData Data { get; set; }
         public ReportModel Model { get; set; }
         public ReportType ReportType { get; set; }
-        
-        
-        public MessageClass MsgClass { get; set; }
+
+
+        //public MessageClass MsgClass { get; set; }
         public bool IsError { get; set; } = false;
-        public string MyMessage { get; set; }
+        public List<string> MyMessage { get; set; } = new();
+      
 
         public PrintService(GlobalService _Config)
         {
             Config = _Config;
             NavManager = Config.NavManager;
             JS = Config.JS;
-            MsgClass = new();
+            //MsgClass = new();
 
+            Data = new();
             Model = new();
 
             Model.InputReport.RootPath = Config.AppPaths.RootPath;
@@ -39,6 +40,10 @@ namespace AppliedAccounts.Services
             Model.OutputReport.BasePath = NavManager.BaseUri;
             Model.OutputReport.RootPath = Config.AppPaths.RootPath;
             Model.OutputReport.FilePath = Config.AppPaths.PDFPath;
+
+            if(string.IsNullOrEmpty(Config.Reporting.ReportTitle)) { Config.Reporting.ReportTitle = "APPLIED SOFTWARE HOUSE"; }
+            if(string.IsNullOrEmpty(Config.Reporting.ReportFooter)) { Config.Reporting.ReportFooter = "APPLIED ACCOUNTS"; }
+
 
             Model.ReportParameters =
             [
@@ -89,19 +94,19 @@ namespace AppliedAccounts.Services
                 }
                 else
                 {
-                    MyMessage = Model.ErrorMessage;
+                    MyMessage.Add(Model.ErrorMessage);
                 }
             }
             catch (Exception error)
             {
 
                 IsError = true;
-                MyMessage = error.Message;
+                MyMessage.Add(error.Message);
             }
 
             if(Model.ErrorMessage.Length > 0)
             {
-                MsgClass.Add(Model.ErrorMessage);
+                MyMessage.Add(Model.ErrorMessage);
             }
 
 
@@ -116,14 +121,14 @@ namespace AppliedAccounts.Services
                 }
                 else
                 {
-                    MyMessage = Model.Messages.Last();
+                    MyMessage.Add(Model.ErrorMessage);
                 }
             }
             catch (Exception error)
             {
 
                 IsError = true;
-                MyMessage = error.Message;
+                MyMessage.Add(error.Message);
             }
         }
         public async Task PDF()
@@ -139,14 +144,14 @@ namespace AppliedAccounts.Services
                 }
                 else
                 {
-                    MyMessage = Model.Messages.Last();
+                    MyMessage.Add(Model.ErrorMessage);
                 }
             }
             catch (Exception error)
             {
 
                 IsError = true;
-                MyMessage = error.Message;
+                MyMessage.Add(error.Message);
             }
         }
         public async Task Excel()
@@ -162,14 +167,14 @@ namespace AppliedAccounts.Services
                 }
                 else
                 {
-                    MyMessage = Model.Messages.Last();
+                    MyMessage.Add(Model.ErrorMessage);
                 }
             }
             catch (Exception error)
             {
 
                 IsError = true;
-                MyMessage = error.Message;
+                MyMessage.Add(error.Message);
             }
         }
         public async Task Word()
@@ -185,14 +190,14 @@ namespace AppliedAccounts.Services
                 }
                 else
                 {
-                    MyMessage = Model.Messages.Last();
+                    MyMessage.Add(Model.ErrorMessage);
                 }
             }
             catch (Exception error)
             {
 
                 IsError = true;
-                MyMessage = error.Message;
+                MyMessage.Add(error.Message);
             }
         }
         public async Task Image()
@@ -206,7 +211,7 @@ namespace AppliedAccounts.Services
             }
             else
             {
-                MyMessage = Model.Messages.Last();
+                MyMessage.Add(Model.ErrorMessage);
             }
 
         }
@@ -223,14 +228,14 @@ namespace AppliedAccounts.Services
                 }
                 else
                 {
-                    MyMessage = Model.Messages.Last();
+                    MyMessage.Add(Model.ErrorMessage);
                 }
             }
             catch (Exception error)
             {
 
                 IsError = true;
-                MyMessage = error.Message;
+                MyMessage.Add(error.Message);
             }
 
         }

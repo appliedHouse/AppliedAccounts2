@@ -2,6 +2,7 @@
 using AppliedAccounts.Models;
 using AppliedDB;
 using Microsoft.AspNetCore.Components;
+using System.Collections.Generic;
 using System.Data;
 
 
@@ -34,9 +35,9 @@ namespace AppliedAccounts.Pages.Accounts
 
         public string GetTitle(List<CodeTitle> _List, int _Value)
         {
-            if (_List.Count == 0) { return string.Empty; }
-            if (_List is null) { return string.Empty; }
-            return _List.Where(x => x.ID == _Value).Select(x => x.Title).First();
+            if (_List == null || _List.Count == 0) {return string.Empty; }
+            return _List.FirstOrDefault(x => x.ID == _Value)!.Title ?? "";
+            //return _List.Where(x => x.ID == _Value).Select(x => x.Title).First();
         }
 
         public void Print(ReportActionClass reportAction)
@@ -49,7 +50,6 @@ namespace AppliedAccounts.Pages.Accounts
             catch (Exception)
             {
                 MyModel.MsgClass.Add(AppMessages.Enums.Messages.prtReportError);
-
             }
         }
     }
