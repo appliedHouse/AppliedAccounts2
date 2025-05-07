@@ -97,11 +97,12 @@ namespace AppReports
                     var _DataSource = ReportDataSource.DataSource;
                     var _ReportStream = new StreamReader(_ReportFile);
                     var _Parameters = ReportParameters;
+                    var _RenderFormat = RenderFormat.Get(OutputReport.ReportType);
                     Messages.Add($"{DateTimeNow}: {_ReportFile} is read as stream.");
 
                     // Report Generating.....
                     LocalReport report = new(); ;
-                    report.ReportEmbeddedResource = _ReportFile;
+                    //report.ReportEmbeddedResource = _ReportFile;
                     report.LoadReportDefinition(_ReportStream);
                     report.DataSources.Add(_DataSource);
                     report.DisplayName = OutputReport.FileName;
@@ -111,7 +112,7 @@ namespace AppReports
                         report.Refresh();
 
                         // Report Rendering ....
-                        ReportBytes = report.Render(OutputReport.ReportType.ToString()) ?? [];
+                        ReportBytes = report.Render(_RenderFormat) ?? [];
                         Messages.Add($"{DateTimeNow}: Report Render bytes are {ReportBytes.Length}");
                         Messages.Add($"{DateTimeNow}: Report rendering completed at {DateTimeNow}");
                         IsReportRendered = true;
@@ -188,7 +189,7 @@ namespace AppReports
             {
                 Extractor ??= new(InputReport.FileFullName);
                 var _Parameter = new ReportParameter(Key, Value);
-                if (Extractor.IsExist(Key))
+                if (Extractor.IsExistParameter(Key))
                 {
                     ReportParameters.Add(_Parameter);
                     Messages.Add($"{DateTimeNow}: Report Parameter add {Key} => {Value}");
@@ -210,6 +211,7 @@ namespace AppReports
             return Extractor.MyParameters.All(myParam => ReportParameters.Any(reportParam =>
             string.Equals(myParam.Name, reportParam.Name, StringComparison.OrdinalIgnoreCase)));
         }
+
 
 
         #endregion

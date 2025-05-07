@@ -27,11 +27,8 @@ namespace AppliedAccounts.Pages.Accounts
             {
                 SpinnerMessage = "Report is being generated.  Wait for some while.";
                 IsWaiting = true;
-
-                await Task.Run(() =>
-                {
-                    MyModel.Print(reportAction);
-                });
+                await InvokeAsync(StateHasChanged);
+                await MyModel.Print(reportAction);
 
             }
             catch (Exception error)

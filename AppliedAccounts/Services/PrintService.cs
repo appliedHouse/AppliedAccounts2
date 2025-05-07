@@ -17,6 +17,7 @@ namespace AppliedAccounts.Services
         public ReportData Data { get; set; }
         public ReportModel Model { get; set; }
         public ReportType ReportType { get; set; }
+        public ReportExtractor Extractor { get; set; }
 
 
         //public MessageClass MsgClass { get; set; }

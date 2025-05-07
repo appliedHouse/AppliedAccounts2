@@ -13,11 +13,16 @@ namespace AppReports
         public List<ReportParameterClass> MyParameters { get; set; }
 
         public string RDL_File { get; set; }
+        public string DataSetName => GetDataSetNames().FirstOrDefault() ?? "";
 
         public ReportExtractor(string _RDLFile)
         {
             RDL_File = _RDLFile;
             MyParameters = GetParameters(RDL_File);
+        }
+        public bool IsExistParameter(string value)
+        {
+            return MyParameters.Any(p => p.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
         }
 
         public static List<ReportParameterClass> GetParameters(string rdlFilePath)
@@ -39,9 +44,24 @@ namespace AppReports
             return parameters;
         }
 
-        public bool IsExist(string value)
+       
+
+        private List<string> GetDataSetNames()
         {
-            return MyParameters.Any(p => p.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
+            XNamespace ns = "http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition";
+            var xdoc = XDocument.Load(RDL_File);
+            var datasetNames = new List<string>();
+
+            foreach (var dataset in xdoc.Descendants(ns + "DataSet"))
+            {
+                var nameAttr = dataset.Attribute("Name");
+                if (nameAttr != null)
+                {
+                    datasetNames.Add(nameAttr.Value);
+                }
+            }
+
+            return datasetNames;
         }
     }
     public class ReportParameterClass

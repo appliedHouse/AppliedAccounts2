@@ -24,6 +24,7 @@
         MyModel = new(UserProfile ?? new());   // BookID and UserProfile.
         MyModel.Source = new(UserProfile ?? new());
         MyModel.AppGlobals = AppGlobals;
+        MyModel.GetKeys();
 
         MyModel.PageIsValid = true;
         if (MyModel.UserProfile is null) { MyModel.PageIsValid = false; return; }
@@ -95,7 +96,7 @@
 
             <!-- Data List (Records)-->
 
-            <div class="table-container">
+            <div class="container">
                 <table class="table-list">
                     <thead>
                         <tr>

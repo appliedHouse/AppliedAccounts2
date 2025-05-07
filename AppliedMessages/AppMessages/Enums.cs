@@ -25,6 +25,9 @@
             rptOutputFileIsZero = 600103,
             rptDataTableIsNull = 600104,
             rptDataRowIsZero = 600105,
+            rptParametersNotValid = 600106,
+            rptNotValidToPrint = 600107,
+            rptDataSetNameNotValid = 600108,
 
             // Row and column
             Row_QtyZero = 30,
@@ -143,7 +146,8 @@
             MasterRecordisNull = 201,
             DetailRecordsisNull = 203,
             DetailRecordsAreZero = 205,
-            AmountNotEqual = 218,
+            AmountNotEqual = 218
+            
         }
 
         public enum Class

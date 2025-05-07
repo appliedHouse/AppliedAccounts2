@@ -33,7 +33,6 @@
         NavManager = AppGlobals.NavManager;
     }
 
-
     private void BookNatureChanged(int _NatureID)
     {
         MyModel.BookNatureID = _NatureID;
@@ -47,16 +46,8 @@
     }
 }
 
-<div class="PageHeading">
-    <h2>@MyModel.BookNatureTitle</h2>
-</div>
-
-@if(MyModel.MsgClass.Count > 0)
-{
-    <ShowMessages MsgClass="MyModel.MsgClass"/>
-}
-
-
+<ShowPageHeading PageTitle="@MyModel.BookNatureTitle"/>
+<ShowMessages MsgClass="MyModel.MsgClass"/>
 
 <EditForm Model="@MyModel">
     <div class="d-flex flex-row mb-3 filter">
@@ -114,10 +105,8 @@
     </div>
 
     <div class="container">
-
         @if (MyModel.BookRecords != null)
         {
-
             <table class="table-list">
                 <thead>
                     <tr>
@@ -167,8 +156,4 @@
             </div>
         }
     </div>
-
-
-
-
 </EditForm>

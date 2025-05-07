@@ -1,7 +1,5 @@
 ﻿using Applied_WebApplication.Data;
 using AppliedAccounts.Data;
-using AppliedAccounts.Models.Interface;
-using AppliedAccounts.Pages.Accounts;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
@@ -30,6 +28,7 @@ namespace AppliedAccounts.Models
         public DateTime DT_End { get; set; }
         public bool PageIsValid { get; set; } = false;
         public PrintService ReportService { get; set; }
+
 
         public ReceiptListModel(AppUserModel _AppUserModel)
         {
@@ -85,6 +84,7 @@ namespace AppliedAccounts.Models
         #region Refresh Data
         public void RefreshData()
         {
+            SetKeys();
             DataList = LoadData();
         }
         #endregion
@@ -92,20 +92,29 @@ namespace AppliedAccounts.Models
         #region Print
         public async Task Print(ReportActionClass reportAction)
         {
-            ReceiptID = reportAction.VoucherID;
-            ReportService = new(AppGlobals); ;
-            ReportService.ReportType = reportAction.PrintType;
-            GetReportData();
-            UpdateReportModel();
+            await Task.Run(() =>
+            {
+                try
+                {
+                    SetKeys();
+                    ReceiptID = reportAction.VoucherID;
+                    ReportService = new(AppGlobals); ;                      // Initialize Report Service
+                    ReportService.ReportType = reportAction.PrintType;      // Assign Report Type 
+                    GetReportData();                                        // Report Data Source Setup
+                    UpdateReportModel();                                    // Update Report Model
 
-            try
-            {
-                ReportService.Print();
-            }
-            catch (Exception error)
-            {
-                MsgClass.Add(error.Message);
-            }
+                    if (!ReportService.IsError) { ReportService.Print(); }  // Report Print / Preview / PDF / Excel / Word / Image / HTML
+                    else
+                    {
+                        MsgClass.Critical(MESSAGES.rptNotValidToPrint);     // Add Error Message to Page error view if Report is not valid
+                    }
+                }
+                catch (Exception error)
+                {
+                    MsgClass.Add(error.Message);
+                }
+
+            });
         }
 
         public void GetReportData()
@@ -113,8 +122,16 @@ namespace AppliedAccounts.Models
             var _Query = Quries.Receipt(ReceiptID);
             var _Table = Source.GetTable(_Query);
 
-            ReportService.Data.ReportTable = _Table;
-            ReportService.Data.DataSetName = "ds_receipt";
+            if (_Table.Columns.Count == 0)
+            {
+                ReportService.IsError = true;
+                MsgClass.Error(MESSAGES.rptDataTableIsNull);
+            }
+            else
+            {
+                ReportService.Data.ReportTable = _Table;
+                ReportService.Data.DataSetName = "ds_receipt";
+            }
         }
 
         public void UpdateReportModel()
@@ -128,34 +145,65 @@ namespace AppliedAccounts.Models
 
             var _Amount = (decimal)ReportService.Data.ReportTable.Rows[0]["Amount"];
             var _NumInWords = new NumInWords();
-            var _AmountinWord = _NumInWords.ChangeCurrencyToWords(_Amount, "SAR", "...");
+            var _Currency = AppGlobals.Currency.Sign ?? "$";
+            var _CurrencyDigit = AppGlobals.Currency.DigitTitle ?? "";
+            var _AmountinWord = _NumInWords.ChangeCurrencyToWords(_Amount, _Currency, _CurrencyDigit);
             var ShowImage = false;
 
             ReportService.Model.InputReport.FileName = $"Receipt.rdl";
-            ReportService.Model.InputReport.FilePath = UserProfile!.ReportFolder;
+            //ReportService.Model.InputReport.FilePath = UserProfile!.ReportFolder;
             ReportService.Model.ReportDataSource = ReportService.Data;
             ReportService.Model.OutputReport.FileName = $"Receipt_{ReceiptID}";
-            ReportService.Model.OutputReport.FilePath = UserProfile!.PDFFolder;
+            //ReportService.Model.OutputReport.FilePath = UserProfile!.PDFFolder;
             ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
-
-            ReportExtractor reportExtractor = new(ReportService.Model.InputReport.FileFullName);
-
             ReportService.Model.AddReportParameter("Heading1", _Heading1);
             ReportService.Model.AddReportParameter("Heading2", _Heading2);
             ReportService.Model.AddReportParameter("InWord", _AmountinWord);
             ReportService.Model.AddReportParameter("CurrencySign", AppGlobals.Currency.Sign ?? "$");
             ReportService.Model.AddReportParameter("PayerTitle", "Donor");
             ReportService.Model.AddReportParameter("ShowImages", ShowImage.ToString());
+            ReportService.Extractor = new ReportExtractor(ReportService.Model.InputReport.FileFullName);
+
+            if(!ReportService.Model.IsParametersValid()) 
+            {
+                ReportService.IsError = true;
+                MsgClass.Error(MESSAGES.rptParametersNotValid);
+            }
+
+            if(ReportService.Data.DataSetName != ReportService.Extractor.DataSetName)
+            {
+                ReportService.IsError = true;
+                MsgClass.Error(MESSAGES.rptDataSetNameNotValid);
+            }
+
         }
         #endregion
 
         #region Edit
         public void Edit(int _ID)
         {
+            SetKeys();
             AppGlobals.NavManager.NavigateTo($"/Accounts/Receipt/{ReceiptID}");
         }
         #endregion
 
+        #region Get & Set Keys
+        public void SetKeys()
+        {
+            AppRegistry.SetKey(Source.DBFile, "rptRcptList", DT_Start, KeyType.From, "Receipt Report /Accounts/ReceiptList");
+            AppRegistry.SetKey(Source.DBFile, "rptRcptList", DT_End, KeyType.To);
+            AppRegistry.SetKey(Source.DBFile, "rptRcptList", SearchText, KeyType.Text);
+            AppRegistry.SetKey(Source.DBFile, "rptRcptList", PayerID, KeyType.Number);
+        }
+
+        public void GetKeys()
+        {
+            SearchText = AppRegistry.GetText(Source.DBFile, "rptRcptList");
+            DT_Start = AppRegistry.GetFrom(Source.DBFile, "rptRcptList");
+            DT_End = AppRegistry.GetTo(Source.DBFile, "rptRcptList");
+            PayerID = AppRegistry.GetNumber(Source.DBFile, "rptRcptList");
+        }
+        #endregion
 
 
     }

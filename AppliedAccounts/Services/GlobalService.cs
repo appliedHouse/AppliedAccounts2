@@ -133,6 +133,8 @@ namespace AppliedAccounts.Services
         public int ID { get; set; }
         public string? Sign { get; set; }
         public string? Title { get; set; }
+        public int? Digits { get; set; }
+        public string? DigitTitle { get; set; }
         public string? Format { get; set; }
     }
     #endregion
