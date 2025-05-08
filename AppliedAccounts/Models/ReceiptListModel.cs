@@ -163,19 +163,6 @@ namespace AppliedAccounts.Models
             ReportService.Model.AddReportParameter("PayerTitle", "Donor");
             ReportService.Model.AddReportParameter("ShowImages", ShowImage.ToString());
             ReportService.Extractor = new ReportExtractor(ReportService.Model.InputReport.FileFullName);
-
-            if(!ReportService.Model.IsParametersValid()) 
-            {
-                ReportService.IsError = true;
-                MsgClass.Error(MESSAGES.rptParametersNotValid);
-            }
-
-            if(ReportService.Data.DataSetName != ReportService.Extractor.DataSetName)
-            {
-                ReportService.IsError = true;
-                MsgClass.Error(MESSAGES.rptDataSetNameNotValid);
-            }
-
         }
         #endregion
 

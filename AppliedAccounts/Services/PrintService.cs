@@ -4,6 +4,8 @@ using AppReports;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Microsoft.Reporting.NETCore;
+using static AppMessages.Enums;
+using System.Formats.Asn1;
 
 namespace AppliedAccounts.Services
 {
@@ -60,26 +62,51 @@ namespace AppliedAccounts.Services
         #region Print a Report
         public async void Print()
         {
+            IsError = ReportValidate();
 
-            switch (Model.OutputReport.ReportType)
+            if (!IsError)
             {
-                case ReportType.Print: await Printer(); break;
-                case ReportType.Preview: await Preview(); break;
-                case ReportType.PDF: await PDF(); break;
-                case ReportType.Excel: await Excel(); break;
-                case ReportType.Word: await Word(); break;
-                case ReportType.Image: await Image(); break;
-                case ReportType.HTML: await HTML(); break;
-                default: await Preview(); break;
+                switch (Model.OutputReport.ReportType)
+                {
+                    case ReportType.Print: await Printer(); break;
+                    case ReportType.Preview: await Preview(); break;
+                    case ReportType.PDF: await PDF(); break;
+                    case ReportType.Excel: await Excel(); break;
+                    case ReportType.Word: await Word(); break;
+                    case ReportType.Image: await Image(); break;
+                    case ReportType.HTML: await HTML(); break;
+                    default: await Preview(); break;
+                }
             }
         }
 
-        public void Print(ReportType reportType)
+        #endregion
+
+        #region Report Validation
+        public bool ReportValidate()
         {
-            Model.OutputReport.ReportType = reportType;
-            Print();
+            bool result = false;
+            Extractor = new(Model.InputReport.FileFullName);
+
+            if (!Model.IsParametersValid())
+            {
+                result = true;
+                MyMessage.Add("Report Parameters are not equal with report.");
+            }
+
+            if (Data.DataSetName != Extractor.DataSetName)
+            {
+                result = true;
+                MyMessage.Add("Report Dataset Name is not matched with report.");
+            }
+
+            return result;
+
         }
         #endregion
+
+
+
 
         #region Option (Type) of Printing Of reports. Print,Preview,PDF, Excel.... 
         public async Task Printer()

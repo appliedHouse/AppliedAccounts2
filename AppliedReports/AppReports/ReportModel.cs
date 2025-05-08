@@ -79,8 +79,6 @@ namespace AppReports
                     Messages.Add($"{DateTimeNow}: Report Parameter {_Parameter.Name} => {_Parameter.Values[0]}");
                 }
 
-
-
                 if (ReportParameters.Count == 0)
                 {
                     Messages.Add("Report Parameters found zero.");

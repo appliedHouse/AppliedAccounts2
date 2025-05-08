@@ -6,11 +6,12 @@ using AppMessages;
 using AppReports;
 using Microsoft.AspNetCore.Components;
 using System.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using MESSAGES = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Pages.Reporting
 {
-    public partial class GeneralLedger : IPrint
+    public partial class GeneralLedger
     {
         public AppUserModel UserModel { get; set; }
         public DataSource Source { get; set; }
@@ -75,11 +76,11 @@ namespace AppliedAccounts.Pages.Reporting
         public void Refresh()
         {
             SetKeys();
-            ReportData _ReportData = GetReportData();
-            if (_ReportData.ReportTable != null)
-            {
-                MyModel.Ledger = _ReportData.ReportTable;
-            }
+            //GetReportData();
+            //if (_ReportData.ReportTable != null)
+            //{
+            //    MyModel.Ledger = _ReportData.ReportTable;
+            //}
         }
 
         public void BackPage()
@@ -91,45 +92,39 @@ namespace AppliedAccounts.Pages.Reporting
         #region Print
         public async void Print(ReportType PrintType)
         {
-            
-            if (MyModel.COAID > 0)
-            {
-                await PrintLedger(MyModel.COAID, PrintType);
-            }
-            else
-            { MsgClass.Add(MESSAGES.COAIsNull); }
-        }
-
-        public async Task PrintLedger(int ID, ReportType PrintType)
-        {
             IsPrinting = true;
             await InvokeAsync(StateHasChanged);
 
-            SetKeys();
-            await Task.Run(() =>
-            {
-                ReportService = new(AppGlobals); ;
-                ReportService.ReportType = PrintType;
-                ReportService.Data = GetReportData();
-                ReportService.Model = CreateReportModel();
-                
-            });
-
             try
             {
-                ReportService.Print();
+                SetKeys();
+                await Task.Run(() =>
+                {
+                    ReportService = new(AppGlobals); ;
+                    ReportService.ReportType = PrintType;
+                    GetReportData();
+                    CreateReportModel();
+
+                    if (!ReportService.IsError)
+                    {
+                        ReportService.Print();
+                    }
+                    
+                });
+
             }
             catch (Exception error)
             {
-                MsgClass.Add(error.Message);
+                MsgClass.Error(error.Message);
             }
-            
 
             IsPrinting = false;
             await InvokeAsync(StateHasChanged);
         }
 
-        public ReportData GetReportData()
+        
+
+        public void GetReportData()
         {
             var _OBDate = MyModel.Date_From.AddDays(-1).ToString(Format.YMD);
             var _DateFrom = MyModel.Date_From.ToString(Format.YMD);
@@ -145,37 +140,30 @@ namespace AppliedAccounts.Pages.Reporting
 
             if (_Table.Columns.Count == 0)
             {
+                ReportService.IsError = false;
                 MsgClass.Add(MESSAGES.NoRecordFound);
-                return new();
             }
 
-            ReportData _ReportData = new()
-            {
-                ReportTable = _Table,
-                DataSetName = "dsname_Ledger"
-            };
-            return _ReportData;
+            ReportService.Data.ReportTable = _Table;
+            ReportService.Data.DataSetName = "dsname_Ledger";
+
+
+
         }
 
-        public ReportModel CreateReportModel()
+        public void CreateReportModel()
         {
-            ReportModel Report = new ReportModel();
-            
+                       
             var _Heading1 = $"General Ledger " + Source.SeekTitle(AppliedDB.Enums.Tables.COA, MyModel.COAID);
             var _Heading2 = $"[{MyModel.Date_From.ToString(Format.DDMMMYY)}] to [{MyModel.Date_To.ToString(Format.DDMMMYY)}] "; 
 
-
-            Report.InputReport.FileName = "Ledger.rdl";
-
-            Report.ReportDataSource = ReportService.Data;                   // Load Reporting Data to Report Model
-
-            Report.OutputReport.FileName = "Ledger_" + "CompanyName";
-            Report.OutputReport.ReportType = ReportService.ReportType;
-
-            Report.AddReportParameter("Heading1", _Heading1);
-            Report.AddReportParameter("Heading2", _Heading2);
-
-            return Report;
+            ReportService.Model.InputReport.FileName = "Ledger.rdl";
+            ReportService.Model.ReportDataSource = ReportService.Data;                   // Load Reporting Data to Report Model
+            ReportService.Model.OutputReport.FileName = "Ledger_" + "CompanyName";
+            ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
+            ReportService.Model.AddReportParameter("Heading1", _Heading1);
+            ReportService.Model.AddReportParameter("Heading2", _Heading2);
+            
         }
         #endregion
     }

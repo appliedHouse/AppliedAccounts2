@@ -8,8 +8,6 @@ namespace AppliedAccounts.Pages.Accounts
 {
     public partial class ReceiptList
     {
-        private object _FileName;
-
         public AppUserModel UserProfile { get; set; }
         public ReceiptListModel MyModel { get; set; }
 
