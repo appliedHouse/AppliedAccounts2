@@ -4,12 +4,12 @@ using AppliedDB;
 using AppMessages;
 using System.Data;
 using SQLQueries;
-using MESSAGE = AppMessages.Enums.Messages;
-using static AppliedDB.Enums;
 using AppliedAccounts.Services;
 using AppReports;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using Applied_WebApplication.Data;
+using static AppliedDB.Enums;
+using MESSAGE = AppMessages.Enums.Messages;
+
 
 namespace AppliedAccounts.Models
 {
@@ -583,24 +583,31 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Print
-        public async Task Print(ReportType rptType)
+        public async Task Print(ReportActionClass reportAction)
         {
             await Task.Run(() =>
             {
-                ReportService = new(AppGlobals); ;
-                ReportService.ReportType = rptType;
-                GetReportData();
-                UpdateReportModel();
-            });
+                try
+                {
+                    SetKeys();
+                    ReceiptID = reportAction.VoucherID;
+                    ReportService = new(AppGlobals); ;                      // Initialize Report Service
+                    ReportService.ReportType = reportAction.PrintType;      // Assign Report Type 
+                    GetReportData();                                        // Report Data Source Setup
+                    UpdateReportModel();                                    // Update Report Model
 
-            try
-            {
-                ReportService.Print();
-            }
-            catch (Exception error)
-            {
-                MsgClass.Add(error.Message);
-            }
+                    if (!ReportService.IsError) { ReportService.Print(); }  // Report Print / Preview / PDF / Excel / Word / Image / HTML
+                    else
+                    {
+                        MsgClass.Critical(MESSAGE.rptNotValidToPrint);     // Add Error Message to Page error view if Report is not valid
+                    }
+                }
+                catch (Exception error)
+                {
+                    MsgClass.Add(error.Message);
+                }
+
+            });
         }
 
         public void GetReportData()
@@ -608,8 +615,16 @@ namespace AppliedAccounts.Models
             var _Query = Quries.Receipt(ReceiptID);
             var _Table = Source.GetTable(_Query);
 
-            ReportService.Data.ReportTable = _Table;
-            ReportService.Data.DataSetName = "ds_receipt";
+            if (_Table.Columns.Count == 0)
+            {
+                ReportService.IsError = true;
+                MsgClass.Error(MESSAGE.rptDataTableIsNull);
+            }
+            else
+            {
+                ReportService.Data.ReportTable = _Table;
+                ReportService.Data.DataSetName = "ds_receipt";
+            }
         }
 
         public void UpdateReportModel()
@@ -623,25 +638,35 @@ namespace AppliedAccounts.Models
 
             var _Amount = (decimal)ReportService.Data.ReportTable.Rows[0]["Amount"];
             var _NumInWords = new NumInWords();
-            var _AmountinWord = _NumInWords.ChangeCurrencyToWords(_Amount, "SAR", "...");
+            var _Currency = AppGlobals.Currency.Sign ?? "$";
+            var _CurrencyDigit = AppGlobals.Currency.DigitTitle ?? "";
+            var _AmountinWord = _NumInWords.ChangeCurrencyToWords(_Amount, _Currency, _CurrencyDigit);
             var ShowImage = false;
 
-            ReportModel rptModel = new();
-
             ReportService.Model.InputReport.FileName = $"Receipt.rdl";
-            ReportService.Model.InputReport.FilePath = UserProfile!.ReportFolder;
             ReportService.Model.ReportDataSource = ReportService.Data;
             ReportService.Model.OutputReport.FileName = $"Receipt_{ReceiptID}";
-            ReportService.Model.OutputReport.FilePath = UserProfile!.PDFFolder;
-            ReportService.Model.OutputReport.ReportType = ReportType.PDF;
-
-            ReportExtractor reportExtractor = new(ReportService.Model.InputReport.FileFullName);
-
+            ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
             ReportService.Model.AddReportParameter("Heading1", _Heading1);
             ReportService.Model.AddReportParameter("Heading2", _Heading2);
             ReportService.Model.AddReportParameter("InWord", _AmountinWord);
+            ReportService.Model.AddReportParameter("CurrencySign", AppGlobals.Currency.Sign ?? "$");
             ReportService.Model.AddReportParameter("PayerTitle", "Donor");
             ReportService.Model.AddReportParameter("ShowImages", ShowImage.ToString());
+
+        }
+        #endregion
+
+        #region Get & Set Keys
+        public void SetKeys()
+        {
+            AppRegistry.SetKey(Source.DBFile, "Receipt", MyVoucher.Master.Vou_Date, KeyType.Date, "Receipt Page");
+            
+        }
+
+        public void GetKeys()
+        {
+            
         }
         #endregion
 

@@ -1,11 +1,19 @@
 ﻿@using AppReports
 
 @code {
-    [Parameter] public EventCallback<ReportType> ReturnValue { get; set; }
+    [Parameter] public EventCallback<ReportActionClass> ReturnValue { get; set; }
+    [Parameter] public int ID { get; set; } 
 
     private void NotifyParent(ReportType reportType)
     {
-        ReturnValue.InvokeAsync(reportType);
+        var _return = new ReportActionClass
+            {
+                PrintType = reportType,
+                VoucherID = ID,
+                Vou_No = string.Empty,
+                
+            };
+        ReturnValue.InvokeAsync(_return);
     }
 }
 

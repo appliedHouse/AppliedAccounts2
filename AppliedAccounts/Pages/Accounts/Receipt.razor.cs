@@ -1,4 +1,5 @@
-﻿using AppliedAccounts.Models;
+﻿using AppliedAccounts.Data;
+using AppliedAccounts.Models;
 using AppliedAccounts.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -90,9 +91,9 @@ namespace AppliedAccounts.Pages.Accounts
 
         #region Print
 
-        public async void Print(AppReports.ReportType _rptType)
+        public async void Print(ReportActionClass reportAction)
         {
-            await MyModel.Print(_rptType);
+            await MyModel.Print(reportAction);
         }
         #endregion
 

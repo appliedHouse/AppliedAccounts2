@@ -90,7 +90,7 @@ namespace AppliedAccounts.Pages.Reporting
         #endregion
 
         #region Print
-        public async void Print(ReportType PrintType)
+        public async void Print(ReportActionClass PrintAction)
         {
             IsPrinting = true;
             await InvokeAsync(StateHasChanged);
@@ -101,7 +101,7 @@ namespace AppliedAccounts.Pages.Reporting
                 await Task.Run(() =>
                 {
                     ReportService = new(AppGlobals); ;
-                    ReportService.ReportType = PrintType;
+                    ReportService.ReportType = PrintAction.PrintType;
                     GetReportData();
                     CreateReportModel();
 

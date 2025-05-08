@@ -11,7 +11,7 @@ using AppReports;
 
 namespace AppliedAccounts.Models
 {
-    public class BookModel : IVoucher, IPrint
+    public class BookModel : IVoucher
     {
 
         #region Variables
@@ -459,12 +459,12 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Print
-        public async void Print(ReportType _ReportType)
+        public async void Print(ReportActionClass _ReportAction)
         {
             await Task.Run(() =>
             {
                 ReportService = new(AppGlobals);
-                ReportService.ReportType = _ReportType;
+                ReportService.ReportType = _ReportAction.PrintType;
                 ReportService.Data = GetReportData();
                 ReportService.Model = CreateReportModel();
             });

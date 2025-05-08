@@ -151,10 +151,8 @@ namespace AppliedAccounts.Models
             var ShowImage = false;
 
             ReportService.Model.InputReport.FileName = $"Receipt.rdl";
-            //ReportService.Model.InputReport.FilePath = UserProfile!.ReportFolder;
             ReportService.Model.ReportDataSource = ReportService.Data;
             ReportService.Model.OutputReport.FileName = $"Receipt_{ReceiptID}";
-            //ReportService.Model.OutputReport.FilePath = UserProfile!.PDFFolder;
             ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
             ReportService.Model.AddReportParameter("Heading1", _Heading1);
             ReportService.Model.AddReportParameter("Heading2", _Heading2);
@@ -162,7 +160,7 @@ namespace AppliedAccounts.Models
             ReportService.Model.AddReportParameter("CurrencySign", AppGlobals.Currency.Sign ?? "$");
             ReportService.Model.AddReportParameter("PayerTitle", "Donor");
             ReportService.Model.AddReportParameter("ShowImages", ShowImage.ToString());
-            ReportService.Extractor = new ReportExtractor(ReportService.Model.InputReport.FileFullName);
+            
         }
         #endregion
 

@@ -110,9 +110,9 @@ namespace AppliedAccounts.Pages.Accounts
         #endregion
 
         #region Print
-        private void Print(ReportType reportType)
+        private void Print(ReportActionClass reportAction)
         {
-            MyModel.Print(reportType);
+            MyModel.Print(reportAction);
         }
         #endregion
 
