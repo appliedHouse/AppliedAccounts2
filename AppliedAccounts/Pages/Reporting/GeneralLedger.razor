@@ -1,5 +1,6 @@
 ﻿@page "/Reporting/GL"
 @attribute [Authorize]
+@layout PageLayout
 
 @using AppReports
 @using AppliedDB;
@@ -7,18 +8,21 @@
 @using AppliedAccounts.Models;
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Services;
+@using System.Data
 
 @inject AuthenticationStateProvider Authorized
 @inject ToastService ToastService
-@inject PrintService ReportSeervice
-@inject IJSRuntime js
-@inject GlobalService GlobalService
+@inject PrintService ReportService
+@inject GlobalService AppGlobals
 
 @code {
+    decimal LedgerBalance;
+    decimal TotalDR;
+    decimal TotalCR;
+
     protected override void OnInitialized()
     {
         var AppUser = ((UserAuthonticationStateProvider)Authorized).AppUser;
-        Globals = GlobalService;
 
         Start(AppUser);
 
@@ -26,8 +30,22 @@
         if (Source is null) { IsPageValid = false; IsPageValidMessage += " Source is null"; }
         //if (ReportService is null) { IsPageValid = false; IsPageValidMessage += " Report Service is null"; }
 
+        decimal LedgerBalance = 0.00M;
+        decimal TotalDR = 0.00M;
+        decimal TotalCR = 0.00M;
 
     }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        LedgerBalance = 0.00M;
+        if (firstRender)
+        {
+
+        }
+    }
+
+ 
 }
 
 @if (IsPrinting)
@@ -40,6 +58,11 @@
     </div>
 }
 
+@if (MsgClass.Count > 0)
+{
+    <PageErrors Messages="MsgClass" />
+}
+
 
 @if (IsPageValid)
 {
@@ -48,13 +71,13 @@
             <div class="row g-2 p-1">
                 <div class="col-3">
                     <div class="form-floating">
-                        <InputDate id="DateFrom" class="form-control" @bind-Value="Date_From"></InputDate>
+                        <InputDate id="DateFrom" class="form-control" @bind-Value="MyModel.Date_From"></InputDate>
                         <label for="DateFrom">From</label>
                     </div>
                 </div>
                 <div class="col-3">
                     <div class="form-floating">
-                        <InputDate id="DateTo" class="form-control" @bind-Value="Date_To"></InputDate>
+                        <InputDate id="DateTo" class="form-control" @bind-Value="MyModel.Date_To"></InputDate>
                         <label for="DateFrom">To</label>
                     </div>
                 </div>
@@ -63,7 +86,7 @@
                 <div class="col-6">
                     <div class="form-floating">
 
-                        <InputSelect id="coa_nature" @bind-Value="@COAID" class="form-control">
+                        <InputSelect id="coa_nature" @bind-Value="@MyModel.COAID" class="form-control">
                             @foreach (var item in Accounts)
                             {
                                 <option value=@item.ID>@item.Title</option>
@@ -73,37 +96,77 @@
                     </div>
                 </div>
             </div>
+            <div class="row g-2 p1-">
+                <button class="btn btn-primary" @onclick="Refresh">Refresh</button>
+            </div>
 
             @if (!IsPrinting)
             {
                 <div class="container control-buttons">
-                    <div class="btn-group" role="group" aria-label="Navigation Buttons" id="printBtns">
-                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Print);})">
-                            <i class="bi bi-printer"></i>
-                        </button>
-
-                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Preview);})">
-                            <i class="bi bi-search"></i>
-                        </button>
-                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.PDF);})">
-                            <i class="bi bi-file-pdf"></i>
-                        </button>
-                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Excel);})">
-                            <i class="bi bi-file-earmark-excel"></i>
-                        </button>
-                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Word);})">
-                            <i class="bi bi-file-earmark-word"></i>
-                        </button>
-                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.HTML);})">
-                            <i class="bi bi-filetype-html"></i>
-                        </button>
-                        <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Image);})">
-                            <i class="bi bi-file-earmark-image"></i>
-                        </button>
+                    <div>
+                        <ReportingButtons ReturnValue="Print" ID="@MyModel.COAID" />
                     </div>
                 </div>
             }
         </div>
+    </div>
+    <div class="table-container">
+        @if (MyModel.Ledger is not null)
+        {
+            <table class="table-list">
+                <thead>
+                    <tr>
+                        <th style="width:8%">Date</th>
+                        <th style="width:8%">Voucher</th>
+                        <th style="width:20%">Vendor / Client</th>
+                        <th style="width:30%">Remarks</th>
+                        <th style="width:10%">Debit</th>
+                        <th style="width:10%">Credit</th>
+                        <th style="width:10%">Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DataRow Row in MyModel.Ledger.Rows)
+                    {
+
+                        TotalDR += (decimal)Row["DR"];
+                        TotalCR += (decimal)Row["CR"];
+                        LedgerBalance += ((decimal)Row["DR"] - (decimal)Row["CR"]);
+
+                        string Debit = ((decimal)Row["DR"]).ToString(Format.Digit);
+                        string Credit = ((decimal)Row["CR"]).ToString(Format.Digit);
+                        string Balance = LedgerBalance.ToString(Format.Digit);
+                        string VouDate = ((DateTime)Row["Vou_Date"]).ToString(Format.DDMMMYY);
+
+                        <tr>
+                            <td>@Conversion.Row2Date(Row["Vou_Date"], Format.DDMMMYYYY)</td>
+                            <td>@Row["Vou_no"].ToString()</td>
+
+                            <td>@Row["CompanyName"].ToString()</td>
+                            <td class="left">@Row["Description"].ToString()</td>
+                            <td class="amount">@Debit</td>
+                            <td class="amount">@Credit</td>
+                            <td class="amount-blue">@Balance</td>
+                        </tr>
+                    }
+
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>TOTAL</td>
+                        <td class="amount">@TotalDR</td>
+                        <td class="amount">@TotalCR</td>
+                        <td class="amount-blue">@LedgerBalance</td>
+                    </tr>
+                </tfoot>
+
+            </table>
+        }
+
+
     </div>
 
 

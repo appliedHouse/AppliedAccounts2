@@ -1,9 +1,5 @@
-﻿using AppliedAccounts.Data;
-using AppliedAccounts.Models;
-using AppliedAccounts.Models.Interface;
+﻿using AppliedAccounts.Models;
 using AppliedAccounts.Services;
-using AppliedDB;
-using AppMessages;
 using AppReports;
 
 //using AppliedReports;
@@ -56,7 +52,7 @@ namespace AppliedAccounts.Pages.Sale
         public void UnitChanged(int _NewValue)
         {
             MyModel.MyVoucher.Detail.Unit = _NewValue;
-            MyModel.MyVoucher.Detail.TitleUnit = MyModel.Taxes.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
+            MyModel.MyVoucher.Detail.TitleUnit = MyModel.Units.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
         }
         #endregion
 
@@ -82,28 +78,30 @@ namespace AppliedAccounts.Pages.Sale
             //MyModel.CalculateTotal();
         }
         #endregion
-
       
-
-      
-        public void SaveAll()
+        public async void SaveAll()
         {
-            //Model.Save();
-            //Record = Model.SaleInvoiceRecord;
-            //Printmodel.ReportData.ReportTable = Model.SaleInvoiceRecords.ToDataTable();
+            var IsSaved = await MyModel.SaveAllAsync();
+
+            await InvokeAsync(StateHasChanged);
+
+            if (IsSaved)
+            {
+                ToastService.ShowToast(ToastClass.SaveToast, $"Save | {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
+                NavManager.NavigateTo($"/Sale/SaleInvoice/{MyModel.MyVoucher.Master.ID1}");
+            }
         }
 
         #region Delete
         public void Delete(int _Sr_No)
         {
-            //foreach (SaleInvoiceRecord _Record in Model.SaleInvoiceRecords)
-            //{
-            //    if (_Record.Sr_No == _Sr_No)
-            //    {
-            //        _Record.Sr_No = _Record.Sr_No * -1;
-            //    }
-            //}
-            //Model.SetTotals();
+            MyModel.MyVoucher.Detail = MyModel.MyVoucher.Details.Where(row => row.Sr_No==_Sr_No).First();
+            if (MyModel.MyVoucher.Detail is not null)
+            {
+                MyModel.Deleted.Add(MyModel.MyVoucher.Detail);                  // Save in deleted list
+                MyModel.MyVoucher.Details.Remove(MyModel.MyVoucher.Detail);     // remove from detail list
+                MyModel.MsgClass.Add(AppMessages.Enums.Messages.RowDeleted);    // Set message to display after deleted.
+            }
 
         }
         #endregion

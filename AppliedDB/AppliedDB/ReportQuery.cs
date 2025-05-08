@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace AppliedDB
 {
@@ -12,6 +7,7 @@ namespace AppliedDB
         public static string SaleInvoiceQuery(string _Filter)
         {
             var _Text = new StringBuilder();
+            _Text.Append("SELECT * FROM ( ");
             _Text.Append("SELECT [B2].[TranID], ");
             _Text.Append("[B1].[Vou_No],");
             _Text.Append("[B1].[Vou_Date], ");
@@ -41,6 +37,7 @@ namespace AppliedDB
             _Text.Append("LEFT JOIN [Customers] [C] ON [C].[ID] = [B1].[Company]");
             _Text.Append("LEFT JOIN [Employees] [E] ON [E].[ID] = [B1].[Employee]");
             _Text.Append("LEFT JOIN [Project] [P] ON [P].[ID] = [B2].[Project] LEFT JOIN [Inventory] [I] ON [I].[ID] = [B2].[Inventory] LEFT JOIN [Taxes] [T] ON[T].[ID] = [B2].[Tax] ");
+            _Text.Append(") AS [SalesInvoice] ");
             _Text.Append($"WHERE {_Filter} ");
 
             return _Text.ToString();

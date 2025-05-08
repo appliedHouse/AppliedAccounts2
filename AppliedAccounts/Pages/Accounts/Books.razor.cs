@@ -1,14 +1,18 @@
-﻿using AppliedAccounts.Models;
+﻿using AppliedAccounts.Data;
+using AppliedAccounts.Models;
+using AppliedAccounts.Models.Interface;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
+using AppReports;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Data;
 
 
 namespace AppliedAccounts.Pages.Accounts
 {
-    public partial class Books
+    public partial class Books 
     {
         [Parameter] public int ID { get; set; }
         //[Parameter] public int NatureID { get; set; }
@@ -34,7 +38,9 @@ namespace AppliedAccounts.Pages.Accounts
         {
             MsgClass = new();
             MyToastClass = new();
-            MyModel = new(ID,BookID, UserProfile);
+            MyModel = new(ID,BookID, UserProfile); ;
+            MyModel.AppGlobals = AppGlobals;
+            MyModel.ReportService = ReportService;
 
             if (MyModel == null) { IsPageValid = false; MsgClass.Add("Model is null"); return; }
             if (MyModel?.MyVoucher == null) { IsPageValid = false; MsgClass.Add("Voucher is null"); return; }
@@ -94,16 +100,21 @@ namespace AppliedAccounts.Pages.Accounts
 
             if (IsSaved)
             {
-                ToastService.ShowToast(ToastClass.SaveToast);
+                ToastService.ShowToast(ToastClass.SaveToast, MyModel.MyVoucher.Master.Vou_No);
             }
         }
         #endregion
-
 
         #region BackPage
         public void BackPage() { NavManager.NavigateTo("/Accounts/BooksList");}
         #endregion
 
+        #region Print
+        private void Print(ReportActionClass reportAction)
+        {
+            MyModel.Print(reportAction);
+        }
+        #endregion
 
 
 

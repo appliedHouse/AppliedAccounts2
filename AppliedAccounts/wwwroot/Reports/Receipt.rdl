@@ -9,7 +9,7 @@
       <am:Name>MSRB</am:Name>
       <am:Version>15.0.20283.0</am:Version>
     </am:UpdatedBy>
-    <am:LastModifiedTimestamp>2025-04-09T04:18:49.8432537Z</am:LastModifiedTimestamp>
+    <am:LastModifiedTimestamp>2025-05-06T19:30:56.0832094Z</am:LastModifiedTimestamp>
   </am:AuthoringMetadata>
   <df:DefaultFontFamily>Segoe UI</df:DefaultFontFamily>
   <AutoRefresh>0</AutoRefresh>
@@ -1054,6 +1054,17 @@ WHERE [R].[ID] = 20</CommandText>
       <AllowBlank>true</AllowBlank>
       <Prompt>Name of Company</Prompt>
     </ReportParameter>
+    <ReportParameter Name="Footer">
+      <DataType>String</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <Values>
+          <Value>Powered by Applied Software House</Value>
+        </Values>
+      </DefaultValue>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>Report footer </Prompt>
+    </ReportParameter>
     <ReportParameter Name="Heading1">
       <DataType>String</DataType>
       <Nullable>true</Nullable>
@@ -1075,17 +1086,6 @@ WHERE [R].[ID] = 20</CommandText>
       </DefaultValue>
       <AllowBlank>true</AllowBlank>
       <Prompt>Report sub heading</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Footer">
-      <DataType>String</DataType>
-      <Nullable>true</Nullable>
-      <DefaultValue>
-        <Values>
-          <Value>Powered by Applied Software House</Value>
-        </Values>
-      </DefaultValue>
-      <AllowBlank>true</AllowBlank>
-      <Prompt>Report footer </Prompt>
     </ReportParameter>
     <ReportParameter Name="InWord">
       <DataType>String</DataType>
@@ -1144,17 +1144,17 @@ WHERE [R].[ID] = 20</CommandText>
         <CellDefinition>
           <ColumnIndex>1</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>Heading1</ParameterName>
+          <ParameterName>Footer</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>2</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>Heading2</ParameterName>
+          <ParameterName>Heading1</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>3</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>Footer</ParameterName>
+          <ParameterName>Heading2</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>

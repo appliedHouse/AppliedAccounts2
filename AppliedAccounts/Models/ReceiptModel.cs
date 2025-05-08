@@ -4,11 +4,12 @@ using AppliedDB;
 using AppMessages;
 using System.Data;
 using SQLQueries;
-using MESSAGE = AppMessages.Enums.Messages;
-using static AppliedDB.Enums;
 using AppliedAccounts.Services;
 using AppReports;
-using Microsoft.AspNetCore.Components;
+using Applied_WebApplication.Data;
+using static AppliedDB.Enums;
+using MESSAGE = AppMessages.Enums.Messages;
+
 
 namespace AppliedAccounts.Models
 {
@@ -43,8 +44,8 @@ namespace AppliedAccounts.Models
 
         public bool IsWaiting { get; set; } = false;
         public ReportType rptType { get; set; }
-        public NavigationManager NavManager { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        public GlobalService AppGlobals { get; set; }
 
 
         #endregion
@@ -582,30 +583,51 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Print
-        public void Print(int _ID)
+        public async Task Print(ReportActionClass reportAction)
         {
-            ReportService = new()
+            await Task.Run(() =>
             {
-                RptData = GetReportData(_ID),              // always generate Data for report
-                RptModel = CreateReportModel(_ID),         // and then generate report parameters
-            };
-            ReportService.Generate();                       // Generate Report & Create reports byte[]
+                try
+                {
+                    SetKeys();
+                    ReceiptID = reportAction.VoucherID;
+                    ReportService = new(AppGlobals); ;                      // Initialize Report Service
+                    ReportService.ReportType = reportAction.PrintType;      // Assign Report Type 
+                    GetReportData();                                        // Report Data Source Setup
+                    UpdateReportModel();                                    // Update Report Model
 
+                    if (!ReportService.IsError) { ReportService.Print(); }  // Report Print / Preview / PDF / Excel / Word / Image / HTML
+                    else
+                    {
+                        MsgClass.Critical(MESSAGE.rptNotValidToPrint);     // Add Error Message to Page error view if Report is not valid
+                    }
+                }
+                catch (Exception error)
+                {
+                    MsgClass.Add(error.Message);
+                }
+
+            });
         }
 
-        public ReportData GetReportData(int ID)
+        public void GetReportData()
         {
-            var _Query = Quries.Receipt(ID);
+            var _Query = Quries.Receipt(ReceiptID);
             var _Table = Source.GetTable(_Query);
-            var _ReportData = new ReportData();
 
-            _ReportData.ReportTable = _Table;
-            _ReportData.DataSetName = "ds_receipt";
-
-            return _ReportData;
+            if (_Table.Columns.Count == 0)
+            {
+                ReportService.IsError = true;
+                MsgClass.Error(MESSAGE.rptDataTableIsNull);
+            }
+            else
+            {
+                ReportService.Data.ReportTable = _Table;
+                ReportService.Data.DataSetName = "ds_receipt";
+            }
         }
 
-        public ReportModel CreateReportModel(int ID)
+        public void UpdateReportModel()
         {
             var _InvoiceNo = "Receipt";
             var _Heading1 = "Receipt";
@@ -614,23 +636,37 @@ namespace AppliedAccounts.Models
             var _CompanyName = UserProfile.Company;
             var _ReportFooter = AppFunctions.ReportFooter();
 
-            ReportModel rptModel = new();
+            var _Amount = (decimal)ReportService.Data.ReportTable.Rows[0]["Amount"];
+            var _NumInWords = new NumInWords();
+            var _Currency = AppGlobals.Currency.Sign ?? "$";
+            var _CurrencyDigit = AppGlobals.Currency.DigitTitle ?? "";
+            var _AmountinWord = _NumInWords.ChangeCurrencyToWords(_Amount, _Currency, _CurrencyDigit);
+            var ShowImage = false;
 
-            rptModel.InputReport.FileName = $"Receipt";
-            rptModel.InputReport.FileExtention = "rdl";
-            rptModel.InputReport.FilePath = UserProfile!.ReportFolder;
+            ReportService.Model.InputReport.FileName = $"Receipt.rdl";
+            ReportService.Model.ReportDataSource = ReportService.Data;
+            ReportService.Model.OutputReport.FileName = $"Receipt_{ReceiptID}";
+            ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
+            ReportService.Model.AddReportParameter("Heading1", _Heading1);
+            ReportService.Model.AddReportParameter("Heading2", _Heading2);
+            ReportService.Model.AddReportParameter("InWord", _AmountinWord);
+            ReportService.Model.AddReportParameter("CurrencySign", AppGlobals.Currency.Sign ?? "$");
+            ReportService.Model.AddReportParameter("PayerTitle", "Donor");
+            ReportService.Model.AddReportParameter("ShowImages", ShowImage.ToString());
 
-            rptModel.OutputReport.FileName = $"Receipt_{ID}";
-            //rptModel.OutputReport.FileExtention = ".pdf";
-            rptModel.OutputReport.FilePath = UserProfile!.PDFFolder;
-            rptModel.OutputReport.ReportType = ReportType.PDF;
+        }
+        #endregion
 
-            rptModel.AddReportParameter("CompanyName", _CompanyName);
-            rptModel.AddReportParameter("Heading1", _Heading1);
-            rptModel.AddReportParameter("Heading2", _Heading2);
-            rptModel.AddReportParameter("Footer", _ReportFooter);
+        #region Get & Set Keys
+        public void SetKeys()
+        {
+            AppRegistry.SetKey(Source.DBFile, "Receipt", MyVoucher.Master.Vou_Date, KeyType.Date, "Receipt Page");
+            
+        }
 
-            return rptModel;
+        public void GetKeys()
+        {
+            
         }
         #endregion
 
@@ -664,7 +700,6 @@ namespace AppliedAccounts.Models
             }
             return _NetAmount;
         }
-
 
 
         #endregion

@@ -11,42 +11,52 @@
 
 @inject GlobalService _Global;
 
-<EditForm Model="@Model" OnValidSubmit="@Submit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+@if (IsError)
+{
+    <div class="alert alert-danger" role="alert">
+        @ErrorMessage
+    </div>
+    <a class="btn btn-link" href="/">Home</a>
+}
+else
+{
+    <EditForm Model="@Model" OnValidSubmit="@Submit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-    <div class="login-wrapper">
-        <div class="login-box">
-            <div class="login-left">
-                <img src="/images/Logo/Logo500_1.png" alt="Logo" />
-                <h2>APPLIED ACCOUNTS</h2>
-                <p>ACCOUNTING SOFTWARE</p>
-            </div>
-
-            <div class="login-right">
-                <h2>Login</h2>
-
-                <InputText class="input" @bind-Value="@Model.UserID" placeholder="ID" />
-                <InputText class="input" @bind-Value="@Model.Password" type="password" placeholder="Password" />
-
-                <div class="options">
-                    <label>
-                        <InputCheckbox @bind-Value="Model.IsSaved" /> Remember Me
-                    </label>
-                    <a class="forgot-link" href="/Users/Resetpw">Forgot Password?</a>
+        <div class="login-wrapper">
+            <div class="login-box">
+                <div class="login-left">
+                    <img src="/images/Logo/Logo500_1.png" alt="Logo" />
+                    <h2>APPLIED ACCOUNTS</h2>
+                    <p>ACCOUNTING SOFTWARE</p>
                 </div>
 
-                <button class="login-button" type="submit">Login</button>
+                <div class="login-right">
+                    <h2>Login</h2>
 
-                @if (!IsLogin)
-                {
-                    <div class="alert alert-danger mt-3">You are not login...</div>
-                    <button type="button" class="btn btn-primary w-100 mt-2" @onclick="ReLoad">Reset Page</button>
-                }
+                    <InputText class="input" @bind-Value="@Model.UserID" placeholder="ID" />
+                    <InputText class="input" @bind-Value="@Model.Password" type="password" placeholder="Password" />
+
+                    <div class="options">
+                        <label>
+                            <InputCheckbox @bind-Value="Model.IsSaved" /> Remember Me
+                        </label>
+                        <a class="forgot-link" href="/Users/Resetpw">Forgot Password?</a>
+                    </div>
+
+                    <button class="login-button" type="submit">Login</button>
+
+                    @if (!IsLogin)
+                    {
+                        <div class="alert alert-danger mt-3">You are not login...</div>
+                        <button type="button" class="btn btn-primary w-100 mt-2" @onclick="ReLoad">Reset Page</button>
+                    }
+                </div>
             </div>
         </div>
-    </div>
-</EditForm>
+    </EditForm>
+}
 
 <style>
     .login-wrapper {

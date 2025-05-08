@@ -1,7 +1,6 @@
 using AppliedDB;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using AppliedAccounts.Data;
 using AppliedAccounts.Authentication;
 using AppliedAccounts.Services;
 using Microsoft.AspNetCore.Components;
@@ -51,12 +50,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 

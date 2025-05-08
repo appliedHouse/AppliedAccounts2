@@ -46,8 +46,9 @@ namespace AppliedAccounts.Models
         public decimal Tot_CR { get; set; }
         public bool IsWaiting { get; set; }
         public bool IsSaved { get; set; }
-        public NavigationManager NavManager { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public PrintService ReportService { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public NavigationManager NavManager => AppGlobals.NavManager;
+        public PrintService ReportService { get; set; }
+        public GlobalService AppGlobals { get; set; }
 
         private int CashNatureID = 0;
         private int BankNatureID = 0;
@@ -323,14 +324,15 @@ namespace AppliedAccounts.Models
                         CommandClass cmdClass1 = new(Row1, Source.MyConnection);
                         cmdClass1.SaveChanges();
 
-                        Row1["ID"] = cmdClass1.PrimaryKeyID;                // Get a new Id of record after save / insert.
+                        VoucherID = cmdClass1.PrimaryKeyID;
+                        Row1["ID"] = VoucherID;                // Get a new Id of record after save / insert.
 
                         var Row2 = Source.GetNewRow(Tables.Book2);
 
                         foreach (var item in MyVoucher.Details)
                         {
                             Row2["ID"] = item.ID2;
-                            Row2["TranID"] = Row1["ID"];
+                            Row2["TranID"] = VoucherID;
                             Row2["SR_NO"] = item.Sr_No;
                             Row2["COA"] = item.COA;
                             Row2["Company"] = item.Company;
@@ -343,8 +345,6 @@ namespace AppliedAccounts.Models
 
                             CommandClass cmdClass2 = new(Row2, Source.MyConnection);
                             cmdClass2.SaveChanges();
-
-
                         }
 
                         IsWaiting = false;
@@ -446,10 +446,6 @@ namespace AppliedAccounts.Models
             { MyVoucher.Detail = MyVoucher.Details.Last(); }
         }
 
-        public void Print()
-        {
-
-        }
 
         public void CalculateTotal()
         {
@@ -460,20 +456,59 @@ namespace AppliedAccounts.Models
                 Tot_CR = MyVoucher.Details.Sum(e => e.CR);
             }
         }
+        #endregion
 
-        public void Print(int _ID)
+        #region Print
+        public async void Print(ReportActionClass _ReportAction)
         {
-            throw new NotImplementedException();
+            await Task.Run(() =>
+            {
+                ReportService = new(AppGlobals);
+                ReportService.ReportType = _ReportAction.PrintType;
+                ReportService.Data = GetReportData();
+                ReportService.Model = CreateReportModel();
+            });
+
+            try
+            {
+                ReportService.Print();
+            }
+            catch (Exception error)
+            {
+                MsgClass.Add(error.Message);
+            }
+
         }
 
-        public ReportData GetReportData(int ID)
+        public ReportData GetReportData()
         {
-            throw new NotImplementedException();
+            ReportData reportData = new(); ;
+            reportData.ReportTable = Source.GetBookVoucher(VoucherID);
+            reportData.DataSetName = "ds_Book";
+
+            return reportData;
         }
 
-        public ReportModel CreateReportModel(int ID)
+        public ReportModel CreateReportModel()
         {
-            throw new NotImplementedException();
+            ReportModel reportModel = new();
+            reportModel.InputReport.FileName = "CashBankBook.rdl";
+            reportModel.InputReport.FilePath = AppGlobals.AppPaths.ReportPath;
+
+            reportModel.ReportDataSource = ReportService.Data;
+            reportModel.OutputReport.FileName = "Book";
+
+            string _CompanyName = AppGlobals.Author.Country;
+            string _Heading1 = BookNatureTitle;
+            string _Heading2 = $"Voucher {MyVoucher.Master.Vou_No}";
+            string _Footer = AppGlobals.Reporting.ReportFooter;
+
+            reportModel.AddReportParameter("Company", _CompanyName);
+            reportModel.AddReportParameter("Heading1", _Heading1);
+            reportModel.AddReportParameter("Heading2", _Heading2);
+            reportModel.AddReportParameter("Footer", _Footer);
+
+            return reportModel;
         }
         #endregion
 

@@ -1,125 +1,272 @@
-﻿using AppReports;
+﻿using AppliedDB;
+using AppMessages;
+using AppReports;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Microsoft.Reporting.NETCore;
+using static AppMessages.Enums;
+using System.Formats.Asn1;
 
 namespace AppliedAccounts.Services
 {
     public class PrintService
     {
-        
-        public ReportData RptData { get; set; }
-        public ReportModel RptModel { get; set; }
-        public ReportType RptType { get; set; }
-        public string RptUrl { get; set; }
-        public string JSOption { get; set; }
         public IJSRuntime JS { get; set; }
         public GlobalService Config { get; set; }
         public NavigationManager NavManager { get; set; }
-        
-        public string ReportUrl { get; set; } = string.Empty;
+        public AppUserModel? UserProfile { get; set; }
+
+        public ReportData Data { get; set; }
+        public ReportModel Model { get; set; }
+        public ReportType ReportType { get; set; }
+        public ReportExtractor Extractor { get; set; }
+
+
+        //public MessageClass MsgClass { get; set; }
+        public bool IsError { get; set; } = false;
+        public List<string> MyMessage { get; set; } = new();
+      
 
         public PrintService(GlobalService _Config)
         {
             Config = _Config;
             NavManager = Config.NavManager;
             JS = Config.JS;
-            ReportUrl = $"{Config.AppPaths.BaseUri}{Config.AppPaths.PDFPath}";
+            //MsgClass = new();
+
+            Data = new();
+            Model = new();
+
+            Model.InputReport.RootPath = Config.AppPaths.RootPath;
+            Model.InputReport.FilePath = Config.AppPaths.ReportPath;
+            
+            Model.OutputReport.BasePath = NavManager.BaseUri;
+            Model.OutputReport.RootPath = Config.AppPaths.RootPath;
+            Model.OutputReport.FilePath = Config.AppPaths.PDFPath;
+
+            if(string.IsNullOrEmpty(Config.Reporting.ReportTitle)) { Config.Reporting.ReportTitle = "APPLIED SOFTWARE HOUSE"; }
+            if(string.IsNullOrEmpty(Config.Reporting.ReportFooter)) { Config.Reporting.ReportFooter = "APPLIED ACCOUNTS"; }
+
+
+            Model.ReportParameters =
+            [
+                new ReportParameter("CompanyName", Config.Reporting.ReportTitle ),
+                new ReportParameter("Footer", Config.Reporting.ReportFooter)
+            ];
         }
 
         public PrintService()
         {
         }
-        public byte[] Generate()
+
+        #region Print a Report
+        public async void Print()
         {
-            
-            RptModel.ReportData = RptData;          // Set Report Data to print in report.
-            if (RptModel.ReportData != null)
+            IsError = ReportValidate();
+
+            if (!IsError)
             {
-                if (RptModel.ReportRender())
+                switch (Model.OutputReport.ReportType)
                 {
-                    // In the Process of ReportRender, ReportBytes are generated.
-                    return RptModel.ReportBytes;
+                    case ReportType.Print: await Printer(); break;
+                    case ReportType.Preview: await Preview(); break;
+                    case ReportType.PDF: await PDF(); break;
+                    case ReportType.Excel: await Excel(); break;
+                    case ReportType.Word: await Word(); break;
+                    case ReportType.Image: await Image(); break;
+                    case ReportType.HTML: await HTML(); break;
+                    default: await Preview(); break;
                 }
             }
-            return [];
         }
 
+        #endregion
 
-        private string RenderReport()
+        #region Report Validation
+        public bool ReportValidate()
         {
-            RptModel.ReportData = RptData;          // Set Report Data to print in report.
+            bool result = false;
+            Extractor = new(Model.InputReport.FileFullName);
 
-            if (RptModel.ReportData != null)
+            if (!Model.IsParametersValid())
             {
-                if (RptModel.ReportRender())
+                result = true;
+                MyMessage.Add("Report Parameters are not equal with report.");
+            }
+
+            if (Data.DataSetName != Extractor.DataSetName)
+            {
+                result = true;
+                MyMessage.Add("Report Dataset Name is not matched with report.");
+            }
+
+            return result;
+
+        }
+        #endregion
+
+
+
+
+        #region Option (Type) of Printing Of reports. Print,Preview,PDF, Excel.... 
+        public async Task Printer()
+        {
+            try
+            {
+                Model.ReportDataSource = Data;
+                bool IsRendered = Model.ReportRender(ReportType.Print);
+                if (IsRendered)
                 {
-                    if (RptType == ReportType.Preview)
-                    { JSOption = "displayPDF"; }
-                    else
-                    { JSOption = "downloadFile"; }
-                    return JSOption;
+                    string rptBytes64 = Convert.ToBase64String(Model.ReportBytes);
+                    await JS.InvokeVoidAsync("printer", rptBytes64);
+                }
+                else
+                {
+                    MyMessage.Add(Model.ErrorMessage);
                 }
             }
-            return "";
-        }
+            catch (Exception error)
+            {
 
-        public string GetReportLink()
+                IsError = true;
+                MyMessage.Add(error.Message);
+            }
+
+            if(Model.ErrorMessage.Length > 0)
+            {
+                MyMessage.Add(Model.ErrorMessage);
+            }
+
+
+        }
+        public async Task Preview()
         {
-            RptModel.OutputReport.ReportType = RptType;
-            JSOption = RenderReport();
-            RptUrl = string.Concat(RptModel.OutputReport.FileLink);
-            return RptUrl;
-        }
+            try
+            {
+                if (Model.ReportRender(ReportType.Preview))
+                {
+                    await JS.InvokeVoidAsync("DisplayPDF", Model.ReportBytes);
+                }
+                else
+                {
+                    MyMessage.Add(Model.ErrorMessage);
+                }
+            }
+            catch (Exception error)
+            {
 
-        public async Task Print()
+                IsError = true;
+                MyMessage.Add(error.Message);
+            }
+        }
+        public async Task PDF()
         {
-            RptModel.ReportData = RptData;
-            RptModel.ReportRender(ReportType.Print);
-            string rptBytes64 = Convert.ToBase64String(RptModel.ReportBytes);
-            await JS.InvokeVoidAsync("printer", rptBytes64);
-        }
+            try
+            {
+                if (Model.ReportRender(ReportType.PDF))
+                {
+                    await JS.InvokeVoidAsync("downloadFile",
+                          Model.OutputReport.FileName,
+                          Model.ReportBytes,
+                          Model.OutputReport.MimeType);
+                }
+                else
+                {
+                    MyMessage.Add(Model.ErrorMessage);
+                }
+            }
+            catch (Exception error)
+            {
 
-        public void Preview()
+                IsError = true;
+                MyMessage.Add(error.Message);
+            }
+        }
+        public async Task Excel()
         {
-            RptModel.ReportRender(ReportType.Preview);
-            JS.InvokeVoidAsync("DisplayPDF", RptModel.ReportBytes);
-        }
+            try
+            {
+                if (Model.ReportRender(ReportType.Excel))
+                {
+                    await JS.InvokeVoidAsync("downloadFile",
+                          Model.OutputReport.FileName,
+                          Model.ReportBytes,
+                          Model.OutputReport.MimeType);
+                }
+                else
+                {
+                    MyMessage.Add(Model.ErrorMessage);
+                }
+            }
+            catch (Exception error)
+            {
 
-        internal void PDF()
+                IsError = true;
+                MyMessage.Add(error.Message);
+            }
+        }
+        public async Task Word()
         {
-            RptModel.ReportRender(ReportType.PDF);
-            JS.InvokeVoidAsync("downloadPDF", RptModel.OutputReport.FileName, RptModel.ReportBytes);
-        }
+            try
+            {
+                if (Model.ReportRender(ReportType.Word))
+                {
+                    await JS.InvokeVoidAsync("downloadFile",
+                          Model.OutputReport.FileName,
+                          Model.ReportBytes,
+                          Model.OutputReport.MimeType);
+                }
+                else
+                {
+                    MyMessage.Add(Model.ErrorMessage);
+                }
+            }
+            catch (Exception error)
+            {
 
-        internal void Excel()
+                IsError = true;
+                MyMessage.Add(error.Message);
+            }
+        }
+        public async Task Image()
         {
-            RptModel.ReportRender(ReportType.Excel);
 
-            var FileLink = $"{ReportUrl}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
-            NavManager.NavigateTo(FileLink, forceLoad: true);
+            if (Model.ReportRender(ReportType.Image))
+            {
+                await JS.InvokeVoidAsync("DisplayFile",
+                    Model.ReportBytes,
+                    Model.OutputReport.MimeType);
+            }
+            else
+            {
+                MyMessage.Add(Model.ErrorMessage);
+            }
+
         }
-
-        internal void Word()
+        public async Task HTML()
         {
-            RptModel.ReportRender(ReportType.Word);
+            try
+            {
+                if (Model.ReportRender(ReportType.HTML))
+                {
+                    await JS.InvokeVoidAsync("downloadFile",
+                          Model.OutputReport.FileName,
+                          Model.ReportBytes,
+                          Model.OutputReport.MimeType);
+                }
+                else
+                {
+                    MyMessage.Add(Model.ErrorMessage);
+                }
+            }
+            catch (Exception error)
+            {
 
-            var FileLink = $"{ReportUrl}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
-            NavManager.NavigateTo(FileLink, forceLoad: true);
-        }
+                IsError = true;
+                MyMessage.Add(error.Message);
+            }
 
-        internal void Image()
-        {
-            RptModel.ReportRender(ReportType.Image);
-            var FileLink = $"{ReportUrl}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
-            NavManager.NavigateTo(FileLink, forceLoad: true);
-            //JS.InvokeVoidAsync("open", FileLink, "_blank");
         }
-
-        internal void HTML()
-        {
-            RptModel.ReportRender(ReportType.HTML);
-            var FileLink = $"{ReportUrl}/{RptModel.OutputReport.FileName}{RptModel.OutputReport.FileExtention}";
-            JS.InvokeVoidAsync("open", FileLink, "_blank");
-        }
+        #endregion
     }
 }

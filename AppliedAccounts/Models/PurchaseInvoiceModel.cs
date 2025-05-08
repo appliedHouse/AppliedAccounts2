@@ -158,7 +158,7 @@ namespace AppliedAccounts.Models
         public void GetPurchaseInvoice(string _InvoiceNo)
         {
             PurchaseInvoiceRecords = SetPurchaseInvoice(_InvoiceNo);
-            Report.ReportData.ReportTable = PurchaseInvoiceRecords.ToDataTable();
+            Report.ReportDataSource.ReportTable = PurchaseInvoiceRecords.ToDataTable();
             SetTotals();
         }
         public List<PurchaseInvoiceRecord> SetPurchaseInvoice(string _InvoiceNo)
@@ -305,7 +305,7 @@ namespace AppliedAccounts.Models
 
                 View_PurchaseInvoice = Source.GetTable(Enums.Tables.view_BillPayable);
                 PurchaseInvoiceRecords = SetPurchaseInvoice(InvoiceNo);
-                Report.ReportData.ReportTable = GetReportTable();
+                Report.ReportDataSource.ReportTable = GetReportTable();
 
                 #endregion
             }
@@ -507,25 +507,25 @@ namespace AppliedAccounts.Models
                 var _ReportFile = GetText(_DBFile, _ReportFileKey);
                 //if (_SourceTable == null) { return new(); }
 
+                
+                // Input Parameters  (.rdl report file)
+                Reportmodel.InputReport.FileName = _ReportFile;
+                
+                // output Parameters (like pdf, excel, word, html, tiff)
+                Reportmodel.OutputReport.FileName = _ReportFile;
+                Reportmodel.OutputReport.ReportType = _RptType;
+
+                // Reports Parameters
+
                 var _Heading1 = GetText(_DBFile, _Heading1Key);
                 var _Heading2 = GetText(_DBFile, _Heading2Key);
 
-                // Input Parameters  (.rdl report file)
-                Reportmodel.InputReport.FilePath = _Globals.AppPaths.ReportPath;
-                Reportmodel.InputReport.FileName = _ReportFile;
-                Reportmodel.InputReport.FileExtention = "rdl";
-                // output Parameters (like pdf, excel, word, html, tiff)
-                Reportmodel.OutputReport.FilePath = _Globals.AppPaths.PDFPath;
-                //Reportmodel.OutputReport.FileLink = _Globals.AppPaths.PDFPath;
-                Reportmodel.OutputReport.FileName = _ReportFile;
-                Reportmodel.OutputReport.ReportType = _RptType;
-                // Reports Parameters
                 Reportmodel.AddReportParameter("CompanyName", UserProfile.Company);
                 Reportmodel.AddReportParameter("Heading1", _Heading1);
                 Reportmodel.AddReportParameter("Heading2", _Heading2);
                 Reportmodel.AddReportParameter("Footer", "Power by Applied Software House");
 
-                Reportmodel.ReportData.DataSetName = _DataSetName;
+                Reportmodel.ReportDataSource.DataSetName = _DataSetName;
                 
             }
             catch (Exception)

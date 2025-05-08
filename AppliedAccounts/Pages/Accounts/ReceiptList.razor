@@ -8,10 +8,9 @@
 @using AppliedDB
 @using System.Data
 
-@inject AuthenticationStateProvider authorized;
-@inject NavigationManager NavManager;
-@inject IJSRuntime js
-@inject PrintService PrintService;
+@inject AuthenticationStateProvider authorized
+@inject PrintService PrintService
+@inject GlobalService AppGlobals
 
 @code {
     private string UserRoll;
@@ -24,6 +23,8 @@
         UserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
         MyModel = new(UserProfile ?? new());   // BookID and UserProfile.
         MyModel.Source = new(UserProfile ?? new());
+        MyModel.AppGlobals = AppGlobals;
+        MyModel.GetKeys();
 
         MyModel.PageIsValid = true;
         if (MyModel.UserProfile is null) { MyModel.PageIsValid = false; return; }
@@ -38,12 +39,12 @@
 
     private void Edit(int ReceiptID)
     {
-        NavManager.NavigateTo($"/Accounts/Receipt/{ReceiptID}");
+        AppGlobals.NavManager.NavigateTo($"/Accounts/Receipt/{ReceiptID}");
     }
 
     private void AddNew()
     {
-        NavManager.NavigateTo($"/Accounts/Receipt");
+        AppGlobals.NavManager.NavigateTo($"/Accounts/Receipt");
     }
 }
 
@@ -95,7 +96,7 @@
 
             <!-- Data List (Records)-->
 
-            <div class="table-container">
+            <div class="container">
                 <table class="table-list">
                     <thead>
                         <tr>
@@ -133,7 +134,7 @@
                                     <td class="amount">@_Amount</td>
                                     <td>
                                         <button class="btn btn-edit" @onclick="(()=>Edit(_ID))"><i class="bi bi-pencil-fill"></i></button>
-                                        <button class="btn btn-edit text-bg-success" @onclick="(()=>Print(_ID))"><i class="bi bi-printer-fill"></i></button>
+                                        <PrintButton ReturnValue="Print" VoucherID="_ID"/>
                                     </td>
                                 </tr>
                             }

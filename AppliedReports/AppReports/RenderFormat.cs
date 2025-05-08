@@ -2,7 +2,7 @@
 {
     public static class RenderFormat
     {
-        public static string GetRenderFormat(ReportType _ReportType)
+        public static string Get(ReportType _ReportType)
         {
             if (_ReportType == ReportType.Print) { return "PDF"; }
             if (_ReportType == ReportType.Preview) { return "PDF"; }

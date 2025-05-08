@@ -42,18 +42,19 @@ function downloadFile(fileName, byteArray, mimeType) {
     URL.revokeObjectURL(link.href); // Clean up the object URL
 }
 
-
 function DisplayPDF(byteArray) {
     const bytes = new Uint8Array(byteArray);
     const blob = new Blob([bytes], { type: "application/pdf" });
-
-    // Create a blob URL
     const blobUrl = URL.createObjectURL(blob);
-
-    // Open in new tab
     window.open(blobUrl, '_blank');
 }
 
+function DisplayFile(byteArray, mimeType ) {
+    const bytes = new Uint8Array(byteArray);
+    const blob = new Blob([bytes], { type: mimeType });
+    const blobUrl = URL.createObjectURL(blob);
+    window.open(blobUrl, '_blank');
+}
 
 // Download a  existed file PDF, Excel, Word, HTML, Image
 window.OpenLink = function (fileUrl) {
@@ -65,10 +66,3 @@ window.OpenLink = function (fileUrl) {
     document.body.removeChild(link);
 }
 
-// display a PDF File in Browser
-window.displayPDF = function (fileUrl) {
-    const link = document.createElement('a');
-    link.href = fileUrl;
-    link.target = "_blank"
-    link.click();
-}

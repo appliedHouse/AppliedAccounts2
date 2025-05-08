@@ -11,13 +11,18 @@ namespace AppliedAccounts.Data
 
         public static string Row2Date(object _Value)
         {
+            return Row2Date(_Value, Format.DDMMMYY);
+        }
+
+        public static string Row2Date(object _Value, string _Format)
+        {
             string _Result = string.Empty;
             if (_Value == null) { return _Result; }
 
             try
             {
                 var _Date = (DateTime)_Value;
-                _Result = _Date.ToString(Format.DDMMYY);
+                _Result = _Date.ToString(_Format);
             }
             catch (Exception)
             {

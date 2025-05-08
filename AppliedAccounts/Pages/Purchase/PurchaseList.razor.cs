@@ -82,11 +82,11 @@ namespace AppliedAccounts.Pages.Purchase
             var _Title = MyModel.Record.SupplierTitle.Replace(".", "_"); // Replace dot with _ for file name correction.
             var _FileName = $"{_Batch}_{_Title}";
 
-            ReportService.RptData = GetReportData(ID);              // always generate Data for report
-            ReportService.RptModel = CreateReportModel(ID);         // and then generate report parameters
-            ReportService.RptType = ReportType.Preview;
-            var ReportList = ReportService.GetReportLink();
-            await js.InvokeVoidAsync("downloadPDF", _FileName, ReportService.RptModel.ReportBytes);
+            ReportService.Data = GetReportData(ID);              // always generate Data for report
+            ReportService.Model = CreateReportModel(ID);         // and then generate report parameters
+            ReportService.ReportType = ReportType.Preview;
+            //var ReportList = ReportService.GetReportLink();
+            await js.InvokeVoidAsync("downloadPDF", _FileName, ReportService.Model.ReportBytes);
 
         }
         private ReportData GetReportData(int ID)
@@ -115,19 +115,11 @@ namespace AppliedAccounts.Pages.Purchase
                 var _CompanyName = AppUser.Company;
                 var _ReportFooter = AppFunctions.ReportFooter();
 
-                // Input Parameters  (.rdl report file)
-                _Reportmodel.InputReport.FilePath = _ReportPath;
                 _Reportmodel.InputReport.FileName = "PurchasedInvoice";
-                _Reportmodel.InputReport.FileExtention = "rdl";
-                // output Parameters (like pdf, excel, word, html, tiff)
-                _Reportmodel.OutputReport.FilePath = AppUser.PDFFolder + "\\";
-                //_Reportmodel.OutputReport.FileLink = "";
                 _Reportmodel.OutputReport.ReportType = _ReportOption;
                 // Reports Parameters
-                _Reportmodel.AddReportParameter("CompanyName", _CompanyName);
                 _Reportmodel.AddReportParameter("Heading1", _Heading1);
                 _Reportmodel.AddReportParameter("Heading2", _Heading2);
-                _Reportmodel.AddReportParameter("Footer", _ReportFooter);
 
                 var _SaveAs = "Test";
 

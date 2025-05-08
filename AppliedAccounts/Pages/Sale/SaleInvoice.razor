@@ -332,7 +332,7 @@
                     </thead>
                     <tbody>
 
-                        @foreach (var SaleRecord in MyModel.MyVoucher.Details)
+                        @foreach (var SaleRecord in MyModel.GetDisplayList(ShowDigits))
                         {
 
                             var _NavTo = $"/Sale/SaleInvoice/{SaleRecord.ID2}";

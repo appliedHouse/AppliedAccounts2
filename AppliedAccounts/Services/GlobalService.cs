@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using AppliedAccounts.Libs;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Reflection.Metadata;
 
 namespace AppliedAccounts.Services
 {
@@ -14,6 +16,8 @@ namespace AppliedAccounts.Services
         public LanguageClass Language { get; set; } = new();
         public CurrencyClass Currency { get; set; } = new();
         public Format AppFormat { get; set; } = new();
+        public PrintReport Reporting { get; set; } = new();
+        
 
         public GlobalService() { }
 
@@ -26,6 +30,7 @@ namespace AppliedAccounts.Services
             AppPaths.BaseUri = NavManager.BaseUri;
             AppPaths.FirstPath = Directory.GetCurrentDirectory();
             AppPaths.RootPath = Config.GetValue<string>("Paths:RootPath") ?? "wwwroot";
+            
             AppPaths.SystemPath = Config.GetValue<string>("Paths:SystemPath") ?? "System";
             AppPaths.ImagesPath = Config.GetValue<string>("Paths:ImagesPath") ?? "Images";
             AppPaths.ReportPath = Config.GetValue<string>("Paths:ReportPath") ?? "Reports";
@@ -64,6 +69,15 @@ namespace AppliedAccounts.Services
                 Title = Config.GetValue<string>("Currency:Title"),
                 Format = Config.GetValue<string>("Currency:Format"),
             };
+
+            Reporting = new()
+            {
+                ReportFooter = Config.GetValue<string>("Report:ReportFooter") ?? "",
+                ReportTitle = Config.GetValue<string>("Report:ReportTitle") ?? "",
+                ReportLogo = Config.GetValue<string>("Report:ReportLogo") ?? "",
+            };
+
+
 
 
         }
@@ -119,6 +133,8 @@ namespace AppliedAccounts.Services
         public int ID { get; set; }
         public string? Sign { get; set; }
         public string? Title { get; set; }
+        public int? Digits { get; set; }
+        public string? DigitTitle { get; set; }
         public string? Format { get; set; }
     }
     #endregion
@@ -143,12 +159,11 @@ namespace AppliedAccounts.Services
     #endregion
 
     #region Printing Reports
-    public class PrintReports
+    public class PrintReport
     {
-        public string BaseUrl { get; set; }
-        public string ReportFooter { get; set; }
         public string ReportTitle { get; set; }
-        public string ReportLogo { get; set; }
+        public string ReportFooter { get; set; }
+        public string ReportLogo { get; set; }          // Link of logi file   jpg, png, bmp etc
     }
     #endregion
 }

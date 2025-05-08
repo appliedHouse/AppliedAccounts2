@@ -1,38 +1,34 @@
-﻿using AppliedAccounts.Data;
-using AppliedAccounts.Models.Interface;
+﻿using Applied_WebApplication.Data;
+using AppliedAccounts.Data;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using AppReports;
-using Microsoft.AspNetCore.Components;
+using SQLQueries;
 using System.Data;
 using System.Text;
 using static AppliedDB.Enums;
+using MESSAGES = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Models
 {
-    public class ReceiptListModel : IVoucherList
+    public class ReceiptListModel
     {
+        public GlobalService AppGlobals { get; set; }
         public AppUserModel? UserProfile { get; set; }
         public DataSource Source { get; set; }
         public List<DataRow> DataList { get; set; }
         public List<CodeTitle> PayerList { get; set; }
+        public int ReceiptID { get; set; }
         public int PayerID { get; set; }
         public Tables Table { get; set; }
         public string SearchText { get; set; }
         public MessageClass MsgClass { get; set; }
-        public PrintService Printer { get; set; }
         public DateTime DT_Start { get; set; }
         public DateTime DT_End { get; set; }
         public bool PageIsValid { get; set; } = false;
         public PrintService ReportService { get; set; }
-        public AppUserModel? AppUser { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string DBFile { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public object Record { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public List<object> Records { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public decimal TotalAmount { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool SelectAll { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public NavigationManager NavManager { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
 
         public ReceiptListModel(AppUserModel _AppUserModel)
         {
@@ -45,7 +41,7 @@ namespace AppliedAccounts.Models
             SearchText = AppRegistry.GetText(Source.DBFile, "rcptSearch");
             PayerList = Source.GetCustomers();
             DataList = LoadData();
-            Printer = new();
+
 
         }
 
@@ -88,39 +84,57 @@ namespace AppliedAccounts.Models
         #region Refresh Data
         public void RefreshData()
         {
+            SetKeys();
             DataList = LoadData();
         }
         #endregion
 
         #region Print
-        public void Print(int _ID)
+        public async Task Print(ReportActionClass reportAction)
         {
-            ReportService = new()
+            await Task.Run(() =>
             {
-                RptData = GetReportData(_ID),              // always generate Data for report
-                RptModel = CreateReportModel(_ID),         // and then generate report parameters
-               
+                try
+                {
+                    SetKeys();
+                    ReceiptID = reportAction.VoucherID;
+                    ReportService = new(AppGlobals); ;                      // Initialize Report Service
+                    ReportService.ReportType = reportAction.PrintType;      // Assign Report Type 
+                    GetReportData();                                        // Report Data Source Setup
+                    UpdateReportModel();                                    // Update Report Model
 
-            };
-            ReportService.RptType = ReportType.Preview;
-            var ReportList = ReportService.GetReportLink();
-            //await js.InvokeVoidAsync("downloadPDF", _FileName, ReportService.RptModel.ReportBytes);
+                    if (!ReportService.IsError) { ReportService.Print(); }  // Report Print / Preview / PDF / Excel / Word / Image / HTML
+                    else
+                    {
+                        MsgClass.Critical(MESSAGES.rptNotValidToPrint);     // Add Error Message to Page error view if Report is not valid
+                    }
+                }
+                catch (Exception error)
+                {
+                    MsgClass.Add(error.Message);
+                }
 
+            });
         }
 
-        public ReportData GetReportData(int ID)
+        public void GetReportData()
         {
-            var _Query = SQLQueries.Quries.Receipt(ID);
+            var _Query = Quries.Receipt(ReceiptID);
             var _Table = Source.GetTable(_Query);
-            var _ReportData = new ReportData();
 
-            _ReportData.ReportTable = _Table;
-            _ReportData.DataSetName = "ds_receipt";
-
-            return _ReportData;
+            if (_Table.Columns.Count == 0)
+            {
+                ReportService.IsError = true;
+                MsgClass.Error(MESSAGES.rptDataTableIsNull);
+            }
+            else
+            {
+                ReportService.Data.ReportTable = _Table;
+                ReportService.Data.DataSetName = "ds_receipt";
+            }
         }
 
-        private ReportModel CreateReportModel(int ID)
+        public void UpdateReportModel()
         {
             var _InvoiceNo = "Receipt";
             var _Heading1 = "Receipt";
@@ -129,36 +143,53 @@ namespace AppliedAccounts.Models
             var _CompanyName = UserProfile.Company;
             var _ReportFooter = AppFunctions.ReportFooter();
 
-            ReportModel rptModel = new();
+            var _Amount = (decimal)ReportService.Data.ReportTable.Rows[0]["Amount"];
+            var _NumInWords = new NumInWords();
+            var _Currency = AppGlobals.Currency.Sign ?? "$";
+            var _CurrencyDigit = AppGlobals.Currency.DigitTitle ?? "";
+            var _AmountinWord = _NumInWords.ChangeCurrencyToWords(_Amount, _Currency, _CurrencyDigit);
+            var ShowImage = false;
 
-            rptModel.InputReport.FileName = $"Receipt";
-            rptModel.InputReport.FileExtention = "rdl";
-            rptModel.InputReport.FilePath = UserProfile!.ReportFolder;
-
-            rptModel.OutputReport.FileName = $"Receipt_{ID}";
-            //rptModel.OutputReport.FileExtention = ".pdf";
-            rptModel.OutputReport.FilePath = UserProfile!.PDFFolder;
-            rptModel.OutputReport.ReportType = ReportType.PDF;
-
-            rptModel.AddReportParameter("CompanyName", _CompanyName);
-            rptModel.AddReportParameter("Heading1", _Heading1);
-            rptModel.AddReportParameter("Heading2", _Heading2);
-            rptModel.AddReportParameter("Footer", _ReportFooter);
-
-            return rptModel;
+            ReportService.Model.InputReport.FileName = $"Receipt.rdl";
+            ReportService.Model.ReportDataSource = ReportService.Data;
+            ReportService.Model.OutputReport.FileName = $"Receipt_{ReceiptID}";
+            ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
+            ReportService.Model.AddReportParameter("Heading1", _Heading1);
+            ReportService.Model.AddReportParameter("Heading2", _Heading2);
+            ReportService.Model.AddReportParameter("InWord", _AmountinWord);
+            ReportService.Model.AddReportParameter("CurrencySign", AppGlobals.Currency.Sign ?? "$");
+            ReportService.Model.AddReportParameter("PayerTitle", "Donor");
+            ReportService.Model.AddReportParameter("ShowImages", ShowImage.ToString());
+            
         }
+        #endregion
 
+        #region Edit
         public void Edit(int _ID)
         {
-            throw new NotImplementedException();
+            SetKeys();
+            AppGlobals.NavManager.NavigateTo($"/Accounts/Receipt/{ReceiptID}");
         }
-
-        List<object> IVoucherList.LoadData()
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion
+
+        #region Get & Set Keys
+        public void SetKeys()
+        {
+            AppRegistry.SetKey(Source.DBFile, "rptRcptList", DT_Start, KeyType.From, "Receipt Report /Accounts/ReceiptList");
+            AppRegistry.SetKey(Source.DBFile, "rptRcptList", DT_End, KeyType.To);
+            AppRegistry.SetKey(Source.DBFile, "rptRcptList", SearchText, KeyType.Text);
+            AppRegistry.SetKey(Source.DBFile, "rptRcptList", PayerID, KeyType.Number);
+        }
+
+        public void GetKeys()
+        {
+            SearchText = AppRegistry.GetText(Source.DBFile, "rptRcptList");
+            DT_Start = AppRegistry.GetFrom(Source.DBFile, "rptRcptList");
+            DT_End = AppRegistry.GetTo(Source.DBFile, "rptRcptList");
+            PayerID = AppRegistry.GetNumber(Source.DBFile, "rptRcptList");
+        }
+        #endregion
+
 
     }
 }
