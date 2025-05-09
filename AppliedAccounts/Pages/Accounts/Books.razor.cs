@@ -4,7 +4,6 @@ using AppliedAccounts.Models.Interface;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
-using AppReports;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Data;
@@ -15,7 +14,6 @@ namespace AppliedAccounts.Pages.Accounts
     public partial class Books 
     {
         [Parameter] public int ID { get; set; }
-        //[Parameter] public int NatureID { get; set; }
         [Parameter] public int BookID { get; set; }
 
         public AppUserModel UserProfile { get; set; }

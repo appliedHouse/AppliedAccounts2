@@ -2,9 +2,6 @@
 using AppliedAccounts.Models;
 using AppliedDB;
 using Microsoft.AspNetCore.Components;
-using System.Collections.Generic;
-using System.Data;
-
 
 namespace AppliedAccounts.Pages.Accounts
 {
@@ -17,8 +14,11 @@ namespace AppliedAccounts.Pages.Accounts
 
         public BooksList() { }
 
+        #region Back Page
         public void Back() { AppGlobals.NavManager.NavigateTo("/Menu/Accounts"); }
+        #endregion
 
+        #region New Voucher
         public void New()
         {
             if (MyModel.BookID > 0)
@@ -26,20 +26,23 @@ namespace AppliedAccounts.Pages.Accounts
                 NavManager.NavigateTo($"/Accounts/Books/{MyModel.VoucherID}/{MyModel.BookID}");
             }
         }
+        #endregion
 
+        #region Refresh Page
         public void Refresh()
         {
             MyModel.SetKeys();
         }
-
+        #endregion
 
         public string GetTitle(List<CodeTitle> _List, int _Value)
         {
             if (_List == null || _List.Count == 0) {return string.Empty; }
             return _List.FirstOrDefault(x => x.ID == _Value)!.Title ?? "";
-            //return _List.Where(x => x.ID == _Value).Select(x => x.Title).First();
+            
         }
 
+        #region Print
         public void Print(ReportActionClass reportAction)
         {
             try
@@ -52,6 +55,7 @@ namespace AppliedAccounts.Pages.Accounts
                 MyModel.MsgClass.Add(AppMessages.Enums.Messages.prtReportError);
             }
         }
+        #endregion
     }
 
 

@@ -51,14 +51,9 @@
 
 @if (IsPageValid)
 {
-    <!-- Error Message -->
-    <PageErrors Messages="@MyModel.MsgClass">
+    <ShowPageHeading PageTitle="CASH OR BANK BOOK"/>
+    <PageErrors Messages="@MyModel.MsgClass"/>
 
-    </PageErrors>
-    <!-- Page Headinh -->
-    <div class="AppHeader">
-        <h3>CASH OR BANK VOUCHER</h3>
-    </div>
     <!-- Form Control -->
     <EditForm Model="@MyModel">
         <div class="container myContainer flex-md-row ">
@@ -302,7 +297,7 @@
                         <button type="button" class="btn btn-sm w1 btn-light" title="Last" @onclick="MyModel.Last"><i class="fa fa-angles-right"></i></button>
                     </div>
                 }
-                <div><ReportingButtons ReturnValue="Print" VoucherID="@MyModel.MyVoucher!.Master.ID1"/></div>
+                <div><ReportingButtons ReturnValue="Print" ID="@MyModel.MyVoucher!.Master.ID1"/></div>
                 <!-- Float Back Button to the Right -->
                 <div class="p-2 ms-auto">
                     <button type="button" class="btn btn-sm w1 btn-warning" title="Back" @onclick="BackPage"><i class="bi bi-arrow-left-circle"></i></button>

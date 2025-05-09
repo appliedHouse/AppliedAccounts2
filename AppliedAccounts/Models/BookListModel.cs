@@ -137,10 +137,9 @@ namespace AppliedAccounts.Models
                 ReportService.ReportType = _ReportType;
                 ReportService.Data = GetReportData();
                 ReportModel();                              // Add / update Report model data.
-
                 ReportService.Print();
 
-                MsgClass.Add(ReportService.Model.ErrorMessage);
+              
 
 
 

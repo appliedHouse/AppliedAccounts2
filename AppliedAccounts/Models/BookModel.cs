@@ -165,19 +165,25 @@ namespace AppliedAccounts.Models
                                 Comments = row.Field<string>("Comments") ?? "",
                                 action = "get",
 
-                                TitleAccount = Accounts.Where(e=> e.ID == row.Field<int>("COA")).Select(e=> e.Title).First() ?? "",
-                                TitleCompany = Companies.Where(e=> e.ID == row.Field<int>("Company")).Select(e=> e.Title).First() ?? "",
-                                TitleProject = Projects.Where(e => e.ID == row.Field < int >("Project")).Select(e => e.Title).First() ?? "",
-                                TitleEmployee = Employees.Where(e => e.ID == row.Field < int >("Employee")).Select(e => e.Title).First() ?? "",
+                                TitleAccount = row.Field<string>("TitleCOA") ?? "",
+                                TitleCompany = row.Field<string>("TitleCompany") ?? "",
+                                TitleEmployee = row.Field<string>("TitleEmployee") ?? "",
+                                TitleProject = row.Field<string>("TitleProject") ?? ""
+
+
+                                //TitleAccount = Accounts.Where(e=> e.ID == row.Field<int>("COA")).Select(e=> e.Title).First() ?? "",
+                                //TitleCompany = Companies.Where(e=> e.ID == row.Field<int>("Company")).Select(e=> e.Title).First() ?? "",
+                                //TitleProject = Projects.Where(e => e.ID == row.Field < int >("Project")).Select(e => e.Title).First() ?? "",
+                                //TitleEmployee = Employees.Where(e => e.ID == row.Field < int >("Employee")).Select(e => e.Title).First() ?? "",
                             })];
 
                             return true;
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception error)
                 {
-
+                    MsgClass.Error(error.Message);
                 }
             }
             return false;
