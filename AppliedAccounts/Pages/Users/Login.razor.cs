@@ -9,8 +9,7 @@ namespace AppliedAccounts.Pages.Users
     public partial class Login
     {
         GlobalService AppGlobals { get; set; } = new();
-        private AppUserModel Model = new();
-        string NavToHome { get; set; } = string.Empty;
+        private AppUserModel MyModel = new();
         bool IsLogin { get; set; } = true;
         bool IsError { get; set; } = false;
         string ErrorMessage { get; set; }
@@ -18,11 +17,11 @@ namespace AppliedAccounts.Pages.Users
 
         public async void Submit()
         {
-            UserProfile AppUser = GetUserProfile(Model);
+            UserProfile AppUser = GetUserProfile(MyModel);
 
 
-            bool IsUser = AppUser.Profile.UserID.Equals(Model.UserID);
-            bool IsPSW = AppUser.Profile.Password.Equals(Model.Password);
+            bool IsUser = AppUser.Profile.UserID.Equals(MyModel.UserID);
+            bool IsPSW = AppUser.Profile.Password.Equals(MyModel.Password);
 
             if (IsUser && IsPSW)     // Validate the User Id and Password are equal.
             {
@@ -55,15 +54,6 @@ namespace AppliedAccounts.Pages.Users
 
                 });
 
-                // This will create a SQL Lite Database Table for local Session
-                // Values could be store and retrive
-
-                // var _Path = Path.Combine(AppUser.Profile.DataPath, "System");
-                // AppliedAccounts.Data.AppLocalDBSession _SessionDB = new(_Path, _newGUID);
-
-                // END.
-
-
                 NavManager.NavigateTo("/", true);
 
             }
@@ -72,14 +62,11 @@ namespace AppliedAccounts.Pages.Users
                 IsLogin = false;
             }
         }
-
         public void ReLoad()
         {
             IsLogin = true;
             return;
         }
-
-
         private UserProfile GetUserProfile(AppUserModel _UserModel)
         {
             var _UserProfile = new UserProfile();

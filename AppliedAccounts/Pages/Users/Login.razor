@@ -20,7 +20,7 @@
 }
 else
 {
-    <EditForm Model="@Model" OnValidSubmit="@Submit">
+    <EditForm Model="@MyModel" OnValidSubmit="@Submit">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
@@ -35,12 +35,12 @@ else
                 <div class="login-right">
                     <h2>Login</h2>
 
-                    <InputText class="input" @bind-Value="@Model.UserID" placeholder="ID" />
-                    <InputText class="input" @bind-Value="@Model.Password" type="password" placeholder="Password" />
+                    <InputText class="input" @bind-Value="@MyModel.UserID" placeholder="ID" />
+                    <InputText class="input" @bind-Value="@MyModel.Password" type="password" placeholder="Password" />
 
                     <div class="options">
                         <label>
-                            <InputCheckbox @bind-Value="Model.IsSaved" /> Remember Me
+                            <InputCheckbox @bind-Value="MyModel.IsSaved" /> Remember Me
                         </label>
                         <a class="forgot-link" href="/Users/Resetpw">Forgot Password?</a>
                     </div>
@@ -160,15 +160,11 @@ else
     {
         AppGlobals = _Global;
 
-        Model.UserID = "";
-        Model.Password = "";
-        Model.IsSaved = false;
-        Model.DataFile = "";
-        Model.Designation = "";
-        Model.Company = "";
-
+        MyModel.UserID = "";
+        MyModel.Password = "";
+        MyModel.IsSaved = false;
+        MyModel.DataFile = "";
+        MyModel.Designation = "";
+        MyModel.Company = "";
     }
-
-
-
 }

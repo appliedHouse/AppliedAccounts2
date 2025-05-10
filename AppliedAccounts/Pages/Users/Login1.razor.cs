@@ -2,8 +2,6 @@
 using AppliedDB;
 using System.Data.SQLite;
 using System.Data;
-using AppliedAccounts.Data;
-using System.Data.Entity;
 using AppliedAccounts.Services;
 
 namespace AppliedAccounts.Pages.Users
@@ -54,15 +52,6 @@ namespace AppliedAccounts.Pages.Users
                     SessionFolder = AppGlobals.AppPaths.SessionPath ?? "Sessions",
 
                 });
-
-                // This will create a SQL Lite Database Table for local Session
-                // Values could be store and retrive
-
-                // var _Path = Path.Combine(AppUser.Profile.DataPath, "System");
-                // AppliedAccounts.Data.AppLocalDBSession _SessionDB = new(_Path, _newGUID);
-
-                // END.
-
 
                 NavManager.NavigateTo("/", true);
 

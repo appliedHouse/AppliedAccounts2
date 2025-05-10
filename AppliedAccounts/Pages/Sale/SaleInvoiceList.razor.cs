@@ -20,7 +20,6 @@ namespace AppliedAccounts.Pages.Sale
         private bool IsPrinting { get; set; } = false;
         private List<string> PrintedReports { get; set; } = new();
         public PrintService ReportService { get; set; }
-        public GlobalService MyGlobals { get; set; }
         public string PrintingMessage { get; set; }
 
         public SaleInvoiceList()
@@ -120,29 +119,36 @@ namespace AppliedAccounts.Pages.Sale
                 {
                     PrintingMessage = $"Sales invoice for {MyModel.Record.TitleCustomer} is being printed.";
                     await InvokeAsync(StateHasChanged);
-                    await DownLoadPrint(item.Id);
+                    //await DownLoadPrint(item.Id);
                 }
             }
             IsPrinting = false;
             await InvokeAsync(StateHasChanged);
         }
 
-        public async Task Print(int ID)
+        public async Task Print(ReportActionClass reportAction)
         {
+            MyModel.VoucherID = reportAction.VoucherID;
+
             try
             {
-                MyModel.Record = MyModel.Records.Where(row => row.Id == ID).First();
+                IsPrinting = true;
+                await InvokeAsync(StateHasChanged);
+                MyModel.Record = MyModel.Records.Where(row => row.Id == MyModel.VoucherID).First();
                 var _Batch = MyModel.Record.Ref_No;
                 var _Title = MyModel.Record.TitleCustomer.Replace(".", "_"); // Replace dot with _ for file name correction.
                 var _FileName = $"{_Batch}_{_Title}";
+                var _VoucherNo = MyModel.Record.Vou_No ?? "NoVoucher";
 
-                ReportService.Data = GetReportData(ID);              // always generate Data for report
-                ReportService.Model = CreateReportModel(ID);         // and then generate report parameters
-                ReportService.ReportType = ReportType.Preview;
-                //var ReportList = ReportService.GetReportLink();
-                string rptBytes64 = Convert.ToBase64String(ReportService.Model.ReportBytes);
+                ReportService = new(AppGlobals);
+                GetReportData();              // always generate Data for report
+                UpdateReportModel();         // and then generate report parameters
+                ReportService.Print();
 
-                await js.InvokeVoidAsync("printer", rptBytes64);
+                IsPrinting = false;
+                IsPrinted = true;
+                await InvokeAsync(StateHasChanged);
+
             }
             catch (Exception error)
             {
@@ -151,41 +157,18 @@ namespace AppliedAccounts.Pages.Sale
 
         }
 
-        public async Task DownLoadPrint(int ID)
+
+
+
+        private void GetReportData()
         {
-            try
-            {
-                MyModel.Record = MyModel.Records.Where(row => row.Id == ID).First();
-                var _Batch = MyModel.Record.Ref_No;
-                var _Title = MyModel.Record.TitleCustomer.Replace(".", "_"); // Replace dot with _ for file name correction.
-                var _FileName = $"{_Batch}_{_Title}";
-
-                ReportService.Data = GetReportData(ID);              // always generate Data for report
-                ReportService.Model = CreateReportModel(ID);         // and then generate report parameters
-                ReportService.ReportType = ReportType.Preview;
-                //var ReportList = ReportService.GetReportLink();
-                var rptArray = ReportService.Model.ReportBytes;
-                var rptMime = ReportService.Model.OutputReport.MimeType;
-                var rptFile = $"{MyModel.Record.Ref_No}_{MyModel.Record.TitleCustomer}";
-                await js.InvokeVoidAsync("downloadFile", rptFile, rptArray, rptMime);
-            }
-            catch (Exception error)
-            {
-                MyModel.MsgClass.Add(error.Message);
-            }
-        }
-
-
-        private ReportData GetReportData(int ID)
-        {
-            ReportData _Result = new();
-            string _Query = ReportQuery.SaleInvoiceQuery($"[B2].[TranID]={ID}");
+            string _Query = ReportQuery.SaleInvoiceQuery($"[TranID]={MyModel.VoucherID}");
             var _DataTable = DataSource.GetDataTable(AppUser.DataFile, _Query, "ReportData");
 
-            _Result.ReportTable = _DataTable;
-            _Result.DataSetName = "ds_SaleInvoice";
+            ReportService.Data.ReportTable = _DataTable;
+            ReportService.Data.DataSetName = "ds_SaleInvoice";
 
-            return _Result;
+           
         }
 
         private ReportData GetReportDataOnePDF(List<int> _SaleInvoiceIDList)
@@ -196,45 +179,22 @@ namespace AppliedAccounts.Pages.Sale
             string _Query = ReportQuery.SaleInvoiceQuery($"[TranID] in ({_Filter})");
             var _DataTable = DataSource.GetDataTable(AppUser.DataFile, _Query, "ReportData");
 
-            _Result.ReportTable = _DataTable;
-            _Result.DataSetName = "ds_SaleInvoice";
+            ReportService.Data.ReportTable = _DataTable;
+            ReportService.Data.DataSetName = "ds_SaleInvoice";
 
             return _Result;
         }
 
-        private ReportModel CreateReportModel(int _ID)
+        private void UpdateReportModel()
         {
-
-            ReportModel _Reportmodel = new();
-            try
-            {
-                var _InvoiceNo = "INV-Testing";
                 var _Heading1 = "Sales Invoice";
-                var _Heading2 = $"Invoice No. {_InvoiceNo}";
-                var _ReportPath = AppUser.ReportFolder;
-                var _ReportOption = ReportType.Excel;
-                var _CompanyName = AppUser.Company;
-                var _ReportFooter = AppFunctions.ReportFooter();
+                var _Heading2 = $"Invoice No. {MyModel.Record.Vou_No}";
 
-
-                // Input Parameters  (.rdl report file)
-                _Reportmodel.InputReport.FilePath = _ReportPath;
-                _Reportmodel.InputReport.FileName = "CDCInv.rdl";
-
-                // output Parameters (like pdf, excel, word, html, tiff)
-                _Reportmodel.OutputReport.FileName = "SaleInvoice_" + _ID.ToString("0000");
-                _Reportmodel.OutputReport.ReportType = _ReportOption;
-                // Reports Parameters
-                _Reportmodel.AddReportParameter("Heading1", _Heading1);
-                _Reportmodel.AddReportParameter("Heading2", _Heading2);
-
-            }
-            catch (Exception)
-            {
-                MyModel.MsgClass.Add(MESSAGE.Default);
-            }
-
-            return _Reportmodel;
+                ReportService.Model.InputReport.FileName = "CDCInv.rdl";
+                ReportService.Model.OutputReport.FileName = "SaleInvoice_" + new Random().Next(10000,99999).ToString();
+                ReportService.Model.AddReportParameter("Heading1", _Heading1);
+                ReportService.Model.AddReportParameter("Heading2", _Heading2);
+            
         }
 
         private ReportModel CreateReportModelOnePDF()
@@ -253,7 +213,7 @@ namespace AppliedAccounts.Pages.Sale
                 _Reportmodel.InputReport.FileName = "CDCInvOnePDF.rdl";
 
                 // output Parameters (like pdf, excel, word, html, tiff)
-                _Reportmodel.OutputReport.FileName = "SaleInvoice_" + (new Random()).Next(1000,9999).ToString();
+                _Reportmodel.OutputReport.FileName = "SaleInvoice_" + (new Random()).Next(1000, 9999).ToString();
                 _Reportmodel.OutputReport.ReportType = _ReportOption;
                 // Reports Parameters
                 _Reportmodel.AddReportParameter("Heading1", _Heading1);
