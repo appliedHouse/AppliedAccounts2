@@ -110,7 +110,9 @@ namespace AppliedAccounts.Pages.Accounts
         #region Print
         private void Print(ReportActionClass reportAction)
         {
+            MyModel.IsWaiting = true;
             MyModel.Print(reportAction);
+            MyModel.IsWaiting = false;
         }
         #endregion
 

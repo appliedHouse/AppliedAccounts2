@@ -49,8 +49,16 @@
 <ShowPageHeading PageTitle="@MyModel.BookNatureTitle"/>
 <ShowMessages MsgClass="MyModel.MsgClass"/>
 
+
+@if(MyModel.IsWaiting)
+{
+    <ShowWaiting MyMessage="Printing Report....."/>
+}
+
+
+
 <EditForm Model="@MyModel">
-    <div class="d-flex flex-row mb-3 filter">
+    <div class="d-flex flex-row mb-3 filter" hidden="@MyModel.IsWaiting">
         <div class="p-2">
             <InputSelect id="ddBook" class="item-height"
                          TValue="int"

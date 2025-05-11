@@ -37,7 +37,7 @@
         Toast = new();
     }
 
-    
+
 }
 
 <style>
@@ -48,13 +48,18 @@
     }
 </style>
 
+<ShowPageHeading PageTitle="CASH OR BANK BOOK" />
+<PageErrors Messages="@MyModel.MsgClass" />
+
+@if(MyModel.IsWaiting)
+{
+    <ShowWaiting MyMessage="Printig Report....."/>
+}
+
 
 @if (IsPageValid)
 {
-    <ShowPageHeading PageTitle="CASH OR BANK BOOK"/>
-    <PageErrors Messages="@MyModel.MsgClass"/>
-
-    <!-- Form Control -->
+       <!-- Form Control -->
     <EditForm Model="@MyModel">
         <div class="container myContainer flex-md-row ">
 

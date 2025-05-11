@@ -43,17 +43,23 @@ namespace AppliedAccounts.Pages.Accounts
         }
 
         #region Print
-        public void Print(ReportActionClass reportAction)
+        public async Task Print(ReportActionClass reportAction)
         {
+            MyModel.IsWaiting = true;
+            await InvokeAsync(StateHasChanged);
+
             try
             {
                 MyModel.VoucherID = reportAction.VoucherID;
-                MyModel.Print(reportAction.PrintType);
+                await Task.Run(() => { MyModel.Print(reportAction.PrintType); });
             }
             catch (Exception)
             {
                 MyModel.MsgClass.Add(AppMessages.Enums.Messages.prtReportError);
             }
+
+            MyModel.IsWaiting = false;
+            await InvokeAsync(StateHasChanged);
         }
         #endregion
     }

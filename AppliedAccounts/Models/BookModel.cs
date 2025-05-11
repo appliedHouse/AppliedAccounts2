@@ -76,8 +76,6 @@ namespace AppliedAccounts.Models
                 CashNatureID = AppRegistry.GetNumber(DataFile, "CashBKNature");
                 BankNatureID = AppRegistry.GetNumber(DataFile, "BankBKNature");
 
-
-
                 if (UserProfile != null)
                 {
                     Source = new(UserProfile);
@@ -467,54 +465,59 @@ namespace AppliedAccounts.Models
         #region Print
         public async void Print(ReportActionClass _ReportAction)
         {
-            await Task.Run(() =>
-            {
-                ReportService = new(AppGlobals);
-                ReportService.ReportType = _ReportAction.PrintType;
-                ReportService.Data = GetReportData();
-                ReportService.Model = CreateReportModel();
-            });
-
             try
             {
-                ReportService.Print();
+                ReportService = new(AppGlobals); ;
+                ReportService.ReportType = _ReportAction.PrintType;
+
+                await GetReportDataAsync();
+                await CreateReportModelAsync();
+                await ReportService.PrintAsync();
+
+                if(ReportService.IsError)
+                {
+                    MsgClass.Add(ReportService.MyMessage.First(), AppMessages.Enums.Class.Danger);
+                }
+
+
             }
             catch (Exception error)
             {
                 MsgClass.Add(error.Message);
             }
 
+
+
         }
 
-        public ReportData GetReportData()
+        public async Task GetReportDataAsync()
         {
-            ReportData reportData = new(); ;
-            reportData.ReportTable = Source.GetBookVoucher(VoucherID);
-            reportData.DataSetName = "ds_Book";
+            await Task.Run(() =>
+            {
+                ReportService.Data.ReportTable = Source.GetBookVoucher(VoucherID);
+                ReportService.Data.DataSetName = "ds_CashBank";   // ds_CashBank
 
-            return reportData;
+            });
         }
 
-        public ReportModel CreateReportModel()
+        public async Task CreateReportModelAsync()
         {
-            ReportModel reportModel = new();
-            reportModel.InputReport.FileName = "CashBankBook.rdl";
-            reportModel.InputReport.FilePath = AppGlobals.AppPaths.ReportPath;
+            await Task.Run(() =>
+            {
+                ReportService.Model.InputReport.FileName = "CashBankBook.rdl";
 
-            reportModel.ReportDataSource = ReportService.Data;
-            reportModel.OutputReport.FileName = "Book";
+                ReportService.Model.ReportDataSource = ReportService.Data;
+                ReportService.Model.OutputReport.FileName = $"{BookNatureTitle}-{MyVoucher.Master.Vou_No}";
 
-            string _CompanyName = AppGlobals.Author.Country;
-            string _Heading1 = BookNatureTitle;
-            string _Heading2 = $"Voucher {MyVoucher.Master.Vou_No}";
-            string _Footer = AppGlobals.Reporting.ReportFooter;
+                string _Heading1 = BookNatureTitle;
+                string _Heading2 = $"Voucher {MyVoucher.Master.Vou_No}";
 
-            reportModel.AddReportParameter("Company", _CompanyName);
-            reportModel.AddReportParameter("Heading1", _Heading1);
-            reportModel.AddReportParameter("Heading2", _Heading2);
-            reportModel.AddReportParameter("Footer", _Footer);
-
-            return reportModel;
+                ReportService.Model.AddReportParameter("Heading1", _Heading1);
+                ReportService.Model.AddReportParameter("Heading2", _Heading2);
+                ReportService.Model.AddReportParameter("InWords", "Words");
+                ReportService.Model.AddReportParameter("CurrencySign", "SAR");
+                ReportService.Model.AddReportParameter("ShowImages", true.ToString());
+            });
         }
         #endregion
 
