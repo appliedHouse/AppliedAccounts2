@@ -463,23 +463,21 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Print
-        public async void Print(ReportActionClass _ReportAction)
+        public void Print(ReportActionClass _ReportAction)
         {
             try
             {
                 ReportService = new(AppGlobals); ;
                 ReportService.ReportType = _ReportAction.PrintType;
 
-                await GetReportDataAsync();
-                await CreateReportModelAsync();
-                await ReportService.PrintAsync();
+                GetReportDataAsync();
+                CreateReportModelAsync();
+                ReportService.Print();
 
-                if(ReportService.IsError)
+                if (ReportService.IsError)
                 {
                     MsgClass.Add(ReportService.MyMessage.First(), AppMessages.Enums.Class.Danger);
                 }
-
-
             }
             catch (Exception error)
             {
@@ -490,34 +488,28 @@ namespace AppliedAccounts.Models
 
         }
 
-        public async Task GetReportDataAsync()
+        public void GetReportDataAsync()
         {
-            await Task.Run(() =>
-            {
-                ReportService.Data.ReportTable = Source.GetBookVoucher(VoucherID);
-                ReportService.Data.DataSetName = "ds_CashBank";   // ds_CashBank
-
-            });
+            ReportService.Data.ReportTable = Source.GetBookVoucher(VoucherID);
+            ReportService.Data.DataSetName = "ds_CashBank";   // ds_CashBank
         }
 
-        public async Task CreateReportModelAsync()
+        public void CreateReportModelAsync()
         {
-            await Task.Run(() =>
-            {
-                ReportService.Model.InputReport.FileName = "CashBankBook.rdl";
+            ReportService.Model.InputReport.FileName = "CashBankBook.rdl";
 
-                ReportService.Model.ReportDataSource = ReportService.Data;
-                ReportService.Model.OutputReport.FileName = $"{BookNatureTitle}-{MyVoucher.Master.Vou_No}";
+            ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
+            ReportService.Model.ReportDataSource = ReportService.Data;
+            ReportService.Model.OutputReport.FileName = $"{BookNatureTitle}-{MyVoucher.Master.Vou_No}";
 
-                string _Heading1 = BookNatureTitle;
-                string _Heading2 = $"Voucher {MyVoucher.Master.Vou_No}";
+            string _Heading1 = BookNatureTitle;
+            string _Heading2 = $"Voucher {MyVoucher.Master.Vou_No}";
 
-                ReportService.Model.AddReportParameter("Heading1", _Heading1);
-                ReportService.Model.AddReportParameter("Heading2", _Heading2);
-                ReportService.Model.AddReportParameter("InWords", "Words");
-                ReportService.Model.AddReportParameter("CurrencySign", "SAR");
-                ReportService.Model.AddReportParameter("ShowImages", true.ToString());
-            });
+            ReportService.Model.AddReportParameter("Heading1", _Heading1);
+            ReportService.Model.AddReportParameter("Heading2", _Heading2);
+            ReportService.Model.AddReportParameter("InWords", "Words");
+            ReportService.Model.AddReportParameter("CurrencySign", "SAR");
+            ReportService.Model.AddReportParameter("ShowImages", true.ToString());
         }
         #endregion
 

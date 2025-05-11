@@ -64,7 +64,8 @@
         }
         public string GetFileFolder()
         {
-            var _FileFolder = Path.Combine(BasePath, RootPath, FilePath);
+            var _FirstPath = Directory.GetCurrentDirectory();
+            var _FileFolder = Path.Combine(_FirstPath, RootPath, FilePath);
 
             if (!Directory.Exists(_FileFolder))
             {

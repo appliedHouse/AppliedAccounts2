@@ -108,11 +108,11 @@ namespace AppliedAccounts.Pages.Accounts
         #endregion
 
         #region Print
-        private void Print(ReportActionClass reportAction)
+        private async void Print(ReportActionClass reportAction)
         {
-            MyModel.IsWaiting = true;
-            MyModel.Print(reportAction);
-            MyModel.IsWaiting = false;
+            MyModel.IsWaiting = true; await InvokeAsync(StateHasChanged);
+            await Task.Run(()=> { MyModel.Print(reportAction); });
+            MyModel.IsWaiting = false; await InvokeAsync(StateHasChanged);
         }
         #endregion
 
