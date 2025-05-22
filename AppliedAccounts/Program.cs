@@ -1,9 +1,9 @@
-using AppliedDB;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using AppliedAccounts.Authentication;
 using AppliedAccounts.Services;
+using AppliedDB;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.JSInterop;
 
 
@@ -16,8 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<AppUserModel>();
-builder.Services.AddSingleton<UserProfile>();
+//builder.Services.AddSingleton<AppUserModel>();              // Create a new instance of AppUserModel
+builder.Services.AddSingleton<UserProfile>();               // Create a User Model Class.
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthonticationStateProvider>();
 builder.Services.AddScoped<ToastService>();

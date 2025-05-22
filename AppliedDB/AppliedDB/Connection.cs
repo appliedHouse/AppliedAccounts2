@@ -1,9 +1,11 @@
 ﻿using System.Data.SQLite;
+using AppliedGlobals;
 
 namespace AppliedDB
 {
     public class Connections : IDisposable
     {
+        public static AppValues.AppPath AppPaths { get; set; }
         public static string AppPath => Directory.GetCurrentDirectory();
         public static string BasePath { get; set; }
         public static string RootPath { get; set; } = "";
@@ -29,7 +31,26 @@ namespace AppliedDB
         public static AppUserModel AppUserProfile { get; set; }
 
 
+        
         public Connections() { }
+        public Connections(AppValues.AppPath _AppPaths)
+        {
+            AppPaths = _AppPaths;
+            BasePath = _AppPaths.BaseUri;
+            RootPath = _AppPaths.RootPath;
+            UsersPath = _AppPaths.UsersPath;
+            ClientPath =_AppPaths.ClientPath;
+            ImagesPath = _AppPaths.ImagesPath;
+            MessagePath = _AppPaths.MessagesPath;
+            LanguagePath = _AppPaths.LanguagesPath;
+            ReportPath = _AppPaths.ReportPath;
+            PDFPath = _AppPaths.PDFPath;
+            SystemPath = _AppPaths.SystemPath;
+            SessionPath = _AppPaths.SessionPath;
+            TempDBPath = _AppPaths.DBTempPath;
+            DB_Client = _AppPaths.DBFile;
+            DB_Session = _AppPaths.DBFile;
+        }
         public Connections(AppUserModel _UserProfile)
         {
             AppUserProfile = _UserProfile;

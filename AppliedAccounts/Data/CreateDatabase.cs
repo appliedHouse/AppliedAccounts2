@@ -1,8 +1,7 @@
-﻿using System;
+﻿using AppliedDB;
 using System.Data;
 using System.Data.SQLite;
 using System.Text;
-using AppliedDB;
 using static AppliedDB.Enums;
 
 namespace AppliedAccounts.Data

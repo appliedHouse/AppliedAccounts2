@@ -72,7 +72,7 @@ namespace AppliedAccounts.Models
                     Batch = item.Field<string>("Batch") ?? "",
                     Qty = item.Field<decimal>("Qty"),
                     Rate = item.Field<decimal>("Rate"),
-                    
+
                     TaxID = item.Field<int>("Tax"),
                     TaxRate = item.Field<decimal>("Tax_Rate"),
                     Description = item.Field<string>("Description") ?? "",
@@ -111,7 +111,7 @@ namespace AppliedAccounts.Models
         public decimal Qty { get; set; }
         public decimal Rate { get; set; }
         public decimal Gross => Qty * Rate;
-        
+
         public int TaxID { get; set; }
         public decimal TaxRate { get; set; }
         public decimal TaxAmount { get; set; }

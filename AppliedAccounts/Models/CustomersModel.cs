@@ -1,5 +1,4 @@
-﻿using AppliedAccounts.Data;
-using AppliedDB;
+﻿using AppliedDB;
 using AppMessages;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
@@ -16,7 +15,7 @@ namespace AppliedAccounts.Models
         public List<CustomerRecord> Records { get; set; } = [];
         public List<DataRow> Data { get; set; } = new();
         public DataRow? MyDataRow { get; set; }
-        public MessageClass MyMessages { get; set; } 
+        public MessageClass MyMessages { get; set; }
         public bool RecordNotFound { get; set; } = false;
         public string SearchText { get; set; } = string.Empty;
 

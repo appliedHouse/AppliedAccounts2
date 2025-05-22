@@ -1,6 +1,4 @@
-﻿using AppliedAccounts.Data;
-using AppliedDB;
-using AppMessages;
+﻿using AppliedDB;
 using System.Data;
 using static AppliedDB.Enums;
 using static AppMessages.Enums;
@@ -99,7 +97,7 @@ namespace AppliedAccounts.Models
             {
                 _DataRow = Data.First();
             }
-            
+
             _DataRow["Id"] = _Record.ID;
             _DataRow["Code"] = _Record.Code;
             _DataRow["Title"] = _Record.Title;

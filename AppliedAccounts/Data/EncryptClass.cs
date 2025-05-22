@@ -3,11 +3,10 @@ using System.Text;
 
 namespace AppliedAccounts.Data
 {
-    #region 16 Byte Key Encryption
-    public class AesEncryption
+    public class EncryptClass
     {
-        private static readonly byte[] Key = Encoding.UTF8.GetBytes("Your16CharKey123"); // Must be 16 bytes for AES-128
-        private static readonly byte[] IV = Encoding.UTF8.GetBytes("Your16CharIV1234");  // Must be 16 bytes
+        private static readonly byte[] Key = Encoding.UTF8.GetBytes("AppliedAccounts1"); // Must be 16 bytes for AES-128
+        private static readonly byte[] IV = Encoding.UTF8.GetBytes("AppliedAccounts2");  // Must be 16 bytes
 
         public static string Encrypt(string plaintext)
         {
@@ -46,7 +45,7 @@ namespace AppliedAccounts.Data
             }
         }
     }
-    #endregion
+
 
     #region Password Hasher
     public class PasswordHasher
@@ -66,7 +65,7 @@ namespace AppliedAccounts.Data
             return BCrypt.Net.BCrypt.HashPassword(Password);
         }
 
-        public bool VerifyPassword(string password, string hash)
+        public static bool VerifyPassword(string password, string hash)
         {
             return BCrypt.Net.BCrypt.Verify(password, hash);
         }
@@ -122,12 +121,3 @@ namespace AppliedAccounts.Data
     }
     #endregion
 }
-
-
-// Usage
-//string password = "MySecurePassword123";
-//string encrypted = AesEncryption.Encrypt(password);
-//Console.WriteLine($"Encrypted: {encrypted}");
-
-//string decrypted = AesEncryption.Decrypt(encrypted);
-//Console.WriteLine($"Decrypted: {decrypted}");

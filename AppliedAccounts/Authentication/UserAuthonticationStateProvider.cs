@@ -1,8 +1,10 @@
 ﻿using AppliedDB;
+using AppliedGlobals;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.Security.Claims;
+
 
 namespace AppliedAccounts.Authentication
 {
@@ -149,7 +151,8 @@ namespace AppliedAccounts.Authentication
                 AppUser.SystemFolder = claims?.FirstOrDefault(x => x.Type.Equals("SystemFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "System";
                 AppUser.SessionFolder = claims?.FirstOrDefault(x => x.Type.Equals("SessionFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "Sessions";
                 AppUser.TempDBFolder = claims?.FirstOrDefault(x => x.Type.Equals("TempDBFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "Sessions";
-            };
+            }
+            ;
 
 
         }

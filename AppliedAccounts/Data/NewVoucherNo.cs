@@ -36,7 +36,7 @@ namespace AppliedAccounts.Data
                 return $"{_Vou_No1}-{_MaxNum}";
             }
         }
-        
+
         public static string GetPurchaseVoucher(string _DBFile, DateTime _VouDate)
         {
             return GetNewVoucherNo(_DBFile, Tables.BillPayable, "AP", _VouDate);

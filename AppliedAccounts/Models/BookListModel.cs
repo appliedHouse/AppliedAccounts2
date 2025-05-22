@@ -1,10 +1,11 @@
-﻿using AppliedDB;
-using Messages = AppMessages.Enums.Messages;
-using System.Data;
-using AppliedAccounts.Services;
-using AppliedAccounts.Data;
+﻿using AppliedAccounts.Data;
 using AppliedAccounts.Pages.Accounts;
+using AppliedAccounts.Services;
+using AppliedDB;
 using AppReports;
+using System.Data;
+using Format = AppliedGlobals.AppValues.Format;
+using Messages = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Models
 {
@@ -82,7 +83,7 @@ namespace AppliedAccounts.Models
 
         public List<BookView> LoadBookRecords(int _BookID)     // Load List of Cash / Bank Book record in Table
         {
-            if(_BookID == 0) { return []; }      
+            if (_BookID == 0) { return []; }
             var _List = new List<BookView>();
             var _Data = Source.GetBookList(_BookID);
 
@@ -131,7 +132,7 @@ namespace AppliedAccounts.Models
         #region Print
         public void Print(ReportType _ReportType)
         {
-            
+
             try
             {
                 ReportService = new(AppGlobals);
@@ -166,7 +167,7 @@ namespace AppliedAccounts.Models
             ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
             ReportService.Model.OutputReport.FileName = $"Book_{_VoucherNo}" +
                 $"{ReportService.Model.OutputReport.FileExt}";          // without Extention
-            
+
             ReportService.Model.AddReportParameter("Heading1", _Heading1);
             ReportService.Model.AddReportParameter("Heading2", _Heading2);
             ReportService.Model.AddReportParameter("InWords", "Words");

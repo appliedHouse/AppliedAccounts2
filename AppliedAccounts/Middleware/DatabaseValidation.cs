@@ -1,9 +1,4 @@
-﻿using AppliedAccounts.Pages.ErrorPages;
-using AppliedAccounts.Services;
-using Microsoft.AspNetCore.Components;
-using System.Data.Entity;
-
-namespace AppliedAccounts.Middleware
+﻿namespace AppliedAccounts.Middleware
 {
     public class DatabaseValidation
     {

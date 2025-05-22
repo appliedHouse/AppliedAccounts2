@@ -1,12 +1,13 @@
-﻿using AppliedAccounts.Data;
+﻿using Applied_WebApplication.Data;
+using AppliedAccounts.Data;
 using AppliedAccounts.Models.Interface;
+using AppliedAccounts.Services;
+using AppliedGlobals;
 using AppliedDB;
 using AppMessages;
-using System.Data;
-using SQLQueries;
-using AppliedAccounts.Services;
 using AppReports;
-using Applied_WebApplication.Data;
+using SQLQueries;
+using System.Data;
 using static AppliedDB.Enums;
 using MESSAGE = AppMessages.Enums.Messages;
 
@@ -51,24 +52,26 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Constructor
-        public ReceiptModel() { }
-        public ReceiptModel(AppUserModel _UserProfile)
+        
+        public ReceiptModel(GlobalService _AppGlobals)
         {
-            UserProfile = _UserProfile;
+            AppGlobals = _AppGlobals;
+            ReportService = new(AppGlobals);
 
         }
-        public ReceiptModel(AppUserModel _UserProfile, int _ReceiptID)
+        public ReceiptModel(GlobalService _AppGlobals, int _ReceiptID)
         {
-            UserProfile = _UserProfile;
+            AppGlobals = _AppGlobals;
             ReceiptID = _ReceiptID;
+            ReportService = new(AppGlobals);
             Start(ReceiptID);
-           
+
 
         }
         public void Start(int _ReceiptID)
         {
-            if (UserProfile is null) { return; }
-            Source ??= new(UserProfile);
+            //if (UserProfile is null) { return; }
+            Source ??= new(AppGlobals);
 
             MsgClass = new();
             MyVoucher = new();
@@ -412,7 +415,7 @@ namespace AppliedAccounts.Models
                             Deleted ??= [];
                             if (Deleted.Count > 0)
                             {
-                                foreach(var item in Deleted)
+                                foreach (var item in Deleted)
                                 {
                                     DataRow RowDeleted = Source.GetNewRow(Tables.Receipt2);
                                     RowDeleted["ID"] = item.ID2;
@@ -428,16 +431,16 @@ namespace AppliedAccounts.Models
                                     RowDeleted["Description"] = item.Description;
 
                                     _Command = new(RowDeleted, Source.DBFile);
-                                    if(!_Command.DeleteRow())
+                                    if (!_Command.DeleteRow())
                                     {
                                         MsgClass.Add(MESSAGE.RowNotDeleted);
                                     }
                                 }
 
                                 int _SRNO = 1;
-                                foreach(var item in MyVoucher.Details)
+                                foreach (var item in MyVoucher.Details)
                                 {
-                                    item.Sr_No =_SRNO++;        // Reset Serial No after deleted row process 
+                                    item.Sr_No = _SRNO++;        // Reset Serial No after deleted row process 
                                 }
                             }
 
@@ -661,12 +664,12 @@ namespace AppliedAccounts.Models
         public void SetKeys()
         {
             AppRegistry.SetKey(Source.DBFile, "Receipt", MyVoucher.Master.Vou_Date, KeyType.Date, "Receipt Page");
-            
+
         }
 
         public void GetKeys()
         {
-            
+
         }
         #endregion
 

@@ -1,13 +1,12 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Models.Interface;
+using AppliedAccounts.Services;
 using AppliedDB;
-using System.Data;
 using AppMessages;
+using Microsoft.AspNetCore.Components;
+using System.Data;
 using MESSAGE = AppMessages.Enums.Messages;
 using Tables = AppliedDB.Enums.Tables;
-using AppliedAccounts.Models.Interface;
-using Microsoft.AspNetCore.Components;
-using AppliedAccounts.Services;
-using AppReports;
 
 namespace AppliedAccounts.Models
 {

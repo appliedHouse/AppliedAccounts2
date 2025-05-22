@@ -22,7 +22,7 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public COANatureModel() { }
-        public COANatureModel(AppUserModel _UserProfile) 
+        public COANatureModel(AppUserModel _UserProfile)
         {
             AppUser = _UserProfile;
             DBFile = AppUser.DataFile;

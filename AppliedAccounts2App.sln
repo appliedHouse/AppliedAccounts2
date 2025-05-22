@@ -33,6 +33,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppReports", "AppliedReport
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLQueries", "SQLQueries\SQLQueries.csproj", "{2B20A705-1C66-4925-A0C8-FB97F7202B5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppliedGlobals", "AppliedGlobals\AppliedGlobals\AppliedGlobals.csproj", "{C425AE4E-58F5-478E-8E0D-E26AECFA8A30}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{2B20A705-1C66-4925-A0C8-FB97F7202B5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B20A705-1C66-4925-A0C8-FB97F7202B5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B20A705-1C66-4925-A0C8-FB97F7202B5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C425AE4E-58F5-478E-8E0D-E26AECFA8A30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C425AE4E-58F5-478E-8E0D-E26AECFA8A30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C425AE4E-58F5-478E-8E0D-E26AECFA8A30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C425AE4E-58F5-478E-8E0D-E26AECFA8A30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +80,7 @@ Global
 		{CD2CDCE7-1210-4CFC-BA9A-6FFB95F11492} = {9CF79BAA-782F-4A70-9F5B-1ABAD409D69B}
 		{99621E99-A721-4F00-B148-C79B2B12031B} = {6F3081C7-DEC2-4AF6-8177-58F74CD0044F}
 		{2B20A705-1C66-4925-A0C8-FB97F7202B5B} = {FE768FAB-5B90-415D-A177-E711E746D594}
+		{C425AE4E-58F5-478E-8E0D-E26AECFA8A30} = {FE768FAB-5B90-415D-A177-E711E746D594}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7430CBA5-E179-4FBF-B19B-CA7BA44112D2}

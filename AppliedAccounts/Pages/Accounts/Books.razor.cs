@@ -1,6 +1,5 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
-using AppliedAccounts.Models.Interface;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
@@ -11,7 +10,7 @@ using System.Data;
 
 namespace AppliedAccounts.Pages.Accounts
 {
-    public partial class Books 
+    public partial class Books
     {
         [Parameter] public int ID { get; set; }
         [Parameter] public int BookID { get; set; }
@@ -36,7 +35,7 @@ namespace AppliedAccounts.Pages.Accounts
         {
             MsgClass = new();
             MyToastClass = new();
-            MyModel = new(ID,BookID, UserProfile); ;
+            MyModel = new(ID, BookID, UserProfile); ;
             MyModel.AppGlobals = AppGlobals;
             MyModel.ReportService = ReportService;
 
@@ -104,14 +103,14 @@ namespace AppliedAccounts.Pages.Accounts
         #endregion
 
         #region BackPage
-        public void BackPage() { NavManager.NavigateTo("/Accounts/BooksList");}
+        public void BackPage() { NavManager.NavigateTo("/Accounts/BooksList"); }
         #endregion
 
         #region Print
         private async void Print(ReportActionClass reportAction)
         {
             MyModel.IsWaiting = true; await InvokeAsync(StateHasChanged);
-            await Task.Run(()=> { MyModel.Print(reportAction); });
+            await Task.Run(() => { MyModel.Print(reportAction); });
             MyModel.IsWaiting = false; await InvokeAsync(StateHasChanged);
         }
         #endregion

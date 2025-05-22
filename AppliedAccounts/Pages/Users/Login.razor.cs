@@ -1,8 +1,8 @@
 ﻿using AppliedAccounts.Authentication;
-using AppliedDB;
-using System.Data.SQLite;
-using System.Data;
 using AppliedAccounts.Services;
+using AppliedDB;
+using System.Data;
+using System.Data.SQLite;
 
 namespace AppliedAccounts.Pages.Users
 {

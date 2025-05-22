@@ -19,7 +19,7 @@ namespace AppliedAccounts.Models
         public decimal TotalAmount { get; set; } = 0.00M;
         public bool SelectAll { get; set; }
         public int VoucherID { get; set; }
-        
+
 
         #region Constructor
         public SaleInvoiceListModel() { }
@@ -163,6 +163,6 @@ namespace AppliedAccounts.Models
 
     }
 
-    
+
 
 }

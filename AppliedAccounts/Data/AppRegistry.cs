@@ -1,6 +1,5 @@
-﻿using AppliedAccounts.Services;
-using System.Data;
-using System.Security.Cryptography;
+﻿using System.Data;
+using Format = AppliedGlobals.AppValues.Format;
 using Tables = AppliedDB.Enums.Tables;
 
 namespace AppliedAccounts.Data
@@ -176,7 +175,7 @@ namespace AppliedAccounts.Data
         public static DateTime GetFrom(string DataFile, string Key)
         {
             if (DataFile == null || DataFile == string.Empty) { return DateTime.Now; }
-            
+
             DataView VW_Registry = GetRegistryView(DataFile);
             VW_Registry.RowFilter = string.Concat($"Code='{Key}'");
             if (VW_Registry.Count == 1)
@@ -256,7 +255,7 @@ namespace AppliedAccounts.Data
             }
 
             if (SQLAction == "Insert") { var cmd = AppliedDB.Commands.Insert(CurrentRow, DataFile); cmd?.Connection.Open(); cmd?.ExecuteNonQuery(); cmd?.Connection.Close(); return true; }
-            if (SQLAction == "Update") { var cmd = AppliedDB.Commands.UpDate(CurrentRow, DataFile); cmd?.Connection.Open();  cmd?.ExecuteNonQuery(); cmd?.Connection.Close(); return true; }
+            if (SQLAction == "Update") { var cmd = AppliedDB.Commands.UpDate(CurrentRow, DataFile); cmd?.Connection.Open(); cmd?.ExecuteNonQuery(); cmd?.Connection.Close(); return true; }
             return false;
         }
         public static int ExpDays(string DataFile)

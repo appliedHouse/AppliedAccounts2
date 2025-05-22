@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Data.SQLite;
 using System.Text;
+using AppliedGlobals;
 using Tables = AppliedDB.Enums.Tables;
 using static AppliedDB.Enums;
 
@@ -8,6 +9,7 @@ namespace AppliedDB
 {
     public class DataSource
     {
+        public AppValues.AppPath AppPaths { get; set; }
         public AppUserModel UserProfile { get; set; }
         public SQLiteConnection MyConnection { get; set; }
         public SQLiteCommand MyCommand { get; set; }
@@ -16,6 +18,20 @@ namespace AppliedDB
 
 
         #region Constructor
+
+        public DataSource(AppValues.AppPath _AppPaths)
+        {
+            AppPaths = _AppPaths;
+            var _Connection = new Connections(AppPaths);
+            MyConnection = _Connection.GetSQLiteClient()!;               // Get a connection of Client
+
+            if (MyConnection is not null)
+            {
+                MyCommand = new SQLiteCommand(MyConnection);
+            }
+        }
+
+
         public DataSource(AppUserModel _UserProfile)
         {
             UserProfile = _UserProfile;

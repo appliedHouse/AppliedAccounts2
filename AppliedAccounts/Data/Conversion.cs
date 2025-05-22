@@ -1,4 +1,4 @@
-﻿using AppliedAccounts.Services;
+﻿using Format = AppliedGlobals.AppValues.Format;
 
 namespace AppliedAccounts.Data
 {

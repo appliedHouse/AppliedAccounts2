@@ -168,7 +168,7 @@ namespace AppliedAccounts.Pages.Sale
             ReportService.Data.ReportTable = _DataTable;
             ReportService.Data.DataSetName = "ds_SaleInvoice";
 
-           
+
         }
 
         private ReportData GetReportDataOnePDF(List<int> _SaleInvoiceIDList)
@@ -187,14 +187,14 @@ namespace AppliedAccounts.Pages.Sale
 
         private void UpdateReportModel()
         {
-                var _Heading1 = "Sales Invoice";
-                var _Heading2 = $"Invoice No. {MyModel.Record.Vou_No}";
+            var _Heading1 = "Sales Invoice";
+            var _Heading2 = $"Invoice No. {MyModel.Record.Vou_No}";
 
-                ReportService.Model.InputReport.FileName = "CDCInv.rdl";
-                ReportService.Model.OutputReport.FileName = "SaleInvoice_" + new Random().Next(10000,99999).ToString();
-                ReportService.Model.AddReportParameter("Heading1", _Heading1);
-                ReportService.Model.AddReportParameter("Heading2", _Heading2);
-            
+            ReportService.Model.InputReport.FileName = "CDCInv.rdl";
+            ReportService.Model.OutputReport.FileName = "SaleInvoice_" + new Random().Next(10000, 99999).ToString();
+            ReportService.Model.AddReportParameter("Heading1", _Heading1);
+            ReportService.Model.AddReportParameter("Heading2", _Heading2);
+
         }
 
         private ReportModel CreateReportModelOnePDF()

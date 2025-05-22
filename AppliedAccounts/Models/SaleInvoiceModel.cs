@@ -1,17 +1,17 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models.Interface;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using AppReports;
 using Microsoft.AspNetCore.Components;
+using SQLQueries;
 using System.Data;
 using static AppliedAccounts.Data.AppRegistry;
+using static AppliedDB.Enums.Status;
 using MESSAGE = AppMessages.Enums.Messages;
 using Tables = AppliedDB.Enums.Tables;
-using static AppliedDB.Enums.Status;
-using AppliedAccounts.Services;
-using SQLQueries;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Format = AppliedGlobals.AppValues.Format;
 
 namespace AppliedAccounts.Models
 {
@@ -105,38 +105,38 @@ namespace AppliedAccounts.Models
 
         private Voucher NewVoucher()
         {
-                var _MyVoucher = new Voucher();
-                _MyVoucher.Master.ID1 = 0;
-                _MyVoucher.Master.Vou_No = "NEW";
-                _MyVoucher.Master.Vou_Date = DateTime.Now;
-                _MyVoucher.Master.Company = 0;
-                _MyVoucher.Master.Employee = 0;
-                _MyVoucher.Master.Ref_No = "";
-                _MyVoucher.Master.Inv_No = "";
-                _MyVoucher.Master.Inv_Date = DateTime.Now;
-                _MyVoucher.Master.Pay_Date = DateTime.Now;
-                _MyVoucher.Master.Remarks = "";
-                _MyVoucher.Master.Comments = "";
-                _MyVoucher.Master.Status = Submitted.ToString();
-                _MyVoucher.Master.TitleCompany = "";
-                _MyVoucher.Master.TitleEmployee = "";
+            var _MyVoucher = new Voucher();
+            _MyVoucher.Master.ID1 = 0;
+            _MyVoucher.Master.Vou_No = "NEW";
+            _MyVoucher.Master.Vou_Date = DateTime.Now;
+            _MyVoucher.Master.Company = 0;
+            _MyVoucher.Master.Employee = 0;
+            _MyVoucher.Master.Ref_No = "";
+            _MyVoucher.Master.Inv_No = "";
+            _MyVoucher.Master.Inv_Date = DateTime.Now;
+            _MyVoucher.Master.Pay_Date = DateTime.Now;
+            _MyVoucher.Master.Remarks = "";
+            _MyVoucher.Master.Comments = "";
+            _MyVoucher.Master.Status = Submitted.ToString();
+            _MyVoucher.Master.TitleCompany = "";
+            _MyVoucher.Master.TitleEmployee = "";
 
 
-                _MyVoucher.Detail.ID2 = 0;
-                _MyVoucher.Detail.Sr_No = 1;
-                _MyVoucher.Detail.Inventory = 0;
-                _MyVoucher.Detail.Batch = "";
-                _MyVoucher.Detail.Qty = 0.00M;
-                _MyVoucher.Detail.Rate = 0.00M;
-                _MyVoucher.Detail.TaxID = 0;
-                _MyVoucher.Detail.TaxRate = 0.00M;
-                _MyVoucher.Detail.Description = "";
-                _MyVoucher.Detail.Project = 0;
-                _MyVoucher.Detail.TitleInventory = "";
-                _MyVoucher.Detail.TitleProject = "";
-                _MyVoucher.Detail.TitleTaxID = "";
+            _MyVoucher.Detail.ID2 = 0;
+            _MyVoucher.Detail.Sr_No = 1;
+            _MyVoucher.Detail.Inventory = 0;
+            _MyVoucher.Detail.Batch = "";
+            _MyVoucher.Detail.Qty = 0.00M;
+            _MyVoucher.Detail.Rate = 0.00M;
+            _MyVoucher.Detail.TaxID = 0;
+            _MyVoucher.Detail.TaxRate = 0.00M;
+            _MyVoucher.Detail.Description = "";
+            _MyVoucher.Detail.Project = 0;
+            _MyVoucher.Detail.TitleInventory = "";
+            _MyVoucher.Detail.TitleProject = "";
+            _MyVoucher.Detail.TitleTaxID = "";
 
-                return _MyVoucher;
+            return _MyVoucher;
         }
         #endregion
 
@@ -303,7 +303,7 @@ namespace AppliedAccounts.Models
             MyVoucher.Details ??= [];           // Construct new if found null;
 
             var _SrNo = 1;
-            if(MyVoucher.Details.Count > 0)
+            if (MyVoucher.Details.Count > 0)
             {
                 _SrNo = MyVoucher.Details.Max(x => x.Sr_No) + 1;
             }
@@ -438,7 +438,7 @@ namespace AppliedAccounts.Models
         public async Task<bool> SaveAllAsync()
         {
             MsgClass = new();
-            
+
 
             var IsSaved = true;
             if (!IsWaiting)
@@ -569,7 +569,7 @@ namespace AppliedAccounts.Models
             return true;
         }
         #endregion
-        
+
 
         #region Calculations
 
@@ -643,9 +643,9 @@ namespace AppliedAccounts.Models
             return rptModel;
         }
 
-       
 
-        
+
+
         #endregion
 
         #region Model

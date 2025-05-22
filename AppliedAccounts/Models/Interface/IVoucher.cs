@@ -1,8 +1,6 @@
 ﻿using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
-using AppReports;
-using Microsoft.AspNetCore.Components;
 
 namespace AppliedAccounts.Models.Interface
 {
@@ -13,10 +11,10 @@ namespace AppliedAccounts.Models.Interface
         MessageClass MsgClass { get; set; }
         PrintService ReportService { get; set; }
         DataSource Source { get; set; }
-        List<CodeTitle> Companies { get; set; } 
-        List<CodeTitle> Employees { get; set; } 
-        List<CodeTitle> Projects { get; set; } 
-        List<CodeTitle> Accounts { get; set; } 
+        List<CodeTitle> Companies { get; set; }
+        List<CodeTitle> Employees { get; set; }
+        List<CodeTitle> Projects { get; set; }
+        List<CodeTitle> Accounts { get; set; }
         string DataFile { get; set; }
         AppUserModel? UserProfile { get; set; }
         int Index { get; set; }

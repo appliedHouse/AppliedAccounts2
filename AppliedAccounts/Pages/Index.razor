@@ -1,6 +1,9 @@
 ﻿@layout HomeLayout
 @page "/"
+@using AppliedGlobals
 @using AppliedDB;
+@using AppliedAccounts.Pages.HomePage
+
 @attribute [AllowAnonymous];
 @inject IJSRuntime js;
 @inject AuthenticationStateProvider authStateProvider;
@@ -19,7 +22,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if(AppAuthState.Result.User.Identity.IsAuthenticated)
+        if(AppAuthState.Result.User.Identity!.IsAuthenticated)
         {
             UserModel = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
         }
@@ -70,10 +73,10 @@
             <AppHeader />
         </header>
         <NavMenu />
-        <AppliedAccounts.Pages.HomePage.HomePageAuthorized />
+        <HomePageAuthorized />
     </Authorized>
     <NotAuthorized>
-        <AppliedAccounts.Pages.HomePage.HomePageNotAuthorized />
+        <HomePageNotAuthorized />
     </NotAuthorized>
     <Authorizing>
         <h3>Wait......</h3>

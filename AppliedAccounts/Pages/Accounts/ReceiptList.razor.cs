@@ -1,7 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
 using AppliedDB;
-using Microsoft.JSInterop;
 
 
 namespace AppliedAccounts.Pages.Accounts
@@ -40,7 +39,7 @@ namespace AppliedAccounts.Pages.Accounts
             }
         }
 
-        
+
 
     }
 }

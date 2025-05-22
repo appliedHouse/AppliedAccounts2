@@ -1,14 +1,14 @@
-﻿using AppliedAccounts.Authentication;
-using AppliedAccounts.Data;
+﻿using AppliedAccounts.Data;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppReports;
 using System.Data;
+using AppliedGlobals;
 using static AppliedAccounts.Data.AppRegistry;
 using static AppliedDB.VoucherTypeClass;
+using Format = AppliedGlobals.AppValues.Format;
 using MESSAGES = AppMessages.Enums.Messages;
 using Query = AppliedDB.Enums.Query;
-
 
 
 namespace AppliedAccounts.Models
@@ -17,7 +17,8 @@ namespace AppliedAccounts.Models
     {
 
         #region Variables
-        public AppUserModel UserProfile { get; set; } = new();
+        public AppValues AppGlobals { get; set; } = new();
+        public AppUserModel UserProfile { get; set; } = new();          // Depreciated.
         public DataSource Source { get; set; }
         public string InvoiceNo { get; set; } = string.Empty;
         public int InvoiceID { get; set; } = 0;
@@ -40,10 +41,10 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Constructor
-        public PurchaseInvoiceModel(AppUserModel _UserProfile)
+        public PurchaseInvoiceModel(AppValues _AppGlobals)                      // Currently used.
         {
-            UserProfile = _UserProfile;
-            Source = new DataSource(UserProfile);
+            AppGlobals = _AppGlobals;
+            Source = new DataSource(AppGlobals.Paths);
             View_PurchaseInvoice = Source.GetTable(Query.PurchaseInvoiceView);
             Customers = Source.GetCustomers();
             Employees = Source.GetEmployees();
@@ -57,10 +58,31 @@ namespace AppliedAccounts.Models
             {
                 InvoiceID = (int)View_PurchaseInvoice.Rows[0]["ID"];
                 IsRecordLoaded = SetPurchaseInvoiceRecord(InvoiceID);
-                //Report.ReportData.ReportTable = GetReportTable();
-
             }
         }
+
+
+        //public PurchaseInvoiceModel(AppUserModel _UserProfile)              // Depreciated.
+        //{
+        //    UserProfile = _UserProfile;
+        //    Source = new DataSource(UserProfile);
+        //    View_PurchaseInvoice = Source.GetTable(Query.PurchaseInvoiceView);
+        //    Customers = Source.GetCustomers();
+        //    Employees = Source.GetEmployees();
+        //    Projects = Source.GetProjects();
+        //    Inventory = Source.GetInventory();
+        //    Taxes = Source.GetTaxes();
+        //    Units = Source.GetUnits();
+        //    //Report = Print();
+
+        //    if (View_PurchaseInvoice.Rows.Count > 0)
+        //    {
+        //        InvoiceID = (int)View_PurchaseInvoice.Rows[0]["ID"];
+        //        IsRecordLoaded = SetPurchaseInvoiceRecord(InvoiceID);
+        //        //Report.ReportData.ReportTable = GetReportTable();
+
+        //    }
+        //}
 
         public PurchaseInvoiceModel()
         {
@@ -364,7 +386,7 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-       
+
         #region Validation of Record and DataRow
         public bool Validation(PurchaseInvoiceRecord _Record)
         {
@@ -507,10 +529,10 @@ namespace AppliedAccounts.Models
                 var _ReportFile = GetText(_DBFile, _ReportFileKey);
                 //if (_SourceTable == null) { return new(); }
 
-                
+
                 // Input Parameters  (.rdl report file)
                 Reportmodel.InputReport.FileName = _ReportFile;
-                
+
                 // output Parameters (like pdf, excel, word, html, tiff)
                 Reportmodel.OutputReport.FileName = _ReportFile;
                 Reportmodel.OutputReport.ReportType = _RptType;
@@ -526,7 +548,7 @@ namespace AppliedAccounts.Models
                 Reportmodel.AddReportParameter("Footer", "Power by Applied Software House");
 
                 Reportmodel.ReportDataSource.DataSetName = _DataSetName;
-                
+
             }
             catch (Exception)
             {

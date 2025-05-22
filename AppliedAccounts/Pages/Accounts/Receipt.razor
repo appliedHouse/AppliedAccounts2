@@ -8,13 +8,14 @@
 @using AppliedDB
 @using AppliedAccounts.Services
 @using Microsoft.Extensions.Hosting
+@using AppliedGlobals;
 
 @inject AuthenticationStateProvider Authorized
 @inject NavigationManager NavManager
 @inject IJSRuntime js
 @inject ToastService ToastService
 @inject PrintService ReportService
-@inject GlobalService GlobalService
+@inject GlobalService AppGlobals
 
 @code {
     [Parameter] public int ID { get; set; }
@@ -26,7 +27,7 @@
     {
         IsPageValid = true;
         var _UserProfile = ((UserAuthonticationStateProvider)Authorized).AppUser;
-        MyModel = new ReceiptModel(_UserProfile);
+        MyModel = new ReceiptModel(AppGlobals);
         MyModel.Start(ID);
 
         if (MyModel.MyVoucher == null) { ErrorMessage = "Voucher is null"; }

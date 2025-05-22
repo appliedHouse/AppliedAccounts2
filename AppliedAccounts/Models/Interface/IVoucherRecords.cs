@@ -18,7 +18,7 @@ namespace AppliedAccounts.Models.Interface
         List<T> LoadData();
         void Print(int ID);
         void Edit(int ID);
-        
-        
+
+
     }
 }

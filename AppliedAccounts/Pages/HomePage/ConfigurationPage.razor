@@ -1,9 +1,12 @@
 ﻿@page "/Config"
 @using AppliedAccounts.Data
+@using AppliedAccounts.Services
 @using AppliedDB
+@using AppliedGlobals
 
 @inject IConfiguration Config;
 @inject AuthenticationStateProvider authStateProvider;
+@inject GlobalService AppGlobal;
 
 @code {
 
@@ -32,7 +35,7 @@
     {
         var UserModel = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
 
-        Source = new(UserModel);
+        Source = new(AppGlobal.AppPaths);
 
         BasePath = Directory.GetCurrentDirectory();
         RootPath = UserModel.RootFolder;

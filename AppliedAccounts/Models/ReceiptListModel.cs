@@ -3,12 +3,12 @@ using AppliedAccounts.Data;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
-using AppReports;
 using SQLQueries;
 using System.Data;
 using System.Text;
 using static AppliedDB.Enums;
 using MESSAGES = AppMessages.Enums.Messages;
+using Format = AppliedGlobals.AppValues.Format;
 
 namespace AppliedAccounts.Models
 {
@@ -160,7 +160,7 @@ namespace AppliedAccounts.Models
             ReportService.Model.AddReportParameter("CurrencySign", AppGlobals.Currency.Sign ?? "$");
             ReportService.Model.AddReportParameter("PayerTitle", "Donor");
             ReportService.Model.AddReportParameter("ShowImages", ShowImage.ToString());
-            
+
         }
         #endregion
 

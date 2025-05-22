@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace AppliedAccounts.Pages.Accounts
 {
-    public partial class BooksList 
+    public partial class BooksList
     {
 
         public AppUserModel UserProfile { get; set; }
@@ -37,9 +37,9 @@ namespace AppliedAccounts.Pages.Accounts
 
         public string GetTitle(List<CodeTitle> _List, int _Value)
         {
-            if (_List == null || _List.Count == 0) {return string.Empty; }
+            if (_List == null || _List.Count == 0) { return string.Empty; }
             return _List.FirstOrDefault(x => x.ID == _Value)!.Title ?? "";
-            
+
         }
 
         #region Print
