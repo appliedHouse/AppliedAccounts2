@@ -1,5 +1,4 @@
-﻿using AppliedDB;
-using AppliedGlobals;
+﻿using AppliedGlobals;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
@@ -75,8 +74,6 @@ namespace AppliedAccounts.Authentication
             {
                 return await Task.FromResult(new AuthenticationState(AnyOne));
             }
-
-
         }
 
         public async Task UpdateAuthonticateState(UserSession? userSession)
