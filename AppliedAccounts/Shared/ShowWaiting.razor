@@ -1,0 +1,13 @@
+﻿@code {
+    [Parameter] public string MyMessage { get; set; }
+
+    protected override void OnInitialized()
+    {
+        MyMessage ??= "Title";
+    }
+}
+
+
+<div class="alert alert-info" role="alert">
+    <p><strong>@MyMessage</strong></p>
+</div>

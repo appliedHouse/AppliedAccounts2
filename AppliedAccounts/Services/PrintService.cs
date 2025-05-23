@@ -60,6 +60,28 @@ namespace AppliedAccounts.Services
         }
 
         #region Print a Report
+
+        public async Task PrintAsync()
+        {
+            IsError = ReportValidate();
+
+            if (!IsError)
+            {
+                switch (Model.OutputReport.ReportType)
+                {
+                    case ReportType.Print: await Printer(); break;
+                    case ReportType.Preview: await Preview(); break;
+                    case ReportType.PDF: await PDF(); break;
+                    case ReportType.Excel: await Excel(); break;
+                    case ReportType.Word: await Word(); break;
+                    case ReportType.Image: await Image(); break;
+                    case ReportType.HTML: await HTML(); break;
+                    default: await Preview(); break;
+                }
+            }
+            
+        }
+
         public async void Print()
         {
             IsError = ReportValidate();

@@ -9,7 +9,7 @@ namespace AppliedAccounts.Models
     public class SaleInvoiceListModel
     {
         public AppUserModel AppUser { get; set; }
-        public DataSource? Source { get; set; }
+        public DataSource Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public SalesRecord Record { get; set; } = new();
         public List<SalesRecord> Records { get; set; } = new();
@@ -18,6 +18,7 @@ namespace AppliedAccounts.Models
         public MessageClass MsgClass { get; set; } = new();
         public decimal TotalAmount { get; set; } = 0.00M;
         public bool SelectAll { get; set; }
+        public int VoucherID { get; set; }
         
 
         #region Constructor
@@ -27,10 +28,19 @@ namespace AppliedAccounts.Models
             AppUser = UserProfile;
             DBFile = AppUser.DataFile;
             Source = new(AppUser);
+
+            LoadData();
+        }
+        #endregion
+
+        #region Load Data
+        private void LoadData()
+        {
             Data = Source.GetList(AppliedDB.Enums.Query.SaleInvoiceList);
             Records = GetFilterRecords();
         }
         #endregion
+
 
         #region Filter Records
         private List<SalesRecord> GetFilterRecords()

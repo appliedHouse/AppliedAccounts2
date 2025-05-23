@@ -4,7 +4,6 @@ using AppliedAccounts.Models.Interface;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
-using AppReports;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Data;
@@ -15,7 +14,6 @@ namespace AppliedAccounts.Pages.Accounts
     public partial class Books 
     {
         [Parameter] public int ID { get; set; }
-        //[Parameter] public int NatureID { get; set; }
         [Parameter] public int BookID { get; set; }
 
         public AppUserModel UserProfile { get; set; }
@@ -110,9 +108,11 @@ namespace AppliedAccounts.Pages.Accounts
         #endregion
 
         #region Print
-        private void Print(ReportActionClass reportAction)
+        private async void Print(ReportActionClass reportAction)
         {
-            MyModel.Print(reportAction);
+            MyModel.IsWaiting = true; await InvokeAsync(StateHasChanged);
+            await Task.Run(()=> { MyModel.Print(reportAction); });
+            MyModel.IsWaiting = false; await InvokeAsync(StateHasChanged);
         }
         #endregion
 

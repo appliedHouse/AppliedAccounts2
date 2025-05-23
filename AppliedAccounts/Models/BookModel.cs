@@ -76,8 +76,6 @@ namespace AppliedAccounts.Models
                 CashNatureID = AppRegistry.GetNumber(DataFile, "CashBKNature");
                 BankNatureID = AppRegistry.GetNumber(DataFile, "BankBKNature");
 
-
-
                 if (UserProfile != null)
                 {
                     Source = new(UserProfile);
@@ -165,19 +163,25 @@ namespace AppliedAccounts.Models
                                 Comments = row.Field<string>("Comments") ?? "",
                                 action = "get",
 
-                                TitleAccount = Accounts.Where(e=> e.ID == row.Field<int>("COA")).Select(e=> e.Title).First() ?? "",
-                                TitleCompany = Companies.Where(e=> e.ID == row.Field<int>("Company")).Select(e=> e.Title).First() ?? "",
-                                TitleProject = Projects.Where(e => e.ID == row.Field < int >("Project")).Select(e => e.Title).First() ?? "",
-                                TitleEmployee = Employees.Where(e => e.ID == row.Field < int >("Employee")).Select(e => e.Title).First() ?? "",
+                                TitleAccount = row.Field<string>("TitleCOA") ?? "",
+                                TitleCompany = row.Field<string>("TitleCompany") ?? "",
+                                TitleEmployee = row.Field<string>("TitleEmployee") ?? "",
+                                TitleProject = row.Field<string>("TitleProject") ?? ""
+
+
+                                //TitleAccount = Accounts.Where(e=> e.ID == row.Field<int>("COA")).Select(e=> e.Title).First() ?? "",
+                                //TitleCompany = Companies.Where(e=> e.ID == row.Field<int>("Company")).Select(e=> e.Title).First() ?? "",
+                                //TitleProject = Projects.Where(e => e.ID == row.Field < int >("Project")).Select(e => e.Title).First() ?? "",
+                                //TitleEmployee = Employees.Where(e => e.ID == row.Field < int >("Employee")).Select(e => e.Title).First() ?? "",
                             })];
 
                             return true;
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception error)
                 {
-
+                    MsgClass.Error(error.Message);
                 }
             }
             return false;
@@ -459,56 +463,53 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Print
-        public async void Print(ReportActionClass _ReportAction)
+        public void Print(ReportActionClass _ReportAction)
         {
-            await Task.Run(() =>
-            {
-                ReportService = new(AppGlobals);
-                ReportService.ReportType = _ReportAction.PrintType;
-                ReportService.Data = GetReportData();
-                ReportService.Model = CreateReportModel();
-            });
-
             try
             {
+                ReportService = new(AppGlobals); ;
+                ReportService.ReportType = _ReportAction.PrintType;
+
+                GetReportDataAsync();
+                CreateReportModelAsync();
                 ReportService.Print();
+
+                if (ReportService.IsError)
+                {
+                    MsgClass.Add(ReportService.MyMessage.First(), AppMessages.Enums.Class.Danger);
+                }
             }
             catch (Exception error)
             {
                 MsgClass.Add(error.Message);
             }
 
+
+
         }
 
-        public ReportData GetReportData()
+        public void GetReportDataAsync()
         {
-            ReportData reportData = new(); ;
-            reportData.ReportTable = Source.GetBookVoucher(VoucherID);
-            reportData.DataSetName = "ds_Book";
-
-            return reportData;
+            ReportService.Data.ReportTable = Source.GetBookVoucher(VoucherID);
+            ReportService.Data.DataSetName = "ds_CashBank";   // ds_CashBank
         }
 
-        public ReportModel CreateReportModel()
+        public void CreateReportModelAsync()
         {
-            ReportModel reportModel = new();
-            reportModel.InputReport.FileName = "CashBankBook.rdl";
-            reportModel.InputReport.FilePath = AppGlobals.AppPaths.ReportPath;
+            ReportService.Model.InputReport.FileName = "CashBankBook.rdl";
 
-            reportModel.ReportDataSource = ReportService.Data;
-            reportModel.OutputReport.FileName = "Book";
+            ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
+            ReportService.Model.ReportDataSource = ReportService.Data;
+            ReportService.Model.OutputReport.FileName = $"{BookNatureTitle}-{MyVoucher.Master.Vou_No}";
 
-            string _CompanyName = AppGlobals.Author.Country;
             string _Heading1 = BookNatureTitle;
             string _Heading2 = $"Voucher {MyVoucher.Master.Vou_No}";
-            string _Footer = AppGlobals.Reporting.ReportFooter;
 
-            reportModel.AddReportParameter("Company", _CompanyName);
-            reportModel.AddReportParameter("Heading1", _Heading1);
-            reportModel.AddReportParameter("Heading2", _Heading2);
-            reportModel.AddReportParameter("Footer", _Footer);
-
-            return reportModel;
+            ReportService.Model.AddReportParameter("Heading1", _Heading1);
+            ReportService.Model.AddReportParameter("Heading2", _Heading2);
+            ReportService.Model.AddReportParameter("InWords", "Words");
+            ReportService.Model.AddReportParameter("CurrencySign", "SAR");
+            ReportService.Model.AddReportParameter("ShowImages", true.ToString());
         }
         #endregion
 

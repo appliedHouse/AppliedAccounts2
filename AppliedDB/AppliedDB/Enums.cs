@@ -50,11 +50,16 @@ namespace AppliedDB
             Employees = 205,
             Directories = 206,
 
+            
+
+
+
             Inventory = 301,
             Inv_Category = 302,
             Inv_SubCategory = 303,
             Inv_Packing = 304,
             Inv_UOM = 305,
+            Inv_Size = 321,
             FinishedGoods = 306,
             OBALStock = 308,
             BOMProfile = 309,
@@ -91,6 +96,12 @@ namespace AppliedDB
 
             Chk_BillReceivable1 = 701,
             Chk_BillReceivable2 = 702,
+
+            Quotation = 801,
+            Quotation2 = 802,
+            Conditions = 803,
+            QuotHistory = 804,
+            QuotStatus = 806,
 
             TempLedger = 9999,
             

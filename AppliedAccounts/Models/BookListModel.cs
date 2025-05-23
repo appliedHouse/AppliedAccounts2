@@ -5,7 +5,6 @@ using AppliedAccounts.Services;
 using AppliedAccounts.Data;
 using AppliedAccounts.Pages.Accounts;
 using AppReports;
-using Windows.Services.Maps;
 
 namespace AppliedAccounts.Models
 {
@@ -28,6 +27,7 @@ namespace AppliedAccounts.Models
         public string BookNatureTitle = "Book Title";
         public List<BookView> BookRecords { get; set; }
         public bool PageIsValid { get; set; } = false;
+        public bool IsWaiting { get; set; } = false;
 
         public BookListModel() { }
         public BookListModel(int _BookID, AppUserModel _AppUserProfile)
@@ -82,6 +82,7 @@ namespace AppliedAccounts.Models
 
         public List<BookView> LoadBookRecords(int _BookID)     // Load List of Cash / Bank Book record in Table
         {
+            if(_BookID == 0) { return []; }      
             var _List = new List<BookView>();
             var _Data = Source.GetBookList(_BookID);
 
@@ -135,36 +136,25 @@ namespace AppliedAccounts.Models
             {
                 ReportService = new(AppGlobals);
                 ReportService.ReportType = _ReportType;
-                ReportService.Data = GetReportData();
+                GetReportData();
                 ReportModel();                              // Add / update Report model data.
-
                 ReportService.Print();
-
-                MsgClass.Add(ReportService.Model.ErrorMessage);
-
-
-
             }
             catch (Exception error)
             {
                 MsgClass.Add(error.Message);
             }
-
         }
 
-        public ReportData GetReportData()
+        public void GetReportData()
         {
-            ReportData reportData = new(); ;
-            reportData.ReportTable = Source.GetBookVoucher(VoucherID);
-            reportData.DataSetName = "ds_CashBank";   // ds_CashBank
+            ReportService.Data.ReportTable = Source.GetBookVoucher(VoucherID);
+            ReportService.Data.DataSetName = "ds_CashBank";   // ds_CashBank
 
-            return reportData;
         }
 
         public void ReportModel()
         {
-
-            
             var _VoucherNo = ReportService.Data.ReportTable.Rows[0]["Vou_No"].ToString();
             var _Heading1 = $"General Ledger {BookNatureTitle}";
             var _Heading2 = $"Voucher {_VoucherNo}";

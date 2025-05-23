@@ -5,10 +5,11 @@
 @using AppliedAccounts.Models
 @using AppliedAccounts.Services
 
+
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager NavManager
 @inject IJSRuntime js
-@inject GlobalService GlobalService
+@inject GlobalService AppGlobals
 @inject PrintService DIPrintReport
 @inject HttpClient Http
 
@@ -23,11 +24,17 @@
         {
 
             AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
-            if (AppUser != null) { MyModel = new(AppUser); }
+            if (AppUser != null)
+            {
+                MyModel = new(AppUser);
+                
+            }
             else { MyModel = new(); }
+
+            
+
             IsDataLoad = true;
 
-            MyGlobals = GlobalService;
             ReportService = new();
         }
         catch (Exception)
@@ -143,7 +150,7 @@
                         var SRNO = 0;
                         @foreach (SalesRecord _Record in @MyModel.Records)
                         {
-                            var _NavTo = $"/Sale/SaleInvoice/{_Record.Vou_No}";
+                            var _NavTo = $"/Sale/SaleInvoice/{_Record.Id}";
                             SRNO++;
 
                             <tr class="tb-body-row">
@@ -157,9 +164,11 @@
                                 <td class="tb-col-left">@_Record.City</td>
                                 <td class="amount">@_Record.Amount.ToString("###,###,##0.00")</td>
                                 <td>
-                                    <button type="submit" class="btn-Edit" @onclick="()=>Edit(_Record.Id)"><i class="bi bi-pencil-fill"></i></button>
+                                    <EditButton NavTo="@_NavTo" Title="Edit" />
+                                    @* <button type="submit" class="btn-Edit" @onclick="()=>Edit(_Record.Id)"><i class="bi bi-pencil-fill"></i></button> *@
                                     <button type="submit" class="btn-Del" @onclick="()=>Delete(_Record.Id)"><i class="bi bi-trash-fill"></i></button>
-                                    <button type="submit" class="btn-print" @onclick="(()=>Print(_Record.Id))"><i class="bi bi-printer-fill"></i></button>
+
+                                    <PrintButton ReturnValue="Print" VoucherID="@_Record.Id" />
                                 </td>
                                 <td class="tb-col-center">
                                     <input type="checkbox" name="selectRow" @bind="_Record.IsSelected">
@@ -229,66 +238,66 @@ else
 
 <style>
 
-                    /* Main container styling */
-.container {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
-}
+    /* Main container styling */
+    .container {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        max-width: 100%;
+        margin: 0 auto;
+    }
 
-/* Header styling */
-.header {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
+    /* Header styling */
+    .header {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
 
-/* Button group styling */
-.button-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
-    align-items: center;
-}
+    /* Button group styling */
+    .button-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+        align-items: center;
+    }
 
-/* General button styling */
-.button {
-    padding: 8px 16px;
-    border: 1px solid #ccc;
-    background-color: #f8f8f8;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s;
-}
+    /* General button styling */
+    .button {
+        padding: 8px 16px;
+        border: 1px solid #ccc;
+        background-color: #f8f8f8;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
 
-.button:hover {
-    background-color: #e8e8e8;
-}
+        .button:hover {
+            background-color: #e8e8e8;
+        }
 
-/* Print buttons container - right aligned */
-.print-buttons {
-    margin-left: auto;
-    display: flex;
-    gap: 10px;
-}
+    /* Print buttons container - right aligned */
+    .print-buttons {
+        margin-left: auto;
+        display: flex;
+        gap: 10px;
+    }
 
-/* Print button specific styling */
-.print-button {
-    padding: 8px 16px;
-    background-color: #4a90e2;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s;
-}
+    /* Print button specific styling */
+    .print-button {
+        padding: 8px 16px;
+        background-color: #4a90e2;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
 
-.print-button:hover {
-    background-color: #3a7bc8;
-}
+        .print-button:hover {
+            background-color: #3a7bc8;
+        }
 
 </style>
