@@ -57,7 +57,6 @@ namespace AppliedDB
             }
             return new DataTable();
         }
-
         public async Task<DataTable> GetTableAsync(Tables _Table)
         {
             if (MyCommand is not null)
@@ -183,8 +182,6 @@ namespace AppliedDB
                 return new DataTable();
             }
         }
-
-
         private static DataTable GetDataTable(Tables _Table, SQLiteCommand _Command)
         {
             try
@@ -213,7 +210,6 @@ namespace AppliedDB
             }
             return new DataTable(); ;
         }
-
         public static DataTable GetDataTable(Tables _Table, SQLiteConnection _Connection)
         {
             return GetDataTable(_Table.ToString(), _Connection);
@@ -1085,6 +1081,53 @@ namespace AppliedDB
             return _Table;
         }
 
+        #endregion
+
+        #region Geting a DB Directory()
+        
+        
+        
+        public static Dictionary<int, string> GetDirectory(string _DirectoryName, string DBFile)
+        {
+            var _Connection = Connections.GetClientConnection(DBFile);
+            var _Dictionary = new Dictionary<int, string> { { 0, "Select..." } };
+
+            var _Query = $"SELECT * FROM [Directories] WHERE [Directory] = '{_DirectoryName}'";
+            var _Table = GetDataTable(_Query, _Connection!);
+            if (_Table is not null)
+            {
+
+                if (_Table.Rows.Count > 0)
+                {
+                    foreach (DataRow Row in _Table.Rows)
+                    {
+                        _Dictionary.Add((int)Row["Key"], (string)Row["Value"]);
+                    }
+                }
+            }
+            return _Dictionary;
+        }
+
+        public Dictionary<int, string> GetDirectory(string _DirectoryName)
+        {
+            var _Connection = Connections.GetClientConnection(DBFile);
+            var _Dictionary = new Dictionary<int, string> { { 0, "Select..." } };
+
+            var _Query = $"SELECT * FROM [Directories] WHERE [Directory] = '{_DirectoryName}'";
+            var _Table = GetDataTable(_Query, MyConnection);
+            if (_Table is not null)
+            {
+
+                if (_Table.Rows.Count > 0)
+                {
+                    foreach (DataRow Row in _Table.Rows)
+                    {
+                        _Dictionary.Add((int)Row["Key"], (string)Row["Value"]);
+                    }
+                }
+            }
+            return _Dictionary;
+        }
         #endregion
 
     }

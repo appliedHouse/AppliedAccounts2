@@ -1,0 +1,30 @@
+﻿@page "/Sale/QuotationsList";
+@layout PageLayout
+
+@using AppliedAccounts.Services
+@using AppliedAccounts.Models
+
+@inject GlobalService AppGlobals;
+
+@code {
+
+
+    private void Quotation()
+    {
+        ///Sales/Quotation/{ID:Vou}
+        AppGlobals.NavManager.NavigateTo($"/Sales/Quotation/{VoucherNo}");
+    }
+}
+
+
+
+@if(IsPageValid)
+{
+
+}
+else
+{
+    <div class="alert alert-ganger">
+        <p>Quotation Page has some error. Contact to Administrator</p>
+    </div>
+}
