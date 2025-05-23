@@ -1,0 +1,25 @@
+﻿@page "/Sales/Quotation/{ID:int}"
+
+@code {
+    [Parameter] public int? ID { get; set; }
+    public int VoucherNo { get; set; }
+    public string Message { get; set; } = "Quotation";
+
+    protected override void OnInitialized()
+    {
+        VoucherNo = ID ?? 0;
+        if(VoucherNo ==0)
+        {
+            Message += " New";
+        }
+        else
+        {
+            Message += $" Number {VoucherNo}";
+        }
+
+    }
+
+}
+
+@Message
+

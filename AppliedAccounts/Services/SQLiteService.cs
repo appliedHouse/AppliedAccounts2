@@ -7,7 +7,7 @@ namespace AppliedAccounts.Services
         public AppliedDB.Connections MyConnections { get; set; }
         public SQLiteService(AppliedDB.AppPaths _AppPaths)
         {
-            MyConnections = new(_AppPaths);
+            //MyConnections = new(_AppPaths);
         }
 
         public SQLiteConnection? GetSQLiteConnection(SQLiteConnectionType _ConnectionType)
