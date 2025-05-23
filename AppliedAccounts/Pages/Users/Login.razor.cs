@@ -9,7 +9,7 @@ namespace AppliedAccounts.Pages.Users
     public partial class Login
     {
         GlobalService AppGlobals { get; set; } = new();
-        private AppUserModel MyModel = new();
+        private AppliedGlobals.AppUserModel MyModel = new();
         bool IsLogin { get; set; } = true;
         bool IsError { get; set; } = false;
         bool IsUserFound { get; set; } = false;
@@ -76,12 +76,12 @@ namespace AppliedAccounts.Pages.Users
             IsLogin = true;
             return;
         }
-        private UserProfile GetUserProfile(AppUserModel _UserModel)
+        private UserProfile GetUserProfile(AppliedGlobals.AppUserModel _UserModel)
         {
             var _UserProfile = new UserProfile();
             try
             {
-                var _Profile = new AppUserModel();
+                var _Profile = new AppliedGlobals.AppUserModel();
                 var _UserID = _UserModel.UserID;
                 if (_UserModel != null)
                 {
@@ -117,6 +117,11 @@ namespace AppliedAccounts.Pages.Users
                                     Session = Guid.NewGuid().ToString(),
                                     DataFile = _UserData["DataFile"].ToString() ?? "",
                                     Company = _UserData["Company"].ToString() ?? "",
+                                    Address1 = _UserData["Address1"].ToString() ?? "",
+                                    Address2 = _UserData["Address1"].ToString() ?? "",
+                                    Contact = _UserData["Contact"].ToString() ?? "",
+                                    City = _UserData["City"].ToString() ?? "",
+                                    Country = _UserData["Country"].ToString() ?? "",
                                 };
                                 IsUserFound = true;
                             }

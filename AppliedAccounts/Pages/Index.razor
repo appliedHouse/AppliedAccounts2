@@ -1,5 +1,6 @@
 ﻿@layout HomeLayout
 @page "/"
+@using AppliedAccounts.Services
 @using AppliedGlobals
 @using AppliedDB;
 @using AppliedAccounts.Pages.HomePage
@@ -7,6 +8,7 @@
 @attribute [AllowAnonymous];
 @inject IJSRuntime js;
 @inject AuthenticationStateProvider authStateProvider;
+@inject GlobalService AppGlobals;
 
 
 <PageTitle>Index</PageTitle>
@@ -60,7 +62,7 @@
         {
             await Task.Run(() =>
             {
-                _ = new CreateDatabase(UserModel);         
+                _ = new CreateDatabase(AppGlobals.AppPaths);         
             });
         }
     }
@@ -79,6 +81,8 @@
         <HomePageNotAuthorized />
     </NotAuthorized>
     <Authorizing>
-        <h3>Wait......</h3>
+        <div class="alert alert-info" role="alert">
+            <p>Wait......</p>
+        </div>
     </Authorizing>
 </AuthorizeView>

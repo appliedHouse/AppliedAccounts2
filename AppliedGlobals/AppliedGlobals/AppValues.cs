@@ -6,6 +6,7 @@ namespace AppliedGlobals
     {
         public AppPath Paths { get; set; } = new();
         public AuthorClass Author { get; set; } = new();
+        public ClientClass Client { get; set; } = new();
         public LanguageClass Language { get; set; } = new();
         public CurrencyClass Currency { get; set; } = new();
         public Format Formats { get; set; } = new();
@@ -30,8 +31,27 @@ namespace AppliedGlobals
             public string MessagesPath { get; set; } = string.Empty;
             public string SessionPath { get; set; } = string.Empty;
             public string DBFile { get; set; } = string.Empty;
+            
         }
 
+        #endregion
+
+        #region Client Data
+        public class ClientClass
+        {
+            public string DisplayName { get; set; } = string.Empty;
+            public string Name { get; set; } = string.Empty;
+            public string Address1 { get; set; } = string.Empty;
+            public string Address2 { get; set; } = string.Empty;
+            public string City { get; set; } = string.Empty;
+            public string Country { get; set; } = string.Empty;
+            public string Contact { get; set; } = string.Empty;
+            public string Email { get; set; } = string.Empty;
+            public string Url { get; set; } = string.Empty;
+            public string PIN { get; set; } = string.Empty;
+            public DateTime LoginTime { get; set; } = DateTime.Now;
+
+        }
         #endregion
 
         #region Author Class

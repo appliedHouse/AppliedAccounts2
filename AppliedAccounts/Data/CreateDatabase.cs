@@ -1,4 +1,5 @@
 ﻿using AppliedDB;
+using AppliedGlobals;
 using System.Data;
 using System.Data.SQLite;
 using System.Text;
@@ -11,18 +12,19 @@ namespace AppliedAccounts.Data
         public Connections ConnectionClass { get; set; }
         public SQLiteConnection MyConnection { get; set; }
         public List<DataRow> TableList { get; set; }
-        public UserProfile AppUser { get; set; }
+        public AppValues.AppPath AppPaths { get; set; }
         public AppUserModel UserModel { get; set; }
         private string TableName { get; set; }
         private string UserName { get; set; }
         private string DBFile { get; set; }
         private List<string> MyMessages { get; set; }
 
-        public CreateDatabase(AppUserModel _UserModel)
+
+        public CreateDatabase(AppValues.AppPath _Paths)
         {
-            UserModel = _UserModel;
+            AppPaths = _Paths;
             MyMessages = new List<string>();
-            ConnectionClass = new(UserModel);
+            ConnectionClass = new(AppPaths);
 
             MyConnection = ConnectionClass.GetSQLiteUsers() ?? new();
 
@@ -32,6 +34,22 @@ namespace AppliedAccounts.Data
                 CreateTables();
             }
         }
+
+
+        //public CreateDatabase(AppUserModel _UserModel)
+        //{
+        //    UserModel = _UserModel;
+        //    MyMessages = new List<string>();
+        //    ConnectionClass = new(UserModel);
+
+        //    MyConnection = ConnectionClass.GetSQLiteUsers() ?? new();
+
+        //    if (!string.IsNullOrEmpty(MyConnection.ConnectionString))
+        //    {
+        //        GetTableNames();
+        //        CreateTables();
+        //    }
+        //}
 
         public void GetTableNames()
         {

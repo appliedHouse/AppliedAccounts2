@@ -27,6 +27,7 @@
     {
         IsPageValid = true;
         var _UserProfile = ((UserAuthonticationStateProvider)Authorized).AppUser;
+        //AppGlobals.DBFile = _UserProfile.DataFile;
         MyModel = new ReceiptModel(AppGlobals);
         MyModel.Start(ID);
 
@@ -125,6 +126,8 @@
                 </div>
                 <div class="row g-1 p-1">
                     <div class="col-md-3">
+                        @if(MyModel.PayCOA != null)
+                        {
                         <div class="form-floating">
                             <InputSelect id="ddAccounts" class="form-control item-height"
                                          TValue="int" @onclick="BrowseCOA"
@@ -132,9 +135,9 @@
                                          ValueExpression="@(() => @MyModel.MyVoucher.Master.COA)"
                                          ValueChanged="@((e) => COAIDChanged(e))">
 
-                                @if (MyModel.PayCOA.Any())
+                                @if (MyModel.PayCOA!.Any())
                                 {
-                                    @foreach (var item in MyModel.PayCOA)
+                                    @foreach (var item in MyModel.PayCOA!)
                                     {
                                         <option value="@item.ID">@item.Title</option>
                                     }
@@ -147,7 +150,7 @@
                             </InputSelect>
                             <label for="ddAccounts">Account</label>
                         </div>
-
+                        }
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating">

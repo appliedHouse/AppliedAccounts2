@@ -7,7 +7,7 @@ namespace AppliedDB
     {
         public static AppValues.AppPath AppPaths { get; set; }
         public static string AppPath => Directory.GetCurrentDirectory();
-        public static string BasePath { get; set; }
+        public static string BaseUrl { get; set; }
         public static string RootPath { get; set; } = "";
         public static string UsersPath { get; set; } = "";
         public static string ClientPath { get; set; } = "";
@@ -36,7 +36,7 @@ namespace AppliedDB
         public Connections(AppValues.AppPath _AppPaths)
         {
             AppPaths = _AppPaths;
-            BasePath = _AppPaths.BaseUri;
+            BaseUrl = _AppPaths.BaseUri;
             RootPath = _AppPaths.RootPath;
             UsersPath = _AppPaths.UsersPath;
             ClientPath =_AppPaths.ClientPath;
@@ -51,25 +51,25 @@ namespace AppliedDB
             DB_Client = _AppPaths.DBFile;
             DB_Session = _AppPaths.DBFile;
         }
-        public Connections(AppUserModel _UserProfile)
-        {
-            AppUserProfile = _UserProfile;
-            BasePath = _UserProfile.BasePath;
-            DB_Client = AppUserProfile.DataFile;
-            DB_Session = AppUserProfile.Session;
+        //public Connections(AppUserModel _UserProfile)
+        //{
+        //    AppUserProfile = _UserProfile;
+        //    BasePath = _UserProfile.BasePath;
+        //    DB_Client = AppUserProfile.DataFile;
+        //    DB_Session = AppUserProfile.Session;
 
-            RootPath = AppUserProfile.RootFolder;
-            UsersPath = AppUserProfile.UsersFolder;
-            ClientPath = AppUserProfile.ClientFolder;
-            ImagesPath = AppUserProfile.ImagesFolder;
-            LanguagePath = AppUserProfile.LanguageFolder;
-            MessagePath = AppUserProfile.MessageFolder;
-            ReportPath = AppUserProfile.ReportFolder;
-            PDFPath = AppUserProfile.PDFFolder;
-            SystemPath = AppUserProfile.SystemFolder;
-            SessionPath = AppUserProfile.SessionFolder;
-            TempDBPath = AppUserProfile.TempDBFolder;
-        }
+        //    RootPath = AppUserProfile.RootFolder;
+        //    UsersPath = AppUserProfile.UsersFolder;
+        //    ClientPath = AppUserProfile.ClientFolder;
+        //    ImagesPath = AppUserProfile.ImagesFolder;
+        //    LanguagePath = AppUserProfile.LanguageFolder;
+        //    MessagePath = AppUserProfile.MessageFolder;
+        //    ReportPath = AppUserProfile.ReportFolder;
+        //    PDFPath = AppUserProfile.PDFFolder;
+        //    SystemPath = AppUserProfile.SystemFolder;
+        //    SessionPath = AppUserProfile.SessionFolder;
+        //    TempDBPath = AppUserProfile.TempDBFolder;
+        //}
 
 
 
@@ -119,7 +119,7 @@ namespace AppliedDB
         #region Static Connection by default values.
         public static SQLiteConnection? GetUsersConnection()
         {
-            var DBFile = Path.Combine(BasePath, "wwwroot", "SQLiteDB", DB_Users);
+            var DBFile = Path.Combine(AppPath, "wwwroot", "SQLiteDB", DB_Users);
             return GetSQLiteConnection(DBFile);
             //if (File.Exists(DBFile))
             //{
@@ -129,7 +129,7 @@ namespace AppliedDB
         }
         public static SQLiteConnection? GetMessagesConnection()
         {
-            var DBFile = Path.Combine(BasePath, "wwwroot", "Messages", DB_Message);
+            var DBFile = Path.Combine(AppPath, "wwwroot", "Messages", DB_Message);
             return GetSQLiteConnection(DBFile);
             //if (File.Exists(DBFile))
             //{
@@ -139,7 +139,7 @@ namespace AppliedDB
         }
         public static SQLiteConnection? GetLanguageConnection()
         {
-            var DBFile = Path.Combine(BasePath, "wwwroot", "Languages", DB_Language);
+            var DBFile = Path.Combine(AppPath, "wwwroot", "Languages", DB_Language);
             return GetSQLiteConnection(DBFile);
             //if (File.Exists(DBFile))
             //{
@@ -149,7 +149,7 @@ namespace AppliedDB
         }
         public static SQLiteConnection? GetClientConnection(string _DBFile)
         {
-            var DBFile = Path.Combine(BasePath, "wwwroot", "SQLiteDB", _DBFile);
+            var DBFile = Path.Combine(AppPath, "wwwroot", "SQLiteDB", _DBFile);
             return GetSQLiteConnection(DBFile);
         }
         public static SQLiteConnection? GetSQLiteConnection(string _UsersDBFile)

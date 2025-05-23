@@ -7,7 +7,7 @@ namespace AppliedAccounts.Pages.Accounts
 {
     public partial class ReceiptList
     {
-        public AppUserModel UserProfile { get; set; }
+        public AppliedGlobals.AppUserModel UserProfile { get; set; }
         public ReceiptListModel MyModel { get; set; }
 
         public bool IsWaiting { get; set; }

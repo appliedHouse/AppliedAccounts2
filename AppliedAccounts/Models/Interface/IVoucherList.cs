@@ -9,7 +9,7 @@ namespace AppliedAccounts.Models.Interface
 
     public interface IVoucherList
     {
-        AppUserModel? AppUser { get; set; }
+        AppliedGlobals.AppUserModel? AppUser { get; set; }
         DataSource Source { get; set; }
         string DBFile { get; set; }
         object Record { get; set; } //  SalesRecord Record or PurchaseRecord  etc.

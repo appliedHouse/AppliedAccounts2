@@ -32,18 +32,18 @@ namespace AppliedDB
         }
 
 
-        public DataSource(AppUserModel _UserProfile)
-        {
-            UserProfile = _UserProfile;
-            var _Connection = new Connections(_UserProfile);
-            MyConnection = _Connection.GetSQLiteClient()!;               // Get a connection of Client
+        //public DataSource(AppUserModel _UserProfile)
+        //{
+        //    UserProfile = _UserProfile;
+        //    var _Connection = new Connections(_UserProfile);
+        //    MyConnection = _Connection.GetSQLiteClient()!;               // Get a connection of Client
 
-            if (MyConnection is not null)
-            {
-                MyCommand = new SQLiteCommand(MyConnection);
-            }
+        //    if (MyConnection is not null)
+        //    {
+        //        MyCommand = new SQLiteCommand(MyConnection);
+        //    }
 
-        }
+        //}
 
         #endregion
 
@@ -991,9 +991,9 @@ namespace AppliedDB
         #region Get Data File Name
         private string GetDataFile()
         {
-            if (UserProfile is not null)
+            if (AppPaths is not null)
             {
-                return UserProfile.DataFile;
+                return AppPaths.DBFile;
             }
             return "";
         }

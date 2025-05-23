@@ -23,13 +23,13 @@
         try
         {
 
-            AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
-            if (AppUser != null)
-            {
-                MyModel = new(AppUser);
+            //AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+            //if (AppUser != null)
+            //{
+                MyModel = new(AppGlobals);
                 
-            }
-            else { MyModel = new(); }
+            //}
+            //else { MyModel = new(); }
 
             
 

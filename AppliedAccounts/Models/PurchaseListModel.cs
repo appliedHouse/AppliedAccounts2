@@ -1,34 +1,33 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models.Interface;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
 using System.Data;
+using static AppliedDB.Enums;
 
 namespace AppliedAccounts.Models
 {
     public class PurchaseListModel : IVoucherRecords<PurchaseRecord>
     {
-        public AppUserModel AppUser { get; set; }
+        public GlobalService AppGlobals { get; set; }
         public DataSource Source { get; set; }
         public NavigationManager NavManager { get; set; }
-        public string DBFile { get; set; }
         public ListFilter FilterClass { get; set; }
         public List<PurchaseRecord> Records { get; set; }
         public PurchaseRecord Record { get; set; }
-
         public MessageClass MsgClass { get; set; }
         public AppliedDB.Enums.Tables Table { get; set; }
         public bool SelectAll { get; set; }
 
-        public PurchaseListModel(AppUserModel _AppUser)
+        public PurchaseListModel(GlobalService _AppGlobals)
         {
-            AppUser = _AppUser;
-            DBFile = AppUser.DataFile;
-            Source = new DataSource(AppUser);
+            AppGlobals = _AppGlobals;
+            Source = new(AppGlobals.AppPaths);
             MsgClass = new();
-            FilterClass = new(DBFile);
-            Table = AppliedDB.Enums.Tables.view_BillPayable;
+            FilterClass = new(AppGlobals.DBFile);
+            Table = Tables.view_BillPayable;
             Records = LoadData();
         }
 

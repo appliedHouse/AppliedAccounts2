@@ -1,4 +1,5 @@
-﻿using AppliedDB;
+﻿using AppliedAccounts.Services;
+using AppliedDB;
 using System.Data;
 using static AppliedDB.Enums;
 using MESSAGE = AppMessages.Enums.Messages;
@@ -7,7 +8,7 @@ namespace AppliedAccounts.Models
 {
     public class COANatureModel
     {
-        public AppUserModel? AppUser { get; set; }
+        public GlobalService AppGlobals { get; set; }
         public DataSource? Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public COANatureRecord Record { get; set; } = new();
@@ -22,11 +23,12 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public COANatureModel() { }
-        public COANatureModel(AppUserModel _UserProfile)
+        public COANatureModel(GlobalService _AppGlobals)
         {
-            AppUser = _UserProfile;
-            DBFile = AppUser.DataFile;
-            Source = new(AppUser);
+            AppGlobals = _AppGlobals; 
+            //AppUser = _UserProfile;
+            //DBFile = AppUser.DataFile;
+            Source = new(AppGlobals.AppPaths);
             Data = Source.GetList(Query.COANatureList);
             Records = GetFilterRecords(string.Empty);
             if (Records.Count > 0) { Record = Records.First(); } else { Record = new COANatureRecord(); }

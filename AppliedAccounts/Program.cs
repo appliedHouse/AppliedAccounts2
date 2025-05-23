@@ -30,9 +30,10 @@ builder.Services.AddScoped<GlobalService>(sp =>
     var config = sp.GetRequiredService<IConfiguration>();
     var navManager = sp.GetRequiredService<NavigationManager>();
     var JSRuntime = sp.GetRequiredService<IJSRuntime>();
+    var StateProvider = sp.GetRequiredService<AuthenticationStateProvider>();
 
     // Initialize GlobalService with dependencies
-    var globalService = new GlobalService(config, navManager, JSRuntime);
+    var globalService = new GlobalService(config, navManager, JSRuntime, StateProvider);
 
     // Set the Language.ID value here
     globalService.Language.ID = 1; // Example: Setting ID to 1

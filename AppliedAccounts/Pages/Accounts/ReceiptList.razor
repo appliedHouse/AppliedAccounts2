@@ -21,13 +21,11 @@
     protected override void OnInitialized()
     {
         UserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
-        MyModel = new(UserProfile ?? new());   // BookID and UserProfile.
-        MyModel.Source = new(UserProfile ?? new());
-        MyModel.AppGlobals = AppGlobals;
+        MyModel = new(AppGlobals);   
         MyModel.GetKeys();
 
         MyModel.PageIsValid = true;
-        if (MyModel.UserProfile is null) { MyModel.PageIsValid = false; return; }
+        if (AppGlobals is null) { MyModel.PageIsValid = false; return; }
         if (MyModel.Source is null) { MyModel.PageIsValid = false; return; }
     }
 

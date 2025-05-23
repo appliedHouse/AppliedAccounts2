@@ -27,8 +27,8 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> Projects { get; set; } = [];
         public List<CodeTitle> Accounts { get; set; } = [];
         public List<CodeTitle> BookList { get; set; } = [];
-
-        public AppUserModel? UserProfile { get; set; }
+        public GlobalService AppGlobal { get; set; }
+        //public AppliedGlobals.AppUserModel? UserProfile { get; set; }
         public DataSource Source { get; set; }
         public MessageClass MsgClass { get; set; }
 
@@ -60,8 +60,9 @@ namespace AppliedAccounts.Models
         {
 
         }
-        public BookModel(int _VoucherID, int _BookID, AppUserModel _AppUserProfile)
+        public BookModel(int _VoucherID, int _BookID, GlobalService _AppGlobals)
         {
+            AppGlobal = _AppGlobals;
             MsgClass = new();
             MyVoucher = new();
 
@@ -69,15 +70,15 @@ namespace AppliedAccounts.Models
             {
                 BookID = _BookID;
                 VoucherID = _VoucherID;
-                UserProfile = _AppUserProfile;
-                DataFile = _AppUserProfile.DataFile;
+                //UserProfile = _AppUserProfile;
+                DataFile = AppGlobal.DBFile;
 
                 CashNatureID = AppRegistry.GetNumber(DataFile, "CashBKNature");
                 BankNatureID = AppRegistry.GetNumber(DataFile, "BankBKNature");
 
-                if (UserProfile != null)
+                if (AppGlobal.AppPaths != null)
                 {
-                    Source = new(UserProfile);
+                    Source = new(AppGlobal.AppPaths);
                     LastVoucherDate = AppRegistry.GetDate(Source.DBFile, "LastBKDate");
 
                     if (VoucherID == 0) { MyVoucher = NewVoucher(); }   // Create a new voucher;
@@ -302,12 +303,12 @@ namespace AppliedAccounts.Models
                         {
                             if (BookNature == CashNatureID)         // Cash Book Nature
                             {
-                                MyVoucher.Master.Vou_No = NewVoucherNo.GetCashVoucher(UserProfile!.DataFile, MyVoucher.Master.Vou_Date);
+                                MyVoucher.Master.Vou_No = NewVoucherNo.GetCashVoucher(AppGlobal.DBFile, MyVoucher.Master.Vou_Date);
                             }
 
                             if (BookNature == BankNatureID)         // Bank Book Nature
                             {
-                                MyVoucher.Master.Vou_No = NewVoucherNo.GetBankVoucher(UserProfile!.DataFile, MyVoucher.Master.Vou_Date);
+                                MyVoucher.Master.Vou_No = NewVoucherNo.GetBankVoucher(AppGlobal.DBFile, MyVoucher.Master.Vou_Date);
                             }
                         }
 

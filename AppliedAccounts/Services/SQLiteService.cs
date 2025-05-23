@@ -1,13 +1,14 @@
 ﻿using System.Data.SQLite;
+using AppliedGlobals;
 
 namespace AppliedAccounts.Services
 {
     public class SQLiteService
     {
         public AppliedDB.Connections MyConnections { get; set; }
-        public SQLiteService(AppliedDB.AppPaths _AppPaths)
+        public SQLiteService(AppValues.AppPath _AppPaths)
         {
-            //MyConnections = new(_AppPaths);
+            MyConnections = new(_AppPaths);
         }
 
         public SQLiteConnection? GetSQLiteConnection(SQLiteConnectionType _ConnectionType)

@@ -4,7 +4,7 @@ using AppliedDB;
 using AppReports;
 using Microsoft.JSInterop;
 using System.Data;
-
+using static AppliedGlobals.AppValues;
 using MESSAGE = AppMessages.Enums.Messages;
 
 
@@ -13,7 +13,7 @@ namespace AppliedAccounts.Pages.Sale
     public partial class SaleInvoiceList
     {
 
-        public AppUserModel AppUser { get; set; }
+        public AppliedGlobals.AppUserModel AppUser { get; set; }
         public Models.SaleInvoiceListModel MyModel { get; set; }
         public ReportModel PrintClass { get; set; }
         private bool IsPrinted { get; set; } = false;

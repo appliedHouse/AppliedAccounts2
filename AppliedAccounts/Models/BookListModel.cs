@@ -15,7 +15,7 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> BookList { get; set; }
         public List<CodeTitle> NatureAccountsList { get; set; }
         public DataSource Source { get; set; }
-        public AppUserModel? UserProfile { get; set; }
+        public AppliedGlobals.AppUserModel? UserProfile { get; set; }
         public AppMessages.MessageClass MsgClass { get; set; }
         public PrintService ReportService { get; set; }
 
@@ -31,11 +31,11 @@ namespace AppliedAccounts.Models
         public bool IsWaiting { get; set; } = false;
 
         public BookListModel() { }
-        public BookListModel(int _BookID, AppUserModel _AppUserProfile)
+        public BookListModel(int _BookID, GlobalService _AppGlobals)
         {
+            AppGlobals = _AppGlobals;
             MsgClass = new();
-            UserProfile = _AppUserProfile;
-            Source = new(UserProfile);
+            Source = new(AppGlobals.AppPaths);
             GetKeys();
 
             try
@@ -49,7 +49,7 @@ namespace AppliedAccounts.Models
                 BookNatureID = (int)result;
 
                 BookID = _BookID;
-                UserProfile = _AppUserProfile;
+                //UserProfile = _AppUserProfile;
 
                 NatureAccountsList =
                 [

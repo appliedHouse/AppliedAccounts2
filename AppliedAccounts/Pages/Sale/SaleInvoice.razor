@@ -15,14 +15,15 @@
 @inject IJSRuntime js
 @inject ToastService ToastService
 @inject PrintService PrintService
+@inject GlobalService AppGlobals
 
 @code {
     [Parameter] public int ID { get; set; }
 
     protected override void OnInitialized()
     {
-        var UserProfile = ((UserAuthonticationStateProvider)Authorized).AppUser;
-        MyModel = new(UserProfile, ID);
+        //var UserProfile = ((UserAuthonticationStateProvider)Authorized).AppUser;
+        MyModel = new(AppGlobals, ID);
 
         // Validate page
         IsPageValid = true;

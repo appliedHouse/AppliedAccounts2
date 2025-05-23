@@ -1,4 +1,6 @@
-﻿using AppliedDB;
+﻿using AppliedAccounts.Services;
+using AppliedDB;
+using AppliedGlobals;
 using AppMessages;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
@@ -8,7 +10,7 @@ namespace AppliedAccounts.Models
 {
     public class CustomersModel
     {
-        public AppUserModel? AppUser { get; set; }
+        public GlobalService AppGlobals { get; set; }
         public DataSource? Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public CustomerRecord Record { get; set; } = new();
@@ -22,11 +24,11 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public CustomersModel() { }
-        public CustomersModel(AppUserModel UserProfile)
+        
+        public CustomersModel(GlobalService _AppGlobals)
         {
-            AppUser = UserProfile;
-            DBFile = AppUser.DataFile;
-            Source = new(AppUser);
+            AppGlobals = _AppGlobals;
+            Source = new(AppGlobals.AppPaths);
             Data = Source.GetList(Query.CustomersList);
             MyDataRow = Source.Seek(Tables.Customers, 0);
 
@@ -39,11 +41,12 @@ namespace AppliedAccounts.Models
                 Record = GetRecord(MyDataRow);
             }
         }
-        public CustomersModel(AppUserModel UserProfile, int ID)
+        public CustomersModel(GlobalService _AppGlobals, int ID)
         {
-            AppUser = UserProfile;
-            DBFile = AppUser.DataFile;
-            Source = new(AppUser);
+            AppGlobals = _AppGlobals;
+            //AppUser = UserProfile;
+            //DBFile = AppUser.DataFile;
+            Source = new(AppGlobals.AppPaths);
             MyDataRow = Source.Seek(Tables.Customers, ID);
             Record = GetRecord(MyDataRow);
         }

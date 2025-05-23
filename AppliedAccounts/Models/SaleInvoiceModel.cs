@@ -19,7 +19,6 @@ namespace AppliedAccounts.Models
     {
         #region Variables
         public int SaleInvoiceID { get; set; }
-        public AppUserModel? UserProfile { get; set; }
         public DataSource Source { get; set; }
         public Voucher MyVoucher { get; set; } = new();
         public List<Detail> Deleted { get; set; }
@@ -51,17 +50,17 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public SaleInvoiceModel() { }
-        public SaleInvoiceModel(AppUserModel _UserProfile)
+        public SaleInvoiceModel(GlobalService _AppGlobals)
         {
-            UserProfile = _UserProfile;
-            Source = new DataSource(UserProfile);
+            AppGlobals = _AppGlobals;
+            Source = new DataSource(AppGlobals.AppPaths);
         }
 
-        public SaleInvoiceModel(AppUserModel _UserProfile, int _SaleInvoiceID)
+        public SaleInvoiceModel(GlobalService _AppGlobals, int _SaleInvoiceID)
         {
-            UserProfile = _UserProfile;
+            AppGlobals = _AppGlobals;
             SaleInvoiceID = _SaleInvoiceID;
-            Source = new DataSource(UserProfile);
+            Source = new DataSource(AppGlobals.AppPaths);
             Start(SaleInvoiceID);
 
         }
@@ -72,15 +71,15 @@ namespace AppliedAccounts.Models
         {
             try
             {
-                if (UserProfile is null) { return; }
-                Source ??= new(UserProfile);
+                if (AppGlobals is null) { return; }
+                Source ??= new(AppGlobals.AppPaths);
 
                 MsgClass = new();
                 MyVoucher = new();
                 LastVoucherDate = GetDate(Source.DBFile, "SInvDate");           // Sale Invoice Date
 
                 SaleInvoiceID = _SaleInvoiceID;
-                DataFile = UserProfile.DataFile;
+                //DataFile = UserProfile.DataFile;
                 Companies = Source.GetCustomers();
                 Accounts = Source.GetAccounts();
                 Employees = Source.GetEmployees();
@@ -625,8 +624,8 @@ namespace AppliedAccounts.Models
         {
             var _Heading1 = "Sale Invoice";
             var _Heading2 = $"{_Heading1} [{MyVoucher.Master.Vou_No}]";
-            var _ReportPath = UserProfile!.ReportFolder;
-            var _CompanyName = UserProfile.Company;
+            var _ReportPath = AppGlobals.AppPaths.ReportPath;
+            var _CompanyName = AppGlobals.Client.Name;
             var _ReportFooter = AppFunctions.ReportFooter();
 
             ReportModel rptModel = new();

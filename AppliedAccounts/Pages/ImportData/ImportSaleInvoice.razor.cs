@@ -16,7 +16,7 @@ namespace AppliedAccounts.Pages.ImportData
     {
 
         #region Variables
-        public AppUserModel AppUser { get; set; }
+        public GlobalService AppGlobals { get; set; }
         public ImportSaleInvoiceModel MyModel { get; set; }
         public ImportExcelFile ImportExcel { get; set; }
         public MessageClass MsgClass { get; set; }
@@ -52,10 +52,10 @@ namespace AppliedAccounts.Pages.ImportData
         #region Constructor
         //public ImportSaleInvoice() { }
 
-        public ImportSaleInvoice(AppUserModel _AppUser)
+        public ImportSaleInvoice(GlobalService _AppGlobals)
         {
+            AppGlobals = _AppGlobals;
             MyModel = new();
-            AppUser = _AppUser;
             MyModel.IsClientUpdate = true;             // true if client info update in DB
 
 
@@ -76,7 +76,7 @@ namespace AppliedAccounts.Pages.ImportData
                 await InvokeAsync(StateHasChanged);
 
 
-                ImportExcel = new(e.File, AppUser);
+                ImportExcel = new(e.File, AppGlobals);
                 await ImportExcel.ImportDataAsync();            // ImportExcelFile.cs Function
                 IsExcelLoaded = true;                           // Excel file has been loaded successfully.
                 MsgClass.Add($"{DateTime.Now} Excel File loaded.... OK");
@@ -152,7 +152,7 @@ namespace AppliedAccounts.Pages.ImportData
         private async Task GetExcelSheetDataAsync()
         {
             MyModel.SpinnerMessage = "Sales invoice data is being Process... Gathering Data sheets";
-            string _TempGUID = AppRegistry.GetText(AppUser.DataFile, "ExcelImport");
+            string _TempGUID = AppRegistry.GetText(AppGlobals.DBFile, "ExcelImport");
             TempDB _TempDB = new(_TempGUID + ".db");
             ClientData = await _TempDB.GetTempTableAsync("Clients List");
             SalesData = await _TempDB.GetTempTableAsync("Data");
@@ -293,7 +293,7 @@ namespace AppliedAccounts.Pages.ImportData
         {
             MyModel.SpinnerMessage = "Sales invoice data is being Process... Gatting Data table";
             ImportSaleInvoiceModel _Result = new();
-            _Result.DBFile = AppUser.DataFile;
+            _Result.DBFile = AppGlobals.DBFile;
             MyModel.IsProgressBar = true;
             MyModel.Counter = 0;
             await GenerateInvoice();
@@ -339,8 +339,8 @@ namespace AppliedAccounts.Pages.ImportData
             }
             #endregion
 
-            Sale1 = DataSource.CloneTable(AppUser.DataFile, Tables.BillReceivable);
-            Sale2 = DataSource.CloneTable(AppUser.DataFile, Tables.BillReceivable2);
+            Sale1 = DataSource.CloneTable(AppGlobals.DBFile, Tables.BillReceivable);
+            Sale2 = DataSource.CloneTable(AppGlobals.DBFile, Tables.BillReceivable2);
 
             MyModel.TotalRec = SalesData.Rows.Count;
 
@@ -364,8 +364,8 @@ namespace AppliedAccounts.Pages.ImportData
 
 
                 DataRow _Row1 = Sale1.NewRow();
-                int _CompanyID = AppliedDB.Functions.Code2Int(AppUser.DataFile, Tables.Customers, (string)Row["Code"]);
-                int _EmployeeID = AppliedDB.Functions.Code2Int(AppUser.DataFile, Tables.Employees, (string)Row["Employee"]);
+                int _CompanyID = AppliedDB.Functions.Code2Int(AppGlobals.DBFile, Tables.Customers, (string)Row["Code"]);
+                int _EmployeeID = AppliedDB.Functions.Code2Int(AppGlobals.DBFile, Tables.Employees, (string)Row["Employee"]);
                 decimal _Total = Conversion.ToDecimal(Row["Total"]);
 
                 if (_Total > 0)     // if Invoice amount is zero, skip this...
@@ -428,7 +428,7 @@ namespace AppliedAccounts.Pages.ImportData
                             _Row2["TranID"] = MyModel.Counter;
                             _Row2["Batch"] = Batch;
 
-                            int _Inventory = AppliedDB.Functions.Code2Int(AppUser.DataFile, Tables.Inventory, (string)Scheme["Code"]);
+                            int _Inventory = AppliedDB.Functions.Code2Int(AppGlobals.DBFile, Tables.Inventory, (string)Scheme["Code"]);
                             _Row2["Inventory"] = _Inventory;
                             _Row2["Batch"] = Batch;
 
@@ -443,9 +443,9 @@ namespace AppliedAccounts.Pages.ImportData
                                 _Row2["Rate"] = Conversion.ToDecimal(Row[(string)Scheme["Rate"]]);
                             }
 
-                            decimal _TaxID = AppliedDB.Functions.Code2Int(AppUser.DataFile, Tables.Taxes, (string)Scheme["STax"]);
+                            decimal _TaxID = AppliedDB.Functions.Code2Int(AppGlobals.DBFile, Tables.Taxes, (string)Scheme["STax"]);
                             _Row2["Tax"] = _TaxID;
-                            _Row2["Tax_Rate"] = AppliedDB.Functions.Code2Rate(AppUser.DataFile, (int)_Row2["Tax"]);
+                            _Row2["Tax_Rate"] = AppliedDB.Functions.Code2Rate(AppGlobals.DBFile, (int)_Row2["Tax"]);
                             _Row2["Description"] = Row[(string)Scheme["Remarks Code"]];
                             int.TryParse(Row["Project"].ToString(), out int _projectID);
                             _Row2["Project"] = _projectID;
@@ -540,7 +540,7 @@ namespace AppliedAccounts.Pages.ImportData
         private async Task SaveAsync()
         {
             MsgClass = new();
-            Source = new(AppUser);
+            Source = new(AppGlobals.AppPaths);
             var BillRec1 = Source.GetTable(Tables.BillReceivable);
             var BillRec2 = Source.GetTable(Tables.BillReceivable2);
             var master = BillRec1.NewRow();
@@ -574,7 +574,7 @@ namespace AppliedAccounts.Pages.ImportData
                 {
                     MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} validated for post / save... ");
                     master["ID"] = 0;           // Set a Datarow for insert command
-                    CommandClass _Commands = new(master, AppUser.DataFile);
+                    CommandClass _Commands = new(master, AppGlobals.DBFile);
                     var IsSaved = _Commands.SaveChanges();
                     MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} saved ---> {IsSaved} ");
                     var _TranID = (int)master["ID"];        // Get ID after save row in SQLite Data Table.
@@ -582,7 +582,7 @@ namespace AppliedAccounts.Pages.ImportData
                     {
                         Row["ID"] = 0;
                         Row["TranID"] = _TranID;
-                        _Commands = new(Row, AppUser.DataFile);
+                        _Commands = new(Row, AppGlobals.DBFile);
                         await Task.Run(() =>
                         {
                             MyModel.SpinnerMessage = $"{master["Vou_No"]} is being saved.";
@@ -623,6 +623,7 @@ namespace AppliedAccounts.Pages.ImportData
     public class ImportSaleInvoiceModel
     {
         //public AppUserModel AppUser { get; set; }
+        public GlobalService AppGlobals { get; set; }
         public DataRow SaleMaster { get; set; }
         public DataRow SaleDetails { get; set; }
         public string DBFile { get; set; }

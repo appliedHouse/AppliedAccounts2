@@ -15,7 +15,6 @@ namespace AppliedAccounts.Models
     public class ReceiptListModel
     {
         public GlobalService AppGlobals { get; set; }
-        public AppUserModel? UserProfile { get; set; }
         public DataSource Source { get; set; }
         public List<DataRow> DataList { get; set; }
         public List<CodeTitle> PayerList { get; set; }
@@ -30,19 +29,17 @@ namespace AppliedAccounts.Models
         public PrintService ReportService { get; set; }
 
 
-        public ReceiptListModel(AppUserModel _AppUserModel)
+        public ReceiptListModel(GlobalService _AppGlobals)
         {
-            UserProfile = _AppUserModel;
+            AppGlobals = _AppGlobals;
             Table = Tables.view_Receipts;
-            Source = new DataSource(UserProfile);
+            Source = new DataSource(AppGlobals.AppPaths);
             MsgClass = new();
             DT_Start = AppRegistry.GetDate(Source.DBFile, "rcptFrom");
             DT_End = AppRegistry.GetDate(Source.DBFile, "rcptTo");
             SearchText = AppRegistry.GetText(Source.DBFile, "rcptSearch");
             PayerList = Source.GetCustomers();
             DataList = LoadData();
-
-
         }
 
         #region Load Data
@@ -139,8 +136,8 @@ namespace AppliedAccounts.Models
             var _InvoiceNo = "Receipt";
             var _Heading1 = "Receipt";
             var _Heading2 = $"Receipt No. {_InvoiceNo}";
-            var _ReportPath = UserProfile!.ReportFolder;
-            var _CompanyName = UserProfile.Company;
+            var _ReportPath = AppGlobals.AppPaths.ReportPath;
+            var _CompanyName = AppGlobals.Client.DisplayName;
             var _ReportFooter = AppFunctions.ReportFooter();
 
             var _Amount = (decimal)ReportService.Data.ReportTable.Rows[0]["Amount"];

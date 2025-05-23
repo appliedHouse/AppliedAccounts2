@@ -2,17 +2,19 @@
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
+@using AppliedAccounts.Services
 
 @inject AuthenticationStateProvider authorized;
 @inject NavigationManager NavManager;
 @inject IJSRuntime js
+@inject GlobalService AppGlobals;
 
 
 @code {
     protected override void OnInitialized()
     {
         var AppUserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
-        if (AppUserProfile != null) { Model = new(AppUserProfile); IsPageValid = GetPageIsValid(); }
+        if (AppUserProfile != null) { Model = new(AppGlobals); IsPageValid = GetPageIsValid(); }
         else { Model = new(); }
     }
 

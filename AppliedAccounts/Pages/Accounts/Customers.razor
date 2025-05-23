@@ -3,12 +3,14 @@
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
+@using AppliedAccounts.Services;
 
 
 
 @inject AuthenticationStateProvider authStateProvider;
 @inject NavigationManager NavManager;
 @inject IJSRuntime js
+@inject GlobalService AppGlobals;
 
 
 @code {
@@ -23,7 +25,7 @@
 
         if (ID < 0) { IsDelete = true; ID = Math.Abs(ID); }
 
-        if (AppUserProfile != null) { Model = new(AppUserProfile, ID); }
+        if (AppUserProfile != null) { Model = new(AppGlobals, ID); }
         else { Model = new(); }
     }
 

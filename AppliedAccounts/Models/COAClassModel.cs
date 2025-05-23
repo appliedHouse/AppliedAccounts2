@@ -1,4 +1,5 @@
-﻿using AppliedDB;
+﻿using AppliedAccounts.Services;
+using AppliedDB;
 using System.Data;
 using static AppliedDB.Enums;
 using static AppMessages.Enums;
@@ -7,7 +8,8 @@ namespace AppliedAccounts.Models
 {
     public class COAClassModel
     {
-        public AppUserModel? AppUser { get; set; }
+        //public AppliedGlobals.AppUserModel? AppUser { get; set; }
+        public GlobalService AppGlobals { get; set; }
         public DataSource? Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public COAClassRecord Record { get; set; } = new();
@@ -23,12 +25,13 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public COAClassModel() { }
-        public COAClassModel(AppUserModel _UserProfile)
+        public COAClassModel(GlobalService _AppGlobals)
         {
-            AppUser = _UserProfile;
+            AppGlobals = _AppGlobals;
+            //AppUser = _UserProfile;
             //MyMessages = MessageClass.Messages;
-            DBFile = AppUser.DataFile;
-            Source = new(AppUser);
+            //DBFile = AppUser.DataFile;
+            Source = new(AppGlobals.AppPaths);
             Data = Source.GetList(Query.COAClassList);
             Records = GetFilterRecords(string.Empty);
             if (Records.Count > 0) { Record = Records.First(); } else { Record = new COAClassRecord(); }

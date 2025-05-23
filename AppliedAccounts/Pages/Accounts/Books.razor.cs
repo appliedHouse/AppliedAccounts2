@@ -15,7 +15,7 @@ namespace AppliedAccounts.Pages.Accounts
         [Parameter] public int ID { get; set; }
         [Parameter] public int BookID { get; set; }
 
-        public AppUserModel UserProfile { get; set; }
+        public AppliedGlobals.AppUserModel UserProfile { get; set; }
         public BookModel MyModel { get; set; } = new();
         public MessageClass MsgClass { get; set; }
 
@@ -35,8 +35,8 @@ namespace AppliedAccounts.Pages.Accounts
         {
             MsgClass = new();
             MyToastClass = new();
-            MyModel = new(ID, BookID, UserProfile); ;
-            MyModel.AppGlobals = AppGlobals;
+            MyModel = new(ID, BookID, AppGlobals); ;
+            //MyModel.AppGlobals = AppGlobals;
             MyModel.ReportService = ReportService;
 
             if (MyModel == null) { IsPageValid = false; MsgClass.Add("Model is null"); return; }

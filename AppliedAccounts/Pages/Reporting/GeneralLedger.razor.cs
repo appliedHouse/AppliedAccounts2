@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
@@ -10,7 +11,7 @@ namespace AppliedAccounts.Pages.Reporting
 {
     public partial class GeneralLedger
     {
-        public AppUserModel UserModel { get; set; }
+        public GlobalService AppGlobal { get; set; }
         public DataSource Source { get; set; }
         public GLModel MyModel { get; set; }
         public MessageClass MsgClass { get; set; }
@@ -27,15 +28,15 @@ namespace AppliedAccounts.Pages.Reporting
             MyModel = new();
         }
 
-        public void Start(AppUserModel _UserModel)
+        public void Start(AppliedGlobals.AppUserModel _UserModel)
         {
             if (_UserModel != null)
             {
 
                 MsgClass = new();
-                UserModel = _UserModel;
-                Source = new(UserModel);
-                DBFile = UserModel.DataFile;
+                //UserModel = _UserModel;
+                Source = new(AppGlobal.AppPaths);
+                //DBFile = UserModel.DataFile;
                 Accounts = Source.GetAccounts();            // Get List of Accounts
 
 

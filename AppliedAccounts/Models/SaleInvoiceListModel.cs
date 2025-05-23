@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using AppReports;
@@ -8,7 +9,7 @@ namespace AppliedAccounts.Models
 {
     public class SaleInvoiceListModel
     {
-        public AppUserModel AppUser { get; set; }
+        public GlobalService  AppGlobals { get; set; }
         public DataSource Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public SalesRecord Record { get; set; } = new();
@@ -23,12 +24,10 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public SaleInvoiceListModel() { }
-        public SaleInvoiceListModel(AppUserModel UserProfile)
+        public SaleInvoiceListModel(GlobalService _AppGlobal)
         {
-            AppUser = UserProfile;
-            DBFile = AppUser.DataFile;
-            Source = new(AppUser);
-
+            AppGlobals = _AppGlobal;
+            Source = new(AppGlobals.AppPaths);
             LoadData();
         }
         #endregion

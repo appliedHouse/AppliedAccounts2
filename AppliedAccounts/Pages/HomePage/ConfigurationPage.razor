@@ -52,7 +52,7 @@
         ClientDB = UserModel.DataFile;
         TempDBPath = UserModel.TempDBFolder;
 
-        _Connections = new(UserModel);
+        _Connections = new(AppGlobal.AppPaths);
         _true = true;
     }
 }

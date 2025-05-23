@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
+using AppliedGlobals;
 using static AppliedDB.Enums;
 
 namespace AppliedDB
@@ -16,9 +12,9 @@ namespace AppliedDB
     public class GetDataRow : IGetDataRow 
     {
         public DataRow? _DataRow;
-        public GetDataRow(AppUserModel _UserProfile, Tables _Tables, int _ID)
+        public GetDataRow(AppValues.AppPath _AppPaths, Tables _Tables, int _ID)
         {
-            DataSource _Source = new(_UserProfile);
+            DataSource _Source = new(_AppPaths);
             DataTable _Table = _Source.GetTable(_Tables, $"ID={_ID}");
             if (_Table != null)
             {

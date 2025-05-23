@@ -33,7 +33,7 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> Accounts { get; set; }
         public List<CodeTitle> PayCOA { get; set; }
         public List<CodeTitle> InvoiceList { get; set; }
-        public string DataFile { get; set; }
+        //public string DataFile => AppGlobals.DBFile;
 
         public AppUserModel? UserProfile { get; set; }
         public int Index { get; set; }
@@ -71,7 +71,7 @@ namespace AppliedAccounts.Models
         public void Start(int _ReceiptID)
         {
             //if (UserProfile is null) { return; }
-            Source ??= new(AppGlobals);
+            Source ??= new(AppGlobals.AppPaths);
 
             MsgClass = new();
             MyVoucher = new();
@@ -80,12 +80,12 @@ namespace AppliedAccounts.Models
             try
             {
                 ReceiptID = _ReceiptID;
-                DataFile = UserProfile?.DataFile ?? "";
+                //DataFile = UserProfile?.DataFile ?? "";
 
-                if (UserProfile != null && !string.IsNullOrEmpty(DataFile))
+                if (AppGlobals != null && !string.IsNullOrEmpty(AppGlobals.DBFile))
                 {
-                    Source = new(UserProfile);
-                    LastVoucherDate = AppRegistry.GetDate(DataFile, "LastRecDate");
+                    Source ??= new(AppGlobals.AppPaths);
+                    LastVoucherDate = AppRegistry.GetDate(AppGlobals.DBFile, "LastRecDate");
 
                     if (ReceiptID == 0) { MyVoucher = NewVoucher(); }   // Create a new voucher;
                     if (ReceiptID > 0)

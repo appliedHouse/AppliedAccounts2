@@ -11,6 +11,7 @@
 @inject NavigationManager NavManager;
 @inject IJSRuntime js
 @inject ToastService ToastService
+@inject GlobalService AppGlobal;
 
 
 @code {
@@ -21,13 +22,13 @@
 
     protected override void OnInitialized()
     {
-        AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        //var AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
 
         
         Stopwatch.Start();
         MsgClass = new();
         //MyModel = new();
-        Source = new(AppUser);
+        Source = new(AppGlobal.AppPaths);
 
     }
 

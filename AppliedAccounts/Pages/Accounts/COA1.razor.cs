@@ -16,7 +16,7 @@ namespace AppliedAccounts.Pages.Accounts
         public bool GetPageIsValid()
         {
             var _Valid = true;
-            if (Model.AppUser is null) { _Valid = false; Model.MsgClass.Add("User not define properly."); }
+           
             if (Model.Records is null) { _Valid = false; Model.MsgClass.Add("Records not found"); }
             if (Model.Record is null) { _Valid = false; Model.MsgClass.Add("Account Class List is empty"); }
             if (Model.NatureList is null) { _Valid = false; Model.MsgClass.Add("Account Nature List is empty"); }

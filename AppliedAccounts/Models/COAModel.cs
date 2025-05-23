@@ -1,4 +1,5 @@
-﻿using AppliedDB;
+﻿using AppliedAccounts.Services;
+using AppliedDB;
 using System.Data;
 using static AppliedDB.Enums;
 using MESSAGES = AppMessages.Enums.Messages;
@@ -8,7 +9,8 @@ namespace AppliedAccounts.Models
     public class COAModel
     {
         #region Valiables
-        public AppUserModel? AppUser { get; set; }
+        //public AppliedGlobals.AppUserModel? AppUser { get; set; }
+        public GlobalService AppGlobals { get; set; }
         public DataSource? Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public COARecord Record { get; set; } = new();
@@ -32,11 +34,12 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public COAModel() { }
-        public COAModel(AppUserModel UserProfile)
+        public COAModel(GlobalService _AppGlobals)
         {
-            AppUser = UserProfile;
-            DBFile = AppUser.DataFile;
-            Source = new(AppUser);
+            AppGlobals = _AppGlobals;
+            //AppUser = UserProfile;
+            //DBFile = AppUser.DataFile;
+            Source = new(AppGlobals.AppPaths);
             Data = Source.GetList(Query.COAList);
             Records = GetFilterRecords();
 

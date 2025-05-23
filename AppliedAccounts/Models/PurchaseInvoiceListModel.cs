@@ -1,13 +1,15 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppReports;
 using System.Data;
+using static AppliedDB.Enums;
 
 namespace AppliedAccounts.Models
 {
     public class PurchaseInvoiceListModel
     {
-        public AppUserModel? AppUser { get; set; }
+        public GlobalService AppGlobals { get; set; }
         public DataSource? Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public PurchaseRecord Record { get; set; } = new();
@@ -23,11 +25,11 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public PurchaseInvoiceListModel() { }
-        public PurchaseInvoiceListModel(AppUserModel UserProfile)
+        public PurchaseInvoiceListModel(GlobalService _AppGlobals)
         {
-            AppUser = UserProfile;
-            DBFile = AppUser.DataFile;
-            Source = new(AppUser);
+            AppGlobals = _AppGlobals;
+            Source = new(AppGlobals.AppPaths);
+            Data = Source.GetList(Query.CustomersList);
             Data = Source.GetList(Enums.Query.PurchaseInvoiceList);
             Records = GetFilterRecords();
 

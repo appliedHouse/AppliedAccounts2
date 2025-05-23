@@ -11,7 +11,7 @@ namespace AppliedAccounts.Services
         public IJSRuntime JS { get; set; }
         public GlobalService Config { get; set; }
         public NavigationManager NavManager { get; set; }
-        public AppUserModel? UserProfile { get; set; }
+        public AppliedGlobals.AppUserModel? UserProfile { get; set; }
 
         public ReportData Data { get; set; }
         public ReportModel Model { get; set; }

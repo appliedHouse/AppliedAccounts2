@@ -1,4 +1,6 @@
 ﻿using System.Data.SQLite;
+using AppliedAccounts.Services;
+using AppliedGlobals;
 
 namespace AppliedAccounts.Data
 {
@@ -11,12 +13,10 @@ namespace AppliedAccounts.Data
         public SQLiteConnection SystemConnection { get; set; }
         public SQLiteConnection SessionConnection { get; set; }
 
-        public DataBaseClass(AppliedDB.AppUserModel _UserProfile)
+        public DataBaseClass(GlobalService _AppGlobals)
         {
-            AppliedDB.Connections _Connection = new(_UserProfile);
-
+            AppliedDB.Connections _Connection = new(_AppGlobals.AppPaths);
         }
-
 
         public static SQLiteConnection? GetMessagesConnection() { return null; }
         public static SQLiteConnection? GetLanguageConnection() { return null; }
