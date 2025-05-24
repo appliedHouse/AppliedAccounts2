@@ -9,7 +9,22 @@
 @inject NavigationManager NavManager;
 @inject AuthenticationStateProvider authStateProvider;
 
-@inject GlobalService _Global;
+@inject GlobalService AppGlobals;
+
+
+@code {
+    protected override void OnInitialized()
+    {
+        
+        MyModel.UserID = "";
+        MyModel.Password = "";
+        MyModel.IsSaved = false;
+        MyModel.DataFile = "";
+        MyModel.Designation = "";
+        MyModel.Company = "";
+    }
+}
+
 
 @if (IsError)
 {
@@ -153,18 +168,3 @@ else
             transform: translateY(-3px);
         }
 </style>
-
-@code {
-
-    protected override void OnInitialized()
-    {
-        AppGlobals = _Global;
-
-        MyModel.UserID = "";
-        MyModel.Password = "";
-        MyModel.IsSaved = false;
-        MyModel.DataFile = "";
-        MyModel.Designation = "";
-        MyModel.Company = "";
-    }
-}

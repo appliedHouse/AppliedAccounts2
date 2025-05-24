@@ -58,7 +58,9 @@
             ColumnIsNull = 14,
             ColumnDBNullValue = 117,
             ColumnValueZero  = 15,
-
+            ClassIsNull = 16,
+            NatureIsNull = 17,
+            NotesIsNull = 18,
 
             //Sale Invoice
             Sale_PayLessInvDate = 119,
@@ -92,7 +94,6 @@
             RecordNotValidated = 137,
             DataLoadSucesscully = 48,
             DataLoadFailed = 49,
-
 
             SQLQueryError = 139,
             CodeLength6 = 10,

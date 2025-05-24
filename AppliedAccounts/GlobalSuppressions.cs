@@ -7,3 +7,4 @@ using System.Diagnostics.CodeAnalysis;
 
 
 [assembly: SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Only targeting Windows platform", Scope = "module")]
+[assembly: SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "Only targeting Windows platform", Scope = "module")]

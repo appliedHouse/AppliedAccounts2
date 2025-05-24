@@ -19,9 +19,9 @@ namespace AppliedAccounts.Models
         public int CountRecord => Records.Count;
         public int Count => Data.Count;
 
-        public List<Dictionary<int, string>> ClassList { get; set; } = new();
-        public List<Dictionary<int, string>> NatureList { get; set; } = new();
-        public List<Dictionary<int, string>> NotesList { get; set; } = new();
+        public List<CodeTitle> ClassList { get; set; } = new();
+        public List<CodeTitle> NatureList { get; set; } = new();
+        public List<CodeTitle> NotesList { get; set; } = new();
 
         public string SelectedClass { get; set; } = "Select..";
         public string SelectedNature { get; set; } = "Select..";
@@ -40,11 +40,12 @@ namespace AppliedAccounts.Models
             Data = Source.GetTable(SQLQueries.Quries.COA()).AsEnumerable().ToList();
             Records = GetFilterRecords();
 
+            ClassList = Source.GetAccClass();
+            NatureList = Source.GetAccNature();
+            NotesList = Source.GetAccNotes();
+
             if (Count > 0) { Record = Records.First(); } else { Record = new COARecord(); }
 
-            ClassList = DataSource.GetDataList(DBFile, Tables.COA_Class);
-            NatureList = DataSource.GetDataList(DBFile, Tables.COA_Nature);
-            NotesList = DataSource.GetDataList(DBFile, Tables.COA_Notes);
             // = MessageClass.Messages;
         }
         #endregion
@@ -125,11 +126,12 @@ namespace AppliedAccounts.Models
                 }
                 else
                 {
-                    if (_Row.Field<string>("Code").Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                    if (_Row["Title"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                    if (_Row["TitleClass"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                    if (_Row["TitleNature"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                    if (_Row["TitleNote"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
+                    var _SearchText = SearchText.ToUpper();
+                    if (_Row.Field<string>("Code").ToUpper().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
+                    if (_Row.Field<string>("Title").ToString().ToUpper().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
+                    if (_Row.Field<string>("TitleClass").ToString().ToUpper().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
+                    if (_Row.Field<string>("TitleNature").ToString().ToUpper().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
+                    if (_Row.Field<string>("TitleNote").ToString().ToUpper().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
                 }
 
             }
@@ -201,9 +203,6 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-
-
-
         #region Validate
         private bool Validate(DataRow _Row)
         {
@@ -211,9 +210,9 @@ namespace AppliedAccounts.Models
             if (_Row["ID"] is null) { _Validated = false; MsgClass.Add(MESSAGES.IDIsNull); }
             if (_Row["Code"] is null) { _Validated = false; MsgClass.Add(MESSAGES.CodeIsNull); }
             if (_Row["Title"] is null) { _Validated = false; MsgClass.Add(MESSAGES.TitleIsNull); }
-            if (_Row["Class"] is null) { _Validated = false; MsgClass.Add(MESSAGES.ColumnIsNull); }
-            if (_Row["Nature"] is null) { _Validated = false; MsgClass.Add(MESSAGES.ColumnIsNull); }
-            if (_Row["Notes"] is null) { _Validated = false; MsgClass.Add(MESSAGES.ColumnIsNull); }
+            if (_Row["Class"] is null) { _Validated = false; MsgClass.Add(MESSAGES.ClassIsNull); }
+            if (_Row["Nature"] is null) { _Validated = false; MsgClass.Add(MESSAGES.NatureIsNull); }
+            if (_Row["Notes"] is null) { _Validated = false; MsgClass.Add(MESSAGES.NotesIsNull); }
 
             if (_Row["Code"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.CodeIsZero); }
             if (_Row["Title"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.TitleIsZero); }

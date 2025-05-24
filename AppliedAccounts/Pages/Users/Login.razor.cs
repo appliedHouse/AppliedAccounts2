@@ -8,7 +8,7 @@ namespace AppliedAccounts.Pages.Users
 {
     public partial class Login
     {
-        GlobalService AppGlobals { get; set; } = new();
+        
         private AppliedGlobals.AppUserModel MyModel = new();
         bool IsLogin { get; set; } = true;
         bool IsError { get; set; } = false;
@@ -44,16 +44,16 @@ namespace AppliedAccounts.Pages.Users
                         LanguageID = LanguageID,
 
                         // Default Application Foler
-                        RootFolder = AppGlobals.AppPaths.RootPath ?? "wwwroot",
-                        ClientsFolder = AppGlobals.AppPaths.ClientPath ?? "SQLiteDB",
-                        UsersFolder = AppGlobals.AppPaths.UsersPath ?? "SQLiteDB",
-                        ReportFolder = AppGlobals.AppPaths.ReportPath ?? "Reports",
-                        LanguageFolder = AppGlobals.AppPaths.LanguagesPath ?? "Languages",
-                        MessageFolder = AppGlobals.AppPaths.MessagesPath ?? "Messages",
-                        ImageFolder = AppGlobals.AppPaths.ImagesPath ?? "Images",
-                        PDFFolder = AppGlobals.AppPaths.PDFPath ?? "PDFReport",
-                        SystemFolder = AppGlobals.AppPaths.SystemPath ?? "System",
-                        SessionFolder = AppGlobals.AppPaths.SessionPath ?? "Sessions",
+                        //RootFolder = AppGlobals.AppPaths.RootPath ?? "wwwroot",
+                        //ClientsFolder = AppGlobals.AppPaths.ClientPath ?? "SQLiteDB",
+                        //UsersFolder = AppGlobals.AppPaths.UsersPath ?? "SQLiteDB",
+                        //ReportFolder = AppGlobals.AppPaths.ReportPath ?? "Reports",
+                        //LanguageFolder = AppGlobals.AppPaths.LanguagesPath ?? "Languages",
+                        //MessageFolder = AppGlobals.AppPaths.MessagesPath ?? "Messages",
+                        //ImageFolder = AppGlobals.AppPaths.ImagesPath ?? "Images",
+                        //PDFFolder = AppGlobals.AppPaths.PDFPath ?? "PDFReport",
+                        //SystemFolder = AppGlobals.AppPaths.SystemPath ?? "System",
+                        //SessionFolder = AppGlobals.AppPaths.SessionPath ?? "Sessions",
 
                     });
 
@@ -118,10 +118,10 @@ namespace AppliedAccounts.Pages.Users
                                     DataFile = _UserData["DataFile"].ToString() ?? "",
                                     Company = _UserData["Company"].ToString() ?? "",
                                     Address1 = _UserData["Address1"].ToString() ?? "",
-                                    Address2 = _UserData["Address1"].ToString() ?? "",
-                                    Contact = _UserData["Contact"].ToString() ?? "",
+                                    Address2 = _UserData["Address2"].ToString() ?? "",
                                     City = _UserData["City"].ToString() ?? "",
                                     Country = _UserData["Country"].ToString() ?? "",
+                                    Contact = _UserData["Contact"].ToString() ?? ""
                                 };
                                 IsUserFound = true;
                             }

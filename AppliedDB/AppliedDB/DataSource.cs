@@ -466,8 +466,6 @@ namespace AppliedDB
             }
             return new();
         }
-
-
         public List<CodeTitle> GetEmployees()
         {
             return GetEmployees("Title");
@@ -687,12 +685,98 @@ namespace AppliedDB
         }
         public List<CodeTitle> GetUnits()
         {
-            return GetUnits("Title");
+            return GetCodeTitle(Tables.Inv_UOM, "Title");
         }
         public List<CodeTitle> GetUnits(string? _Sort)
         {
+
+            return GetCodeTitle(Tables.Inv_UOM, _Sort);
+
+            //_Sort ??= "Title";
+            //var _Table = GetTable(Tables.Inv_UOM, "", "Title");
+            //if (_Table is not null)
+            //{
+            //    var _CodeTitle = new CodeTitle();
+            //    var _CodeTitleList = new List<CodeTitle>();
+
+            //    if (_Table.Rows.Count > 0)
+            //    {
+            //        _CodeTitleList.Add(new CodeTitle()
+            //        {
+            //            ID = 0,
+            //            Code = "Top",
+            //            Title = "Select...."
+            //        });
+
+            //        foreach (DataRow Row in _Table.Rows)
+            //        {
+            //            if (Row["ID"] == null) { Row["ID"] = 0; }
+            //            if (Row["Code"] == null) { Row["Code"] = string.Empty; }
+            //            if (Row["Title"] == null) { Row["Title"] = string.Empty; }
+
+            //            _CodeTitle = new();
+            //            _CodeTitle.ID = (int)Row["ID"];
+            //            _CodeTitle.Code = (string)Row["Code"];
+            //            _CodeTitle.Title = (string)Row["Title"];
+
+            //            _CodeTitleList.Add(_CodeTitle);
+            //        }
+            //    }
+
+            //    _Table.Dispose(); _Table = null;
+            //    return _CodeTitleList;
+            //}
+
+            //return new();
+
+        }
+        public List<CodeTitle> GetInvoices()
+        {
+            // Generate Unpaid invoices to show in Receipt Page..... it is pending now.
+            return new();
+        }
+
+        public List<CodeTitle> GetAccClass()
+        {
+            return GetCodeTitle(Tables.COA_Class, "Title");
+        }
+        public List<CodeTitle> GetAccClass(string? _Sort)
+        {
             _Sort ??= "Title";
-            var _Table = GetTable(Tables.Inv_UOM, "", "Title");
+            return GetCodeTitle(Tables.COA_Class, _Sort);
+        }
+
+        public List<CodeTitle> GetAccNature()
+        {
+            return GetCodeTitle(Tables.COA_Nature, "Title");
+        }
+
+        public List<CodeTitle> GetAccNature(string? _Sort)
+        {
+            _Sort ??= "Title";
+            return GetCodeTitle(Tables.COA_Nature, _Sort);
+        }
+
+        public List<CodeTitle> GetAccNotes()
+        {
+            return GetCodeTitle(Tables.COA_Notes, "Title");
+        }
+
+        public List<CodeTitle> GetAccNotes(string? _Sort)
+        {
+            _Sort ??= "Title";
+            return GetCodeTitle(Tables.COA_Notes, _Sort);
+        }
+
+
+
+
+        #region Getting Code and Title for all tables
+        public List<CodeTitle> GetCodeTitle(Tables _DataTable, string? _Sort)
+        {
+            // General method for obtain Code and Title for all direcotrues. like account,client, cusotmer, class, nature etc...
+            _Sort ??= "Title";
+            var _Table = GetTable(_DataTable, "", "Title");
             if (_Table is not null)
             {
                 var _CodeTitle = new CodeTitle();
@@ -727,13 +811,10 @@ namespace AppliedDB
             }
 
             return new();
+        }
+        #endregion
 
-        }
-        public List<CodeTitle> GetInvoices()
-        {
-            // Generate Unpaid invoices to show in Receipt Page..... it is pending now.
-            return new();
-        }
+
         public static List<CodeTitle> GetCodeTitle(string _Table, SQLiteConnection DBConnection)
         {
             var _Sort = "Title";
@@ -781,17 +862,7 @@ namespace AppliedDB
         public static string GetTitle(List<CodeTitle> _List, int _ID)
         {
             var _Title = _List.Where(l => l.ID == _ID).Select(l => l.Title).ToString();
-
             if (_Title is null) { return string.Empty; }
-
-            //foreach (CodeTitle Item in _List)
-            //{
-            //    if (Item.ID.Equals(_ID))
-            //    {
-            //        return Item.Title;
-            //    }
-
-            //}
             return _Title;
         }
 

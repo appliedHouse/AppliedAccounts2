@@ -179,6 +179,11 @@ namespace AppMessages
                 MessageText = _Text
             };
         }
+
+        public void Add(object classIsNull)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }

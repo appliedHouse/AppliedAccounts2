@@ -1,28 +1,20 @@
 ﻿@page "/Accounts/COA"
 @attribute [Authorize];
-@using AppliedAccounts.Libs;
-@using AppliedAccounts.Models;
+@using AppliedAccounts.Libs
+@using AppliedAccounts.Models
 @using AppliedAccounts.Services
 
-@inject AuthenticationStateProvider authorized;
-@inject NavigationManager NavManager;
-@inject IJSRuntime js
-@inject GlobalService AppGlobals;
-
+@inject GlobalService AppGlobals
 
 @code {
+    private string[] BrowseList = { "Class", "Nature", "Notes" };
+
+
     protected override void OnInitialized()
     {
-        //var AppUserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
-        //if (AppUserProfile != null) { Model = new(AppGlobals); IsPageValid = GetPageIsValid(); }
-        //else { Model = new(AppGlobals); }
-
         MyModel = new(AppGlobals);
         IsPageValid = GetPageIsValid();
-
     }
-
-
 }
 
 <PageHeading Text="Chart of Accounts" />
@@ -48,7 +40,7 @@
                     <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
                         <InputNumber @bind-Value="@MyModel.Record.ID" placeholder="ID" id="ID" hidden></InputNumber>
                         <div class="row mt-2">
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="form-floating mb-3 txt">
                                     <InputText @bind-Value="@MyModel.Record.Code" class="form-control" id="txtCode" placeholder="Account Code" />
                                     <label for="txtCode">Code</label>
@@ -60,49 +52,108 @@
                                     <label for="txtTitle">Title of Account</label>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="form-floating mb-3 txt">
                                     <InputNumber @bind-Value="@MyModel.Record.OBal" class="form-control" id="txtOBal" placeholder="Voucher No" />
                                     <label for="txtOBal">Opening Balance</label>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-floating">
-                                    <InputSelect id="coa_Class" @bind-Value="@MyModel.Record.Class" class="form-control">
-                                        @foreach (var item in MyModel.ClassList)
-                                        {
-                                            <option value=@item.First().Key>@item.First().Value</option>
-                                        }
-                                    </InputSelect>
-                                    <label for="coa_class">Account Class</label>
-                                </div>
+                        <!-- Class, Nature and Notes Dropdown-->
+                        <div class="row mt-2">
+                            <div class="col-md-4">
+                                @if (MyModel.ClassList != null)
+                                {
+                                    <div class="form-floating d-flex gap-2">
+                                        <InputSelect id="ddAccounts" class="form-control item-height flex-grow-1"
+                                                     TValue="int"
+                                                     Value="@MyModel.Record.Class"
+                                                     ValueChanged="@((e) => ClassChanged(e))"
+                                                     ValueExpression="@(() => MyModel.Record.Class)">
+                                            @if (MyModel.ClassList?.Any() == true)
+                                            {
+                                                @foreach (var item in MyModel.ClassList)
+                                                {
+                                                    <option value="@item.ID">@item.Title</option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <option value="0">No Records - Accounts</option>
+                                            }
+                                        </InputSelect>
+
+                                        <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(BrowseList[0])">
+                                            <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
+                                        </button>
+
+                                        <label for="ddAccounts">Account</label>
+                                    </div>
+                                }
                             </div>
                             <div class="col-md-4">
-                                <div class="form-floating">
+                                @if (MyModel.NatureList != null)
+                                {
+                                    <div class="form-floating d-flex gap-2">
+                                        <InputSelect id="ddNature" class="form-control item-height flex-grow-1"
+                                                     TValue="int"
+                                                     Value="@MyModel.Record.Nature"
+                                                     ValueChanged="@((e) => ClassChanged(e))"
+                                                     ValueExpression="@(() => MyModel.Record.Nature)">
+                                            @if (MyModel.ClassList?.Any() == true)
+                                            {
+                                                @foreach (var item in MyModel.NatureList)
+                                                {
+                                                    <option value="@item.ID">@item.Title</option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <option value="0">No Records - Accounts Nature</option>
+                                            }
+                                        </InputSelect>
 
-                                    <InputSelect id="coa_nature" @bind-Value="@MyModel.Record.Nature" class="form-control">
-                                        @foreach (var item in MyModel.NatureList)
-                                        {
-                                            <option value=@item.First().Key>@item.First().Value</option>
-                                        }
-                                    </InputSelect>
-                                    <label for="coa_nature">Account Nature</label>
-                                </div>
+                                        <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(BrowseList[1])">
+                                            <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
+                                        </button>
+
+                                        <label for="ddNature">Nature</label>
+                                    </div>
+                                }
                             </div>
-                            <div class="col-md-3">
-                                <div class="form-floating">
-                                    <InputSelect id="coa_notes" @bind-Value="@MyModel.Record.Notes" class="form-control">
-                                        @foreach (var item in MyModel.NotesList)
-                                        {
-                                            <option value=@item.First().Key>@item.First().Value</option>
-                                        }
-                                    </InputSelect>
-                                    <label></label>
-                                </div>
+                            <div class="col-md-4">
+                                @if (MyModel.NotesList != null)
+                                {
+                                    <div class="form-floating d-flex gap-2">
+                                        <InputSelect id="ddNotes" class="form-control item-height flex-grow-1"
+                                                     TValue="int"
+                                                     Value="@MyModel.Record.Notes"
+                                                     ValueChanged="@((e) => ClassChanged(e))"
+                                                     ValueExpression="@(() => MyModel.Record.Notes)">
+                                            @if (MyModel.ClassList?.Any() == true)
+                                            {
+                                                @foreach (var item in MyModel.NotesList)
+                                                {
+                                                    <option value="@item.ID">@item.Title</option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <option value="0">No Records - Accounts Notes</option>
+                                            }
+                                        </InputSelect>
+
+                                        <button class="btn btn-outline-secondary" @onclick="() => ShowClassPopup()">
+                                            <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
+                                        </button>
+
+                                        <label for="ddNotes">Notes</label>
+                                    </div>
+                                }
                             </div>
+                            
                         </div>
+                      
                         <div class="container mt-2 mb-2">
                             <div class="row">
                                 <div class="col">
@@ -174,6 +225,25 @@
                 </tbody>
             </table>
         </div>
+
+        @if (showPopup)
+        {
+            <div class="modal-backdrop">
+                <div class="modal">
+                    <h5>Select a Class</h5>
+                    <ul>
+                        @foreach (var item in MyModel.ClassList!)
+                        {
+                            <li>
+                                <a href="#" @onclick="() => SelectClass(item.ID)">@item.Title</a>
+                            </li>
+                        }
+                    </ul>
+                    <button @onclick="() => showPopup = false">Close</button>
+                </div>
+            </div>
+        }
+
 
     </EditForm>
 }
