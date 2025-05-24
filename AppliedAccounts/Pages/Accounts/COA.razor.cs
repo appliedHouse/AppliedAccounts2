@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Models;
+using AppliedAccounts.Services;
 using Microsoft.JSInterop;
 
 
@@ -6,21 +7,24 @@ namespace AppliedAccounts.Pages.Accounts
 {
 
 
-    public partial class COA1
+    public partial class COA
     {
-        public COAModel Model { get; set; } = new();
+        public COAModel MyModel { get; set; } = new();
         public bool IsPageValid { get; set; }
         //public string ErrorMessage { get; set; } = string.Empty;
-        public COA1() { }
+        public COA() 
+        {
+            
+        }
 
         public bool GetPageIsValid()
         {
             var _Valid = true;
            
-            if (Model.Records is null) { _Valid = false; Model.MsgClass.Add("Records not found"); }
-            if (Model.Record is null) { _Valid = false; Model.MsgClass.Add("Account Class List is empty"); }
-            if (Model.NatureList is null) { _Valid = false; Model.MsgClass.Add("Account Nature List is empty"); }
-            if (Model.NotesList is null) { _Valid = false; Model.MsgClass.Add("Financial Notes List is empty"); }
+            if (MyModel.Records is null) { _Valid = false; MyModel.MsgClass.Add("Records not found"); }
+            if (MyModel.Record is null) { _Valid = false; MyModel.MsgClass.Add("Account Class List is empty"); }
+            if (MyModel.NatureList is null) { _Valid = false; MyModel.MsgClass.Add("Account Nature List is empty"); }
+            if (MyModel.NotesList is null) { _Valid = false; MyModel.MsgClass.Add("Financial Notes List is empty"); }
             return _Valid;
         }
 
@@ -28,7 +32,7 @@ namespace AppliedAccounts.Pages.Accounts
 
         public async void Add()
         {
-            Model.Add();
+            MyModel.Add();
             await js.InvokeVoidAsync("showAcordion", "accordionRecordDisplay");
 
             //Model.Add();
@@ -36,7 +40,7 @@ namespace AppliedAccounts.Pages.Accounts
 
         public async void Edit(int ID)
         {
-            Model.Edit(ID);
+            MyModel.Edit(ID);
             await js.InvokeVoidAsync("showAcordion", "accordionRecordDisplay");
         }
 

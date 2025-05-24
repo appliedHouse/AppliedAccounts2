@@ -1,4 +1,5 @@
 using AppliedAccounts.Authentication;
+using AppliedAccounts.Middleware;
 using AppliedAccounts.Services;
 using AppliedDB;
 using Microsoft.AspNetCore.Components;
@@ -51,7 +52,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-
+app.UseMiddleware<DatabaseValidation>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

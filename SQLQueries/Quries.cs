@@ -3,7 +3,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SQLQueries
 {
-    public static class Quries
+    public class Quries
     {
         #region Receipt
         public static string Receipt(int _ReceiptID)
@@ -268,6 +268,24 @@ namespace SQLQueries
             return _Text.ToString();
         }
 
+        #endregion
+
+        #region Chart of Accounts CRUD
+        public static string COA()
+        {
+            var _Text = new StringBuilder();
+            _Text.Append("SELECT");
+            _Text.Append("[COA].*,");
+            _Text.Append("[C].[Title] [TitleClass],");
+            _Text.Append("[T].[Title] [TitleNature],");
+            _Text.Append("[N].[Title] [TitleNote]");
+            _Text.Append("FROM [COA]");
+            _Text.Append("LEFT JOIN[COA_Class]  [C] ON[C].[ID] = [COA].[Class]");
+            _Text.Append("LEFT JOIN[COA_Nature] [T] ON[T].[ID] = [COA].[Nature]");
+            _Text.Append("LEFT JOIN[COA_Notes]  [N] ON[N].[ID] = [COA].[Notes]");
+
+            return _Text.ToString();
+        }
         #endregion
     }
 }

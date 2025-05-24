@@ -9,7 +9,6 @@ namespace AppliedAccounts.Models
     public class COAModel
     {
         #region Valiables
-        //public AppliedGlobals.AppUserModel? AppUser { get; set; }
         public GlobalService AppGlobals { get; set; }
         public DataSource? Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
@@ -37,10 +36,8 @@ namespace AppliedAccounts.Models
         public COAModel(GlobalService _AppGlobals)
         {
             AppGlobals = _AppGlobals;
-            //AppUser = UserProfile;
-            //DBFile = AppUser.DataFile;
             Source = new(AppGlobals.AppPaths);
-            Data = Source.GetList(Query.COAList);
+            Data = Source.GetTable(SQLQueries.Quries.COA()).AsEnumerable().ToList();
             Records = GetFilterRecords();
 
             if (Count > 0) { Record = Records.First(); } else { Record = new COARecord(); }

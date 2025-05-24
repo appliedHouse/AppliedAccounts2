@@ -94,6 +94,12 @@ namespace AppliedDB
             }
             return new DataTable();
         }
+        
+        public DataTable GetTable(SQLQueries.Quries _SQLQuery)
+        {
+            return GetTable(_SQLQuery);
+        }
+
         public DataTable GetTable(Query _SQLQuery)
         {
 

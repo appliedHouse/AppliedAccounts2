@@ -24,7 +24,7 @@
                 string dbPath = Path.Combine(Directory.GetCurrentDirectory(),
                     "wwwroot",
                     "SQLiteDB",
-                    "AppliedUsers3.db");
+                    "AppliedUsers2.db");
 
                 // Check if the database file exists
                 _isDatabaseValid = File.Exists(dbPath);
