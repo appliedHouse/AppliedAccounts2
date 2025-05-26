@@ -1,6 +1,7 @@
 ﻿using AppliedAccounts.Services;
 using AppliedDB;
 using System.Data;
+using System.IO;
 using static AppliedDB.Enums;
 using MESSAGES = AppMessages.Enums.Messages;
 
@@ -28,6 +29,7 @@ namespace AppliedAccounts.Models
         public string SelectedNotes { get; set; } = "Select..";
         public string SearchText { get; set; } = string.Empty;
         public AppMessages.MessageClass MsgClass { get; set; } = new();
+        public BrowseModel BrowseClass { get; set; } = new();
 
         #endregion
 
@@ -117,25 +119,21 @@ namespace AppliedAccounts.Models
         #region Filter List
         private List<COARecord> GetFilterRecords()
         {
-            List<COARecord> _FilterRecords = new List<COARecord>();
-            foreach (DataRow _Row in Data)
-            {
-                if (SearchText.Length == 0)
-                {
-                    _FilterRecords.Add(GetRecord(_Row));
-                }
-                else
-                {
-                    var _SearchText = SearchText.ToUpper();
-                    if (_Row.Field<string>("Code").ToUpper().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                    if (_Row.Field<string>("Title").ToString().ToUpper().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                    if (_Row.Field<string>("TitleClass").ToString().ToUpper().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                    if (_Row.Field<string>("TitleNature").ToString().ToUpper().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                    if (_Row.Field<string>("TitleNote").ToString().ToUpper().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                }
+            var OIC = StringComparison.OrdinalIgnoreCase;
 
-            }
-            return _FilterRecords;
+            var filteredData = Data.AsEnumerable()
+                .Where(row =>
+                    (row.Field<string>("Code")?.Contains(SearchText, OIC) ?? false)
+                  || (row.Field<string>("Title")?.Contains(SearchText, OIC) ?? false)
+                  || (row.Field<string>("TitleClass")?.Contains(SearchText, OIC) ?? false)
+                  || (row.Field<string>("TitleNature")?.Contains(SearchText, OIC) ?? false)
+                  || (row.Field<string>("TitleNote")?.Contains(SearchText, OIC) ?? false))
+                .Select(GetRecord)
+                .ToList();
+
+            return filteredData;
+
+
         }
         #endregion
 
@@ -165,11 +163,23 @@ namespace AppliedAccounts.Models
         #region Save
         internal bool Save()
         {
-            var _NewRow = GetDataRow(Record);
+            var _NewRow = Source!.GetNewRow(Tables.COA);
+
+            _NewRow["ID"] = Record.ID;
+            _NewRow["Code"] = Record.Code;
+            _NewRow["Title"] = Record.Title;
+            _NewRow["Class"] = Record.Class;
+            _NewRow["Nature"] = Record.Nature;
+            _NewRow["Notes"] = Record.Notes;
+            _NewRow["OPENING_BALANCE"] = Record.OBal;
+
             if (Validate(_NewRow))
             {
-                var _Commands = new CommandClass(_NewRow, DBFile);
-                return _Commands.SaveChanges();
+                Source!.Save(_NewRow);
+                return true;
+
+                //var _Commands = new CommandClass(_NewRow, DBFile);
+                //return _Commands.SaveChanges();
             }
 
             return false;
@@ -219,11 +229,19 @@ namespace AppliedAccounts.Models
             if (_Row["Class"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.AccClassZero); }
             if (_Row["Nature"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.AccNatureZero); }
             if (_Row["Notes"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.AccNotesZero); }
-
             if (_Row["Code"].ToString()?.Length != 6) { _Validated = false; MsgClass.Add(MESSAGES.CodeLength6); }
 
 
             return _Validated;
+        }
+        #endregion
+
+        #region Browse Modol
+        public void SelectedBrowse(int _SelectedID)
+        {
+            if (BrowseClass.Type == 1) { Record.Class = _SelectedID; }
+            if (BrowseClass.Type == 2) { Record.Nature = _SelectedID; }
+            if (BrowseClass.Type == 2) { Record.Notes = _SelectedID; }
         }
         #endregion
 

@@ -10,9 +10,9 @@ namespace AppliedDB
     public class DataSource
     {
         public AppValues.AppPath AppPaths { get; set; }
-        public AppUserModel UserProfile { get; set; }
         public SQLiteConnection MyConnection { get; set; }
         public SQLiteCommand MyCommand { get; set; }
+        public CommandClass MyCommands { get; set; } = new();
         public string DBFile => GetDataFile();
         public string ErrorMessage { get; set; }
 
@@ -94,7 +94,7 @@ namespace AppliedDB
             }
             return new DataTable();
         }
-        
+
         public DataTable GetTable(SQLQueries.Quries _SQLQuery)
         {
             return GetTable(_SQLQuery);
@@ -328,10 +328,10 @@ namespace AppliedDB
 
         public List<DataRow> GetList(Query Query)
         {
-            if (UserProfile is not null)
+            if (AppPaths is not null)
             {
                 var _QueryClass = SQLQuery.GetQuery(Query);
-                var Table = GetDataTable(UserProfile.DataFile, _QueryClass.QueryText, _QueryClass.TableName);
+                var Table = GetDataTable(AppPaths.DBFile, _QueryClass.QueryText, _QueryClass.TableName);
                 if (Table is not null)
                 {
                     return Table.AsEnumerable().ToList();
@@ -429,42 +429,8 @@ namespace AppliedDB
         }
         public List<CodeTitle> GetCustomers(string? _Sort)
         {
-            var _Table = GetTable(Tables.Customers, "", _Sort ?? "");
-            var _CodeTitleList = new List<CodeTitle>();
-
-            try
-            {
-                if (_Table is not null)
-                {
-
-                    if (_Table.Rows.Count > 0)
-                    {
-                        _CodeTitleList.Add(new CodeTitle()
-                        {
-                            ID = 0,
-                            Code = "Top",
-                            Title = "Select...."
-                        });
-
-
-                        _CodeTitleList.AddRange([.. _Table.AsEnumerable().ToList().Select(row => new CodeTitle
-                        {
-                            ID = row.Field<int>("ID"),
-                            Code = row.Field<string>("Code") ?? "",
-                            Title = row.Field<string>("Title")?.Trim() ?? ""
-                        }).OrderBy(e=> e.Title)
-                        ]);
-
-                        return _CodeTitleList;
-                    }
-                }
-            }
-            catch { }
-            finally
-            {
-                _Table.Dispose();
-            }
-            return new();
+            _Sort ??= "Title";
+            return GetCodeTitle(Tables.Customers, _Sort);
         }
         public List<CodeTitle> GetEmployees()
         {
@@ -473,40 +439,7 @@ namespace AppliedDB
         public List<CodeTitle> GetEmployees(string? _Sort)
         {
             _Sort ??= "Title";
-            var _Table = GetTable(Tables.Employees, "", "Title");
-            if (_Table is not null)
-            {
-                var _CodeTitle = new CodeTitle();
-                var _CodeTitleList = new List<CodeTitle>();
-
-                if (_Table.Rows.Count > 0)
-                {
-                    _CodeTitleList.Add(new CodeTitle()
-                    {
-                        ID = 0,
-                        Code = "Top",
-                        Title = "Select...."
-                    });
-
-                    foreach (DataRow Row in _Table.Rows)
-                    {
-                        if (Row["ID"] == null) { Row["ID"] = 0; }
-                        if (Row["Code"] == null) { Row["Code"] = string.Empty; }
-                        if (Row["Title"] == null) { Row["Title"] = string.Empty; }
-
-                        _CodeTitle = new();
-                        _CodeTitle.ID = (int)Row["ID"];
-                        _CodeTitle.Code = (string)Row["Code"];
-                        _CodeTitle.Title = (string)Row["Title"];
-
-                        _CodeTitleList.Add(_CodeTitle);
-                    }
-                }
-
-                _Table.Dispose(); _Table = null;
-                return _CodeTitleList;
-            }
-            return new();
+            return GetCodeTitle(Tables.Employees, _Sort);
         }
         public List<CodeTitle> GetProjects()
         {
@@ -515,42 +448,7 @@ namespace AppliedDB
         public List<CodeTitle> GetProjects(string? _Sort)
         {
             _Sort ??= "Title";
-            var _Table = GetTable(Tables.Project, "", "Title");
-            if (_Table is not null)
-            {
-                var _CodeTitle = new CodeTitle();
-                var _CodeTitleList = new List<CodeTitle>();
-
-                if (_Table.Rows.Count > 0)
-                {
-                    _CodeTitleList.Add(new CodeTitle()
-                    {
-                        ID = 0,
-                        Code = "Top",
-                        Title = "Select...."
-                    });
-
-                    foreach (DataRow Row in _Table.Rows)
-                    {
-                        if (Row["ID"] == null) { Row["ID"] = 0; }
-                        if (Row["Code"] == null) { Row["Code"] = string.Empty; }
-                        if (Row["Title"] == null) { Row["Title"] = string.Empty; }
-
-                        _CodeTitle = new();
-                        _CodeTitle.ID = (int)Row["ID"];
-                        _CodeTitle.Code = (string)Row["Code"];
-                        _CodeTitle.Title = (string)Row["Title"];
-
-                        _CodeTitleList.Add(_CodeTitle);
-                    }
-                }
-
-                _Table.Dispose(); _Table = null;
-                return _CodeTitleList;
-            }
-
-            return new();
-
+            return GetCodeTitle(Tables.Project, _Sort);
         }
         public List<CodeTitle> GetAccounts()
         {
@@ -559,42 +457,7 @@ namespace AppliedDB
         public List<CodeTitle> GetAccounts(string? _Sort)
         {
             _Sort ??= "Title";
-            var _Table = GetTable(Tables.COA, "", "Title");
-            if (_Table is not null)
-            {
-                var _CodeTitle = new CodeTitle();
-                var _CodeTitleList = new List<CodeTitle>();
-
-                if (_Table.Rows.Count > 0)
-                {
-                    _CodeTitleList.Add(new CodeTitle()
-                    {
-                        ID = 0,
-                        Code = "Top",
-                        Title = "Select...."
-                    });
-
-                    foreach (DataRow Row in _Table.Rows)
-                    {
-                        if (Row["ID"] == null) { Row["ID"] = 0; }
-                        if (Row["Code"] == null) { Row["Code"] = string.Empty; }
-                        if (Row["Title"] == null) { Row["Title"] = string.Empty; }
-
-                        _CodeTitle = new();
-                        _CodeTitle.ID = (int)Row["ID"];
-                        _CodeTitle.Code = (string)Row["Code"];
-                        _CodeTitle.Title = (string)Row["Title"];
-
-                        _CodeTitleList.Add(_CodeTitle);
-                    }
-                }
-
-                _Table.Dispose(); _Table = null;
-                return _CodeTitleList;
-            }
-
-            return new();
-
+            return GetCodeTitle(Tables.COA, _Sort);
         }
         public List<CodeTitle> GetInventory()
         {
@@ -603,42 +466,7 @@ namespace AppliedDB
         public List<CodeTitle> GetInventory(string? _Sort)
         {
             _Sort ??= "Title";
-            var _Table = GetTable(Tables.Inventory, "", "Title");
-            if (_Table is not null)
-            {
-                var _CodeTitle = new CodeTitle();
-                var _CodeTitleList = new List<CodeTitle>();
-
-                if (_Table.Rows.Count > 0)
-                {
-                    _CodeTitleList.Add(new CodeTitle()
-                    {
-                        ID = 0,
-                        Code = "Top",
-                        Title = "Select...."
-                    });
-
-                    foreach (DataRow Row in _Table.Rows)
-                    {
-                        if (Row["ID"] == null) { Row["ID"] = 0; }
-                        if (Row["Code"] == null) { Row["Code"] = string.Empty; }
-                        if (Row["Title"] == null) { Row["Title"] = string.Empty; }
-
-                        _CodeTitle = new();
-                        _CodeTitle.ID = (int)Row["ID"];
-                        _CodeTitle.Code = (string)Row["Code"];
-                        _CodeTitle.Title = (string)Row["Title"];
-
-                        _CodeTitleList.Add(_CodeTitle);
-                    }
-                }
-
-                _Table.Dispose(); _Table = null;
-                return _CodeTitleList;
-            }
-
-            return new();
-
+            return GetCodeTitle(Tables.Inventory, _Sort);
         }
         public List<CodeTitle> GetTaxes()
         {
@@ -647,41 +475,7 @@ namespace AppliedDB
         public List<CodeTitle> GetTaxes(string? _Sort)
         {
             _Sort ??= "Title";
-            var _Table = GetTable(Tables.Taxes, "", "Title");
-            if (_Table is not null)
-            {
-                var _CodeTitle = new CodeTitle();
-                var _CodeTitleList = new List<CodeTitle>();
-
-                if (_Table.Rows.Count > 0)
-                {
-                    _CodeTitleList.Add(new CodeTitle()
-                    {
-                        ID = 0,
-                        Code = "Top",
-                        Title = "Select...."
-                    });
-
-                    foreach (DataRow Row in _Table.Rows)
-                    {
-                        if (Row["ID"] == null) { Row["ID"] = 0; }
-                        if (Row["Code"] == null) { Row["Code"] = string.Empty; }
-                        if (Row["Title"] == null) { Row["Title"] = string.Empty; }
-
-                        _CodeTitle = new();
-                        _CodeTitle.ID = (int)Row["ID"];
-                        _CodeTitle.Code = (string)Row["Code"];
-                        _CodeTitle.Title = (string)Row["Title"];
-
-                        _CodeTitleList.Add(_CodeTitle);
-                    }
-                }
-
-                _Table.Dispose(); _Table = null;
-                return _CodeTitleList;
-            }
-
-            return new();
+            return GetCodeTitle(Tables.Taxes, _Sort);
         }
         public List<CodeTitle> GetUnits()
         {
@@ -689,53 +483,14 @@ namespace AppliedDB
         }
         public List<CodeTitle> GetUnits(string? _Sort)
         {
-
+            _Sort ??= "Title";
             return GetCodeTitle(Tables.Inv_UOM, _Sort);
-
-            //_Sort ??= "Title";
-            //var _Table = GetTable(Tables.Inv_UOM, "", "Title");
-            //if (_Table is not null)
-            //{
-            //    var _CodeTitle = new CodeTitle();
-            //    var _CodeTitleList = new List<CodeTitle>();
-
-            //    if (_Table.Rows.Count > 0)
-            //    {
-            //        _CodeTitleList.Add(new CodeTitle()
-            //        {
-            //            ID = 0,
-            //            Code = "Top",
-            //            Title = "Select...."
-            //        });
-
-            //        foreach (DataRow Row in _Table.Rows)
-            //        {
-            //            if (Row["ID"] == null) { Row["ID"] = 0; }
-            //            if (Row["Code"] == null) { Row["Code"] = string.Empty; }
-            //            if (Row["Title"] == null) { Row["Title"] = string.Empty; }
-
-            //            _CodeTitle = new();
-            //            _CodeTitle.ID = (int)Row["ID"];
-            //            _CodeTitle.Code = (string)Row["Code"];
-            //            _CodeTitle.Title = (string)Row["Title"];
-
-            //            _CodeTitleList.Add(_CodeTitle);
-            //        }
-            //    }
-
-            //    _Table.Dispose(); _Table = null;
-            //    return _CodeTitleList;
-            //}
-
-            //return new();
-
         }
         public List<CodeTitle> GetInvoices()
         {
             // Generate Unpaid invoices to show in Receipt Page..... it is pending now.
             return new();
         }
-
         public List<CodeTitle> GetAccClass()
         {
             return GetCodeTitle(Tables.COA_Class, "Title");
@@ -745,30 +500,24 @@ namespace AppliedDB
             _Sort ??= "Title";
             return GetCodeTitle(Tables.COA_Class, _Sort);
         }
-
         public List<CodeTitle> GetAccNature()
         {
             return GetCodeTitle(Tables.COA_Nature, "Title");
         }
-
         public List<CodeTitle> GetAccNature(string? _Sort)
         {
             _Sort ??= "Title";
             return GetCodeTitle(Tables.COA_Nature, _Sort);
         }
-
         public List<CodeTitle> GetAccNotes()
         {
             return GetCodeTitle(Tables.COA_Notes, "Title");
         }
-
         public List<CodeTitle> GetAccNotes(string? _Sort)
         {
             _Sort ??= "Title";
             return GetCodeTitle(Tables.COA_Notes, _Sort);
         }
-
-
 
 
         #region Getting Code and Title for all tables
@@ -1093,7 +842,7 @@ namespace AppliedDB
         public DataTable GetBookVoucher(int ID)
         {
             DataTable _Table = new DataTable();
-            if (UserProfile is not null)
+            if (AppPaths is not null)
             {
                 var _filter = $"ID1 = {ID}";
                 var _Query = SQLQuery.View_Book(_filter);         // Get Records from Book and Book2 table.
@@ -1106,7 +855,7 @@ namespace AppliedDB
         public DataTable GetBookList(int BookID)
         {
             DataTable _Table = new DataTable();
-            if (UserProfile is not null)
+            if (AppPaths is not null)
             {
                 var _Query = SQLQuery.View_Book($"BookID = {BookID}");
                 _Table = GetTable(_Query);
@@ -1161,9 +910,9 @@ namespace AppliedDB
         #endregion
 
         #region Geting a DB Directory()
-        
-        
-        
+
+
+
         public static Dictionary<int, string> GetDirectory(string _DirectoryName, string DBFile)
         {
             var _Connection = Connections.GetClientConnection(DBFile);
@@ -1205,8 +954,18 @@ namespace AppliedDB
             }
             return _Dictionary;
         }
+
+
         #endregion
 
+
+        #region Save
+        public void Save(DataRow newRow)
+        {
+            MyCommands = new(newRow, MyConnection);
+            MyCommands.SaveChanges();
+        }
+        #endregion
     }
 
     public class CodeTitle

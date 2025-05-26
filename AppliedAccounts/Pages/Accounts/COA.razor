@@ -83,7 +83,7 @@
                                             }
                                         </InputSelect>
 
-                                        <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(BrowseList[0])">
+                                        <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(1)">
                                             <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
                                         </button>
 
@@ -98,7 +98,7 @@
                                         <InputSelect id="ddNature" class="form-control item-height flex-grow-1"
                                                      TValue="int"
                                                      Value="@MyModel.Record.Nature"
-                                                     ValueChanged="@((e) => ClassChanged(e))"
+                                                     ValueChanged="@((e) => NatureChanged(e))"
                                                      ValueExpression="@(() => MyModel.Record.Nature)">
                                             @if (MyModel.ClassList?.Any() == true)
                                             {
@@ -113,7 +113,7 @@
                                             }
                                         </InputSelect>
 
-                                        <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(BrowseList[1])">
+                                        <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(2)">
                                             <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
                                         </button>
 
@@ -128,7 +128,7 @@
                                         <InputSelect id="ddNotes" class="form-control item-height flex-grow-1"
                                                      TValue="int"
                                                      Value="@MyModel.Record.Notes"
-                                                     ValueChanged="@((e) => ClassChanged(e))"
+                                                     ValueChanged="@((e) => NotesChanged(e))"
                                                      ValueExpression="@(() => MyModel.Record.Notes)">
                                             @if (MyModel.ClassList?.Any() == true)
                                             {
@@ -143,7 +143,7 @@
                                             }
                                         </InputSelect>
 
-                                        <button class="btn btn-outline-secondary" @onclick="() => ShowClassPopup()">
+                                        <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(3)">
                                             <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
                                         </button>
 
@@ -154,6 +154,7 @@
                             
                         </div>
                       
+                        <!-- Control Buttons-->
                         <div class="container mt-2 mb-2">
                             <div class="row">
                                 <div class="col">
@@ -168,6 +169,7 @@
             </div>
         </div>
 
+        <!-- Filter -->
         <div class="container mb-2">
             <div class="row row-filter">
                 <div class="col-4">
@@ -187,6 +189,7 @@
             </div>
         </div>
 
+        <!-- Table -->
         <div class="table-container">
 
             <table class="table-list">
@@ -226,23 +229,7 @@
             </table>
         </div>
 
-        @if (showPopup)
-        {
-            <div class="modal-backdrop">
-                <div class="modal">
-                    <h5>Select a Class</h5>
-                    <ul>
-                        @foreach (var item in MyModel.ClassList!)
-                        {
-                            <li>
-                                <a href="#" @onclick="() => SelectClass(item.ID)">@item.Title</a>
-                            </li>
-                        }
-                    </ul>
-                    <button @onclick="() => showPopup = false">Close</button>
-                </div>
-            </div>
-        }
+       
 
 
     </EditForm>
@@ -256,6 +243,55 @@ else
         </div>
     </div>
 }
+
+
+<div class="modal fade" id="winBrowse" tabindex="-1" aria-labelledby="browseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="browseModalLabel">@MyModel.BrowseClass.Heading</h1>
+                    <InputText @bind-Value="MyModel.BrowseClass.SearchText"
+                               @oninput="InputHandler"
+                               placeholder="Search..."
+                               class="form-control" />
+                   
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width:15%">Code</th>
+                                    <th style="width:70%">Title</th>
+                                    <th style="width:15%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in @MyModel.BrowseClass.BrowseList)
+                                {
+                                    <tr>
+                                        <td>@item.Code</td>
+                                        <td>@item.Title</td>
+                                        <td>
+                                            <button class="btn btn-link" data-bs-dismiss="modal" @onclick="(e) =>  MyModel.SelectedBrowse(item.ID)">
+                                                <i class="bi bi-mouse"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+ <BrowseWindow ReturnValue="SelectClass" ModelClass="MyModel.BrowseClass"/>
 
 <style>
 

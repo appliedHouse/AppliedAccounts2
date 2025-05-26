@@ -52,32 +52,81 @@ namespace AppliedAccounts.Pages.Accounts
                 .Where(e => e.ID == MyModel.Record.Class)
                 .Select(e => e.Title)
                 .First() ?? "";
-
-            
         }
 
-        private void ShowClassPopup()
+        private void NatureChanged(int _ID)
         {
-            showPopup = true;
-            // Optionally: Load AllClasses if not loaded
+            MyModel.Record.Nature = _ID;
+            MyModel.Record.TitleNature = MyModel.NatureList
+                .Where(e => e.ID == MyModel.Record.Nature)
+                .Select(e => e.Title)
+                .First() ?? "";
+        }
+
+        private void NotesChanged(int _ID)
+        {
+            MyModel.Record.Notes = _ID;
+            MyModel.Record.TitleNote = MyModel.NotesList
+                .Where(e => e.ID == MyModel.Record.Notes)
+                .Select(e => e.Title)
+                .First() ?? "";
         }
 
         private void SelectClass(int selectedId)
         {
+            if(MyModel.BrowseClass.Type==1) { ClassChanged(selectedId); }
+            else if (MyModel.BrowseClass.Type == 2) { NatureChanged(selectedId); }
+            else if (MyModel.BrowseClass.Type == 3) { NotesChanged(selectedId); }
+
             MyModel.Record.Class = selectedId;
             showPopup = false;
         }
 
        
 
-        public async Task BrowseWindow(string _SelectList)             
+        public async void BrowseWindow(int _ListType)             
         {
-            // Browse a windows that display list of Account Class to select any one and assign to dropdown
-            await Task.Delay(100);
-            // MyBrowseModel.BrowseListName = "COA";
-            // await InvokeAsync(StateHasChanged);
-            // await Task.Delay(1000);
-            // await js.InvokeVoidAsync("showModol", "browseCodeTitle");
+            showPopup = true;
+
+            switch (_ListType)
+            {
+                case 0:                                         // Nill
+                    MyModel.BrowseClass = new();
+                    break;
+
+                case 1:
+                    MyModel.BrowseClass = new();
+                    MyModel.BrowseClass.Type = 1;
+                    MyModel.BrowseClass.Heading = "Account Class";
+                    MyModel.BrowseClass.Selected = MyModel.Record.Class;
+                    MyModel.BrowseClass.BrowseList = MyModel.ClassList;
+                    break;
+
+
+                case 2:
+                    MyModel.BrowseClass = new();
+                    MyModel.BrowseClass.Type = 2;
+                    MyModel.BrowseClass.Heading = "Account Nature";
+                    MyModel.BrowseClass.Selected = MyModel.Record.Nature;
+                    MyModel.BrowseClass.BrowseList = MyModel.NatureList;
+                    break;
+
+                case 3:
+                    MyModel.BrowseClass = new();
+                    MyModel.BrowseClass.Type = 3;
+                    MyModel.BrowseClass.Heading = "Account Notes";
+                    MyModel.BrowseClass.Selected = MyModel.Record.Notes;
+                    MyModel.BrowseClass.BrowseList = MyModel.NotesList;
+                    break;
+
+                default:
+                    MyModel.BrowseClass = new();
+                    break;
+            }
+
+            await InvokeAsync(StateHasChanged);
+            await AppGlobals.JS.InvokeVoidAsync("showModol", "winBrowse");
+
         }
 
         #endregion
