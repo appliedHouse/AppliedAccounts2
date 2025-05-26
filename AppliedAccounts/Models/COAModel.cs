@@ -1,7 +1,6 @@
 ﻿using AppliedAccounts.Services;
 using AppliedDB;
 using System.Data;
-using System.IO;
 using static AppliedDB.Enums;
 using MESSAGES = AppMessages.Enums.Messages;
 
@@ -236,14 +235,7 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-        #region Browse Modol
-        public void SelectedBrowse(int _SelectedID)
-        {
-            if (BrowseClass.Type == 1) { Record.Class = _SelectedID; }
-            if (BrowseClass.Type == 2) { Record.Nature = _SelectedID; }
-            if (BrowseClass.Type == 2) { Record.Notes = _SelectedID; }
-        }
-        #endregion
+        
 
     }
 

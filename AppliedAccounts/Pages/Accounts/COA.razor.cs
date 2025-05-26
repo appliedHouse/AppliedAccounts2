@@ -9,7 +9,6 @@ namespace AppliedAccounts.Pages.Accounts
     {
         public COAModel MyModel { get; set; } = new();
         public bool IsPageValid { get; set; }
-        private bool showPopup = false;
         
         public COA() 
         {
@@ -72,22 +71,17 @@ namespace AppliedAccounts.Pages.Accounts
                 .First() ?? "";
         }
 
-        private void SelectClass(int selectedId)
+        private void SelectedBrowse(int selectedId)
         {
             if(MyModel.BrowseClass.Type==1) { ClassChanged(selectedId); }
             else if (MyModel.BrowseClass.Type == 2) { NatureChanged(selectedId); }
             else if (MyModel.BrowseClass.Type == 3) { NotesChanged(selectedId); }
-
-            MyModel.Record.Class = selectedId;
-            showPopup = false;
         }
 
        
 
         public async void BrowseWindow(int _ListType)             
         {
-            showPopup = true;
-
             switch (_ListType)
             {
                 case 0:                                         // Nill

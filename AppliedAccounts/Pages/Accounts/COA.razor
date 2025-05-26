@@ -190,8 +190,7 @@
         </div>
 
         <!-- Table -->
-        <div class="table-container">
-
+        <div class="container">
             <table class="table-list">
                 <thead >
                     <tr class="tb-head-row tb-row-center">
@@ -228,10 +227,6 @@
                 </tbody>
             </table>
         </div>
-
-       
-
-
     </EditForm>
 }
 else
@@ -251,7 +246,7 @@ else
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="browseModalLabel">@MyModel.BrowseClass.Heading</h1>
                     <InputText @bind-Value="MyModel.BrowseClass.SearchText"
-                               @oninput="InputHandler"
+                               @oninput="MyModel.BrowseClass.InputHandler"
                                placeholder="Search..."
                                class="form-control" />
                    
@@ -267,13 +262,13 @@ else
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var item in @MyModel.BrowseClass.BrowseList)
+                                @foreach (var item in @MyModel.BrowseClass.GetBrowseList())
                                 {
                                     <tr>
                                         <td>@item.Code</td>
                                         <td>@item.Title</td>
                                         <td>
-                                            <button class="btn btn-link" data-bs-dismiss="modal" @onclick="(e) =>  MyModel.SelectedBrowse(item.ID)">
+                                            <button class="btn btn-link" data-bs-dismiss="modal" @onclick="(e) =>  SelectedBrowse(item.ID)">
                                                 <i class="bi bi-mouse"></i>
                                             </button>
                                         </td>
@@ -290,8 +285,6 @@ else
         </div>
     </div>
 
-
- <BrowseWindow ReturnValue="SelectClass" ModelClass="MyModel.BrowseClass"/>
 
 <style>
 
