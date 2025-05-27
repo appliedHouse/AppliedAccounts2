@@ -1,0 +1,27 @@
+﻿@page "/Stock/Stocklist"
+
+@layout PageLayout;
+@attribute [Authorize];
+
+@using AppliedAccounts.Libs;
+@using AppliedAccounts.Models;
+@using AppliedAccounts.Data;
+@using AppliedAccounts.Services
+@using AppliedDB
+@using System.Data
+
+@inject GlobalService AppGlobals;
+
+@code {
+    private string UserRoll;
+    private string DateFormat = Format.DDMMYY;
+    private string CurrFormat = Format.Currency;
+    private decimal Tot_DR = 0.0M;
+    private decimal Tot_CR = 0.0M;
+
+    protected override void OnInitialized()
+    {
+        MyModel = new(AppGlobals);   // BookID and UserProfile.
+        MyModel.GetKeys();
+    }
+}

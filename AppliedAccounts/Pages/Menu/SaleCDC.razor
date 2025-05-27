@@ -4,20 +4,10 @@
 
 @code {
 
-    private void CustomerList()
-    {
-        NavManager.NavigateTo("/CustomerList", true);
-    }
-
-    private void LoadExcel()
-    {
-        NavManager.NavigateTo("/ImportData/ImportSalesInvoice", true);
-    }
-
-    private void SaleInvoices()
-    {
-        NavManager.NavigateTo("/Sale/SaleInvoiceList", true);
-    }
+    private void CustomerList() { NavManager.NavigateTo("/CustomerList", true); }
+    private void LoadExcel() { NavManager.NavigateTo("/ImportData/ImportSalesInvoice", true); }
+    private void SaleInvoices() { NavManager.NavigateTo("/Sale/SaleInvoiceList", true); }
+    private void StockList() { NavManager.NavigateTo("/Stock/StockList", true); }
 }
 
 <style>
@@ -59,6 +49,18 @@
         </div>
         <div class="col-md-4">
             <div class="card text-bg-light shadow-sm mb-3" style="height: 250px;">
+                <div class="card-header fw-bold">Service List</div>
+                <div class="card-body">
+                    <h5 class="card-title">Manage Services</h5>
+                    <p class="card-text">Easily add, edit, and remove Services details.</p>
+                    <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" @onclick="StockList" aria-label="Go to Customer List">
+                        <i class="bi bi-arrow-right-square"></i> View Services
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-light shadow-sm mb-3" style="height: 250px;">
                 <div class="card-header fw-bold">Excel Sheet</div>
                 <div class="card-body">
                     <h5 class="card-title">Upload Excel Sheet</h5>
@@ -69,7 +71,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-4">
             <div class="card text-bg-light shadow-sm mb-3" style="height: 250px;">
                 <div class="card-header fw-bold">Sale Invoice</div>
@@ -77,8 +79,8 @@
                     <h5 class="card-title">Print Sale Invoice</h5>
                     <p class="card-text">Generate and print sales invoices of clients.</p>
                     <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" @onclick="SaleInvoices" aria-label=" Go to Customer List">
-                       
-                        
+
+
                         <i class="bi bi-arrow-right-square"></i> View Clients
                     </button>
                 </div>

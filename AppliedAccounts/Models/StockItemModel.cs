@@ -40,8 +40,6 @@ namespace AppliedAccounts.Models
             ListCategories = DataSource.GetDataList(DataFile, Tables.Inv_SubCategory);
 
             if (TB_Stock.Rows.Count > 0) { CurrentRow = TB_Stock.Rows[0]; } else { CurrentRow = TB_Stock.NewRow(); }
-
-
         }
         public StockItemModel(string _DataFile, int? _StockID)
         {
