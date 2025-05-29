@@ -8,7 +8,7 @@
 @attribute [AllowAnonymous];
 @inject IJSRuntime js;
 @inject AuthenticationStateProvider authStateProvider;
-@inject GlobalService AppGlobals;
+@inject GlobalService AppGlobal;
 
 
 <PageTitle>Index</PageTitle>
@@ -26,7 +26,7 @@
     {
         if(AppAuthState.Result.User.Identity!.IsAuthenticated)
         {
-            UserModel = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+            UserModel = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
         }
     }
 
@@ -62,7 +62,7 @@
         {
             await Task.Run(() =>
             {
-                _ = new CreateDatabase(AppGlobals.AppPaths);         
+                _ = new CreateDatabase(AppGlobal.AppPaths);         
             });
         }
     }

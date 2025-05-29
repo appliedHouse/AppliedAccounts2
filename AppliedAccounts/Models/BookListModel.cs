@@ -11,7 +11,7 @@ namespace AppliedAccounts.Models
 {
     public class BookListModel  // : IVoucherList
     {
-        public GlobalService AppGlobals { get; set; }
+        public GlobalService AppGlobal { get; set; }
         public List<CodeTitle> BookList { get; set; }
         public List<CodeTitle> NatureAccountsList { get; set; }
         public DataSource Source { get; set; }
@@ -31,11 +31,11 @@ namespace AppliedAccounts.Models
         public bool IsWaiting { get; set; } = false;
 
         public BookListModel() { }
-        public BookListModel(int _BookID, GlobalService _AppGlobals)
+        public BookListModel(int _BookID, GlobalService _AppGlobal)
         {
-            AppGlobals = _AppGlobals;
+            AppGlobal = _AppGlobal;
             MsgClass = new();
-            Source = new(AppGlobals.AppPaths);
+            Source = new(AppGlobal.AppPaths);
             GetKeys();
 
             try
@@ -135,7 +135,7 @@ namespace AppliedAccounts.Models
 
             try
             {
-                ReportService = new(AppGlobals);
+                ReportService = new(AppGlobal);
                 ReportService.ReportType = _ReportType;
                 GetReportData();
                 ReportModel();                              // Add / update Report model data.
@@ -181,7 +181,7 @@ namespace AppliedAccounts.Models
         public void Edit(int _ID)
         {
             SetKeys();
-            AppGlobals.NavManager.NavigateTo($"/Accounts/Books/{BookID}/{BookNatureID}");
+            AppGlobal.NavManager.NavigateTo($"/Accounts/Books/{BookID}/{BookNatureID}");
         }
         #endregion
 

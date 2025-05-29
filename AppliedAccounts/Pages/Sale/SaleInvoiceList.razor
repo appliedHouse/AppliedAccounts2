@@ -9,7 +9,7 @@
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager NavManager
 @inject IJSRuntime js
-@inject GlobalService AppGlobals
+@inject GlobalService AppGlobal
 @inject PrintService DIPrintReport
 @inject HttpClient Http
 
@@ -23,10 +23,10 @@
         try
         {
 
-            //AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+            //AppUser = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
             //if (AppUser != null)
             //{
-                MyModel = new(AppGlobals);
+                MyModel = new(AppGlobal);
                 
             //}
             //else { MyModel = new(); }

@@ -17,7 +17,7 @@ namespace AppliedAccounts.Models
     {
 
         #region Variables
-        public AppValues AppGlobals { get; set; } = new();
+        public AppValues AppGlobal { get; set; } = new();
         public AppUserModel UserProfile { get; set; } = new();          // Depreciated.
         public DataSource Source { get; set; }
         public string InvoiceNo { get; set; } = string.Empty;
@@ -41,10 +41,10 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Constructor
-        public PurchaseInvoiceModel(AppValues _AppGlobals)                      // Currently used.
+        public PurchaseInvoiceModel(AppValues _AppGlobal)                      // Currently used.
         {
-            AppGlobals = _AppGlobals;
-            Source = new DataSource(AppGlobals.Paths);
+            AppGlobal = _AppGlobal;
+            Source = new DataSource(AppGlobal.Paths);
             View_PurchaseInvoice = Source.GetTable(Query.PurchaseInvoiceView);
             Customers = Source.GetCustomers();
             Employees = Source.GetEmployees();

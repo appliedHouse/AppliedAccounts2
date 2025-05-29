@@ -12,7 +12,7 @@
 
     protected override void OnInitialized()
     {
-        AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        AppUser = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
         if (AppUser.Role == "Administrator")
         {
             IsAdmin = true;
@@ -26,7 +26,7 @@
 
     public async Task Logout()
     {
-        var AppAuthState = (UserAuthonticationStateProvider)authStateProvider;
+        var AppAuthState = (UserAuthenticationStateProvider)authStateProvider;
         await AppAuthState.UpdateAuthonticateState(null);
 
         NavManager.NavigateTo($"/", true);

@@ -9,7 +9,7 @@ namespace AppliedAccounts.Models
     public class COAClassModel
     {
         //public AppliedGlobals.AppUserModel? AppUser { get; set; }
-        public GlobalService AppGlobals { get; set; }
+        public GlobalService AppGlobal { get; set; }
         public DataSource? Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public COAClassRecord Record { get; set; } = new();
@@ -25,13 +25,13 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public COAClassModel() { }
-        public COAClassModel(GlobalService _AppGlobals)
+        public COAClassModel(GlobalService _AppGlobal)
         {
-            AppGlobals = _AppGlobals;
+            AppGlobal = _AppGlobal;
             //AppUser = _UserProfile;
             //MyMessages = MessageClass.Messages;
             //DBFile = AppUser.DataFile;
-            Source = new(AppGlobals.AppPaths);
+            Source = new(AppGlobal.AppPaths);
             Data = Source.GetList(Query.COAClassList);
             Records = GetFilterRecords(string.Empty);
             if (Records.Count > 0) { Record = Records.First(); } else { Record = new COAClassRecord(); }

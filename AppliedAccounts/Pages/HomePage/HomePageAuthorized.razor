@@ -5,12 +5,12 @@
 @inject GlobalService GlobalService;
 
 @code {
-    public GlobalService AppGlobals { get; set; }
+    public GlobalService AppGlobal { get; set; }
     public string? BusinessPic { get; set; }
     protected override void OnInitialized()
     {
-        AppGlobals = GlobalService;
-        BusinessPic = $"{AppGlobals.AppPaths.ImagesPath}/Accounts3.jpg";
+        AppGlobal = GlobalService;
+        BusinessPic = $"{AppGlobal.AppPaths.ImagesPath}/Accounts3.jpg";
     }
 }
 <div class="HomeDiv">

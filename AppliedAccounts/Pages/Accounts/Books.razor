@@ -15,7 +15,7 @@
 @inject IJSRuntime js
 @inject ToastService ToastService
 @inject PrintService ReportService
-@inject GlobalService AppGlobals
+@inject GlobalService AppGlobal
 
 @code {
 
@@ -32,7 +32,7 @@
 
     protected override void OnInitialized()
     {
-        UserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
+        UserProfile = ((UserAuthenticationStateProvider)authorized).AppUser;
         Start();
         Toast = new();
     }

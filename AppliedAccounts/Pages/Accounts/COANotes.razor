@@ -6,13 +6,13 @@
 @inject AuthenticationStateProvider authStateProvider;
 @inject NavigationManager NavManager;
 @inject IJSRuntime js
-@inject GlobalService AppGlobals;
+@inject GlobalService AppGlobal;
 
 @code {
     protected override void OnInitialized()
     {
-        var AppUserProfile = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
-        if (AppUserProfile != null) { Model = new(AppGlobals); }
+        var AppUserProfile = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
+        if (AppUserProfile != null) { Model = new(AppGlobal); }
         else { Model = new(); }
     }
 

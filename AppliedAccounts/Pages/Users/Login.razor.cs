@@ -29,7 +29,7 @@ namespace AppliedAccounts.Pages.Users
                 if (IsUser && IsPSW)     // Validate the User Id and Password are equal.
                 {
                     var _newGUID = Guid.NewGuid();
-                    var userAuthStateProvider = (UserAuthonticationStateProvider)authStateProvider;
+                    var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
                     await userAuthStateProvider.UpdateAuthonticateState(new UserSession
                     {
                         UserName = AppUser.Profile.UserID,
@@ -44,16 +44,16 @@ namespace AppliedAccounts.Pages.Users
                         LanguageID = LanguageID,
 
                         // Default Application Foler
-                        //RootFolder = AppGlobals.AppPaths.RootPath ?? "wwwroot",
-                        //ClientsFolder = AppGlobals.AppPaths.ClientPath ?? "SQLiteDB",
-                        //UsersFolder = AppGlobals.AppPaths.UsersPath ?? "SQLiteDB",
-                        //ReportFolder = AppGlobals.AppPaths.ReportPath ?? "Reports",
-                        //LanguageFolder = AppGlobals.AppPaths.LanguagesPath ?? "Languages",
-                        //MessageFolder = AppGlobals.AppPaths.MessagesPath ?? "Messages",
-                        //ImageFolder = AppGlobals.AppPaths.ImagesPath ?? "Images",
-                        //PDFFolder = AppGlobals.AppPaths.PDFPath ?? "PDFReport",
-                        //SystemFolder = AppGlobals.AppPaths.SystemPath ?? "System",
-                        //SessionFolder = AppGlobals.AppPaths.SessionPath ?? "Sessions",
+                        //RootFolder = AppGlobal.AppPaths.RootPath ?? "wwwroot",
+                        //ClientsFolder = AppGlobal.AppPaths.ClientPath ?? "SQLiteDB",
+                        //UsersFolder = AppGlobal.AppPaths.UsersPath ?? "SQLiteDB",
+                        //ReportFolder = AppGlobal.AppPaths.ReportPath ?? "Reports",
+                        //LanguageFolder = AppGlobal.AppPaths.LanguagesPath ?? "Languages",
+                        //MessageFolder = AppGlobal.AppPaths.MessagesPath ?? "Messages",
+                        //ImageFolder = AppGlobal.AppPaths.ImagesPath ?? "Images",
+                        //PDFFolder = AppGlobal.AppPaths.PDFPath ?? "PDFReport",
+                        //SystemFolder = AppGlobal.AppPaths.SystemPath ?? "System",
+                        //SessionFolder = AppGlobal.AppPaths.SessionPath ?? "Sessions",
 
                     });
 
@@ -86,9 +86,9 @@ namespace AppliedAccounts.Pages.Users
                 if (_UserModel != null)
                 {
                     var UsersDBFile = Path.Combine(
-                        AppGlobals.AppPaths.FirstPath,
-                        AppGlobals.AppPaths.RootPath,
-                        AppGlobals.AppPaths.UsersPath, "AppliedUsers2.db");
+                        AppGlobal.AppPaths.FirstPath,
+                        AppGlobal.AppPaths.RootPath,
+                        AppGlobal.AppPaths.UsersPath, "AppliedUsers2.db");
 
                     var _CommandText = $"SELECT * FROM [Users] WHERE [UserID] = '{_UserID}'";
                     var _Connection = Connections.GetSQLiteConnection(UsersDBFile); _Connection?.Open();

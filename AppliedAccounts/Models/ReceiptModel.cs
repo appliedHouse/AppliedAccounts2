@@ -33,7 +33,7 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> Accounts { get; set; }
         public List<CodeTitle> PayCOA { get; set; }
         public List<CodeTitle> InvoiceList { get; set; }
-        //public string DataFile => AppGlobals.DBFile;
+        //public string DataFile => AppGlobal.DBFile;
 
         public AppUserModel? UserProfile { get; set; }
         public int Index { get; set; }
@@ -46,24 +46,24 @@ namespace AppliedAccounts.Models
         public bool IsWaiting { get; set; } = false;
         public ReportType rptType { get; set; }
 
-        public GlobalService AppGlobals { get; set; }
+        public GlobalService AppGlobal { get; set; }
 
 
         #endregion
 
         #region Constructor
         
-        public ReceiptModel(GlobalService _AppGlobals)
+        public ReceiptModel(GlobalService _AppGlobal)
         {
-            AppGlobals = _AppGlobals;
-            ReportService = new(AppGlobals);
+            AppGlobal = _AppGlobal;
+            ReportService = new(AppGlobal);
 
         }
-        public ReceiptModel(GlobalService _AppGlobals, int _ReceiptID)
+        public ReceiptModel(GlobalService _AppGlobal, int _ReceiptID)
         {
-            AppGlobals = _AppGlobals;
+            AppGlobal = _AppGlobal;
             ReceiptID = _ReceiptID;
-            ReportService = new(AppGlobals);
+            ReportService = new(AppGlobal);
             Start(ReceiptID);
 
 
@@ -71,7 +71,7 @@ namespace AppliedAccounts.Models
         public void Start(int _ReceiptID)
         {
             //if (UserProfile is null) { return; }
-            Source ??= new(AppGlobals.AppPaths);
+            Source ??= new(AppGlobal.AppPaths);
 
             MsgClass = new();
             MyVoucher = new();
@@ -82,10 +82,10 @@ namespace AppliedAccounts.Models
                 ReceiptID = _ReceiptID;
                 //DataFile = UserProfile?.DataFile ?? "";
 
-                if (AppGlobals != null && !string.IsNullOrEmpty(AppGlobals.DBFile))
+                if (AppGlobal != null && !string.IsNullOrEmpty(AppGlobal.DBFile))
                 {
-                    Source ??= new(AppGlobals.AppPaths);
-                    LastVoucherDate = AppRegistry.GetDate(AppGlobals.DBFile, "LastRecDate");
+                    Source ??= new(AppGlobal.AppPaths);
+                    LastVoucherDate = AppRegistry.GetDate(AppGlobal.DBFile, "LastRecDate");
 
                     if (ReceiptID == 0) { MyVoucher = NewVoucher(); }   // Create a new voucher;
                     if (ReceiptID > 0)
@@ -594,7 +594,7 @@ namespace AppliedAccounts.Models
                 {
                     SetKeys();
                     ReceiptID = reportAction.VoucherID;
-                    ReportService = new(AppGlobals); ;                      // Initialize Report Service
+                    ReportService = new(AppGlobal); ;                      // Initialize Report Service
                     ReportService.ReportType = reportAction.PrintType;      // Assign Report Type 
                     GetReportData();                                        // Report Data Source Setup
                     UpdateReportModel();                                    // Update Report Model
@@ -641,8 +641,8 @@ namespace AppliedAccounts.Models
 
             var _Amount = (decimal)ReportService.Data.ReportTable.Rows[0]["Amount"];
             var _NumInWords = new NumInWords();
-            var _Currency = AppGlobals.Currency.Sign ?? "$";
-            var _CurrencyDigit = AppGlobals.Currency.DigitTitle ?? "";
+            var _Currency = AppGlobal.Currency.Sign ?? "$";
+            var _CurrencyDigit = AppGlobal.Currency.DigitTitle ?? "";
             var _AmountinWord = _NumInWords.ChangeCurrencyToWords(_Amount, _Currency, _CurrencyDigit);
             var ShowImage = false;
 
@@ -653,7 +653,7 @@ namespace AppliedAccounts.Models
             ReportService.Model.AddReportParameter("Heading1", _Heading1);
             ReportService.Model.AddReportParameter("Heading2", _Heading2);
             ReportService.Model.AddReportParameter("InWord", _AmountinWord);
-            ReportService.Model.AddReportParameter("CurrencySign", AppGlobals.Currency.Sign ?? "$");
+            ReportService.Model.AddReportParameter("CurrencySign", AppGlobal.Currency.Sign ?? "$");
             ReportService.Model.AddReportParameter("PayerTitle", "Donor");
             ReportService.Model.AddReportParameter("ShowImages", ShowImage.ToString());
 

@@ -33,7 +33,7 @@
 
     protected override void OnInitialized()
     {
-        var UserModel = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        var UserModel = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
 
         Source = new(AppGlobal.AppPaths);
 

@@ -43,24 +43,24 @@ namespace AppliedAccounts.Models
         public bool IsWaiting { get; set; }             // Page is wait for completion of process like save or data load
         public int Count => MyVoucher.Details.Count;    // total records in detail list.
         public int ListType { get; set; }               // List type for display in View Table at page
-        public GlobalService AppGlobals { get; set; }
+        public GlobalService AppGlobal { get; set; }
 
 
         #endregion
 
         #region Constructor
         public SaleInvoiceModel() { }
-        public SaleInvoiceModel(GlobalService _AppGlobals)
+        public SaleInvoiceModel(GlobalService _AppGlobal)
         {
-            AppGlobals = _AppGlobals;
-            Source = new DataSource(AppGlobals.AppPaths);
+            AppGlobal = _AppGlobal;
+            Source = new DataSource(AppGlobal.AppPaths);
         }
 
-        public SaleInvoiceModel(GlobalService _AppGlobals, int _SaleInvoiceID)
+        public SaleInvoiceModel(GlobalService _AppGlobal, int _SaleInvoiceID)
         {
-            AppGlobals = _AppGlobals;
+            AppGlobal = _AppGlobal;
             SaleInvoiceID = _SaleInvoiceID;
-            Source = new DataSource(AppGlobals.AppPaths);
+            Source = new DataSource(AppGlobal.AppPaths);
             Start(SaleInvoiceID);
 
         }
@@ -71,8 +71,8 @@ namespace AppliedAccounts.Models
         {
             try
             {
-                if (AppGlobals is null) { return; }
-                Source ??= new(AppGlobals.AppPaths);
+                if (AppGlobal is null) { return; }
+                Source ??= new(AppGlobal.AppPaths);
 
                 MsgClass = new();
                 MyVoucher = new();
@@ -593,7 +593,7 @@ namespace AppliedAccounts.Models
         {
             await Task.Run(() =>
             {
-                ReportService = new(AppGlobals); ;
+                ReportService = new(AppGlobal); ;
                 ReportService.ReportType = _rptType;
                 ReportService.Data = GetReportData();
                 ReportService.Model = CreateReportModel();
@@ -624,8 +624,8 @@ namespace AppliedAccounts.Models
         {
             var _Heading1 = "Sale Invoice";
             var _Heading2 = $"{_Heading1} [{MyVoucher.Master.Vou_No}]";
-            var _ReportPath = AppGlobals.AppPaths.ReportPath;
-            var _CompanyName = AppGlobals.Client.Name;
+            var _ReportPath = AppGlobal.AppPaths.ReportPath;
+            var _CompanyName = AppGlobal.Client.Name;
             var _ReportFooter = AppFunctions.ReportFooter();
 
             ReportModel rptModel = new();

@@ -13,9 +13,9 @@ namespace AppliedAccounts.Data
         public SQLiteConnection SystemConnection { get; set; }
         public SQLiteConnection SessionConnection { get; set; }
 
-        public DataBaseClass(GlobalService _AppGlobals)
+        public DataBaseClass(GlobalService _AppGlobal)
         {
-            AppliedDB.Connections _Connection = new(_AppGlobals.AppPaths);
+            AppliedDB.Connections _Connection = new(_AppGlobal.AppPaths);
         }
 
         public static SQLiteConnection? GetMessagesConnection() { return null; }

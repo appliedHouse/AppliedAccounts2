@@ -10,7 +10,7 @@
 @inject AuthenticationStateProvider authStateProvider;
 @inject NavigationManager NavManager;
 @inject IJSRuntime js
-@inject GlobalService AppGlobals;
+@inject GlobalService AppGlobal;
 
 
 @code {
@@ -21,11 +21,11 @@
 
     protected override void OnInitialized()
     {
-        var AppUserProfile = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        var AppUserProfile = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
 
         if (ID < 0) { IsDelete = true; ID = Math.Abs(ID); }
 
-        if (AppUserProfile != null) { Model = new(AppGlobals, ID); }
+        if (AppUserProfile != null) { Model = new(AppGlobal, ID); }
         else { Model = new(); }
     }
 

@@ -45,9 +45,8 @@ namespace AppliedAccounts.Models
         public decimal Tot_CR { get; set; }
         public bool IsWaiting { get; set; }
         public bool IsSaved { get; set; }
-        public NavigationManager NavManager => AppGlobals.NavManager;
+        public NavigationManager NavManager => AppGlobal.NavManager;
         public PrintService ReportService { get; set; }
-        public GlobalService AppGlobals { get; set; }
 
         private int CashNatureID = 0;
         private int BankNatureID = 0;
@@ -60,9 +59,9 @@ namespace AppliedAccounts.Models
         {
 
         }
-        public BookModel(int _VoucherID, int _BookID, GlobalService _AppGlobals)
+        public BookModel(int _VoucherID, int _BookID, GlobalService _AppGlobal)
         {
-            AppGlobal = _AppGlobals;
+            AppGlobal = _AppGlobal;
             MsgClass = new();
             MyVoucher = new();
 
@@ -467,7 +466,7 @@ namespace AppliedAccounts.Models
         {
             try
             {
-                ReportService = new(AppGlobals); ;
+                ReportService = new(AppGlobal); ;
                 ReportService.ReportType = _ReportAction.PrintType;
 
                 GetReportDataAsync();

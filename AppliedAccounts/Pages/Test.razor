@@ -4,7 +4,7 @@
 
 
 @inject AuthenticationStateProvider authStateProvider
-@inject GlobalService AppGlobals
+@inject GlobalService AppGlobal
 
 @code {
    
@@ -13,8 +13,8 @@
 
     protected override void OnInitialized()
     {
-        //var UserAuthentication = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
-        DBClass = new(AppGlobals);
+        //var UserAuthentication = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
+        DBClass = new(AppGlobal);
         Value1 = MyConfig.GetValue("Paths:DBPath","").ToString();
         Value2 = MyEnvir.ContentRootPath;
 

@@ -4,7 +4,7 @@
 @using AppliedAccounts.Services
 @using AppliedAccounts.Models
 
-@inject GlobalService AppGlobals;
+@inject GlobalService AppGlobal;
 
 @code {
 
@@ -12,7 +12,7 @@
     private void Quotation()
     {
         ///Sales/Quotation/{ID:Vou}
-        AppGlobals.NavManager.NavigateTo($"/Sales/Quotation/{VoucherNo}");
+        AppGlobal.NavManager.NavigateTo($"/Sales/Quotation/{VoucherNo}");
     }
 }
 

@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace AppliedAccounts.Authentication
 {
-    public class UserAuthonticationStateProvider : AuthenticationStateProvider
+    public class UserAuthenticationStateProvider : AuthenticationStateProvider
     {
         private readonly ProtectedSessionStorage _sessionStorage;
         private readonly ClaimsPrincipal AnyOne = new(new ClaimsIdentity());
@@ -15,7 +15,7 @@ namespace AppliedAccounts.Authentication
         public AppUserModel AppUser = new AppUserModel();
         public IEnumerable<Claim> Claims { get; set; }
 
-        public UserAuthonticationStateProvider(ProtectedSessionStorage sessionStorage, NavigationManager NavManager)
+        public UserAuthenticationStateProvider(ProtectedSessionStorage sessionStorage, NavigationManager NavManager)
         {
             _sessionStorage = sessionStorage;
             _navManager = NavManager;

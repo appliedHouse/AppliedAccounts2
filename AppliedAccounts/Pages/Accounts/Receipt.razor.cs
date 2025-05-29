@@ -15,7 +15,7 @@ namespace AppliedAccounts.Pages.Accounts
 
         public Receipt()
         {
-            MyModel = new ReceiptModel(AppGlobals);
+            MyModel = new ReceiptModel(AppGlobal);
             IsPageValid = true;
             ErrorMessage = string.Empty;
         }

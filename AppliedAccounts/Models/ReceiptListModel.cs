@@ -14,7 +14,7 @@ namespace AppliedAccounts.Models
 {
     public class ReceiptListModel
     {
-        public GlobalService AppGlobals { get; set; }
+        public GlobalService AppGlobal { get; set; }
         public DataSource Source { get; set; }
         public List<DataRow> DataList { get; set; }
         public List<CodeTitle> PayerList { get; set; }
@@ -29,11 +29,11 @@ namespace AppliedAccounts.Models
         public PrintService ReportService { get; set; }
 
 
-        public ReceiptListModel(GlobalService _AppGlobals)
+        public ReceiptListModel(GlobalService _AppGlobal)
         {
-            AppGlobals = _AppGlobals;
+            AppGlobal = _AppGlobal;
             Table = Tables.view_Receipts;
-            Source = new DataSource(AppGlobals.AppPaths);
+            Source = new DataSource(AppGlobal.AppPaths);
             MsgClass = new();
             DT_Start = AppRegistry.GetDate(Source.DBFile, "rcptFrom");
             DT_End = AppRegistry.GetDate(Source.DBFile, "rcptTo");
@@ -95,7 +95,7 @@ namespace AppliedAccounts.Models
                 {
                     SetKeys();
                     ReceiptID = reportAction.VoucherID;
-                    ReportService = new(AppGlobals); ;                      // Initialize Report Service
+                    ReportService = new(AppGlobal); ;                      // Initialize Report Service
                     ReportService.ReportType = reportAction.PrintType;      // Assign Report Type 
                     GetReportData();                                        // Report Data Source Setup
                     UpdateReportModel();                                    // Update Report Model
@@ -136,14 +136,14 @@ namespace AppliedAccounts.Models
             var _InvoiceNo = "Receipt";
             var _Heading1 = "Receipt";
             var _Heading2 = $"Receipt No. {_InvoiceNo}";
-            var _ReportPath = AppGlobals.AppPaths.ReportPath;
-            var _CompanyName = AppGlobals.Client.DisplayName;
+            var _ReportPath = AppGlobal.AppPaths.ReportPath;
+            var _CompanyName = AppGlobal.Client.DisplayName;
             var _ReportFooter = AppFunctions.ReportFooter();
 
             var _Amount = (decimal)ReportService.Data.ReportTable.Rows[0]["Amount"];
             var _NumInWords = new NumInWords();
-            var _Currency = AppGlobals.Currency.Sign ?? "$";
-            var _CurrencyDigit = AppGlobals.Currency.DigitTitle ?? "";
+            var _Currency = AppGlobal.Currency.Sign ?? "$";
+            var _CurrencyDigit = AppGlobal.Currency.DigitTitle ?? "";
             var _AmountinWord = _NumInWords.ChangeCurrencyToWords(_Amount, _Currency, _CurrencyDigit);
             var ShowImage = false;
 
@@ -154,7 +154,7 @@ namespace AppliedAccounts.Models
             ReportService.Model.AddReportParameter("Heading1", _Heading1);
             ReportService.Model.AddReportParameter("Heading2", _Heading2);
             ReportService.Model.AddReportParameter("InWord", _AmountinWord);
-            ReportService.Model.AddReportParameter("CurrencySign", AppGlobals.Currency.Sign ?? "$");
+            ReportService.Model.AddReportParameter("CurrencySign", AppGlobal.Currency.Sign ?? "$");
             ReportService.Model.AddReportParameter("PayerTitle", "Donor");
             ReportService.Model.AddReportParameter("ShowImages", ShowImage.ToString());
 
@@ -165,7 +165,7 @@ namespace AppliedAccounts.Models
         public void Edit(int _ID)
         {
             SetKeys();
-            AppGlobals.NavManager.NavigateTo($"/Accounts/Receipt/{ReceiptID}");
+            AppGlobal.NavManager.NavigateTo($"/Accounts/Receipt/{ReceiptID}");
         }
         #endregion
 

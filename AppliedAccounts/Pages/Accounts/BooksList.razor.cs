@@ -15,7 +15,7 @@ namespace AppliedAccounts.Pages.Accounts
         public BooksList() { }
 
         #region Back Page
-        public void Back() { AppGlobals.NavManager.NavigateTo("/Menu/Accounts"); }
+        public void Back() { AppGlobal.NavManager.NavigateTo("/Menu/Accounts"); }
         #endregion
 
         #region New Voucher

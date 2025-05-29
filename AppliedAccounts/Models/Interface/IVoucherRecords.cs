@@ -8,7 +8,7 @@ namespace AppliedAccounts.Models.Interface
 {
     public interface IVoucherRecords<T> where T : class
     {
-        GlobalService AppGlobals { get; set; }
+        GlobalService AppGlobal { get; set; }
         DataSource Source { get; set; }
         NavigationManager NavManager { get; set; }
         ListFilter FilterClass { get; set; }

@@ -20,7 +20,7 @@ builder.Services.AddServerSideBlazor();
 //builder.Services.AddSingleton<AppUserModel>();              // Create a new instance of AppUserModel
 builder.Services.AddSingleton<UserProfile>();               // Create a User Model Class.
 builder.Services.AddScoped<ProtectedSessionStorage>();
-builder.Services.AddScoped<AuthenticationStateProvider, UserAuthonticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
 builder.Services.AddScoped<ToastService>();
 builder.Services.AddScoped<PrintService>();
 builder.Services.AddHttpClient();

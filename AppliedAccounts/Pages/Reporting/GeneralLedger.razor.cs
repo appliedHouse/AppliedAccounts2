@@ -11,7 +11,6 @@ namespace AppliedAccounts.Pages.Reporting
 {
     public partial class GeneralLedger
     {
-        public GlobalService AppGlobal { get; set; }
         public DataSource Source { get; set; }
         public GLModel MyModel { get; set; }
         public MessageClass MsgClass { get; set; }
@@ -19,7 +18,7 @@ namespace AppliedAccounts.Pages.Reporting
         public bool IsPageValid { get; set; }
         public bool IsPrinting { get; set; }
         string IsPageValidMessage { get; set; } = "Page has some error. Consult to Administrator";
-        NavigationManager NavManager => AppGlobals.NavManager;
+        NavigationManager NavManager => AppGlobal.NavManager;
 
         public List<CodeTitle> Accounts { get; set; }
 
@@ -98,7 +97,7 @@ namespace AppliedAccounts.Pages.Reporting
                 SetKeys();
                 await Task.Run(() =>
                 {
-                    ReportService = new(AppGlobals); ;
+                    ReportService = new(AppGlobal); ;
                     ReportService.ReportType = PrintAction.PrintType;
                     GetReportData();
                     CreateReportModel();

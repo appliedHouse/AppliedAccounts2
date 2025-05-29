@@ -15,7 +15,7 @@
 @inject IJSRuntime js
 @inject ToastService ToastService
 @inject PrintService ReportService
-@inject GlobalService AppGlobals
+@inject GlobalService AppGlobal
 
 @code {
     [Parameter] public int ID { get; set; }
@@ -26,9 +26,9 @@
     protected override void OnInitialized()
     {
         IsPageValid = true;
-        var _UserProfile = ((UserAuthonticationStateProvider)Authorized).AppUser;
-        //AppGlobals.DBFile = _UserProfile.DataFile;
-        MyModel = new ReceiptModel(AppGlobals);
+        var _UserProfile = ((UserAuthenticationStateProvider)Authorized).AppUser;
+        //AppGlobal.DBFile = _UserProfile.DataFile;
+        MyModel = new ReceiptModel(AppGlobal);
         MyModel.Start(ID);
 
         if (MyModel.MyVoucher == null) { ErrorMessage = "Voucher is null"; }

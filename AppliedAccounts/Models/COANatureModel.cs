@@ -8,7 +8,7 @@ namespace AppliedAccounts.Models
 {
     public class COANatureModel
     {
-        public GlobalService AppGlobals { get; set; }
+        public GlobalService AppGlobal { get; set; }
         public DataSource? Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public COANatureRecord Record { get; set; } = new();
@@ -23,12 +23,12 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public COANatureModel() { }
-        public COANatureModel(GlobalService _AppGlobals)
+        public COANatureModel(GlobalService _AppGlobal)
         {
-            AppGlobals = _AppGlobals; 
+            AppGlobal = _AppGlobal; 
             //AppUser = _UserProfile;
             //DBFile = AppUser.DataFile;
-            Source = new(AppGlobals.AppPaths);
+            Source = new(AppGlobal.AppPaths);
             Data = Source.GetList(Query.COANatureList);
             Records = GetFilterRecords(string.Empty);
             if (Records.Count > 0) { Record = Records.First(); } else { Record = new COANatureRecord(); }

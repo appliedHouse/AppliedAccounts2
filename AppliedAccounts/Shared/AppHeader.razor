@@ -10,7 +10,7 @@
 
     protected override void OnInitialized()
     {
-        AppUser = ((UserAuthonticationStateProvider)Authorized).AppUser;
+        AppUser = ((UserAuthenticationStateProvider)Authorized).AppUser;
         CompanyName = AppUser.Company;
         AppUserName = AppUser.DisplayName;
     }
@@ -19,7 +19,7 @@
     {
         await Task.Run(() =>
         {
-            AppUser = ((UserAuthonticationStateProvider)Authorized).AppUser;
+            AppUser = ((UserAuthenticationStateProvider)Authorized).AppUser;
             CompanyName = AppUser.Company;
             AppUserName = AppUser.DisplayName;
             InvokeAsync(()=>StateHasChanged());

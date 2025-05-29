@@ -9,33 +9,33 @@
 
 @code {
 
-    public GlobalService AppGlobals { get; set; }
+    public GlobalService AppGlobal { get; set; }
     public string? BusinessPic { get; set; }
     public bool UserDBFileExist { get; set; }
 
     protected override void OnInitialized()
     {
-        AppGlobals = GlobalService;
-        BusinessPic = Path.Combine(AppGlobals.AppPaths.ImagesPath, "Accounts3.jpg");
-        string UserDB = Path.Combine(AppGlobals.AppPaths.FirstPath,
-                                     AppGlobals.AppPaths.RootPath,
-                                     AppGlobals.AppPaths.ClientPath,
+        AppGlobal = GlobalService;
+        BusinessPic = Path.Combine(AppGlobal.AppPaths.ImagesPath, "Accounts3.jpg");
+        string UserDB = Path.Combine(AppGlobal.AppPaths.FirstPath,
+                                     AppGlobal.AppPaths.RootPath,
+                                     AppGlobal.AppPaths.ClientPath,
                                      "AppliedUsers2.db");
 
         UserDBFileExist = File.Exists(UserDB);
     }
 
-    string BasePath => AppGlobals.AppPaths.BaseUri;
-    string CompanyName => AppGlobals.Author.Company;
-    string Address1 => AppGlobals.Author.Address1;
-    string Address2 => AppGlobals.Author.Address2;
-    string Country => AppGlobals.Author.City + ", " + AppGlobals.Author.Country;
-    string Email => AppGlobals.Author.Email;
-    string Contact => AppGlobals.Author.Contact;
-    string Url => AppGlobals.Author.Url;
-    string Url2 => AppGlobals.Author.Url2;
+    string BasePath => AppGlobal.AppPaths.BaseUri;
+    string CompanyName => AppGlobal.Author.Company;
+    string Address1 => AppGlobal.Author.Address1;
+    string Address2 => AppGlobal.Author.Address2;
+    string Country => AppGlobal.Author.City + ", " + AppGlobal.Author.Country;
+    string Email => AppGlobal.Author.Email;
+    string Contact => AppGlobal.Author.Contact;
+    string Url => AppGlobal.Author.Url;
+    string Url2 => AppGlobal.Author.Url2;
 
-    string ImagePath => AppGlobals.AppPaths.ImagesPath;
+    string ImagePath => AppGlobal.AppPaths.ImagesPath;
     string btnLogo => $"{ImagePath}/Home/logo.png";
     string btnSignin => $"{ImagePath}/Home/loginBtnIcon.png";
     string btnSignup => $"{ImagePath}/Home/signupBtnIcon.png";

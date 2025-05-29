@@ -35,8 +35,8 @@ namespace AppliedAccounts.Pages.Accounts
         {
             MsgClass = new();
             MyToastClass = new();
-            MyModel = new(ID, BookID, AppGlobals); ;
-            //MyModel.AppGlobals = AppGlobals;
+            MyModel = new(ID, BookID, AppGlobal); ;
+            //MyModel.AppGlobal = AppGlobal;
             MyModel.ReportService = ReportService;
 
             if (MyModel == null) { IsPageValid = false; MsgClass.Add("Model is null"); return; }

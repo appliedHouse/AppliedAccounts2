@@ -26,7 +26,7 @@
     font-size: 2rem;
     color: darkgreen;
 }
-
+/*
 .btn-Edit {
     color: royalblue;
     padding: 1px;
@@ -34,8 +34,8 @@
     border-color: transparent;
     background-color: transparent;
     width: 15px;
-}
-
+}*/
+  
 
 .btn-Del {
     color: orangered;
@@ -52,7 +52,7 @@
     margin: 1px;
     border: 0px;
 }
-
+/*
 .btn-Add {
     color: darkgreen;
     background-color: transparent;
@@ -61,6 +61,8 @@
     border: 0px;
     width: 80px
 }
+
+*/
 
 .btn-New {
     color: white;

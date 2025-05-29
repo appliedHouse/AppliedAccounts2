@@ -140,7 +140,7 @@ namespace AppliedAccounts.Pages.Sale
                 var _FileName = $"{_Batch}_{_Title}";
                 var _VoucherNo = MyModel.Record.Vou_No ?? "NoVoucher";
 
-                ReportService = new(AppGlobals);
+                ReportService = new(AppGlobal);
                 GetReportData();              // always generate Data for report
                 UpdateReportModel();         // and then generate report parameters
                 ReportService.Print();

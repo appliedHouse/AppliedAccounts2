@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Drawing;
+using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SQLQueries
@@ -285,6 +286,27 @@ namespace SQLQueries
             _Text.Append("LEFT JOIN[COA_Notes]  [N] ON[N].[ID] = [COA].[Notes]");
 
             return _Text.ToString();
+        }
+        #endregion
+
+        #region Inventory
+        public static string Inventory() 
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("SELECT [I].*,");
+            _Text.AppendLine("[P].[Title] [TitlePacking],");
+            _Text.AppendLine("[U].[Title] [TitleUOM],");
+            _Text.AppendLine("[S].[Title] [TitleSubCategory],");
+            _Text.AppendLine("[C].[Title] [TitleCategory],");
+            _Text.AppendLine("[Z].[Title] [TitleSize]");
+            _Text.AppendLine("FROM [Inventory] [I]");
+            _Text.AppendLine("LEFT JOIN [Inv_Packing]     [P] ON [P].[ID] = [I].[Packing]");
+            _Text.AppendLine("LEFT JOIN [Inv_UOM]         [U] ON [U].[ID] = [I].[UOM]");
+            _Text.AppendLine("LEFT JOIN [Inv_SubCategory] [S] ON [S].[ID] = [I].[SubCategory]");
+            _Text.AppendLine("LEFT JOIN [Inv_Category]    [C] ON [C].[ID] = [S].[Category]");
+            _Text.AppendLine("LEFT JOIN [Inv_Size]        [Z] ON [Z].[ID] = [I].[Size]");
+            return _Text.ToString();
+
         }
         #endregion
     }

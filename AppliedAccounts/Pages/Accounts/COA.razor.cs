@@ -9,37 +9,34 @@ namespace AppliedAccounts.Pages.Accounts
     {
         public COAModel MyModel { get; set; } = new();
         public bool IsPageValid { get; set; }
-        
-        public COA() 
+
+        public COA()
         {
-            
+
         }
 
         public bool GetPageIsValid()
         {
             var _Valid = true;
-           
+
             if (MyModel.Records is null) { _Valid = false; MyModel.MsgClass.Add("Records not found"); }
             if (MyModel.Record is null) { _Valid = false; MyModel.MsgClass.Add("Account Class List is empty"); }
             if (MyModel.NatureList is null) { _Valid = false; MyModel.MsgClass.Add("Account Nature List is empty"); }
             if (MyModel.NotesList is null) { _Valid = false; MyModel.MsgClass.Add("Financial Notes List is empty"); }
             return _Valid;
         }
-
-        protected void Back() { AppGlobals.NavManager.NavigateTo("/Menu/Accounts"); }
-
+        protected void Back() { AppGlobal.NavManager.NavigateTo("/Menu/Accounts"); }
         public async void Add()
         {
             MyModel.Add();
-            await AppGlobals.JS.InvokeVoidAsync("showAcordion", "accordionRecordDisplay");
+            await AppGlobal.JS.InvokeVoidAsync("showAcordion", "accordionRecordDisplay");
 
             //Model.Add();
         }
-
         public async void Edit(int ID)
         {
             MyModel.Edit(ID);
-            await AppGlobals.JS.InvokeVoidAsync("showAcordion", "accordionRecordDisplay");
+            await AppGlobal.JS.InvokeVoidAsync("showAcordion", "accordionRecordDisplay");
         }
 
 
@@ -52,7 +49,6 @@ namespace AppliedAccounts.Pages.Accounts
                 .Select(e => e.Title)
                 .First() ?? "";
         }
-
         private void NatureChanged(int _ID)
         {
             MyModel.Record.Nature = _ID;
@@ -61,7 +57,6 @@ namespace AppliedAccounts.Pages.Accounts
                 .Select(e => e.Title)
                 .First() ?? "";
         }
-
         private void NotesChanged(int _ID)
         {
             MyModel.Record.Notes = _ID;
@@ -70,17 +65,13 @@ namespace AppliedAccounts.Pages.Accounts
                 .Select(e => e.Title)
                 .First() ?? "";
         }
-
         private void SelectedBrowse(int selectedId)
         {
-            if(MyModel.BrowseClass.Type==1) { ClassChanged(selectedId); }
+            if (MyModel.BrowseClass.Type == 1) { ClassChanged(selectedId); }
             else if (MyModel.BrowseClass.Type == 2) { NatureChanged(selectedId); }
             else if (MyModel.BrowseClass.Type == 3) { NotesChanged(selectedId); }
         }
-
-       
-
-        public async void BrowseWindow(int _ListType)             
+        public async void BrowseWindow(int _ListType)
         {
             switch (_ListType)
             {
@@ -119,7 +110,7 @@ namespace AppliedAccounts.Pages.Accounts
             }
 
             await InvokeAsync(StateHasChanged);
-            await AppGlobals.JS.InvokeVoidAsync("showModol", "winBrowse");
+            await AppGlobal.JS.InvokeVoidAsync("showModol", "winBrowse");
 
         }
 

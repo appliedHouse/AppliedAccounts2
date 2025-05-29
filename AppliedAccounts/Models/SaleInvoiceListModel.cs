@@ -9,7 +9,7 @@ namespace AppliedAccounts.Models
 {
     public class SaleInvoiceListModel
     {
-        public GlobalService  AppGlobals { get; set; }
+        public GlobalService  AppGlobal { get; set; }
         public DataSource Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public SalesRecord Record { get; set; } = new();
@@ -26,8 +26,8 @@ namespace AppliedAccounts.Models
         public SaleInvoiceListModel() { }
         public SaleInvoiceListModel(GlobalService _AppGlobal)
         {
-            AppGlobals = _AppGlobal;
-            Source = new(AppGlobals.AppPaths);
+            AppGlobal = _AppGlobal;
+            Source = new(AppGlobal.AppPaths);
             LoadData();
         }
         #endregion

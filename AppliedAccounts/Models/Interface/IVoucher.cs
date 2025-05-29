@@ -7,7 +7,7 @@ namespace AppliedAccounts.Models.Interface
 {
     public interface IVoucher
     {
-        GlobalService AppGlobals { get; set; }
+        GlobalService AppGlobal { get; set; }
         DateTime LastVoucherDate { get; set; }
         DateTime MaxVouDate { get; set; }
         MessageClass MsgClass { get; set; }

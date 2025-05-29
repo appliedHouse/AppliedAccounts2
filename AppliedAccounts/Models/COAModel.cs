@@ -9,7 +9,7 @@ namespace AppliedAccounts.Models
     public class COAModel
     {
         #region Valiables
-        public GlobalService AppGlobals { get; set; }
+        public GlobalService AppGlobal { get; set; }
         public DataSource? Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public COARecord Record { get; set; } = new();
@@ -34,10 +34,10 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public COAModel() { }
-        public COAModel(GlobalService _AppGlobals)
+        public COAModel(GlobalService _AppGlobal)
         {
-            AppGlobals = _AppGlobals;
-            Source = new(AppGlobals.AppPaths);
+            AppGlobal = _AppGlobal;
+            Source = new(AppGlobal.AppPaths);
             Data = Source.GetTable(SQLQueries.Quries.COA()).AsEnumerable().ToList();
             Records = GetFilterRecords();
 

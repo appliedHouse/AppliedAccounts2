@@ -34,7 +34,7 @@ namespace AppliedAccounts.Services
             NavManager = _NavManager;
             JS = _JS;
 
-            var _AppUser = ((UserAuthonticationStateProvider)_StateProvider).AppUser;
+            var _AppUser = ((UserAuthenticationStateProvider)_StateProvider).AppUser;
             AppPaths.DBFile = _AppUser.DataFile;
             UserID = _AppUser.UserID;
 

@@ -4,7 +4,7 @@
 @using AppliedAccounts.Models
 @using AppliedAccounts.Services
 
-@inject GlobalService AppGlobals
+@inject GlobalService AppGlobal
 
 @code {
     private string[] BrowseList = { "Class", "Nature", "Notes" };
@@ -12,7 +12,7 @@
 
     protected override void OnInitialized()
     {
-        MyModel = new(AppGlobals);
+        MyModel = new(AppGlobal);
         IsPageValid = GetPageIsValid();
     }
 }

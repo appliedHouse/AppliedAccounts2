@@ -1,5 +1,8 @@
 ﻿using AppliedDB;
 using AppliedGlobals;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Reporting.Map.WebForms.BingMaps;
 using System.Data;
 using System.Data.SQLite;
 using System.Text;
@@ -34,22 +37,6 @@ namespace AppliedAccounts.Data
                 CreateTables();
             }
         }
-
-
-        //public CreateDatabase(AppUserModel _UserModel)
-        //{
-        //    UserModel = _UserModel;
-        //    MyMessages = new List<string>();
-        //    ConnectionClass = new(UserModel);
-
-        //    MyConnection = ConnectionClass.GetSQLiteUsers() ?? new();
-
-        //    if (!string.IsNullOrEmpty(MyConnection.ConnectionString))
-        //    {
-        //        GetTableNames();
-        //        CreateTables();
-        //    }
-        //}
 
         public void GetTableNames()
         {
@@ -196,6 +183,9 @@ namespace AppliedAccounts.Data
                     break;
                 case Tables.Inv_UOM:
                     break;
+                case Tables.Inv_Size:
+                    _CommandText = ItemSize();
+                    break;
                 case Tables.StockCategory:
                     _CommandText = StockCategory();
                     break;
@@ -304,18 +294,9 @@ namespace AppliedAccounts.Data
 
         }
 
-
+      
 
         #endregion
-
-
-
-        /// <Queries>
-        /// Start SQL Query Text  //////////////////////////////////////////////////////////////////////
-        /// Start SQL Query Text  //////////////////////////////////////////////////////////////////////
-        /// </summary>
-
-
 
 
         #region Sale Return
@@ -469,7 +450,6 @@ namespace AppliedAccounts.Data
 
         #endregion
 
-
         #region Stock Position Data
         public string StockPositionData()
         {
@@ -612,26 +592,6 @@ namespace AppliedAccounts.Data
         }
         #endregion
 
-        #region Stock Category View
-        private string StockCategory()
-        {
-            var Text = new StringBuilder();
-            Text.AppendLine("CREATE VIEW [StockCategory] AS ");
-            Text.AppendLine("SELECT ");
-            Text.AppendLine("[S].[ID],");
-            Text.AppendLine("[S].[Code],");
-            Text.AppendLine("[S].[Title],");
-            Text.AppendLine("[S].[Category],");
-            Text.AppendLine("[C].[Code] [CatCode],");
-            Text.AppendLine("[C].[Title] [CatTitle]");
-            Text.AppendLine("FROM [Inv_SubCategory] [S]");
-            Text.AppendLine("LEFT JOIN [Inv_Category] [C] ");
-            Text.AppendLine("ON [C].[ID] = [S].[Category]");
-            return Text.ToString();
-        }
-
-        #endregion
-
         #region Stock in Hand
         private string StockInHand()
         {
@@ -765,6 +725,37 @@ namespace AppliedAccounts.Data
         }
         #endregion
 
+        #region Inventory, Category, UOM, Size etc.
+
+
+        private static string ItemSize()
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("CREATE TABLE [Inv_Size] (");
+            _Text.AppendLine("[ID] INT PRIMARY KEY NOT NULL UNIQUE, ");
+            _Text.AppendLine("[Code] NVARCHAR(6) NOT NULL UNIQUE, ");
+            _Text.AppendLine("[Title] NVARCHAR(30) NOT NULL UNIQUE) ");
+
+            return _Text.ToString();
+        }
+       
+        private static string StockCategory()
+        {
+            var Text = new StringBuilder();
+            Text.AppendLine("CREATE VIEW [StockCategory] AS ");
+            Text.AppendLine("SELECT ");
+            Text.AppendLine("[S].[ID],");
+            Text.AppendLine("[S].[Code],");
+            Text.AppendLine("[S].[Title],");
+            Text.AppendLine("[S].[Category],");
+            Text.AppendLine("[C].[Code] [CatCode],");
+            Text.AppendLine("[C].[Title] [CatTitle]");
+            Text.AppendLine("FROM [Inv_SubCategory] [S]");
+            Text.AppendLine("LEFT JOIN [Inv_Category] [C] ");
+            Text.AppendLine("ON [C].[ID] = [S].[Category]");
+            return Text.ToString();
+        }
+        #endregion
 
     }
 }

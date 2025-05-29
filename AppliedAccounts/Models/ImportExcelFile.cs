@@ -13,7 +13,7 @@ namespace AppliedAccounts.Models
     {
         public IBrowserFile ExcelFile { get; set; }
         public DataSource Source { get; set; }
-        public GlobalService AppGlobals { get; set; }
+        public GlobalService AppGlobal { get; set; }
         public DataSet ImportDataSet { get; set; }
         public bool IsImported { get; set; } = false;
         public string MyMessages { get; set; }
@@ -21,7 +21,7 @@ namespace AppliedAccounts.Models
 
         public ImportExcelFile(IBrowserFile excelFile, GlobalService _AppGlobal)
         {
-            AppGlobals = _AppGlobal;
+            AppGlobal = _AppGlobal;
             //AppUser = appUser;
             ExcelFile = excelFile;
         }
@@ -33,7 +33,7 @@ namespace AppliedAccounts.Models
         {
             try
             {
-                var _Path = Path.Combine(AppGlobals.AppPaths.FirstPath, AppGlobals.AppPaths.RootPath);
+                var _Path = Path.Combine(AppGlobal.AppPaths.FirstPath, AppGlobal.AppPaths.RootPath);
                 var _Directory = Path.Combine(_Path, "ExcelFiles");
                 if (!Directory.Exists(_Directory)) { Directory.CreateDirectory(_Directory); }
 
@@ -79,7 +79,7 @@ namespace AppliedAccounts.Models
             string _Path = Connections.GetTempDBPath();
             string _GUID = Guid.NewGuid().ToString();
             string _Title = $"Import file {ExcelFile} dated {DateTime.Now}";
-            string _OldFile = AppRegistry.GetText(AppGlobals.DBFile, "ExcelImport");
+            string _OldFile = AppRegistry.GetText(AppGlobal.DBFile, "ExcelImport");
             bool _FirstRow = true;
 
             try
@@ -94,7 +94,7 @@ namespace AppliedAccounts.Models
 
 
 
-            AppRegistry.SetKey(AppGlobals.DBFile, "ExcelImport", _GUID, KeyType.Text, _Title);
+            AppRegistry.SetKey(AppGlobal.DBFile, "ExcelImport", _GUID, KeyType.Text, _Title);
 
             string _ConnText = $"";
             string _ImportDBPath = Path.Combine(_Path, _GUID + ".db");

@@ -11,7 +11,7 @@ namespace AppliedAccounts.Models
 {
     public class PurchaseListModel : IVoucherRecords<PurchaseRecord>
     {
-        public GlobalService AppGlobals { get; set; }
+        public GlobalService AppGlobal { get; set; }
         public DataSource Source { get; set; }
         public NavigationManager NavManager { get; set; }
         public ListFilter FilterClass { get; set; }
@@ -21,12 +21,12 @@ namespace AppliedAccounts.Models
         public AppliedDB.Enums.Tables Table { get; set; }
         public bool SelectAll { get; set; }
 
-        public PurchaseListModel(GlobalService _AppGlobals)
+        public PurchaseListModel(GlobalService _AppGlobal)
         {
-            AppGlobals = _AppGlobals;
-            Source = new(AppGlobals.AppPaths);
+            AppGlobal = _AppGlobal;
+            Source = new(AppGlobal.AppPaths);
             MsgClass = new();
-            FilterClass = new(AppGlobals.DBFile);
+            FilterClass = new(AppGlobal.DBFile);
             Table = Tables.view_BillPayable;
             Records = LoadData();
         }

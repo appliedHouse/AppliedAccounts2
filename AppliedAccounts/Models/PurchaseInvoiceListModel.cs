@@ -9,7 +9,7 @@ namespace AppliedAccounts.Models
 {
     public class PurchaseInvoiceListModel
     {
-        public GlobalService AppGlobals { get; set; }
+        public GlobalService AppGlobal { get; set; }
         public DataSource? Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public PurchaseRecord Record { get; set; } = new();
@@ -25,10 +25,10 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public PurchaseInvoiceListModel() { }
-        public PurchaseInvoiceListModel(GlobalService _AppGlobals)
+        public PurchaseInvoiceListModel(GlobalService _AppGlobal)
         {
-            AppGlobals = _AppGlobals;
-            Source = new(AppGlobals.AppPaths);
+            AppGlobal = _AppGlobal;
+            Source = new(AppGlobal.AppPaths);
             Data = Source.GetList(Query.CustomersList);
             Data = Source.GetList(Enums.Query.PurchaseInvoiceList);
             Records = GetFilterRecords();

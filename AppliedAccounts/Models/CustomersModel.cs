@@ -10,7 +10,7 @@ namespace AppliedAccounts.Models
 {
     public class CustomersModel
     {
-        public GlobalService AppGlobals { get; set; }
+        public GlobalService AppGlobal { get; set; }
         public DataSource? Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public CustomerRecord Record { get; set; } = new();
@@ -25,10 +25,10 @@ namespace AppliedAccounts.Models
         #region Constructor
         public CustomersModel() { }
         
-        public CustomersModel(GlobalService _AppGlobals)
+        public CustomersModel(GlobalService _AppGlobal)
         {
-            AppGlobals = _AppGlobals;
-            Source = new(AppGlobals.AppPaths);
+            AppGlobal = _AppGlobal;
+            Source = new(AppGlobal.AppPaths);
             Data = Source.GetList(Query.CustomersList);
             MyDataRow = Source.Seek(Tables.Customers, 0);
 
@@ -41,12 +41,12 @@ namespace AppliedAccounts.Models
                 Record = GetRecord(MyDataRow);
             }
         }
-        public CustomersModel(GlobalService _AppGlobals, int ID)
+        public CustomersModel(GlobalService _AppGlobal, int ID)
         {
-            AppGlobals = _AppGlobals;
+            AppGlobal = _AppGlobal;
             //AppUser = UserProfile;
             //DBFile = AppUser.DataFile;
-            Source = new(AppGlobals.AppPaths);
+            Source = new(AppGlobal.AppPaths);
             MyDataRow = Source.Seek(Tables.Customers, ID);
             Record = GetRecord(MyDataRow);
         }
