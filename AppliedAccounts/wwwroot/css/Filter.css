@@ -1,0 +1,59 @@
+﻿:root {
+    --appBlue: #3498db;
+    --appBlueHover: #2958af;
+}
+
+.filter {
+    background-color: antiquewhite;
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    padding: 5px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.btn-refresh {
+    background-color: var(--appBlue);
+    color: white;
+    padding: 2px;
+    border: none;
+    cursor: pointer;
+    width: 32px
+}
+
+    .btn-refresh::before {
+        content: "\F130"; /* Unicode for Bootstrap "bi-search" icon */
+        font-family: "Bootstrap-icons";
+        font-size: 1rem;
+        margin-right: 0px;
+    }
+
+    .btn-refresh:hover {
+        background-color: var(--appBlueHover);
+        color: white;
+    }
+
+
+.btn-new {
+    background-color: var(--appBlue);
+    color: white;
+    padding: 2px;
+    border: none;
+    cursor: pointer;
+    width: 32px
+}
+
+    .btn-new::before {
+        content: "\F4FA"; /* Unicode for Bootstrap "bi-search" icon */
+        font-family: "Bootstrap-icons";
+        font-size: 1rem;
+        margin-right: 0px;
+    }
+
+    .btn-new:hover {
+        background-color: var(--appBlueHover);
+        color: white;
+    }

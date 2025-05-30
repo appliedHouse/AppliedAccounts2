@@ -1,0 +1,90 @@
+﻿@page "/CustomerList"
+@attribute [Authorize];
+@using AppliedAccounts.Libs;
+@using AppliedAccounts.Models;
+@using AppliedAccounts.Services
+
+@inject AuthenticationStateProvider Authorized;
+@inject NavigationManager NavManager;
+@inject IJSRuntime js
+@inject GlobalService AppGlobal;
+
+
+
+@code {
+    protected override void OnInitialized()
+    {
+        var AppUserProfile = ((UserAuthenticationStateProvider)Authorized).AppUser;
+        if (AppUserProfile != null) { Model = new(AppGlobal); }
+        else { Model = new(); }
+    }
+
+    public void Back() { NavManager.NavigateTo("/Menu/Accounts"); }
+    public void Add1() { NavManager.NavigateTo("/Customer/0"); }
+    public void Edit(int ID) { NavManager.NavigateTo($"/Customer/{ID}"); }
+    public void Delete(int ID) { NavManager.NavigateTo($"/Customer/{ID}"); }
+    public void Submit() { }
+}
+
+<PageHeading Text="List of Customers, Clients, Vendors" />
+
+<EditForm Model="@Model" OnSubmit="Submit">
+    <div class="container mb-2">
+        <div class="row row-filter">
+            <div class="col-4">
+                <InputText @bind-Value="@Model.SearchText" class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
+            </div>
+            <div class="col-2">
+                <button style="margin-top:5px;" class="btn btn-primary btn-sm" @onclick="()=>Model.Search()">Search</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <table class="table-list">
+            <thead>
+                <tr>
+                    <th style="width:10%; margin-right:2px">Code</th>
+                    <th style="width:35%;">Name</th>
+                    <th style="width:30%">Address</th>
+                    <th style="width:20%">City / Country</th>
+                    <th style="width:5%">
+                        <button id="btnadd" @onclick="Add1" class="tb-btn-add"><i class="bi bi-plus-circle-fill"></i></button>
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var _Record in Model.Records)
+                {
+                    <tr>
+                        <td rowspan="2">@_Record.Code</td>
+                        <td rowspan="2" style="font-size:larger">@_Record.Title</td>
+
+                        <td>@_Record.Address1</td>
+                        <td>@_Record.City</td>
+
+                        <td rowspan="2">
+                            <div>
+                                <!-- Edit Button -->
+                                <button id="btnEdit" type="button" class="btn-Edit" aria-label="Edit Record" @onclick="() => Edit(_Record.ID)">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </button>
+                                <button id="btnDel" type="button" class="btn-Del" aria-label="Delete Record" @onclick="() => Delete(_Record.ID * -1)">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>@_Record.Address2</td>
+                        <td>@_Record.Country</td>
+                        
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+</EditForm>

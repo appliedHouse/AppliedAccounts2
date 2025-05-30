@@ -1,0 +1,12 @@
+
+
+Buttons for form
+	New					Btn-New
+	Save				Btn-Save
+	Add					Btn-Add
+	Delete				Btn-Delete
+	Print				Btn-Print
+	Preview				Btn-Preview
+	Back				Btn-Back
+	Edit				Btn-Edit
+	Search				Btn-Search

@@ -1,0 +1,23 @@
+
+
+
+List of CashBook COA Accounts		Book Nature wise or
+List of BsnkBook COA Accounts		Book Nature wise
+
+DropDown List of COA
+DropDown List of Companies
+DropDown List of Employee
+DropDown List of Project
+
+Book DataRow
+Book List of DataRow
+
+Methods
+			Create Model
+			Load Data
+
+			Edit DataRow
+			Delete DataRow
+			Create DataRow
+
+			Save Voucher

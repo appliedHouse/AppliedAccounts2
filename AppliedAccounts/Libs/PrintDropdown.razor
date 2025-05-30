@@ -1,0 +1,24 @@
+﻿@using AppReports;
+
+@code {
+    [Parameter] public EventCallback<ReportType> ReturnValue { get; set; }
+
+    private void NotifyParent(ReportType reportType)
+    {
+        ReturnValue.InvokeAsync(reportType);
+    }
+}
+
+<div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" title="Print" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-printer"></i>
+    </button>
+    <ul class="dropdown-menu">
+        <li><button type="submit" id="print-1" class="btn btn-link border-0" @onclick="() => NotifyParent(AppReports.ReportType.Preview)">Preview</button></li>
+        <li><button type="submit" id="print-2" class="btn btn-link border-0" @onclick="() => NotifyParent(AppReports.ReportType.PDF)">PDF</button></li>
+        <li><button type="submit" id="print-3" class="btn btn-link border-0" @onclick="() => NotifyParent(AppReports.ReportType.Excel)">Excel</button></li>
+        <li><button type="submit" id="print-4" class="btn btn-link border-0" @onclick="() => NotifyParent(AppReports.ReportType.Word)">Word</button></li>
+        <li><button type="submit" id="print-5" class="btn btn-link border-0" @onclick="() => NotifyParent(AppReports.ReportType.HTML)">HTML</button></li>
+        <li><button type="submit" id="print-5" class="btn btn-link border-0" @onclick="() => NotifyParent(AppReports.ReportType.Image)">HTML</button></li>
+    </ul>
+</div>

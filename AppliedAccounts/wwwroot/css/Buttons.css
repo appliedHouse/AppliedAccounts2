@@ -1,0 +1,228 @@
+﻿
+:root {
+    --control-bg: #F1EFEC;
+    --control-btn-bg: #EBE5C2
+}
+
+
+
+.center-btn {
+    justify-content: center;
+}
+
+.center-txt {
+    text-align: center
+}
+
+.btn-print {
+    font-size: 1rem;
+    color: darkgreen;
+    background-color: transparent;
+    border: none;
+}
+
+.btn-Search {
+    content: "Search";
+    font-size: 2rem;
+    color: darkgreen;
+}
+/*
+.btn-Edit {
+    color: royalblue;
+    padding: 1px;
+    border: 0px;
+    border-color: transparent;
+    background-color: transparent;
+    width: 15px;
+}*/
+
+
+.btn-Del {
+    color: orangered;
+    padding: 1px;
+    margin: 1px;
+    border: 0px;
+    background-color: transparent;
+    width: 15px;
+}
+
+.btn-UnDel {
+    color: orangered;
+    padding: 1px;
+    margin: 1px;
+    border: 0px;
+}
+/*
+.btn-Add {
+    color: darkgreen;
+    background-color: transparent;
+    padding: 1px;
+    margin: 1px;
+    border: 0px;
+    width: 80px
+}
+
+*/
+
+.btn-New {
+    color: white;
+    background-color: royalblue;
+    width: 45px;
+    height: 16px;
+}
+
+.btn-Save {
+    color: white;
+    background-color: forestgreen;
+    width: 45px;
+    height: 16px;
+}
+
+
+.btn-Delete {
+    font-size: 1rem;
+    color: ghostwhite;
+    background-color: red;
+    width: 45px;
+    height: 16px;
+}
+
+
+.btn-Back {
+    color: red;
+    background-color: gold;
+    width: 45px;
+    height: 16px;
+}
+
+.btn-trash {
+    color: red;
+    background-color: transparent;
+    border: none;
+    width: 45px;
+    height: 16px;
+}
+
+.btn-pencil {
+    color: blue;
+    background-color: transparent;
+    border: none;
+    width: 45px;
+    height: 16px;
+}
+
+.btn-post {
+    font-size: 1rem;
+    color: green;
+    border: none;
+    background-color: transparent;
+    width: 45px;
+    height: 16px;
+}
+
+.btn-center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.btn-Menu {
+    background-image: linear-gradient(#0dccea, #0d70ea);
+    border: 0;
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, .3) 0 5px 15px;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    font-family: "Exo 2", sans-serif; /*Montserrat, sans-serif;*/
+    font-size: .9em;
+    margin: 5px;
+    padding: 10px 5px;
+    text-align: center;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    min-width: 100px
+}
+
+    .btn-Menu:hover {
+        transform: rotate(5deg); /* Rotates the button by 15 degrees */
+    }
+
+
+
+
+.control-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0px;
+    padding: 3px;
+    background-color: var(--control-bg);
+}
+
+    .control-buttons .ctrl-gap {
+        background-color: transparent;
+    }
+
+    .control-buttons .ctrl {
+        padding: 1px;
+        border: 0px;
+        width: 26px;
+        height: 26px;
+        margin: 3px;
+    }
+
+    .control-buttons .ctrl-new {
+        color: royalblue;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-edit {
+        color: #255F38;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-del {
+        color: orangered;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-print {
+        color: royalblue;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-top {
+        color: royalblue;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-next {
+        color: royalblue;
+        background-color: var(--control-btn-bg);
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    .control-buttons .ctrl-back {
+        color: royalblue;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-last {
+        color: royalblue;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-saveAll {
+        color: green;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-backPage {
+        color: #A5158C;
+        background-color: var(--control-btn-bg);
+    }

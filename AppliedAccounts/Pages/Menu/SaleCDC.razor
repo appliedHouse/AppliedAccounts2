@@ -1,0 +1,90 @@
+﻿@page "/Menu/SaleCDC";
+@inject NavigationManager NavManager;
+
+
+@code {
+
+    private void CustomerList() { NavManager.NavigateTo("/CustomerList", true); }
+    private void LoadExcel() { NavManager.NavigateTo("/ImportData/ImportSalesInvoice", true); }
+    private void SaleInvoices() { NavManager.NavigateTo("/Sale/SaleInvoiceList", true); }
+    private void StockList() { NavManager.NavigateTo("/Stock/StockList", true); }
+}
+
+<style>
+    .container1 {
+        margin: 10px;
+        padding: 10px
+    }
+
+    .btn-go {
+        width: 40px;
+        height: 40px;
+    }
+
+        .btn-go :hover {
+            transform:
+        }
+
+    .btn-print1::before {
+        content: "\f02f"; /* Unicode for the 'bi bi-printer' icon */
+        font-family: 'Bootstrap Icons';
+        margin-right: 8px; /* Add some space between the icon and text */
+    }
+</style>
+
+
+<div class="container-fluid container1">
+    <div class="row flex-row">
+        <div class="col-md-4">
+            <div class="card text-bg-light shadow-sm mb-3" style="height: 250px;">
+                <div class="card-header fw-bold">Client List</div>
+                <div class="card-body">
+                    <h5 class="card-title">Manage Clients</h5>
+                    <p class="card-text">Easily add, edit, and remove client details.</p>
+                    <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" @onclick="CustomerList" aria-label="Go to Customer List">
+                        <i class="bi bi-arrow-right-square"></i> View Clients
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-light shadow-sm mb-3" style="height: 250px;">
+                <div class="card-header fw-bold">Service List</div>
+                <div class="card-body">
+                    <h5 class="card-title">Manage Services</h5>
+                    <p class="card-text">Easily add, edit, and remove Services details.</p>
+                    <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" @onclick="StockList" aria-label="Go to Customer List">
+                        <i class="bi bi-arrow-right-square"></i> View Services
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-light shadow-sm mb-3" style="height: 250px;">
+                <div class="card-header fw-bold">Excel Sheet</div>
+                <div class="card-body">
+                    <h5 class="card-title">Upload Excel Sheet</h5>
+                    <p class="card-text">Upload Excel sheet for generate bulk invocies of client for the month.</p>
+                    <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" @onclick="LoadExcel" aria-label=" Go to Customer List">
+                        <i class="bi bi-arrow-right-square"></i> View Clients
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-bg-light shadow-sm mb-3" style="height: 250px;">
+                <div class="card-header fw-bold">Sale Invoice</div>
+                <div class="card-body">
+                    <h5 class="card-title">Print Sale Invoice</h5>
+                    <p class="card-text">Generate and print sales invoices of clients.</p>
+                    <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" @onclick="SaleInvoices" aria-label=" Go to Customer List">
+
+
+                        <i class="bi bi-arrow-right-square"></i> View Clients
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

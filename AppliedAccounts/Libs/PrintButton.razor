@@ -1,0 +1,16 @@
+﻿@using AppReports;
+@using AppliedAccounts.Data;
+
+@code {
+    [Parameter] public EventCallback<ReportActionClass> ReturnValue { get; set; }
+    [Parameter] public int VoucherID { get; set; }
+
+    private void NotifyParent(ReportType reportType)
+    {
+        var action = new ReportActionClass { PrintType = reportType, VoucherID = VoucherID, Vou_No=string.Empty };
+        ReturnValue.InvokeAsync(action);
+    }
+}
+
+
+<button class="btn ctrl ctrl-print" @onclick="((e)=> NotifyParent(ReportType.Print))"> <i class="bi bi-printer"></i> </button>

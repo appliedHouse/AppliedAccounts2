@@ -1,0 +1,44 @@
+﻿<h3>Accordion1</h3>
+
+@code {
+    public void Save() {}
+    public void Add() {}
+    public void Back() {}
+
+}
+
+
+<EditForm>
+
+<div class="container">
+    <div class="accordion accordion-flush" id="accordionRecordDisplay">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="flush-RecordDetail">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                    Record Title - Details
+                </button>
+            </h2>
+            <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                <div class="container mt-2 mb-2">
+
+                    <div>
+                        <!-- code here for edit form -->
+
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn btn-Save" @onclick="Save">Save</button>
+                            <button type="button" class="btn btn-New" @onclick="Add">New</button>
+                            <button type="button" class="btn btn-Back" @onclick="Back">Back</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</EditForm>

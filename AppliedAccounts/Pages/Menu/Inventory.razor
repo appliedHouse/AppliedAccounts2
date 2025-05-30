@@ -1,0 +1,31 @@
+﻿@page "/Menu/Inventory"
+@page "/Menu/Stock"
+@attribute [Authorize];
+@inject NavigationManager NavManager;
+
+
+
+@code {
+    public void Stock()
+    {
+        NavManager.NavigateTo("/Stock/StockList", true);
+    }
+}
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="width: 18rem;">
+                <img src="./images/Cards/Inventory.jpg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Inventories</h5>
+                    <p class="card-text">Stock is the supply of finished goods available for sale, and inventory includes both finished goods and components that create a finished product. In other words, all stock is inventory, but not all inventory is stock.</p>
+                    <button class="btn btn-primary" @onclick="Stock">Click</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

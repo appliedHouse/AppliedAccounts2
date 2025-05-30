@@ -1,0 +1,113 @@
+﻿@page "/Config"
+@using AppliedAccounts.Data
+@using AppliedAccounts.Services
+@using AppliedDB
+@using AppliedGlobals
+
+@inject IConfiguration Config;
+@inject AuthenticationStateProvider authStateProvider;
+@inject GlobalService AppGlobal;
+
+@code {
+
+    public AppUserModel? UserModel { get; set; }
+    public AppliedDB.DataSource? Source { get; set; }
+
+    public string? BasePath;
+    public string? RootPath;
+    public string? UsersPath;
+    public string? ClientPath;
+    public string? ImagesPath;
+    public string? LanguagePath;
+    public string? MessagePath;
+    public string? ReportPath;
+    public string? PDFPath;
+    public string? SystemPath;
+    public string? SessionPath;
+    public string? Session;
+    public string? ClientDB;
+    public string? TempDBPath;
+    public static AppliedDB.Connections? _Connections;
+
+    private bool _true = true;
+
+    protected override void OnInitialized()
+    {
+        var UserModel = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
+
+        Source = new(AppGlobal.AppPaths);
+
+        BasePath = Directory.GetCurrentDirectory();
+        RootPath = UserModel.RootFolder;
+        UsersPath = UserModel.UsersFolder;
+        ClientPath = UserModel.ClientFolder;
+        ImagesPath = UserModel.ImagesFolder;
+        LanguagePath = UserModel.LanguageFolder;
+        MessagePath = UserModel.MessageFolder;
+        ReportPath = UserModel.ReportFolder;
+        PDFPath = UserModel.PDFFolder;
+        SystemPath = UserModel.SystemFolder;
+        SessionPath = UserModel.SessionFolder;
+        Session = UserModel.Session;
+        ClientDB = UserModel.DataFile;
+        TempDBPath = UserModel.TempDBFolder;
+
+        _Connections = new(AppGlobal.AppPaths);
+        _true = true;
+    }
+}
+
+<div class="container">
+    <div class="row">
+        <table>
+            <thead class="bg-light">
+                <tr>
+                    <th style="width:300px">Key</th>
+                    <th style="width:600px">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Base     Path</td> <td>@BasePath </td></tr>
+                <tr><td>Root     Path</td> <td>@RootPath </td></tr>
+                <tr><td>Users    Path</td> <td>@UsersPath </td></tr>
+                <tr><td>Client   Path</td> <td>@ClientPath </td></tr>
+                <tr><td>Images   Path</td> <td>@ImagesPath </td></tr>
+                <tr><td>Language Path</td> <td>@LanguagePath </td></tr>
+                <tr><td>Message  Path</td> <td>@ReportPath </td></tr>
+                <tr><td>PDFFile  Path</td> <td>@PDFPath </td></tr>
+                <tr><td>System   Path</td> <td>@SystemPath </td></tr>
+                <tr><td>Session  Path</td> <td>@SessionPath </td></tr>
+                <tr><td>Session  Text</td> <td>@Session </td></tr>
+                <tr><td>Client   DB  </td> <td>@ClientDB </td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<hr />
+
+
+@if (_Connections.GetSQLiteClient != null)
+{
+
+    <table style="width:100%">
+        <thead>
+            <tr>
+                <th style="width:300px">Key</th>
+                <th style="width:600px">Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Client Connection String</td>      <td>@_Connections.GetSQLiteClient</td></tr>
+        </tbody>
+    </table>
+}
+else
+{
+
+
+    <br />
+    <hr />
+
+    @* <p>@Source.ConnectionString</p> *@
+    <p>Connection is not established.</p>
+}

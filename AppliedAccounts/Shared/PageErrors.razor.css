@@ -1,0 +1,15 @@
+﻿body {
+}
+
+
+.alert {
+    height: 35px;
+    font-size: small;
+    margin: 1px;
+    padding: 1px;
+}
+
+.messages {
+    margin-Top: 5px;
+    margin-bottom: 5px;
+}

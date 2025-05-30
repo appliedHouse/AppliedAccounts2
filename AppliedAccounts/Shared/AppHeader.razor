@@ -1,0 +1,106 @@
+﻿@using AppliedAccounts.Data;
+@using System.Security.Claims;
+
+@inject AuthenticationStateProvider Authorized;
+
+@code {
+    private AppliedGlobals.AppUserModel AppUser { get; set; }
+    private string? AppUserName { get; set; }
+    private string? CompanyName;
+
+    protected override void OnInitialized()
+    {
+        AppUser = ((UserAuthenticationStateProvider)Authorized).AppUser;
+        CompanyName = AppUser.Company;
+        AppUserName = AppUser.DisplayName;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Task.Run(() =>
+        {
+            AppUser = ((UserAuthenticationStateProvider)Authorized).AppUser;
+            CompanyName = AppUser.Company;
+            AppUserName = AppUser.DisplayName;
+            InvokeAsync(()=>StateHasChanged());
+        
+        });
+    }
+
+    public string GetCompanyName() { return AppUser.Company ?? ""; }
+    public string GetAppUserName() => AppUser.DisplayName ?? "";
+
+
+
+}
+
+<style>
+    .merienda-font {
+        font-family: "Eczar", serif;
+        font-optical-sizing: auto;
+        font-weight:900;
+        font-style: normal;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .gradient-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 75px;
+        text-align: center;
+    }
+
+        .gradient-container h1 {
+            font-size: clamp(2rem, 5vw, 4rem); /* Responsive font size */
+        }
+
+</style>
+
+<div class="AppHeader">
+
+    <div class="AppTitle merienda-font">
+        <a href="/"><h3 style="font-size:larger">@GetCompanyName()</h3></a>
+    </div>
+</div>
+
+<div class="SubHeading">
+    <a href="/">Home</a>
+    <AuthorizeView>
+        <Authorized>
+            <h5 class="SubHeading">Hello @GetAppUserName()</h5>
+        </Authorized>
+        <NotAuthorized>
+            <h5 class="SubHeading">Hello Guest!</h5>
+        </NotAuthorized>
+    </AuthorizeView>
+   
+</div>
+
+
+<footer class="footer">
+    <div class="container-fluid h-100 d-flex justify-content-center align-items-center">
+        <div class="row">
+            <div class="col">
+                Applied Software House V2.1
+            </div>
+        </div>
+
+    </div>
+</footer>
+
+<style>
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 20px;
+        font-family: 'Berlin Sans FB';
+        background-color: linen; /* Example background color */
+        text-align: center; /* Align text to the right */
+        padding: 10px; /* Adjust padding as necessary */
+        opacity: .5;
+        
+    }
+
+</style>

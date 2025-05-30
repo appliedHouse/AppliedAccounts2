@@ -1,0 +1,92 @@
+﻿@using AppliedAccounts.Models
+@using AppliedDB
+
+@code {
+    [Parameter] public EventCallback<int> ReturnValue { get; set; }
+    [Parameter] public BrowseModel ModelClass { get; set; }
+    public List<CodeTitle> FilterList { get; set; } = new List<CodeTitle>();
+    public string SearchText { get; set; } = string.Empty;
+    public bool IsPageValid { get; set; } = true;
+
+    protected override void OnInitialized()
+    {
+        if (ModelClass == null)
+        {
+            IsPageValid = false;
+            return;
+        }
+        FilterList = ModelClass.BrowseList;
+    }
+
+    public void NotifyParent(int _SelectValue)
+    {
+        ReturnValue.InvokeAsync(_SelectValue);
+    }
+
+    public List<CodeTitle> FilterData(string _SearchText)
+    {
+        if (string.IsNullOrEmpty(_SearchText))
+        {
+            return ModelClass.BrowseList;
+        }
+        return ModelClass.BrowseList
+            .Where(x => x.Title.Contains(_SearchText, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    public void InputHandler(ChangeEventArgs e)
+    {
+        SearchText = e.Value?.ToString() ?? string.Empty;
+        FilterList = FilterData(SearchText);
+    }
+}
+
+@if (IsPageValid)
+{
+    <EditForm Model="ModelClass">
+    <div class="modal fade" id="winBrowse" tabindex="-1" aria-labelledby="browseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="browseModalLabel">@ModelClass.Heading</h1>
+                    <InputText @bind-Value="SearchText"
+                               @oninput="InputHandler"
+                               placeholder="Search..."
+                               class="form-control" />
+                   
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width:15%">Code</th>
+                                    <th style="width:70%">Title</th>
+                                    <th style="width:15%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in FilterList)
+                                {
+                                    <tr>
+                                        <td>@item.Code</td>
+                                        <td>@item.Title</td>
+                                        <td>
+                                            <button class="btn btn-link" data-bs-dismiss="modal" @onclick="(e) => NotifyParent(item.ID)">
+                                                <i class="bi bi-mouse"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </EditForm>
+}

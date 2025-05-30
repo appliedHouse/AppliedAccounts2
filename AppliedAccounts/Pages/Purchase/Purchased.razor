@@ -1,0 +1,11 @@
+﻿@page "/Purchase/Purchased"
+@page "/Purchase/Purchased/{ID:int}"
+@using AppliedAccounts.Libs
+@layout PageLayout
+
+@code {
+    [Parameter] public int ID { get; set; }
+}
+
+
+<PageHeading Text="Purchase Invoice"/>

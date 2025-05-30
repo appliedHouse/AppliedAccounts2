@@ -1,0 +1,26 @@
+﻿@page "/ViewPDF"
+@* @page "/ViewPDF/{string:PDFFile}" *@
+@attribute [Authorize];
+@using AppliedAccounts.Libs;
+@using AppliedAccounts.Models;
+@using AppliedDB;
+
+@inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager NavManager;
+@inject IJSRuntime js
+
+@code {
+
+
+    [Parameter] public string PDFFile { get; set; }
+    public AppUserModel AppUser { get; set; }
+    protected override void OnInitialized()
+    {
+        AppUser = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
+        //AppRegistry.GetText(AppUser.DataFile, "PDFFile");
+    }
+}
+
+<a href=@PDFFile target="_blank">Open PDF in New Tab</a>
+
+<iframe src="@PDFFile" style="width:100%; height:100vh;"></iframe>

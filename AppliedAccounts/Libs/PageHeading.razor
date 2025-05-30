@@ -1,0 +1,21 @@
+﻿
+@code {
+    [Parameter]
+    public string Text { get; set; } = "....:Page Heading:...";
+}
+
+<style>
+#Heading{
+    background-color:purple;
+    color:white;
+    font-family:Calibri;
+    padding:0px;
+}
+</style>
+
+<div class="container-fluid m-0 p-0">
+    <div class="row p-0 g-0">
+        <h3 id="Heading" class="text-center">@Text</h3>
+    </div>
+
+</div>

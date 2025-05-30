@@ -1,0 +1,174 @@
+﻿
+:root {
+    --applied-pageheight: 100vh;
+    --greenDark: #86A788;
+    --greenMedium: #AAB99A;
+    --greenLight: #D0DDD0;
+    --greenLow: #F0F0D7;
+    --greenSolid: green;
+    --HeadText: white;
+    --BodyText: darkblue;
+    --FootText: white;
+    --Border: #96D4D4;
+    --accent: #F6C1C7;
+}
+
+
+.table-container {
+    width: 100%;
+    overflow: auto; /* Enables scrolling */
+    border: 1px solid var(--Border); /* Optional border */
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.table-list {
+    display: table;
+    overflow-x: auto;
+    width: 99%; /* Adjust width as needed */
+    border-collapse: collapse;
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: small;
+    font-family: 'Nunito Sans', sans-serif;
+}
+
+
+    .table-list thead {
+        height: 50px;
+    }
+
+        .table-list thead tr {
+            /*background-color: var(--greenDark);*/
+
+        }
+
+            .table-list thead tr th {
+                background-color: var(--greenDark);
+                color: var(--HeadText);
+                text-align: center;
+                border: 1px solid;
+                border-color: var(--Border)
+            }
+
+        .table-list thead th #btnAdd {
+            background-color: var(--greenMedium);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+            .table-list thead th #btnAdd:hover {
+                background-color: var(--greenDark);
+            }
+
+    .table-list tbody {
+        background-color: var(--greenLow);
+        color: var(--BodyText);
+        padding: 8px;
+        border: 1px solid;
+        border-color: var(--Border);
+        text-align: center;
+    }
+
+        .table-list tbody tr {
+            height: 40px;
+            border-radius: 4px;
+            background-color: var(--greenLow);
+            border: 1px solid;
+            border-color: var(--Border);
+            
+        }
+
+            .table-list tbody tr:hover {
+                background-color: var(--accent);
+                transition: background-color 0.3s ease;
+            }
+
+                .table-list tbody tr:hover td {
+                    background-color: var(--greenMedium);
+                    border: 1px solid;
+                    border-color: var(--Border);
+                    
+                }
+
+    .table-list tfoot {
+        background-color: var(--greenMedium);
+        color: var(--FootText);
+        height: 25px;
+    }
+
+        .table-list tfoot tr {
+            /*background-color: var(--greenMedium);*/
+        }
+
+            .table-list tfoot tr td {
+                background-color: var(--greenMedium);
+                padding: 5px;
+                border: 1px solid;
+                border-color: var(--Border)
+            }
+
+                .table-list tfoot tr td .amount {
+                    text-align: left;
+                }
+
+.amount {
+    text-align: right;
+    padding-right: 13px;
+    margin-right: 5px;
+}
+
+.amount-red {
+    color: red;
+    text-align: right;
+}
+
+.amount-blue {
+    color: blue;
+    text-align: right;
+}
+
+.amount-green {
+    color: green;
+    text-align: right;
+}
+
+.amount-width {
+    width: 100px;
+    text-align: right;
+}
+
+.amount-w10 {
+    width: 10%;
+    text-align: right;
+}
+
+.amount-w15 {
+    width: 15%;
+    text-align: right;
+}
+
+
+.left{
+    text-align:start;
+}
+
+.right {
+    text-align: end;
+}
+
+.center{
+    text-align:center;
+}
+
+.chkbox-digit {
+    justify-content: center;
+    text-align: center;
+    align-content: center;
+}
+

@@ -1,0 +1,29 @@
+﻿@page "/Test";
+@using AppliedAccounts.Services
+
+
+
+@inject AuthenticationStateProvider authStateProvider
+@inject GlobalService AppGlobal
+
+@code {
+   
+    public DataBaseClass DBClass; 
+
+
+    protected override void OnInitialized()
+    {
+        //var UserAuthentication = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
+        DBClass = new(AppGlobal);
+        Value1 = MyConfig.GetValue("Paths:DBPath","").ToString();
+        Value2 = MyEnvir.ContentRootPath;
+
+    }
+
+}
+
+
+@Value1;
+<br />
+@Value2;
+
