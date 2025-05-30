@@ -1,4 +1,6 @@
 ﻿using AppliedAccounts.Models;
+using AppliedAccounts.Services;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace AppliedAccounts.Pages.Stock
@@ -8,15 +10,16 @@ namespace AppliedAccounts.Pages.Stock
         public StockListModel MyModel { get; set; }
         public bool ShowList { get; set; }                  //play List or Edit form
         public bool ShowForm { get; set; }                  //play List or Edit form
+       
 
         public void BackPage()
         {
-            ShowList = true;
-            ShowForm = false;
+            ShowList = !ShowList;
+            ShowForm = !ShowForm;
         }
 
 
-        #region Add, Edit & Delete
+        #region Add, Edit, Delete & Save
         public void Add()
         {
             ShowList = false;
@@ -30,9 +33,23 @@ namespace AppliedAccounts.Pages.Stock
             MyModel.Edit(ID);
 
         }
-        public void Delete(int ID)
+        public async void Delete(int? ID)
         {
-
+            if (MyModel.Delete())
+            {
+                ShowList = true;
+                ShowForm = false;
+                await Toaster.ShowToastAsync(ToastClass.DeleteToast);
+            }
+        }
+        public async void Save()
+        {
+            if (MyModel.Save())
+            {
+                ShowList = true;
+                ShowForm = false;
+                await Toaster.ShowToastAsync(ToastClass.SaveToast);
+            }
         }
 
         #endregion
@@ -137,5 +154,13 @@ namespace AppliedAccounts.Pages.Stock
 
         }
         #endregion
+
+        #region Search
+        public void Search()
+        {
+
+        }
+        #endregion
+
     }
 }

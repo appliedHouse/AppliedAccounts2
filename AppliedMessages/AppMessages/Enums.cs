@@ -153,9 +153,9 @@
 
         public enum Class
         {
-            Sucess,
+            Success,
             Alert,
-            Warrning,
+            Warning,
             Critical,
             Danger,
             Error,

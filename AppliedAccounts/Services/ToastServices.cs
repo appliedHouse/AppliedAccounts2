@@ -5,6 +5,7 @@
     {
         public event Action<ToastClass>? OnShowToast;
         public event Action? OnHideToast;
+        public ToastClass Toasters = new();
 
         public void ShowToast(ToastClass toast)
         {
@@ -16,6 +17,11 @@
                 toast.ShowToast = false;
                 OnHideToast?.Invoke(); // Notify UI to hide it
             });
+        }
+
+        public async Task ShowToastAsync(ToastClass toast)
+        {
+            await Task.Run(() => ShowToast(toast));
         }
 
         public void ShowToast(ToastClass toast, string? _Message)

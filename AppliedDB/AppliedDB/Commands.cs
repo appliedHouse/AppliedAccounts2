@@ -220,13 +220,13 @@ namespace AppliedDB
                     }
                     catch (Exception)
                     {
-                        MyMessages.Add(Messages.RowNotInserted); result= false;
+                        MyMessages.Danger(Messages.RowNotInserted); result= false;
                     }
 
                 }
             }
 
-            if (Effected == 0) { MyMessages.Add(Messages.NotSave); result= false; }
+            if (Effected == 0) { MyMessages.Alert(Messages.NotSave); result= false; }
             if (Effected > 0) { MyMessages.Add(Messages.Save); result= true; }
 
             return result;

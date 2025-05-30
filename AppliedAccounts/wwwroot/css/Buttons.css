@@ -35,7 +35,7 @@
     background-color: transparent;
     width: 15px;
 }*/
-  
+
 
 .btn-Del {
     color: orangered;
@@ -67,13 +67,15 @@
 .btn-New {
     color: white;
     background-color: royalblue;
-    width: 80px
+    width: 45px;
+    height: 16px;
 }
 
 .btn-Save {
     color: white;
     background-color: forestgreen;
-    width: 80px
+    width: 45px;
+    height: 16px;
 }
 
 
@@ -81,26 +83,32 @@
     font-size: 1rem;
     color: ghostwhite;
     background-color: red;
-    border: none;
+    width: 45px;
+    height: 16px;
 }
 
 
 .btn-Back {
     color: red;
     background-color: gold;
-    width: 80px
+    width: 45px;
+    height: 16px;
 }
 
 .btn-trash {
     color: red;
     background-color: transparent;
     border: none;
+    width: 45px;
+    height: 16px;
 }
 
 .btn-pencil {
     color: blue;
     background-color: transparent;
     border: none;
+    width: 45px;
+    height: 16px;
 }
 
 .btn-post {
@@ -108,6 +116,8 @@
     color: green;
     border: none;
     background-color: transparent;
+    width: 45px;
+    height: 16px;
 }
 
 .btn-center {

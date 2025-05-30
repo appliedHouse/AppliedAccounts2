@@ -4,6 +4,8 @@ using AppliedDB;
 using AppMessages;
 using System.Data;
 using Tables = AppliedDB.Enums.Tables;
+using MESSAGE = AppMessages.Enums.Messages;
+
 namespace AppliedAccounts.Models
 {
     public class StockListModel
@@ -14,12 +16,14 @@ namespace AppliedAccounts.Models
         public int RecordID { get; set; } = 0; // Current record ID
         public RecordModel Record { get; set; } = new(); // List of stock records
         public List<RecordModel> Records { get; set; } = new(); // List of stock records
+        public List<RecordModel> FilterRecords { get; set; } = new(); // List of stock records
 
         public List<CodeTitle> Category { get; set; } = new();
         public List<CodeTitle> SubCategory { get; set; } = new();
         public List<CodeTitle> Packing { get; set; } = new();
         public List<CodeTitle> UOM { get; set; } = new();
         public List<CodeTitle> Size { get; set; } = new();
+        public string SearchText { get; set; }
 
         public BrowseModel BrowseClass { get; set; } = new();
 
@@ -41,21 +45,7 @@ namespace AppliedAccounts.Models
             UOM = Source.GetCodeTitle(Tables.Inv_UOM, "Title");
             Size = Source.GetCodeTitle(Tables.Inv_Size, "Title");
             Records = [.. Source.GetTable(SQLQueries.Quries.Inventory()).AsEnumerable().Select(row => Row2Record(row))];
-        }
-
-
-        private void Record2Row()
-        {
-            DataRow row = Source.GetNewRow(AppliedDB.Enums.Tables.Inventory);
-            row["ID"] = Record.ID;
-            row["Code"] = Record.Code;
-            row["Title"] = Record.Title;
-            row["Qty_Packing"] = Record.Qty_Packing;
-            row["Packing"] = Record.Packing;
-            row["UOM"] = Record.UOM;
-            row["Size"] = Record.Size;
-            row["SubCategory"] = Record.SubCategory;
-            row["Notes"] = Record.Notes;
+            FilterRecords = Records;
         }
 
         #region Add, Edit & Delete
@@ -78,35 +68,40 @@ namespace AppliedAccounts.Models
 
         public void Edit(int ID)
         {
-            Record = Records.FirstOrDefault(r => r.ID == ID) ?? new RecordModel();
-            RecordID = ID;
-            if (RecordID > 0)
+            try
             {
-                Record2Row();
+                Record = Records.FirstOrDefault(r => r.ID == ID) ?? new RecordModel();
+                RecordID = Record.ID;
             }
-            else
+            catch (Exception error)
             {
-                Record = new RecordModel
-                {
-                    ID = 0,
-                    Code = string.Empty,
-                    Title = string.Empty,
-                    Qty_Packing = 1,
-                    Packing = 0,
-                    UOM = 0,
-                    Size = 0,
-                    SubCategory = 0,
-                    Notes = string.Empty
-                };
+                MsgClass.Add(error.Message);
             }
-
         }
 
-        public void Delete(int ID)
+        public bool Delete()
         {
+            return Source.Delete(Tables.Inventory, Record2Row());
+
         }
         #endregion
 
+        #region DataRow to Record and Record to DataRow
+        private DataRow Record2Row()
+        {
+            var row = Source.GetNewRow(Tables.Inventory);
+            row["ID"] = Record.ID;
+            row["Code"] = Record.Code;
+            row["Title"] = Record.Title;
+            row["Qty_Packing"] = Record.Qty_Packing;
+            row["Packing"] = Record.Packing;
+            row["UOM"] = Record.UOM;
+            row["Size"] = Record.Size;
+            row["SubCategory"] = Record.SubCategory;
+            row["Notes"] = Record.Notes;
+
+            return row;
+        }
         private RecordModel Row2Record(DataRow row)
         {
             AppliedDB.Functions.RemoveNull(row);
@@ -129,11 +124,22 @@ namespace AppliedAccounts.Models
                 TitlePacking = row.Field<string>("TitlePacking")!,
             };
         }
+        #endregion
 
-        public void Save()
+        #region Save
+        public bool Save()
         {
-        }
+            var _Row = Record2Row();
+            var _Saved = Source.Save(Tables.Inventory, _Row);
+            if(!_Saved)
+            {
+                MsgClass = Source.MyCommands.MyMessages;
+            }
+            return _Saved;
 
+
+        }
+        #endregion
 
         #region Get & Set Registry Keys
         public void GetKeys()
@@ -167,6 +173,36 @@ namespace AppliedAccounts.Models
             public virtual string TitleCategory { get; set; }
             public virtual string TitleSize { get; set; }
 
+        }
+        #endregion
+
+        #region Search
+        public void Search()
+        {
+            var _SearchText = SearchText;
+            if (string.IsNullOrWhiteSpace(_SearchText))
+            {
+                FilterRecords = Records;
+            }
+            else
+            {
+                var Oic = StringComparison.OrdinalIgnoreCase;
+                FilterRecords = [.. Records.Where(r =>
+                    r.Code.Contains(_SearchText, Oic) ||
+                    r.Title.Contains(_SearchText, Oic) ||
+                    r.Notes.Contains(_SearchText, Oic) ||
+                    r.TitlePacking.Contains(_SearchText, Oic) ||
+                    r.TitleUOM.Contains(_SearchText, Oic) ||
+                    r.TitleSubCategory.Contains(_SearchText, Oic) ||
+                    r.TitleCategory.Contains(_SearchText, Oic)
+                )];
+            }
+        }
+
+        public void ClearSearch()
+        {
+            SearchText = string.Empty;
+            FilterRecords = Records;
         }
         #endregion
 

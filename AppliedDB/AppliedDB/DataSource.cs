@@ -777,19 +777,14 @@ namespace AppliedDB
         #region Delete Row
         public bool Delete(Tables _Table, DataRow _Row)
         {
-            // Mode this codes to CommandClass...
+            var _DataTable = GetTable(_Table);
+            var _NewRow = _DataTable.NewRow();
+            var _RowArray = _Row.ItemArray;
 
+            _NewRow.ItemArray = _RowArray;
 
-            //var SQLCommands = new CommandClass(_Row, DBFile);
-            //var Deleted = SQLCommands.CommandDelete?.ExecuteNonQuery();
-            //if (Deleted is not null)
-            //{
-            //    if (Deleted > 0)
-            //    {
-            //        return true;
-            //    }
-            //}
-            return false;
+            MyCommands = new(_NewRow, MyConnection);
+            return MyCommands.DeleteRow();
         }
         #endregion
 
@@ -958,12 +953,17 @@ namespace AppliedDB
 
         #endregion
 
-
         #region Save
         public void Save(DataRow newRow)
         {
             MyCommands = new(newRow, MyConnection);
             MyCommands.SaveChanges();
+        }
+
+        public bool Save(Tables _Table, DataRow newRow)
+        {
+            MyCommands = new(newRow, MyConnection);
+            return MyCommands.SaveChanges();
         }
         #endregion
     }
