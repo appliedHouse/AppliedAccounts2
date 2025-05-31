@@ -86,6 +86,8 @@ namespace AppliedAccounts.Models
             {
                 if (_OldFile.Length > 0)
                 {
+                    if(!Directory.Exists(_Path)) { Directory.CreateDirectory(_Path); }
+
                     var _OldFilePath = Path.Combine(_Path, _OldFile + ".db");
                     if (File.Exists(_OldFilePath)) { File.Delete(_OldFilePath); }
                 }

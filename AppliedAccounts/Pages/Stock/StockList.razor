@@ -58,35 +58,8 @@
                 </div>
             </div>
             <div class="row justify-content-center mt-2">
-                <div class="col-md-3">
-                    @if (MyModel.Category != null)
-                    {
-                        <div class="form-floating d-flex gap-2">
-                            <InputSelect id="ddCategory" class="form-control item-height flex-grow-1"
-                                         TValue="int"
-                                         Value="@MyModel.Record.Category"
-                                         ValueChanged="@((e) => CategoryChanged(e))"
-                                         ValueExpression="@(() => MyModel.Record.Category)">
-                                @if (MyModel.Category?.Any() == true)
-                                {
-                                    @foreach (var item in MyModel.Category)
-                                    {
-                                        <option value="@item.ID">@item.Title</option>
-                                    }
-                                }
-                                else
-                                {
-                                    <option value="0">No Records - Category</option>
-                                }
-                            </InputSelect>
-                            <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(1)">
-                                <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
-                            </button>
-                            <label for="ddCategory">Category</label>
-                        </div>
-                    }
-                </div>
-                <div class="col-md-3">
+                
+                <div class="col-md-4">
                     @if (MyModel.SubCategory != null)
                     {
                         <div class="form-floating d-flex gap-2">
@@ -107,14 +80,13 @@
                                     <option value="0">No Records - SubCategory</option>
                                 }
                             </InputSelect>
-                            <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(2)">
-                                <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
-                            </button>
-                            <label for="ddSubCategory">SubCategory</label>
+                            <Dropdown_Search @onclick="() => BrowseWindow(2)" />
+                            <label for="ddSubCategory">Category</label>
+
                         </div>
                     }
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     @if (MyModel.Packing != null)
                     {
                         <div class="form-floating d-flex gap-2">
@@ -135,14 +107,12 @@
                                     <option value="0">No Records - Packing</option>
                                 }
                             </InputSelect>
-                            <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(3)">
-                                <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
-                            </button>
+                            <Dropdown_Search @onclick="() => BrowseWindow(3)" />
                             <label for="ddPacking">Packing</label>
                         </div>
                     }
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     @if (MyModel.Size != null)
                     {
                         <div class="form-floating d-flex gap-2">
@@ -163,9 +133,7 @@
                                     <option value="0">No Records - Size</option>
                                 }
                             </InputSelect>
-                            <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(4)">
-                                <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
-                            </button>
+                            <Dropdown_Search @onclick="() => BrowseWindow(3)" />
                             <label for="ddSize">Size</label>
                         </div>
                     }
@@ -208,7 +176,7 @@
 
                        </div>
                        
-                       <Btn_Back NavTo="/Stock/Stocklist" />
+                       <Btn_Back NavTo="/" />
                    </div>
                </div>
            </div>

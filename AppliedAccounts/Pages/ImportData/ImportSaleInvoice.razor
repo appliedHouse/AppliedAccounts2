@@ -3,6 +3,7 @@
 @attribute [Authorize]
 @using System.Data
 @using AppliedAccounts.Services
+@using AppliedAccounts.Component
 @using AppliedDB
 @using Microsoft.AspNetCore.Components.Forms
 
@@ -35,7 +36,7 @@
     private async Task SaveMessage()
     {
         await js.InvokeVoidAsync("showModol", "modalSave");
-        
+
     }
 }
 
@@ -54,10 +55,93 @@
 }
 else
 {
-
-
     <EditForm Model="MyModel">
-        @if (MyModel.ShowImportedData)
+
+        @if (ShowSpinner)
+        {
+
+            <div class="alert alert-info" role="alert">
+                <div class="spinner-border text-warning" role="status">
+                    <span class="visually-hidden">@MyModel.SpinnerMessage</span>
+                </div>
+                <p>@MyModel.SpinnerMessage</p>
+                @if (ShowProgress)
+                {
+                    <div class="row justify-content-start">
+                        <div class="col-6">
+
+                            @if (MyModel.IsProgressBar)
+                            {
+                                <div class="progress bg-success progress-bar-striped progress-bar-animated">
+                                    <div class="progress-bar" role="progressbar"
+                                         style="width:@MyModel.BarPercent%"
+                                         aria-valuenow="@MyModel.Counter"
+                                         aria-valuemin="0"
+                                         aria-valuemax="@MyModel.TotalRec">
+                                        @MyModel.BarPercent.ToString("0.##")%
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                <p class="text-danger">This process may take some time, so please be patient.</p>
+            </div>
+        }
+
+
+
+        @if (Step1)
+        {
+            <div class="container">
+                <div class="d-flex flex-row mb-3">
+                    <div class="p-2">
+                        <button class="btn btn-primary w1" disabled="@(IsExcelLoaded ? true : ShowSpinner)"
+                                title="Upload Excel file" @onclick="TriggerFileInput">
+                            Upload Excel file
+                        </button>
+                        <InputFile id="inputFile" class="d-none" OnChange="GetExcelFile" />
+
+
+                    </div>
+                    <div class="p-2">
+                        <label>@ExcelFileName</label>
+                    </div>
+                    @if (IsExcelLoaded)
+                    {
+                        <div class="p-2">
+                            <label>Excel File has been loaded successfully.</label>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        }
+
+        @if (Step2)
+        {
+            <div class="container mt-3">
+                <div class="d-flex flex-column mb-3">
+                    <div class="row">
+                        <p>Excel file [@ExcelFileName] has been loaded successfully.</p>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" @bind-value="MyModel.IsClientUpdate" id="flexCheckChecked" checked>
+                        <label class="form-check-label" for="flexCheckChecked">
+                            Update Client Data
+                        </label>
+                    </div>
+
+                    <div class="p-2">
+                        <button class="btn btn-primary w1" id="btnImport" disabled="@ShowSpinner" @onclick="(()=>GetImportDataAsync())">Generate Invoices</button>
+                    </div>
+
+                </div>
+            </div>
+        }
+
+
+        @if (Step3)
         {
             <div class="container p-2 m-2">
                 <div class="row">
@@ -96,7 +180,7 @@ else
                                     <td class="tb-col-left">@item["Description"]</td>
                                     <td class="amount-blue">@_Amount</td>
                                     <td>
-                                        <button type="button" class="btn" @onclick="(()=>ShowInvoiceModol(_ID))">
+                                        <button type="button" class="btn" @onclick="(()=>ShowInvoiceModal(_ID))">
                                             <i class="bi bi-stack-overflow"></i>
                                         </button>
                                     </td>
@@ -107,120 +191,27 @@ else
                 </div>
             }
         }
-        else
+
+        @if (Step4)
         {
-            <!-- Upload Excel File-->
-            <div class="container">
-                <div class="d-flex flex-row mb-3">
+            <div class="alert alert-success" role="alert">
+                <div class="d-flex">
+                    <div class="p-2 flex-grow-1">Invoice Posting Log</div>
                     <div class="p-2">
-                        <button class="btn btn-primary w1" disabled="@(IsExcelLoaded ? true : ShowSpinner)"
-                                title="Upload Excel file" @onclick="TriggerFileInput">
-                            Upload Excel file
-                        </button>
-                        <InputFile id="inputFile" class="d-none" OnChange="GetExcelFile" />
-
-
+                        <Btn_Back NavTo="/" />
                     </div>
-                    <div class="p-2">
-                        <label>@ExcelFileName</label>
-                    </div>
-                    @if (IsExcelLoaded)
+                </div>
+            </div>
+
+            <div class="border rounded" style="max-height: 70vh; overflow-y: auto;">
+                <ul class="list-group">
+                    @foreach (var item in MsgClass.MessageList)
                     {
-                        <div class="p-2">
-                            <label>Excel File has been loaded successfully.</label>
-                        </div>
+                        <li class="list-group-item">@item.MessageText</li>
                     }
-
-                </div>
+                </ul>
             </div>
-
-            <!-- Import Data from Excel file.-->
-            @if (IsExcelLoaded)
-            {
-                <div class="container">
-                    <div class="d-flex flex-column mb-3">
-
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" @bind-value="MyModel.IsClientUpdate" id="flexCheckChecked" checked>
-                            <label class="form-check-label" for="flexCheckChecked">
-                                Update Client Data
-                            </label>
-                        </div>
-
-                        <div class="p-2">
-                            <button class="btn btn-primary w1" id="btnImport" disabled="@ShowSpinner" @onclick="(()=>GetImportDataAsync())">Generate Invoices</button>
-                        </div>
-
-                    </div>
-                </div>
-            }
-
-            <!-- Spinner & Messages -->
-            <div class="container">
-                <div class="row mt-2">
-                    @if (ShowSpinner)
-                    {
-                        <div class="row justify-content-center">
-                            <div class="col-6">
-                                <p>@MyModel.SpinnerMessage</p>
-                                @if (MyModel.IsProgressBar)
-                                {
-                                    <div class="progress bg-success progress-bar-striped progress-bar-animated">
-                                        <div class="progress-bar" role="progressbar"
-                                             style="width:@MyModel.BarPercent%"
-                                             aria-valuenow="@MyModel.Counter"
-                                             aria-valuemin="0"
-                                             aria-valuemax="@MyModel.TotalRec">
-                                            @MyModel.BarPercent.ToString("0.##")%
-                                        </div>
-                                    </div>
-                                }
-                                <p class="text-danger">This process may take some time, so please be patient.</p>
-                            </div>
-                            <div class="col-1 center-txt">
-                                <div class="spinner-border text-warning" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                        </div>
-                    }
-
-                </div>
-
-            </div>
-        }
-
-
-        <!-- Importing of Data process Completed.-->
-        @if (MyModel.ShowMessages)
-        {
-            <div class="container mt-2">
-                <div class="row mb-2">
-                    <div class="col-10">
-                        <label id="lblMessahe">Sale Invoices generating process is completed...</label>
-                    </div>
-                    <div class="col-2">
-                        <button type="submit" class="btn btn-warning" @onclick="ShowInvoices">Next <i class="bi bi-arrow-right-square"></i></button>
-                    </div>
-                </div>
-                <div class="row">
-                    <table class="table-message">
-                        <thead>
-                            <tr>
-                                <th>Message</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var message in MsgClass.MessageList)
-                            {
-                                <tr>
-                                    <td>@message.MessageText</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <hr />
         }
 
     </EditForm>
@@ -300,7 +291,7 @@ else
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" @onclick="Post">Save changes</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="Post">Save changes</button>
             </div>
         </div>
     </div>

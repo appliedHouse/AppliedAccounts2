@@ -17,7 +17,7 @@ namespace AppliedAccounts.Models
         public List<CustomerRecord> Records { get; set; } = [];
         public List<DataRow> Data { get; set; } = new();
         public DataRow? MyDataRow { get; set; }
-        public MessageClass MyMessages { get; set; }
+        public MessageClass MsgClass { get; set; }
         public bool RecordNotFound { get; set; } = false;
         public string SearchText { get; set; } = string.Empty;
 
@@ -28,6 +28,7 @@ namespace AppliedAccounts.Models
         public CustomersModel(GlobalService _AppGlobal)
         {
             AppGlobal = _AppGlobal;
+            MsgClass = new();
             Source = new(AppGlobal.AppPaths);
             Data = Source.GetList(Query.CustomersList);
             MyDataRow = Source.Seek(Tables.Customers, 0);
@@ -150,7 +151,7 @@ namespace AppliedAccounts.Models
                     _Commands.DeleteRow();
                     if (_Commands.Effected > 0)
                     {
-                        MyMessages = _Commands.MyMessages;
+                        MsgClass = _Commands.MyMessages;
                         Data = Source.GetList(Query.CustomersList);
                         if (Data is not null) { Records = GetFilterRecords(""); }
                         return true;
@@ -176,14 +177,14 @@ namespace AppliedAccounts.Models
 
         private bool Validate(DataRow _Row)
         {
-            if (_Row["ID"] == null) { MyMessages.Add(AppMessages.Enums.Messages.IDIsNull); }
-            if (_Row["Code"] == null) { MyMessages.Add(AppMessages.Enums.Messages.CodeIsNull); }
-            if (_Row["Title"] == null) { MyMessages.Add(AppMessages.Enums.Messages.TitleIsNull); }
-            if (_Row["City"] == null) { MyMessages.Add(AppMessages.Enums.Messages.CityIsZero); }
+            if (_Row["ID"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.IDIsNull); }
+            if (_Row["Code"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.CodeIsNull); }
+            if (_Row["Title"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.TitleIsNull); }
+            if (_Row["City"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.CityIsZero); }
 
-            if (((string)_Row["Code"]).Length == 0) { MyMessages.Add(AppMessages.Enums.Messages.CodeIsZero); }
-            if (((string)_Row["Title"]).Length == 0) { MyMessages.Add(AppMessages.Enums.Messages.TitleIsZero); }
-            if (((string)_Row["City"]).Length == 0) { MyMessages.Add(AppMessages.Enums.Messages.CityIsZero); }
+            if (((string)_Row["Code"]).Length == 0) { MsgClass.Alert(AppMessages.Enums.Messages.CodeIsZero); }
+            if (((string)_Row["Title"]).Length == 0) { MsgClass.Alert(AppMessages.Enums.Messages.TitleIsZero); }
+            if (((string)_Row["City"]).Length == 0) { MsgClass.Alert(AppMessages.Enums.Messages.CityIsZero); }
 
             return true;
         }

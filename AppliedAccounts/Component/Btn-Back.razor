@@ -1,0 +1,19 @@
+﻿@using Microsoft.AspNetCore.Components
+@inject NavigationManager NavManager;
+
+@code {
+    [Parameter] public string NavTo { get; set; }
+
+    private void HandleClick(MouseEventArgs e)
+    {
+        
+
+        NavManager.NavigateTo(NavTo);
+    }
+}
+
+
+<button class="btn btn-link btn-sm" title="Back" @onclick="HandleClick">
+    <i class="bi bi-arrow-left-circle" ></i>
+</button>
+

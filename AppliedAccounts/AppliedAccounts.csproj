@@ -47,6 +47,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\ExcelFiles\2025-04 - April CDC.xlsx" />
+    <None Include="wwwroot\ExcelFiles\2025-05 - May CDC.xlsx" />
     <None Include="wwwroot\Icon200.ico" />
   </ItemGroup>
 

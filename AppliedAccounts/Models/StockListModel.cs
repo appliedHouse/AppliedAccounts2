@@ -97,6 +97,7 @@ namespace AppliedAccounts.Models
             row["Packing"] = Record.Packing;
             row["UOM"] = Record.UOM;
             row["Size"] = Record.Size;
+            row["Category"] = Record.Category;
             row["SubCategory"] = Record.SubCategory;
             row["Notes"] = Record.Notes;
 

@@ -47,14 +47,11 @@
 <PageHeading Text="Customer / Client Detail" />
 
 @* Show Messages if any *@
-@if (Model.MyMessages.Count > 0)
-{
-    <ShowMessages Messages="@Model.MyMessages"></ShowMessages>
-}
+<ShowMessages MsgClass="Model.MsgClass"></ShowMessages>
 
 @if (!Model.RecordNotFound)
 {
-        <EditForm Model="@Model">
+    <EditForm Model="@Model">
         <div class="container">
             <InputNumber @bind-Value="@Model.Record.ID" placeholder="ID" id="ID" hidden></InputNumber>
             <div class="row">
