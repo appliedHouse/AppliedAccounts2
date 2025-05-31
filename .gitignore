@@ -369,3 +369,5 @@ FodyWeavers.xsd
 /AppliedAccounts/wwwroot/SQLiteDB/HFSSteel.db
 /AppliedAccounts/Pages/ImportData/ImportSaleInvoice.razor.cs
 /AppliedAccounts/wwwroot/SQLiteDB/AppliedUsers2.db
+/AppliedAccounts/wwwroot/ExcelFiles/2025-04 - April CDC.xlsx
+/AppliedAccounts/wwwroot/ExcelFiles/2025-05 - May CDC.xlsx
