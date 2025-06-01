@@ -1,9 +1,11 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Pages.Accounts;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppReports;
 using Microsoft.JSInterop;
 using System.Data;
+using System.Formats.Asn1;
 using static AppliedGlobals.AppValues;
 using MESSAGE = AppMessages.Enums.Messages;
 
@@ -12,14 +14,11 @@ namespace AppliedAccounts.Pages.Sale
 {
     public partial class SaleInvoiceList
     {
-
-        public AppliedGlobals.AppUserModel AppUser { get; set; }
         public Models.SaleInvoiceListModel MyModel { get; set; }
         public ReportModel PrintClass { get; set; }
         private bool IsPrinted { get; set; } = false;
         private bool IsPrinting { get; set; } = false;
         private List<string> PrintedReports { get; set; } = new();
-        public PrintService ReportService { get; set; }
         public string PrintingMessage { get; set; }
 
         public SaleInvoiceList()
@@ -70,7 +69,7 @@ namespace AppliedAccounts.Pages.Sale
         {
             IsPrinting = true;
             await InvokeAsync(StateHasChanged);
-            PrintingMessage = "Priting Start.";
+            PrintingMessage = "Printing Start.";
             List<int> SaleInvoiceIDList = new List<int>();
 
 
@@ -86,14 +85,19 @@ namespace AppliedAccounts.Pages.Sale
                     var _RandomNo = (new Random()).Next(1000, 9999);
                     var _FileName = $"SalesInvoice_{_Text}_{_RandomNo}";
 
-                    ReportService.Data = GetReportDataOnePDF(SaleInvoiceIDList);              // always generate Data for report
-                    ReportService.Model = CreateReportModelOnePDF();                          // and then generate report parameters
+                    GetReportDataOnePDF(SaleInvoiceIDList);              // always generate Data for report
+                    CreateReportModelOnePDF();                          // and then generate report parameters
                     ReportService.ReportType = ReportType.Preview;
-                    //var ReportList = ReportService.GetReportLink();
-                    var rptArray = ReportService.Model.ReportBytes;
-                    var rptMime = ReportService.Model.OutputReport.MimeType;
-                    var rptFile = $"{MyModel.Record.Ref_No}_{MyModel.Record.TitleCustomer}";
-                    await js.InvokeVoidAsync("downloadFile", _FileName, rptArray, rptMime);
+                    ReportService.Print();
+
+                    if (ReportService.MyMessage.Count > 0)
+                    {
+                        foreach (var message in ReportService.MyMessage)
+                        {
+                            MyModel.MsgClass.Error(message);
+                        }
+                    }
+
                 }
                 catch (Exception error)
                 {
@@ -109,17 +113,27 @@ namespace AppliedAccounts.Pages.Sale
 
         public async void PrintAll()
         {
+            PrintingMessage = "Printing of all listed invoices are being generated.";
             IsPrinting = true;
             await InvokeAsync(StateHasChanged);
-            PrintingMessage = "Priting Start.";
+            await Task.Delay(500);
+
+            
 
             foreach (var item in MyModel.Records)
             {
                 if (item.IsSelected)
                 {
+                    ReportActionClass _ReportClass = new()
+                    {
+                        PrintType = ReportType.PDF,
+                        VoucherID = item.Id,
+                        Vou_No = item.Vou_No
+                    };
+
                     PrintingMessage = $"Sales invoice for {MyModel.Record.TitleCustomer} is being printed.";
                     await InvokeAsync(StateHasChanged);
-                    //await DownLoadPrint(item.Id);
+                    await Print(_ReportClass);
                 }
             }
             IsPrinting = false;
@@ -129,22 +143,38 @@ namespace AppliedAccounts.Pages.Sale
         public async Task Print(ReportActionClass reportAction)
         {
             MyModel.VoucherID = reportAction.VoucherID;
+            PrintingMessage = "Wait ....  Report is being printed.";
 
             try
             {
                 IsPrinting = true;
                 await InvokeAsync(StateHasChanged);
-                MyModel.Record = MyModel.Records.Where(row => row.Id == MyModel.VoucherID).First();
-                var _Batch = MyModel.Record.Ref_No;
-                var _Title = MyModel.Record.TitleCustomer.Replace(".", "_"); // Replace dot with _ for file name correction.
-                var _FileName = $"{_Batch}_{_Title}";
-                var _VoucherNo = MyModel.Record.Vou_No ?? "NoVoucher";
+                await Task.Delay(5000);
 
-                ReportService = new(AppGlobal);
-                GetReportData();              // always generate Data for report
-                UpdateReportModel();         // and then generate report parameters
-                ReportService.Print();
+                MyModel.Record = MyModel.Records.FirstOrDefault(row => row.Id == MyModel.VoucherID)!;
+                if (MyModel.Record is not null)
+                {
+                    var _Batch = MyModel.Record.Ref_No;
+                    var _Title = MyModel.Record.TitleCustomer.Replace(".", "_"); // Replace dot with _ for file name correction.
+                    var _FileName = $"{_Batch}_{_Title}";
+                    var _VoucherNo = MyModel.Record.Vou_No ?? "NoVoucher";
 
+                    ReportService = new(AppGlobal);
+                    GetReportData();              // always generate Data for report
+                    UpdateReportModel();          // and then generate report parameters
+                    ReportService.ReportType = reportAction.PrintType;
+                    ReportService.Print();
+
+
+
+                    if (ReportService.MyMessage.Count > 0)
+                    {
+                        foreach (var message in ReportService.MyMessage)
+                        {
+                            MyModel.MsgClass.Error(message);
+                        }
+                    }
+                }
                 IsPrinting = false;
                 IsPrinted = true;
                 await InvokeAsync(StateHasChanged);
@@ -163,7 +193,7 @@ namespace AppliedAccounts.Pages.Sale
         private void GetReportData()
         {
             string _Query = ReportQuery.SaleInvoiceQuery($"[TranID]={MyModel.VoucherID}");
-            var _DataTable = DataSource.GetDataTable(AppUser.DataFile, _Query, "ReportData");
+            var _DataTable = DataSource.GetDataTable(AppGlobal.DBFile, _Query, "ReportData");
 
             ReportService.Data.ReportTable = _DataTable;
             ReportService.Data.DataSetName = "ds_SaleInvoice";
@@ -177,7 +207,7 @@ namespace AppliedAccounts.Pages.Sale
             var _Filter = string.Join(",", _SaleInvoiceIDList);
 
             string _Query = ReportQuery.SaleInvoiceQuery($"[TranID] in ({_Filter})");
-            var _DataTable = DataSource.GetDataTable(AppUser.DataFile, _Query, "ReportData");
+            var _DataTable = DataSource.GetDataTable(AppGlobal.DBFile, _Query, "ReportData");
 
             ReportService.Data.ReportTable = _DataTable;
             ReportService.Data.DataSetName = "ds_SaleInvoice";
@@ -197,10 +227,8 @@ namespace AppliedAccounts.Pages.Sale
 
         }
 
-        private ReportModel CreateReportModelOnePDF()
+        private void CreateReportModelOnePDF()
         {
-
-            ReportModel _Reportmodel = new();
             try
             {
                 var _InvoiceNo = "INV-Testing";
@@ -210,14 +238,14 @@ namespace AppliedAccounts.Pages.Sale
 
 
                 // Input Parameters  (.rdl report file)
-                _Reportmodel.InputReport.FileName = "CDCInvOnePDF.rdl";
+                ReportService.Model.InputReport.FileName = "CDCInvOnePDF.rdl";
 
                 // output Parameters (like pdf, excel, word, html, tiff)
-                _Reportmodel.OutputReport.FileName = "SaleInvoice_" + (new Random()).Next(1000, 9999).ToString();
-                _Reportmodel.OutputReport.ReportType = _ReportOption;
+                ReportService.Model.OutputReport.FileName = "SaleInvoice_" + (new Random()).Next(1000, 9999).ToString();
+                ReportService.Model.OutputReport.ReportType = _ReportOption;
                 // Reports Parameters
-                _Reportmodel.AddReportParameter("Heading1", _Heading1);
-                _Reportmodel.AddReportParameter("Heading2", _Heading2);
+                ReportService.Model.AddReportParameter("Heading1", _Heading1);
+                ReportService.Model.AddReportParameter("Heading2", _Heading2);
 
             }
             catch (Exception)
@@ -225,7 +253,6 @@ namespace AppliedAccounts.Pages.Sale
                 MyModel.MsgClass.Add(MESSAGE.Default);
             }
 
-            return _Reportmodel;
         }
         #endregion
 

@@ -8,11 +8,12 @@
 @using Microsoft.AspNetCore.Components.Forms
 
 
-@inject AuthenticationStateProvider authStateProvider;
-@inject NavigationManager NavManager;
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager NavManager
 @inject IJSRuntime js
 @inject ToastService ToastService
-@inject GlobalService AppGlobal;
+@inject GlobalService AppGlobal
+@inject PrintService ReportService
 
 
 @code {
@@ -26,6 +27,7 @@
         Stopwatch.Start();
         MsgClass = new();
         Source = new(AppGlobal.AppPaths);
+        
     }
 
     private async Task TriggerFileInput()

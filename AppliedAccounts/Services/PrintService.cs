@@ -63,9 +63,12 @@ namespace AppliedAccounts.Services
         {
             IsError = ReportValidate();
 
+            Model.OutputReport.ReportType = ReportType;
+            Model.ReportDataSource = Data; // Set the data source for the report
+
             if (!IsError)
             {
-                switch (Model.OutputReport.ReportType)
+                switch (ReportType)
                 {
                     case ReportType.Print: await Printer(); break;
                     case ReportType.Preview: await Preview(); break;
@@ -84,9 +87,12 @@ namespace AppliedAccounts.Services
         {
             IsError = ReportValidate();
 
+            Model.OutputReport.ReportType = ReportType;
+            Model.ReportDataSource = Data; // Set the data source for the report
+
             if (!IsError)
             {
-                switch (Model.OutputReport.ReportType)
+                switch (ReportType)
                 {
                     case ReportType.Print: await Printer(); break;
                     case ReportType.Preview: await Preview(); break;

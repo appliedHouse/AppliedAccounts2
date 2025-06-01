@@ -609,8 +609,6 @@ namespace AppliedAccounts.Pages.ImportData
                     MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} Serial # {Row["Sr_No"]}  is {Validated} validated");
                 }
 
-
-
                 if (Validated)
                 {
                     MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} validated for post / save... ");
@@ -639,6 +637,9 @@ namespace AppliedAccounts.Pages.ImportData
                 {
                     MsgClass.Add($"{DateTime.Now} ERROR : Sales Date is not valid to post...");
                 }
+
+                await Task.Delay(3000); // Simulate some delay for UI update
+                await InvokeAsync(StateHasChanged);
             }
 
         }
