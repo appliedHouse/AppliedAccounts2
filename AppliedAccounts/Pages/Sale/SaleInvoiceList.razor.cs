@@ -68,8 +68,10 @@ namespace AppliedAccounts.Pages.Sale
         public async void PrintOnePDF()
         {
             IsPrinting = true;
+            PrintingMessage = "Wait.... Printing all invoices are in one PDF is being generated.";
             await InvokeAsync(StateHasChanged);
-            PrintingMessage = "Printing Start.";
+            await Task.Delay(500);
+
             List<int> SaleInvoiceIDList = new List<int>();
 
 
@@ -85,6 +87,7 @@ namespace AppliedAccounts.Pages.Sale
                     var _RandomNo = (new Random()).Next(1000, 9999);
                     var _FileName = $"SalesInvoice_{_Text}_{_RandomNo}";
 
+                    ReportService = new(AppGlobal);
                     GetReportDataOnePDF(SaleInvoiceIDList);              // always generate Data for report
                     CreateReportModelOnePDF();                          // and then generate report parameters
                     ReportService.ReportType = ReportType.Preview;
@@ -105,20 +108,15 @@ namespace AppliedAccounts.Pages.Sale
                 }
             }
 
-
-
             IsPrinting = false;
             await InvokeAsync(StateHasChanged);
         }
 
         public async void PrintAll()
         {
-            PrintingMessage = "Printing of all listed invoices are being generated.";
             IsPrinting = true;
             await InvokeAsync(StateHasChanged);
             await Task.Delay(500);
-
-            
 
             foreach (var item in MyModel.Records)
             {
@@ -130,9 +128,7 @@ namespace AppliedAccounts.Pages.Sale
                         VoucherID = item.Id,
                         Vou_No = item.Vou_No
                     };
-
-                    PrintingMessage = $"Sales invoice for {MyModel.Record.TitleCustomer} is being printed.";
-                    await InvokeAsync(StateHasChanged);
+                   
                     await Print(_ReportClass);
                 }
             }
@@ -143,7 +139,7 @@ namespace AppliedAccounts.Pages.Sale
         public async Task Print(ReportActionClass reportAction)
         {
             MyModel.VoucherID = reportAction.VoucherID;
-            PrintingMessage = "Wait ....  Report is being printed.";
+            PrintingMessage = $"Sales invoice for {reportAction.Vou_No} is being printed.";
 
             try
             {
@@ -163,7 +159,7 @@ namespace AppliedAccounts.Pages.Sale
                     GetReportData();              // always generate Data for report
                     UpdateReportModel();          // and then generate report parameters
                     ReportService.ReportType = reportAction.PrintType;
-                    ReportService.Print();
+                    await ReportService.PrintAsync();
 
 
 

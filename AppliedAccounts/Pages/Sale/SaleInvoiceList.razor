@@ -70,15 +70,18 @@
     <PageErrors Messages="@MyModel.MsgClass"></PageErrors>
     @if (IsPrinting)
     {
-        <div class="alert alert-info" role="alert" style="height:100px">
-            <div class="d-flex">
+        <div class="alert alert-info justify-content-center align-items-center" role="alert" style="height:100px">
+            <div class="d-flex align-items-center">
+               
                 <div class="p-1">
-                    <div class="spinner-border" role="status"></div>
+                    <div class="spinner-border text-warning" role="status"></div>
                 </div>
-                <div class="p-1">
+                
+                <div class="p-1 text-success">
                     <i class="bi bi-printer fs-1"></i>
                 </div>
-                <div class="p-1">
+                
+                <div class="p-1 fw-bolder">
                     @PrintingMessage
                 </div>
             </div>
