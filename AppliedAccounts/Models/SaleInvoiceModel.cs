@@ -9,9 +9,9 @@ using SQLQueries;
 using System.Data;
 using static AppliedAccounts.Data.AppRegistry;
 using static AppliedDB.Enums.Status;
+using Format = AppliedGlobals.AppValues.Format;
 using MESSAGE = AppMessages.Enums.Messages;
 using Tables = AppliedDB.Enums.Tables;
-using Format = AppliedGlobals.AppValues.Format;
 
 namespace AppliedAccounts.Models
 {
@@ -21,7 +21,7 @@ namespace AppliedAccounts.Models
         public int SaleInvoiceID { get; set; }
         public DataSource Source { get; set; }
         public Voucher MyVoucher { get; set; } = new();
-        public List<Detail> Deleted { get; set; }
+        public List<Detail> Deleted { get; set; } = new();
         public Total Totals { get; set; } = new();
 
         public List<CodeTitle> Companies { get; set; }
@@ -74,7 +74,7 @@ namespace AppliedAccounts.Models
                 if (AppGlobal is null) { return; }
                 Source ??= new(AppGlobal.AppPaths);
 
-                MsgClass = new();
+                MsgClass = new(Msg.GetMessages());
                 MyVoucher = new();
                 LastVoucherDate = GetDate(Source.DBFile, "SInvDate");           // Sale Invoice Date
 
@@ -210,23 +210,23 @@ namespace AppliedAccounts.Models
 
                         MyVoucher.Details = [.. VoucherData.Select(row => new Detail()
                         {
-                            ID2 = row.Field<int>("ID2"),
-                            TranID = row.Field<int>("TranID"),
-                            Sr_No = row.Field<int>("Sr_No"),
-                            Inventory = row.Field<int>("Inventory"),
+                            ID2 = row.Field<int?>("ID2") ?? 0,
+                            TranID = row.Field<int?>("TranID") ?? 0,
+                            Sr_No = row.Field<int?>("Sr_No") ?? 0,
+                            Inventory = row.Field<int?>("Inventory") ?? 0,
                             Batch = row.Field<string>("Batch") ?? "",
-                            Unit = row.Field<int>("Unit"),
-                            Qty = row.Field<decimal>("Qty"),
-                            Rate = row.Field<decimal>("Rate"),
-                            TaxID = row.Field<int>("Tax"),
-                            TaxRate = row.Field<decimal>("Tax_Rate"),
+                            Unit = row.Field<int?>("Unit") ?? 0,
+                            Qty = row.Field<decimal?>("Qty") ?? 0.00M,
+                            Rate = row.Field<decimal?>("Rate") ?? 0.00M,
+                            TaxID = row.Field<int?>("Tax") ?? 0,
+                            TaxRate = row.Field<decimal?>("Tax_Rate") ?? 0.00M,
                             Description = row.Field<string>("Description") ?? "",
-                            Project = row.Field<int>("Project"),
+                            Project = row.Field<int?>("Project") ?? 0,
 
                             TitleInventory = row.Field<string>("TitleStock") ?? "",
-                            TitleProject = row.Field < string >("TitleProject") ?? "",
-                            TitleTaxID = row.Field < string >("TitleTax") ?? "",
-                            TitleUnit = row.Field < string >("TitleUnit") ?? "",
+                            TitleProject = row.Field<string>("TitleProject") ?? "",
+                            TitleTaxID = row.Field<string>("TitleTax") ?? "",
+                            TitleUnit = row.Field<string>("TitleUnit") ?? "",
 
                             })];
 
@@ -252,7 +252,8 @@ namespace AppliedAccounts.Models
         public bool IsVoucherValidated()
         {
             bool IsValid = true;
-            MsgClass = new();
+            MsgClass ??= new(Msg.GetMessages());
+            MsgClass.ClearMessages();
 
             if (MyVoucher.Master == null) { MsgClass.Add(MESSAGE.MasterRecordisNull); return false; }
             if (MyVoucher.Details == null) { MsgClass.Add(MESSAGE.DetailRecordsisNull); return false; }
@@ -260,7 +261,7 @@ namespace AppliedAccounts.Models
             if (MyVoucher.Master.Vou_No.Length == 0) { MsgClass.Add(MESSAGE.VouNoNotDefine); }
             if (!MyVoucher.Master.Vou_No.ToLower().Equals("new"))
             {
-                if (MyVoucher.Master.Vou_No.Length != 11) { MsgClass.Add(MESSAGE.VouNoNotDefineProperly); }
+                if (MyVoucher.Master.Vou_No.Length < 11) { MsgClass.Add(MESSAGE.VouNoNotDefineProperly); }
             }
             if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgClass.Add(MESSAGE.VouDateLess); }
             if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgClass.Add(MESSAGE.VouDateMore); }
@@ -363,14 +364,12 @@ namespace AppliedAccounts.Models
 
         public List<Detail> GetDisplayList(bool _Deleted)
         {
-
             if (_Deleted)
             {
                 return Deleted;
             }
             return MyVoucher.Details;
         }
-
 
         #region Remove
         public void Remove()
@@ -423,7 +422,7 @@ namespace AppliedAccounts.Models
                 if (!IsSrNo)
                 {
                     MyVoucher.Detail.Action = "save";
-                    MyVoucher.Details.Add(MyVoucher.Detail);
+                    MyVoucher.Details.Add(MyVoucher.Detail);            
                 }
             }
             else

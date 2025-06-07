@@ -6,6 +6,7 @@
 @using AppReports
 @using AppliedDB;
 @using AppliedAccounts.Data;
+@using AppliedAccounts.Component;
 @using AppliedAccounts.Models;
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Services;
@@ -183,15 +184,15 @@
                     <div class="row mt-1 g-1">
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
-                                <FormatedInputNumber Value="@MyModel.MyVoucher.Detail.Qty" ValueChanged="@((val) => MyModel.MyVoucher.Detail.Qty = val)" />
-                                @* <InputNumber id="txtBatch" Step=".0001" class="form-control right" @bind-Value="@MyModel.MyVoucher.Detail.Qty" placeholder="Stock Quantity" /> *@
+                                <!--<FormatedInputNumber Value="@MyModel.MyVoucher.Detail.Qty" ValueChanged="@((val) => MyModel.MyVoucher.Detail.Qty = val)" />-->
+                                <InputNumber id="txtBatch" Step=".0001" class="form-control right" @bind-Value="@MyModel.MyVoucher.Detail.Qty" placeholder="Stock Quantity" />
                                 <label for="txtBatch">Quantity</label>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
-                                <FormatedInputNumber Value="@MyModel.MyVoucher.Detail.Rate" ValueChanged="@((val) => MyModel.MyVoucher.Detail.Rate = val)" />
-                                @* <InputNumber id="txtRate" Step=".0001" class="form-control right" @bind-Value="@MyModel.MyVoucher.Detail.Rate" placeholder="Stock Rate" /> *@
+                                <!--<FormatedInputNumber Value="@MyModel.MyVoucher.Detail.Rate" ValueChanged="@((val) => MyModel.MyVoucher.Detail.Rate = val)" />-->
+                                <InputNumber id="txtRate" Step=".0001" class="form-control right" @bind-Value="@MyModel.MyVoucher.Detail.Rate" placeholder="Stock Rate" />
                                 <label for="txtRate">Rate</label>
                             </div>
                         </div>
@@ -253,12 +254,14 @@
                 <div class="grid gap-0 column-gap-3 ctrl-gap">
                     <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
                     <button @onclick="MyModel.Save" class="btn ctrl ctrl-edit"><i class="bi bi-floppy"></i></button>
+                    
+                    
                     @if (MyModel.Count > 0)
                     {
-
+                       
                         <button @onclick="MyModel.Remove" class="btn ctrl ctrl-del"><i class="bi bi-trash"></i></button>
 
-
+                        
                         <div class="btn-group" role="group" aria-label="Navigation Buttons" id="navigationBtns">
                             <button type="button" class="btn ctrl ctrl-top" @onclick="MyModel.Top"><i class="bi bi-arrow-bar-left"></i></button>
                             <button type="button" class="btn ctrl ctrl-next" @onclick="MyModel.Next"><i class="bi bi-arrow-right-short"></i></button>

@@ -1,5 +1,4 @@
 ﻿using AppliedAccounts.Authentication;
-using AppliedAccounts.Services;
 using AppliedDB;
 using System.Data;
 using System.Data.SQLite;
@@ -8,7 +7,7 @@ namespace AppliedAccounts.Pages.Users
 {
     public partial class Login
     {
-        
+
         private AppliedGlobals.AppUserModel MyModel = new();
         bool IsLogin { get; set; } = true;
         bool IsError { get; set; } = false;
@@ -42,19 +41,6 @@ namespace AppliedAccounts.Pages.Users
                         PIN = "0000",
                         SessionGuid = _newGUID,
                         LanguageID = LanguageID,
-
-                        // Default Application Foler
-                        //RootFolder = AppGlobal.AppPaths.RootPath ?? "wwwroot",
-                        //ClientsFolder = AppGlobal.AppPaths.ClientPath ?? "SQLiteDB",
-                        //UsersFolder = AppGlobal.AppPaths.UsersPath ?? "SQLiteDB",
-                        //ReportFolder = AppGlobal.AppPaths.ReportPath ?? "Reports",
-                        //LanguageFolder = AppGlobal.AppPaths.LanguagesPath ?? "Languages",
-                        //MessageFolder = AppGlobal.AppPaths.MessagesPath ?? "Messages",
-                        //ImageFolder = AppGlobal.AppPaths.ImagesPath ?? "Images",
-                        //PDFFolder = AppGlobal.AppPaths.PDFPath ?? "PDFReport",
-                        //SystemFolder = AppGlobal.AppPaths.SystemPath ?? "System",
-                        //SessionFolder = AppGlobal.AppPaths.SessionPath ?? "Sessions",
-
                     });
 
                     NavManager.NavigateTo("/", true);

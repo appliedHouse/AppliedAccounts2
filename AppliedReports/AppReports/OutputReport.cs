@@ -17,12 +17,12 @@
         public string RootPath { get; set; } = "wwwroot";
         public string FilePath { get; set; } = string.Empty;            // file path after wwwroot
         public string FileName { get; set; } = string.Empty;            // file Name
-        
-        
+
+
         public ReportType ReportType { get; set; } = ReportType.Preview;
         public string MimeType { get; set; } = string.Empty;
         public FileStream FileStream { get; set; }
-        
+
         public bool IsFileExist { get => File.Exists(FileFullName); }
         public string FileFullName { get => GetFullName(); }
         public string OutputFileName { get => GetFileName(); }
@@ -41,7 +41,7 @@
 
         private string GetFullName()
         {
-            var _Extention = ReportExtention.Get(ReportType); 
+            var _Extention = ReportExtention.Get(ReportType);
 
             if (FilePath.Length > 0 && FileName.Length > 0 && _Extention.Length > 0)
             {
@@ -80,7 +80,7 @@
         }
 
 
-        
+
 
     }
 }

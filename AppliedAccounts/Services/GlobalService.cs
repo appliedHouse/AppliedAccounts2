@@ -1,11 +1,7 @@
 ﻿using AppliedAccounts.Authentication;
-using AppliedDB;
-using AppliedGlobals;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
-using System.Data;
-using System.Data.SQLite;
 using static AppliedGlobals.AppValues;
 
 namespace AppliedAccounts.Services

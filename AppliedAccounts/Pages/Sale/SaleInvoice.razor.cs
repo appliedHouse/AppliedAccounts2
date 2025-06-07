@@ -3,7 +3,6 @@ using AppliedAccounts.Services;
 using AppReports;
 using Format = AppliedGlobals.AppValues.Format;
 
-
 namespace AppliedAccounts.Pages.Sale
 {
     public partial class SaleInvoice

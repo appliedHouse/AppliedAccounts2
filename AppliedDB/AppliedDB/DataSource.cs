@@ -1,9 +1,9 @@
-﻿using System.Data;
+﻿using AppliedGlobals;
+using System.Data;
 using System.Data.SQLite;
 using System.Text;
-using AppliedGlobals;
-using Tables = AppliedDB.Enums.Tables;
 using static AppliedDB.Enums;
+using Tables = AppliedDB.Enums.Tables;
 
 namespace AppliedDB
 {
@@ -48,21 +48,23 @@ namespace AppliedDB
         #endregion
 
         #region Get Table
-        public DataTable GetTable(Tables _Table)
-        {
-            if (MyCommand is not null)
-            {
-                MyCommand.CommandText = $"SELECT * FROM [{_Table}]";
-                return GetDataTable(_Table, MyCommand);
-            }
-            return new DataTable();
-        }
+
+        #region Get Table by AppliedDB.Enum.Tables
         public async Task<DataTable> GetTableAsync(Tables _Table)
         {
             if (MyCommand is not null)
             {
                 MyCommand.CommandText = $"SELECT * FROM [{_Table}]";
                 return await Task.Run(() => GetDataTable(_Table, MyCommand)); ;
+            }
+            return new DataTable();
+        }
+        public DataTable GetTable(Tables _Table)
+        {
+            if (MyCommand is not null)
+            {
+                MyCommand.CommandText = $"SELECT * FROM [{_Table}]";
+                return GetDataTable(_Table, MyCommand);
             }
             return new DataTable();
         }
@@ -94,12 +96,9 @@ namespace AppliedDB
             }
             return new DataTable();
         }
+        #endregion
 
-        public DataTable GetTable(SQLQueries.Quries _SQLQuery)
-        {
-            return GetTable(_SQLQuery);
-        }
-
+        #region Get Table by AppliedDB.Enum.Query
         public DataTable GetTable(Query _SQLQuery)
         {
 
@@ -161,16 +160,28 @@ namespace AppliedDB
                 return new DataTable();
             }
         }
+        #endregion
+
+        #region Get Table by string
         public DataTable GetTable(string _SQLQuery)
+        {
+            return GetTable(_SQLQuery, "", "");
+        }
+        public DataTable GetTable(string _SQLQuery, string _Filter)
+        {
+            return GetTable(_SQLQuery, _Filter, "");
+        }
+        public DataTable GetTable(string _SQLQuery, string _Filter, string _Sort)
         {
             try
             {
                 if (!string.IsNullOrEmpty(_SQLQuery))
-
                     if (MyConnection is not null)
                     {
                         if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
                         var _Command = new SQLiteCommand(_SQLQuery, MyConnection);
+                        if (!string.IsNullOrEmpty(_Filter)) { _Command.CommandText += $" WHERE {_Filter}"; }
+                        if (!string.IsNullOrEmpty(_Sort)) { _Command.CommandText += $" ORDER BY {_Sort}"; }
                         var _Adapter = new SQLiteDataAdapter(_Command);
                         var _DataSet = new DataSet();
                         _Adapter.Fill(_DataSet, (Guid.NewGuid()).ToString());
@@ -179,7 +190,6 @@ namespace AppliedDB
                         {
                             return _DataSet.Tables[0];
                         }
-
                     }
                 return new DataTable();
             }
@@ -188,6 +198,11 @@ namespace AppliedDB
                 return new DataTable();
             }
         }
+        #endregion
+
+
+        #region Get Table Static
+
         private static DataTable GetDataTable(Tables _Table, SQLiteCommand _Command)
         {
             try
@@ -281,6 +296,7 @@ namespace AppliedDB
                 return new DataTable();
             }
         }
+        #endregion
         #endregion
 
         #region Get Messages Table

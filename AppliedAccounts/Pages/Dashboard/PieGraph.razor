@@ -1,0 +1,54 @@
+﻿@inject IJSRuntime JS
+@inherits ComponentBase
+
+<canvas id="@ChartId" width="400" height="400"></canvas>
+
+@code {
+    [Parameter] public string ChartId { get; set; } = "myChart";
+    [Parameter] public string ChartType { get; set; } = "doughnut"; // or 'pie'
+    [Parameter] public List<string> Labels { get; set; }
+    [Parameter] public List<decimal> DataPie { get; set; }
+    [Parameter] public List<string> BackgroundColors { get; set; }
+    [Parameter] public string ChartTitle { get; set; } = "Sample Chart";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("drawChart", ChartId, ChartType, Labels, DataPie, BackgroundColors, ChartTitle);
+        }
+    }
+}
+
+
+<script>
+        window.drawChart = (chartId, chartType, labels, data, backgroundColors, chartTitle) => {
+        const ctx = document.getElementById(chartId).getContext('2d');
+        new Chart(ctx, {
+            type: chartType,
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        data: data,
+                        backgroundColor: backgroundColors,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        display: true,
+                    },
+                    title: {
+                        display: true,
+                        text: chartTitle,
+
+                    },
+                },
+            },
+        });
+    };
+</script>

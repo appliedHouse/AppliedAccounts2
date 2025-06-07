@@ -1,0 +1,43 @@
+﻿@using Microsoft.AspNetCore.Components
+
+@code {
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    private async Task ClickTop(MouseEventArgs e)
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(e);
+        }
+    }
+    private async Task ClickNext(MouseEventArgs e)
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(e);
+        }
+    }
+    private async Task ClickBack(MouseEventArgs e)
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(e);
+        }
+    }
+    private async Task ClickLast(MouseEventArgs e)
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(e);
+        }
+    }
+}
+
+
+<div class="btn-group" role="group" aria-label="Navigation Buttons" id="navigationBtns">
+    <button type="button" class="btn ctrl ctrl-top" @onclick="ClickTop"><i class="bi bi-arrow-bar-left"></i></button>
+    <button type="button" class="btn ctrl ctrl-next" @onclick="ClickNext"><i class="bi bi-arrow-right-short"></i></button>
+    <button type="button" class="btn ctrl ctrl-back" @onclick="ClickBack"><i class="bi bi-arrow-left-short"></i></button>
+    <button type="button" class="btn ctrl ctrl-last" @onclick="ClickLast"><i class="bi bi-arrow-bar-right"></i></button>
+</div>

@@ -1,10 +1,8 @@
 ﻿using AppliedAccounts.Services;
-using AppliedAccounts.Data;
 using AppliedDB;
 using AppMessages;
 using System.Data;
 using Tables = AppliedDB.Enums.Tables;
-using MESSAGE = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Models
 {
@@ -132,7 +130,7 @@ namespace AppliedAccounts.Models
         {
             var _Row = Record2Row();
             var _Saved = Source.Save(Tables.Inventory, _Row);
-            if(!_Saved)
+            if (!_Saved)
             {
                 MsgClass = Source.MyCommands.MyMessages;
             }

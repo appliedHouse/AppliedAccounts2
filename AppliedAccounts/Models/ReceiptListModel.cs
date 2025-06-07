@@ -7,8 +7,8 @@ using SQLQueries;
 using System.Data;
 using System.Text;
 using static AppliedDB.Enums;
-using MESSAGES = AppMessages.Enums.Messages;
 using Format = AppliedGlobals.AppValues.Format;
+using MESSAGES = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Models
 {

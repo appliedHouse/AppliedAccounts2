@@ -1,0 +1,52 @@
+﻿@inject IJSRuntime JSRuntime
+
+<div class="canvas">
+    <canvas id="myChart"></canvas>
+</div>
+
+@code {
+    [Parameter] public string ChartType { get; set; }
+    [Parameter] public List<string> Labels { get; set; }
+    [Parameter] public List<int> DataValues { get; set; }
+    [Parameter] public string labelTitle { get; set; }
+    [Parameter] public List<string> BackgroundColors { get; set; }
+    [Parameter] public List<string> BorderColors { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("renderChart", ChartType, Labels, DataValues, labelTitle, BackgroundColors, BorderColors);
+        }
+    }
+}
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function renderChart(chartType, labels, dataValues, labelTitle, bgColors, bdrColors) {
+        const ctx = document.getElementById('myChart');
+
+        new Chart(ctx, {
+            type: chartType,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: labelTitle,
+                    data: dataValues,
+                    backgroundColor: bgColors,
+                    borderColor: bdrColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+</script>
+

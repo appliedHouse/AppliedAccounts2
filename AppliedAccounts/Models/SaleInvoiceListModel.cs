@@ -9,19 +9,18 @@ namespace AppliedAccounts.Models
 {
     public class SaleInvoiceListModel
     {
-        public GlobalService  AppGlobal { get; set; }
+        public GlobalService AppGlobal { get; set; }
         public DataSource Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public SalesRecord Record { get; set; } = new();
         public List<SalesRecord> Records { get; set; } = new();
         public List<DataRow> Data { get; set; } = new();
-        public string SearchText { get; set; } = string.Empty;
+
         public MessageClass MsgClass { get; set; } = new();
         public decimal TotalAmount { get; set; } = 0.00M;
         public bool SelectAll { get; set; }
         public int VoucherID { get; set; }
-
-
+        public string SearchText { get; set; } = string.Empty;
         #region Constructor
         public SaleInvoiceListModel() { }
         public SaleInvoiceListModel(GlobalService _AppGlobal)
@@ -45,36 +44,34 @@ namespace AppliedAccounts.Models
         private List<SalesRecord> GetFilterRecords()
         {
             var _FilterRecords = new List<SalesRecord>();
-            TotalAmount = 0.00M;
 
-            foreach (DataRow _Row in Data)
+            if (SearchText.Length > 0)
             {
-                if (SearchText.Length == 0)
-                {
-                    TotalAmount = TotalAmount + (decimal)_Row["Amount"];
-                    _FilterRecords.Add(GetRecord(_Row));
-                }
-                else
-                {
-                    var IsSearch = false;
-                    if (_Row["Vou_No"].ToString().Contains(SearchText)) { IsSearch = true; }
-                    if (AppFunctions.Date2Text(_Row["Vou_Date"]).Contains(SearchText)) { IsSearch = true; }
-                    if (AppFunctions.Date2Text(_Row["Inv_Date"]).Contains(SearchText)) { IsSearch = true; }
-                    if (AppFunctions.Date2Text(_Row["Pay_Date"]).Contains(SearchText)) { IsSearch = true; }
-                    if (_Row["Company"].ToString().Contains(SearchText)) { IsSearch = true; }
-                    if (_Row["City"].ToString().Contains(SearchText)) { IsSearch = true; }
-                    if (_Row["Salesman"].ToString().Contains(SearchText)) { IsSearch = true; }
-                    if (_Row["Ref_No"].ToString().Contains(SearchText)) { IsSearch = true; }
+                _FilterRecords = Data.AsEnumerable().Where(row =>
+                (row.Field<string>("Vou_No") ?? string.Empty)!.Contains(SearchText) ||
+                AppFunctions.Date2Text(row.Field<DateTime>("Vou_Date"))!.Contains(SearchText) ||
+                AppFunctions.Date2Text(row.Field<DateTime>("Inv_Date"))!.Contains(SearchText) ||
+                AppFunctions.Date2Text(row.Field<DateTime>("Pay_Date"))!.Contains(SearchText) ||
+                (row.Field<string>("Company") ?? string.Empty).Contains(SearchText) ||
+                (row.Field<string>("City") ?? string.Empty).Contains(SearchText) ||
+                (row.Field<string>("Salesman") ?? string.Empty).Contains(SearchText) ||
+                (row.Field<string>("Ref_No") ?? string.Empty).Contains(SearchText)
+                ).Select(row => GetRecord(row)).ToList();
 
-                    if (IsSearch)
-                    {
-                        _FilterRecords.Add(GetRecord(_Row));
-                        TotalAmount = TotalAmount + (decimal)_Row["Amount"];
-                    }
-                }
             }
+
+            if (SearchText.Length == 0)
+            {
+                _FilterRecords = [.. Data.AsEnumerable().ToList().Select(GetRecord)];
+                //_FilterRecords = Data.AsEnumerable().ToList().Select(row => GetRecord(row)).ToList();
+            }
+
+            TotalAmount = _FilterRecords.Sum(row => row.Amount);
+
+
             return _FilterRecords;
         }
+
         #endregion
 
         #region Get Records by Row & ID
@@ -133,6 +130,7 @@ namespace AppliedAccounts.Models
         public void Search()
         {
             Records = GetFilterRecords();
+
         }
 
         public void ClearText()

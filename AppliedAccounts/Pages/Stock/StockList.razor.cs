@@ -1,6 +1,5 @@
 ﻿using AppliedAccounts.Models;
 using AppliedAccounts.Services;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace AppliedAccounts.Pages.Stock
@@ -10,7 +9,7 @@ namespace AppliedAccounts.Pages.Stock
         public StockListModel MyModel { get; set; }
         public bool ShowList { get; set; }                  //play List or Edit form
         public bool ShowForm { get; set; }                  //play List or Edit form
-       
+
 
         public void BackPage()
         {

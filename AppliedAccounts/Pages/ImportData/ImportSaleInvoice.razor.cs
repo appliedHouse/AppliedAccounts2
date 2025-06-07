@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using System.Data;
 using System.Diagnostics;
-using Tables = AppliedDB.Enums.Tables;
 using Format = AppliedGlobals.AppValues.Format;
+using Tables = AppliedDB.Enums.Tables;
 
 namespace AppliedAccounts.Pages.ImportData
 {
@@ -172,11 +172,11 @@ namespace AppliedAccounts.Pages.ImportData
             }
         }
         #endregion
-        
+
         #region 2.1   Get from Temp SQLiet DB file  to Data Tables
         private async Task GetExcelSheetDataAsync()   //Step 2.1
         {
-           
+
             MyModel.SpinnerMessage = "Sales invoice data is being Process... Gathering Data sheets";
             string _TempGUID = AppRegistry.GetText(AppGlobal.DBFile, "ExcelImport");
             TempDB _TempDB = new(_TempGUID + ".db");
@@ -221,7 +221,7 @@ namespace AppliedAccounts.Pages.ImportData
         #region 2.2  Update Client List
         private async Task UpdateClientListAsync()   // Step 2.2
         {
-            
+
             var Log = new Dictionary<string, bool>();
             MyModel.IsProgressBar = true;
 
@@ -514,7 +514,7 @@ namespace AppliedAccounts.Pages.ImportData
         }
         #endregion
         #endregion
-        
+
         #region Get Invoice Data from Excel file
         // Like Invoice Date, due Date, Invoice No pattern.
         // 
@@ -562,7 +562,7 @@ namespace AppliedAccounts.Pages.ImportData
             await InvokeAsync(StateHasChanged);
 
             await SaveAsync();
-            
+
             ShowSpinner = false;
             ShowProgress = false;
             MyModel.ShowImportedData = false;
@@ -655,7 +655,7 @@ namespace AppliedAccounts.Pages.ImportData
         }
         #endregion
 
-       
+
     }
 
     #region Model Class

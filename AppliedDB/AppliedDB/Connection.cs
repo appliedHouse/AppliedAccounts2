@@ -1,5 +1,5 @@
-﻿using System.Data.SQLite;
-using AppliedGlobals;
+﻿using AppliedGlobals;
+using System.Data.SQLite;
 
 namespace AppliedDB
 {
@@ -31,7 +31,7 @@ namespace AppliedDB
         public static AppUserModel AppUserProfile { get; set; }
 
 
-        
+
         public Connections() { }
         public Connections(AppValues.AppPath _AppPaths)
         {
@@ -39,7 +39,7 @@ namespace AppliedDB
             BaseUrl = _AppPaths.BaseUri;
             RootPath = _AppPaths.RootPath;
             UsersPath = _AppPaths.UsersPath;
-            ClientPath =_AppPaths.ClientPath;
+            ClientPath = _AppPaths.ClientPath;
             ImagesPath = _AppPaths.ImagesPath;
             MessagePath = _AppPaths.MessagesPath;
             LanguagePath = _AppPaths.LanguagesPath;

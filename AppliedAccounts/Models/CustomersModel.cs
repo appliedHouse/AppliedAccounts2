@@ -1,6 +1,5 @@
 ﻿using AppliedAccounts.Services;
 using AppliedDB;
-using AppliedGlobals;
 using AppMessages;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
@@ -11,7 +10,7 @@ namespace AppliedAccounts.Models
     public class CustomersModel
     {
         public GlobalService AppGlobal { get; set; }
-        public DataSource? Source { get; set; }
+        public DataSource Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public CustomerRecord Record { get; set; } = new();
         public List<CustomerRecord> Records { get; set; } = [];
@@ -24,7 +23,7 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public CustomersModel() { }
-        
+
         public CustomersModel(GlobalService _AppGlobal)
         {
             AppGlobal = _AppGlobal;
@@ -93,19 +92,32 @@ namespace AppliedAccounts.Models
 
         private DataRow GetDataRow(CustomerRecord _Record)
         {
-            DataRow _DataRow = MyDataRow.Table.NewRow();
-            _DataRow["Id"] = _Record.ID;
-            _DataRow["Code"] = _Record.Code;
-            _DataRow["Title"] = _Record.Title;
-            _DataRow["Address1"] = _Record.Address1;
-            _DataRow["Address2"] = _Record.Address2;
-            _DataRow["City"] = _Record.City;
-            _DataRow["Country"] = _Record.Country;
-            _DataRow["Phone"] = _Record.Phone;
-            _DataRow["Mobile"] = _Record.Mobile;
-            _DataRow["Email"] = _Record.Email;
-            _DataRow["NTN"] = _Record.NTN;
-            _DataRow["CNIC"] = _Record.CNIC;
+            DataRow _DataRow = MyDataRow!.Table.NewRow();
+            if (MyDataRow is not null)
+            {
+                //_DataRow = MyDataRow.Table.NewRow();
+                _DataRow["Id"] = _Record.ID;
+                _DataRow["Code"] = _Record.Code;
+                _DataRow["Title"] = _Record.Title;
+                _DataRow["Address1"] = _Record.Address1;
+                _DataRow["Address2"] = _Record.Address2;
+                _DataRow["Address3"] = _Record.Address3;
+                _DataRow["City"] = _Record.City;
+                _DataRow["State"] = _Record.State;
+                _DataRow["Country"] = _Record.Country;
+                _DataRow["Phone"] = _Record.Phone;
+                _DataRow["Mobile"] = _Record.Mobile;
+                _DataRow["Email"] = _Record.Email;
+                _DataRow["NTN"] = _Record.NTN;
+                _DataRow["CNIC"] = _Record.CNIC;
+                _DataRow["Notes"] = _Record.Notes;
+               
+               
+            }
+            else
+            {
+                MsgClass.Alert(AppMessages.Enums.Messages.RecordNotSaved);
+            }
             return _DataRow;
         }
         #endregion
@@ -168,9 +180,14 @@ namespace AppliedAccounts.Models
             var _NewRow = GetDataRow(Record);
             if (Validate(_NewRow))
             {
-                var _Commands = new CommandClass(_NewRow, DBFile);
+                Source ??= new(AppGlobal.AppPaths);
+                Source.Save(_NewRow);
 
-                return _Commands.SaveChanges();
+                //var _Commands = new CommandClass(_NewRow, DBFile);
+
+
+
+                return true;
             }
             return false;
         }
@@ -224,7 +241,7 @@ namespace AppliedAccounts.Models
         [Required]
         public string Address1 { get; set; } = string.Empty;
         public string Address2 { get; set; } = string.Empty;
-        [Required]
+        public string Address3 { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
         public string State { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;

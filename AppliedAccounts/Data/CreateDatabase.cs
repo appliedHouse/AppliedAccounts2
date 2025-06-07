@@ -1,8 +1,5 @@
 ﻿using AppliedDB;
 using AppliedGlobals;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.Reporting.Map.WebForms.BingMaps;
 using System.Data;
 using System.Data.SQLite;
 using System.Text;
@@ -294,7 +291,7 @@ namespace AppliedAccounts.Data
 
         }
 
-      
+
 
         #endregion
 
@@ -738,7 +735,7 @@ namespace AppliedAccounts.Data
 
             return _Text.ToString();
         }
-       
+
         private static string StockCategory()
         {
             var Text = new StringBuilder();

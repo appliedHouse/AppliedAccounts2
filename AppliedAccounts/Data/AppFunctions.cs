@@ -122,7 +122,7 @@ namespace AppliedAccounts.Data
 
             if (_Value == null || _Value == DBNull.Value)
             {
-                if(_Type == typeof(string))
+                if (_Type == typeof(string))
                 {
                     return string.Empty;
                 }

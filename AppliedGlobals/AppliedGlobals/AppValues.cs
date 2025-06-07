@@ -31,7 +31,7 @@ namespace AppliedGlobals
             public string MessagesPath { get; set; } = string.Empty;
             public string SessionPath { get; set; } = string.Empty;
             public string DBFile { get; set; } = string.Empty;
-            
+
         }
 
         #endregion

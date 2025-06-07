@@ -5,8 +5,12 @@ namespace AppliedDB
 {
     public class Languages
     {
-        public SQLiteConnection LangConnection = Connections.GetLanguageConnection() ?? new();
-        public DataTable GetLanguageList()
+        //public SQLiteConnection LangConnection = Connections.GetLanguageConnection() ?? new();
+
+
+
+
+        public static DataTable GetLanguageList()
         {
             var _Connection = Connections.GetLanguageConnection();
             if (_Connection is not null)

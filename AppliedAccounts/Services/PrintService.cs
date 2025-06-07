@@ -1,5 +1,4 @@
-﻿using AppliedDB;
-using AppReports;
+﻿using AppReports;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Microsoft.Reporting.NETCore;

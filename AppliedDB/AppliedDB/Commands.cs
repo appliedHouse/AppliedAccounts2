@@ -1,14 +1,14 @@
-﻿using System.Data.SQLite;
+﻿using AppMessages;
 using System.Data;
+using System.Data.SQLite;
 using System.Text;
 using Messages = AppMessages.Enums.Messages;
-using AppMessages;
 
 namespace AppliedDB
 {
     public class Commands
     {
-        
+
         public static SQLiteCommand? Insert(DataRow CurrentRow, SQLiteConnection DBConnection)
         {
             if ((int)CurrentRow["ID"] == 0)
@@ -43,8 +43,8 @@ namespace AppliedDB
                     _ParameterName = string.Concat('@', _Column.ColumnName.Replace(" ", ""));
                     _Command.Parameters.AddWithValue(_ParameterName, CurrentRow[_Column.ColumnName]);
                 }
-                
-                CurrentRow["ID"] = DataSource.GetMaxID(_TableName,DBConnection);
+
+                CurrentRow["ID"] = DataSource.GetMaxID(_TableName, DBConnection);
                 _Command.Parameters["@ID"].Value = CurrentRow["ID"];
                 return _Command;
             }
@@ -53,9 +53,9 @@ namespace AppliedDB
         public static SQLiteCommand? Insert(DataRow CurrentRow, string DBFile)
         {
             var _Connection = Connections.GetClientConnection(DBFile);
-            if(_Connection is not null)
-            { 
-            return Insert(CurrentRow, _Connection);
+            if (_Connection is not null)
+            {
+                return Insert(CurrentRow, _Connection);
             }
             return null;
         }
@@ -112,7 +112,7 @@ namespace AppliedDB
             }
             return null;
         }
-        public static SQLiteCommand? Delete (DataRow CurrentRow, SQLiteConnection DBConnection)
+        public static SQLiteCommand? Delete(DataRow CurrentRow, SQLiteConnection DBConnection)
         {
             if ((int)CurrentRow["ID"] != 0)
             {
@@ -175,7 +175,7 @@ namespace AppliedDB
 
             if ((int)Row["ID"] == 0) { Action = "Insert"; } else { Action = "Update"; }
 
-            CommandInsert = Commands.Insert(Row, DBConnection); 
+            CommandInsert = Commands.Insert(Row, DBConnection);
             CommandUpdate = Commands.UpDate(Row, DBConnection);
             CommandDelete = Commands.Delete(Row, DBConnection);
 
@@ -220,14 +220,14 @@ namespace AppliedDB
                     }
                     catch (Exception)
                     {
-                        MyMessages.Danger(Messages.RowNotInserted); result= false;
+                        MyMessages.Danger(Messages.RowNotInserted); result = false;
                     }
 
                 }
             }
 
-            if (Effected == 0) { MyMessages.Alert(Messages.NotSave); result= false; }
-            if (Effected > 0) { MyMessages.Add(Messages.Save); result= true; }
+            if (Effected == 0) { MyMessages.Alert(Messages.NotSave); result = false; }
+            if (Effected > 0) { MyMessages.Add(Messages.Save); result = true; }
 
             return result;
         }

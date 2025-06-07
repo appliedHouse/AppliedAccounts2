@@ -1,5 +1,4 @@
 ﻿using Microsoft.Reporting.NETCore;
-using System.Data;
 
 namespace AppReports
 {
@@ -90,7 +89,7 @@ namespace AppReports
                     Messages.Add($"{DateTimeNow}: Report Type is {OutputReport.ReportType}");
 
                     OutputReport.MimeType = ReportMime.Get(OutputReport.ReportType);
-                    
+
                     var _ReportFile = InputReport.FileFullName;
                     var _DataSource = ReportDataSource.DataSource;
                     var _ReportStream = new StreamReader(_ReportFile);
@@ -117,7 +116,7 @@ namespace AppReports
                     }
                     else
                     {
-                        if(!ReportParameters.Equals(Extractor.MyParameters.Count))
+                        if (!ReportParameters.Equals(Extractor.MyParameters.Count))
                         {
                             Messages.Add($"{DateTimeNow}: Parameters {ReportParameters.Count} != {Extractor.MyParameters.Count} ");
                         }

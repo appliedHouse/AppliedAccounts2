@@ -1,11 +1,7 @@
 ﻿using AppliedAccounts.Data;
-using AppliedAccounts.Pages.Accounts;
-using AppliedAccounts.Services;
 using AppliedDB;
 using AppReports;
-using Microsoft.JSInterop;
 using System.Data;
-using System.Formats.Asn1;
 using static AppliedGlobals.AppValues;
 using MESSAGE = AppMessages.Enums.Messages;
 
@@ -128,7 +124,7 @@ namespace AppliedAccounts.Pages.Sale
                         VoucherID = item.Id,
                         Vou_No = item.Vou_No
                     };
-                   
+
                     await Print(_ReportClass);
                 }
             }
@@ -139,6 +135,11 @@ namespace AppliedAccounts.Pages.Sale
         public async Task Print(ReportActionClass reportAction)
         {
             MyModel.VoucherID = reportAction.VoucherID;
+            if (string.IsNullOrEmpty(reportAction.Vou_No))
+            {
+                MyModel.VoucherID = MyModel.Records.FirstOrDefault(row => row.Id == MyModel.VoucherID)?.Id ?? 0;
+            }
+
             PrintingMessage = $"Sales invoice for {reportAction.Vou_No} is being printed.";
 
             try

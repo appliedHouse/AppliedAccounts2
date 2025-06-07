@@ -12,13 +12,13 @@ namespace AppliedGlobals
         public string DisplayName { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
         public string Designation { get; set; } = string.Empty;
-        
-        public DateTime LoginTime { get; set; } 
+
+        public DateTime LoginTime { get; set; }
         public string LastLogin { get; set; } = string.Empty;
         public string Session { get; set; } = string.Empty;
         public string DataFile { get; set; } = string.Empty;
         public string DataPath { get; set; } = string.Empty;
-        
+
         public string Company { get; set; } = string.Empty;
         public string Address1 { get; set; } = string.Empty;
         public string Address2 { get; set; } = string.Empty;

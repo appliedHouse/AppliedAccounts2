@@ -1,9 +1,9 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Services;
-using AppliedDB ;
+using AppliedDB;
+using AppliedGlobals;
 using AppReports;
 using System.Data;
-using AppliedGlobals;
 using static AppliedAccounts.Data.AppRegistry;
 using static AppliedDB.VoucherTypeClass;
 using Format = AppliedGlobals.AppValues.Format;

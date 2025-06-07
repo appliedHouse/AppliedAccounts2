@@ -30,13 +30,13 @@ namespace AppliedAccounts.Models
             var Oic = StringComparison.OrdinalIgnoreCase;
             var _Value = e.Value?.ToString() ?? string.Empty;
             var _SearchText = SearchText;
-            
+
             if (_Value.Length > 0)
             {
                 FilterList = BrowseList.Where
-                                (x => 
+                                (x =>
                                 x.Code.Contains(_Value, Oic) ||
-                                x.Title.Contains(_Value, Oic) 
+                                x.Title.Contains(_Value, Oic)
                                 )
                                 .ToList();
             }

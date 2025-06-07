@@ -1,5 +1,4 @@
 ﻿using AppliedAccounts.Services;
-using AppliedGlobals;
 using AppliedDB;
 using AppMessages;
 
@@ -17,7 +16,7 @@ namespace AppliedAccounts.Models.Interface
         List<CodeTitle> Employees { get; set; }
         List<CodeTitle> Projects { get; set; }
         List<CodeTitle> Accounts { get; set; }
-       
+
         int Index { get; set; }
         int Count { get; }
 

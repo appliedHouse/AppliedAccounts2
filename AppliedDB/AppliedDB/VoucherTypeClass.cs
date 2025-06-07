@@ -3,7 +3,7 @@ namespace AppliedDB
 {
     public static class VoucherTypeClass
     {
-        public  enum VoucherType
+        public enum VoucherType
         {
             JV,
             Cash,
@@ -16,7 +16,7 @@ namespace AppliedDB
             Payroll
         }
 
-        public  enum VoucherStatus
+        public enum VoucherStatus
         {
             New,
             Submitted,

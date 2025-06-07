@@ -5,7 +5,6 @@
 @using AppliedAccounts.Models
 @using AppliedAccounts.Services
 
-
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager NavManager
 @inject IJSRuntime js
@@ -13,10 +12,10 @@
 @inject PrintService ReportService
 @inject HttpClient Http
 
-
 @code {
     private Timer MyTime { get; set; }
     private string CurrentTime { get; set; }
+
 
 
     protected override void OnInitialized()
@@ -57,7 +56,6 @@
         }
     }
 
-
     bool IsDataLoad = false;
     string NoRecordFound = "No Record Found....";
     string NavToNew = $"/Sale/SaleInvoice/New";
@@ -72,15 +70,15 @@
     {
         <div class="alert alert-info justify-content-center align-items-center" role="alert" style="height:100px">
             <div class="d-flex align-items-center">
-               
+
                 <div class="p-1">
                     <div class="spinner-border text-warning" role="status"></div>
                 </div>
-                
+
                 <div class="p-1 text-success">
                     <i class="bi bi-printer fs-1"></i>
                 </div>
-                
+
                 <div class="p-1 fw-bolder">
                     @PrintingMessage
                 </div>
@@ -92,36 +90,29 @@
     {
         <EditForm Model=@MyModel>
 
-        <div class="container">
-            <div class="d-flex filter">
-                <div class="p-2 flex-grow-1">
-                    <div class="p-2">
-                        <InputText @bind-Value="@MyModel.SearchText" class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
+            <div class="container">
+                <div class="d-flex filter">
+                    <div class="p-2 flex-grow-1">
+                        <div class="p-2">
+                            <InputText @bind-Value="@MyModel.SearchText"
+                                       class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
+
+                        </div>
                     </div>
-                </div>
-                <div class="p-2">
-                    <button type="button" class="btn btn-primary btn-sm" @onclick="() => MyModel.Search()">Search</button>
-                </div>
-
-                @if (MyModel.SearchText.Length > 0)
-                {
                     <div class="p-2">
-                        <button type="button" style="margin-top:5px; margin-left:5px" class="btn btn-primary btn-sm" @onclick="() => MyModel.ClearText()">Clear</button>
+                        <button type="button" class="btn btn-primary btn-sm" @onclick="() => MyModel.Search()">Search</button>
                     </div>
-                }
+                    <div class="p-2">
+                        <button type="button" disabled="@(MyModel.SearchText.Length == 0)" class="btn btn-primary btn-sm" @onclick="() => MyModel.ClearText()">Clear</button>
+                    </div>
 
+                    <div class="p-2">
+                        <button type="submit" disabled="@(MyModel.Records.Count ==0)" class="btn-print" @onclick="(() => PrintAll())"><i class="bi bi-printer-fill"></i> Selected</button>
+                        <button type="submit" disabled="@(MyModel.Records.Count ==0)" class="btn-print" @onclick="(() => PrintOnePDF())"><i class="bi bi-printer-fill"></i> One PDF</button>
+                    </div>
 
-
-                <div class="p-2">
-                    @if (MyModel.Records.Count > 0)
-                    {
-                        <button type="submit" class="btn-print" @onclick="(() => PrintAll())"><i class="bi bi-printer-fill"></i> Selected</button>
-                        <button type="submit" class="btn-print" @onclick="(() => PrintOnePDF())"><i class="bi bi-printer-fill"></i> One PDF</button>
-                    }
                 </div>
-
             </div>
-        </div>
         </EditForm>
 
         <div class="container">
@@ -182,12 +173,9 @@
                     else
                     {
                         <tr>
-                            <td>@NoRecordFound</td>
+                            <td colspan="10">@NoRecordFound</td>
                         </tr>
-
-
                     }
-
 
                 </tbody>
                 <tfoot>

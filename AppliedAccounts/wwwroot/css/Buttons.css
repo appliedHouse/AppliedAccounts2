@@ -21,12 +21,18 @@
     border: none;
 }
 
+    .btn-print:disabled {
+        color: gray; 
+        cursor: not-allowed; 
+    }
+
+
 .btn-Search {
     content: "Search";
     font-size: 2rem;
     color: darkgreen;
 }
-/*
+
 .btn-Edit {
     color: royalblue;
     padding: 1px;
@@ -34,7 +40,7 @@
     border-color: transparent;
     background-color: transparent;
     width: 15px;
-}*/
+}
 
 
 .btn-Del {
@@ -52,7 +58,7 @@
     margin: 1px;
     border: 0px;
 }
-/*
+
 .btn-Add {
     color: darkgreen;
     background-color: transparent;
@@ -62,7 +68,7 @@
     width: 80px
 }
 
-*/
+
 
 .btn-New {
     color: white;
@@ -153,15 +159,16 @@
 
 
 
-
 .control-buttons {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0px;
     padding: 3px;
     background-color: var(--control-bg);
 }
+
+
+
 
     .control-buttons .ctrl-gap {
         background-color: transparent;

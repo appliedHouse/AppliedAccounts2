@@ -25,7 +25,7 @@ namespace AppliedAccounts.Models
         public COANatureModel() { }
         public COANatureModel(GlobalService _AppGlobal)
         {
-            AppGlobal = _AppGlobal; 
+            AppGlobal = _AppGlobal;
             //AppUser = _UserProfile;
             //DBFile = AppUser.DataFile;
             Source = new(AppGlobal.AppPaths);

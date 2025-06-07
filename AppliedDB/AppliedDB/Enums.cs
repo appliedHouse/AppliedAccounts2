@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AppliedDB
+﻿namespace AppliedDB
 {
     public class Enums
     {
@@ -50,7 +44,7 @@ namespace AppliedDB
             Employees = 205,
             Directories = 206,
 
-            
+
 
 
 
@@ -73,7 +67,7 @@ namespace AppliedDB
             Production2 = 317,
             view_Production = 318,
             StockCategory = 319,
-            StockInHand=320,
+            StockInHand = 320,
 
             Ledger = 401,
             view_Ledger = 402,
@@ -104,7 +98,7 @@ namespace AppliedDB
             QuotStatus = 806,
 
             TempLedger = 9999,
-            
+
         }
         public enum SQLType
         {

@@ -22,8 +22,8 @@
             AppUser = ((UserAuthenticationStateProvider)Authorized).AppUser;
             CompanyName = AppUser.Company;
             AppUserName = AppUser.DisplayName;
-            InvokeAsync(()=>StateHasChanged());
-        
+            InvokeAsync(() => StateHasChanged());
+
         });
     }
 
@@ -38,7 +38,7 @@
     .merienda-font {
         font-family: "Eczar", serif;
         font-optical-sizing: auto;
-        font-weight:900;
+        font-weight: 900;
         font-style: normal;
         text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     }
@@ -58,31 +58,36 @@
 </style>
 
 <div class="AppHeader">
-
     <div class="AppTitle merienda-font">
         <a href="/"><h3 style="font-size:larger">@GetCompanyName()</h3></a>
     </div>
 </div>
 
-<div class="SubHeading">
-    <a href="/">Home</a>
-    <AuthorizeView>
-        <Authorized>
-            <h5 class="SubHeading">Hello @GetAppUserName()</h5>
-        </Authorized>
-        <NotAuthorized>
-            <h5 class="SubHeading">Hello Guest!</h5>
-        </NotAuthorized>
-    </AuthorizeView>
-   
-</div>
+<AuthorizeView>
+    <Authorized>
+        <div class="SubHeading d-flex align-items-center">
+            <div class="p-1"><a href="/">Home</a></div>
+            <div class="p-1 ms-auto"><h5 class="SubHeading">Hello @GetAppUserName()</h5></div>
+        </div>
+
+    </Authorized>
+    <NotAuthorized>
+        <div class="SubHeading d-flex align-items-center">
+            <div class="p-1"><a href="/">Home</a></div>
+            <div class="p-1 ms-auto"><h5 class="SubHeading">Hello Guest!</h5></div>
+        </div>
+
+    </NotAuthorized>
+</AuthorizeView>
+
+
 
 
 <footer class="footer">
     <div class="container-fluid h-100 d-flex justify-content-center align-items-center">
         <div class="row">
             <div class="col">
-                Applied Software House V2.1
+                Applied Software House V2.1.2
             </div>
         </div>
 
@@ -100,7 +105,6 @@
         text-align: center; /* Align text to the right */
         padding: 10px; /* Adjust padding as necessary */
         opacity: .5;
-        
     }
 
 </style>

@@ -2,8 +2,8 @@
 using AppliedAccounts.Data;
 using AppliedAccounts.Models.Interface;
 using AppliedAccounts.Services;
-using AppliedGlobals;
 using AppliedDB;
+using AppliedGlobals;
 using AppMessages;
 using AppReports;
 using SQLQueries;
@@ -52,7 +52,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Constructor
-        
+
         public ReceiptModel(GlobalService _AppGlobal)
         {
             AppGlobal = _AppGlobal;

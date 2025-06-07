@@ -52,7 +52,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseMiddleware<DatabaseValidation>();
+app.UseMiddleware<DatabaseValidation>(); // Custom middleware to validate the database
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

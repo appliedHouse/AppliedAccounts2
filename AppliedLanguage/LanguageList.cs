@@ -21,7 +21,7 @@ namespace AppLanguages
         public static List<DataRow> GetLanguageList()
         {
             List<DataRow> _List = new();
-            DataTable _Table = new Languages().GetLanguageList();
+            DataTable _Table = Languages.GetLanguageList();
 
             if (_Table.Rows.Count > 0)
             {

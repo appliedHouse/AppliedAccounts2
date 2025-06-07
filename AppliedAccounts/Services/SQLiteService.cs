@@ -1,5 +1,5 @@
-﻿using System.Data.SQLite;
-using AppliedGlobals;
+﻿using AppliedGlobals;
+using System.Data.SQLite;
 
 namespace AppliedAccounts.Services
 {

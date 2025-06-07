@@ -9,7 +9,7 @@ namespace AppliedAccounts.Pages.Sale.Quotations
 
         public Filters FilterClass { get; set; } = new Filters();
 
-        
+
     }
     public class Filters
     {
@@ -21,7 +21,7 @@ namespace AppliedAccounts.Pages.Sale.Quotations
 
         public Filters(string _RegistryKey, string _DBFile)
         {
-            From = AppRegistry.GetFrom(_DBFile,_RegistryKey);
+            From = AppRegistry.GetFrom(_DBFile, _RegistryKey);
             From = AppRegistry.GetTo(_DBFile, _RegistryKey);
             CustomerID = AppRegistry.GetNumber(_DBFile, _RegistryKey);
             SearchText = AppRegistry.GetText(_DBFile, _RegistryKey);
