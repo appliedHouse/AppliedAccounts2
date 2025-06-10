@@ -103,6 +103,8 @@ namespace AppliedDB
                     _ => string.Empty
                 };
             }
+
+            if(ReturnValue==DBNull.Value) { return string.Empty; }
             return ReturnValue;
         }
         #endregion

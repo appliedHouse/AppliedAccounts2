@@ -1,5 +1,4 @@
 ﻿using AppliedGlobals;
-using System.ComponentModel.Design;
 using System.Data;
 using System.Data.SQLite;
 using System.Text;
