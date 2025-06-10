@@ -1,12 +1,13 @@
 ﻿@using AppliedAccounts.Data.ChartData
 @using AppliedAccounts.Services
 @using System.Data
+@using static AppliedGlobals.AppErums
 
 @inject GlobalService AppGlobal
-
+@inject IJSRuntime JS
 
 @code {
-    public double Alpha = 0.7;
+    public double Alpha = 0.7;   // Color ocapacity for the chart colors
 
     public AppliedDB.DataSource Source { get; set; }
     private string ChartType = "bar";
@@ -44,16 +45,54 @@
     "rgba(255, 192, 203, 1)", // Light Pink
     "rgba(240, 230, 140, 1)"  // Khaki
 };
+    private List<string> BatchList = [];
+    private SearchModel MyModel { get; set; } = new();
+
+    private class SearchModel
+    {
+        public string SearchText { get; set; }
+    }
 
     protected override void OnInitialized()
     {
         Source = new(AppGlobal.AppPaths);
-        string _Query = SQLQueries.Quries.RevenueGraph("B25-04-A");
+
+        var _Batch = Source.GetText("Batch");
+
+        BatchList = GetBatchList();
+        if (BatchList.Contains(_Batch) == false || _Batch.Length > 0) { BatchList.Add(_Batch); }
+
+        if (_Batch.Length == 0)
+        {
+            if (BatchList.Count > 0)
+            {
+                _Batch = BatchList.First();
+            }
+        }
+
+        GetData(_Batch);
+
+    }
+
+    private List<string> GetBatchList()
+    {
+        string _Query = SQLQueries.Quries.BatchesForGraph();
+        DataTable _DataTable = Source.GetTable(_Query);
+        var _BatchList = _DataTable.AsEnumerable().Select(row => row.Field<string>("Batch") ?? "").ToList();
+        return _BatchList;
+    }
+    private void GetData(string _Batch)
+    {
+        string _Query = SQLQueries.Quries.RevenueGraph(_Batch);
         DataTable _DataTable = Source.GetTable(_Query, "", "Amount Desc");
         int count = _DataTable.Rows.Count;
         int counter = 0;
         int OtherAmount = 0;
         decimal OtherPie = 0.00M;
+
+        Labels.Clear();
+        DataValues.Clear();
+        DataPie.Clear();
 
         foreach (DataRow row in _DataTable.Rows)
         {
@@ -61,13 +100,13 @@
             {
                 Labels.Add(row["Title"].ToString()!);
                 DataValues.Add(Conversion.ToInteger(row["Amount"]));
-                DataPie.Add(decimal.Parse(row["Amount"].ToString()));
+                DataPie.Add(decimal.Parse(row["Amount"].ToString() ?? ""));
                 counter++;
             }
             else
             {
                 OtherAmount += Conversion.ToInteger(row["Amount"]);
-                OtherPie += decimal.Parse(row["Amount"].ToString());
+                OtherPie += decimal.Parse(row["Amount"].ToString() ?? "");
             }
         }
 
@@ -78,30 +117,57 @@
             DataPie.Add(OtherPie);
         }
     }
+
+
+    private string BatchNull = "Null";
+    private void LoadData(string _Batch)
+    {
+        Source.SetKey("Batch", _Batch, KeyTypes.Text, "Graph Batch");
+        AppGlobal.NavManager.NavigateTo("/", true);
+    }
 }
+
+
+<EditForm Model="MyModel">
+    <div class="container">
+        <div class="d-flex">
+            @foreach (var _Batch in BatchList)
+            {
+                <div class="p-1">
+                    <button class="btn btn-primary btn-sm" @onclick="(() => LoadData(_Batch))">@_Batch</button>
+                </div>
+
+            }
+            <div class="P-1">
+                <InputText @bind-Value="MyModel.SearchText" @onblur="(() => LoadData(MyModel.SearchText))" />
+            </div>
+        </div>
+    </div>
+</EditForm>
+
 
 <div class="container">
     <!-- First Row -->
     <div class="row mt-2 mb-2">
-        <div class="col-md-6 col-12 mb-5 top-left justify-content-center">
+        <div class="col-md-6 col-12 mb-5 top-left">
             <BarGraph ChartType="bar"
-                       labelTitle="Revenue"
-                       Labels="Labels"
-                       DataValues="DataValues"
-                       BackgroundColors="BackgroundColors"
-                       BorderColors="BorderColors" />
+                      labelTitle="Revenue"
+                      Labels="Labels"
+                      DataValues="DataValues"
+                      BackgroundColors="BackgroundColors"
+                      BorderColors="BorderColors" />
         </div>
-        <div class="col-md-6 col-12 mb-5 top-left justify-content-center">
+        <div class="col-md-6 col-12 mb-5 top-right">
             <PieGraph ChartId="myDoughnutChart"
-                         ChartType="doughnut"
-                         Labels="Labels"
-                         DataPie=DataPie
-                         BackgroundColors="BackgroundColors"
-                         ChartTitle="Revenue" />
+                      ChartType="doughnut"
+                      Labels="Labels"
+                      DataPie=DataPie
+                      BackgroundColors="BackgroundColors"
+                      ChartTitle="Revenue" />
         </div>
     </div>
 
-   @*  <!-- Second Row -->
+    @*  <!-- Second Row -->
     <div class="row">
         <div class="col-md-6 col-12 mb-1 bottom-left"></div>
         <div class="col-md-6 col-12 mb-1 bottom-right"></div>
@@ -109,26 +175,30 @@
 </div>
 
 <style>
+    :root {
+        --ChartHeight: 400px; /* Define the CSS variable for chart height */
+    }
+
     .top-left {
-        height: 500px;
+        height: var(--ChartHeight);
         background-color: cornsilk;
         border: 1px solid rgba(86, 61, 124, 0.15);
     }
 
     .top-right {
-        height: 500px;
+        height: var(--ChartHeight);
         background-color: lightcyan;
         border: 1px solid rgba(86, 61, 124, 0.15);
     }
 
     .bottom-left {
-        height: 500px;
+        height: var(--ChartHeight);
         background-color: lightskyblue;
         border: 1px solid rgba(86, 61, 124, 0.15);
     }
 
     .bottom-right {
-        height: 500px;
+        height: var(--ChartHeight);
         background-color: honeydew;
         border: 1px solid rgba(86, 61, 124, 0.15);
     }

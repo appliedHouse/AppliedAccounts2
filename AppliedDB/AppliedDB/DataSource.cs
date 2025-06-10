@@ -1,8 +1,10 @@
 ﻿using AppliedGlobals;
+using System.ComponentModel.Design;
 using System.Data;
 using System.Data.SQLite;
 using System.Text;
 using static AppliedDB.Enums;
+using static AppliedGlobals.AppErums;
 using Tables = AppliedDB.Enums.Tables;
 
 namespace AppliedDB
@@ -200,7 +202,6 @@ namespace AppliedDB
         }
         #endregion
 
-
         #region Get Table Static
 
         private static DataTable GetDataTable(Tables _Table, SQLiteCommand _Command)
@@ -286,6 +287,38 @@ namespace AppliedDB
                         {
                             return _DataSet.Tables[0];
                         }
+                    }
+                }
+                return new DataTable();
+            }
+            catch (Exception)
+            {
+
+                return new DataTable();
+            }
+        }
+
+        public static DataTable GetDataTable(Tables _Table, SQLiteConnection _Connection, string _Filter)
+        {
+            try
+            {
+                if (_Connection is not null)
+                {
+
+                    var _Query = $"SELECT * FROM {_Table} ";
+                    if (_Filter.Length > 0) { _Query += $"WHERE {_Filter}"; }
+
+                    var _Command = new SQLiteCommand(_Query, _Connection);
+                    using var _Adapter = new SQLiteDataAdapter(_Command);
+                    using var _DataSet = new DataSet();
+
+                    if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
+                    _Adapter.Fill(_DataSet, _Table.ToString());
+                    if (_Connection.State == ConnectionState.Open) { _Connection.Close(); }
+                   
+                    if (_DataSet.Tables.Count == 1)
+                    {
+                        return _DataSet.Tables[0];
                     }
                 }
                 return new DataTable();
@@ -982,6 +1015,67 @@ namespace AppliedDB
             return MyCommands.SaveChanges();
         }
         #endregion
+
+        #region Get Registry Keys
+
+        public void SetKey(string Key, object KeyValue, KeyTypes keytype, string _Title)
+        {
+            Registry _Registry = new(MyConnection, DBFile);
+            _Registry.SetKey(Key, KeyValue, keytype, _Title);
+        }
+
+        public async Task SetKeyAsync(string Key, object KeyValue, KeyTypes keytype, string _Title)
+        {
+            await Task.Run(() =>
+            {
+                Registry _Registry = new(MyConnection, DBFile);
+                _Registry.SetKey(Key, KeyValue, keytype, _Title);
+            });
+        }
+
+        public string GetText(string Key)
+        {
+            Registry _Registry = new(MyConnection, DBFile);
+            return (string)_Registry.GetKey(Key, KeyTypes.Text);
+        }
+        public int GetNumber(string Key)
+        {
+            Registry _Registry = new(MyConnection, DBFile);
+            return (int)_Registry.GetKey(Key, KeyTypes.Number);
+        }
+
+        public DateTime GetDate(string Key)
+        {
+            Registry _Registry = new(MyConnection, DBFile);
+            return (DateTime)_Registry.GetKey(Key, KeyTypes.Date);
+        }
+
+        public bool GetBoolean(string Key)
+        {
+            Registry _Registry = new(MyConnection, DBFile);
+            return (bool)_Registry.GetKey(Key, KeyTypes.Boolean);
+        }
+
+        public DateTime GetFrom(string Key)
+        {
+            Registry _Registry = new(MyConnection, DBFile);
+            return (DateTime)_Registry.GetKey(Key, KeyTypes.From);
+        }
+
+        public DateTime GetTo(string Key)
+        {
+            Registry _Registry = new(MyConnection, DBFile);
+            return (DateTime)_Registry.GetKey(Key, KeyTypes.To);
+        }
+
+        public DateTime[] GetFromTo(string Key)
+        {
+            DateTime[] _Dates = [GetFrom(Key), GetTo(Key)];
+            return _Dates;
+        }
+
+        #endregion
+
     }
 
     public class CodeTitle

@@ -47,6 +47,7 @@ namespace AppliedAccounts.Pages.Accounts
         {
             MyModel.IsWaiting = true;
             await InvokeAsync(StateHasChanged);
+            await Task.Delay(100);                  // Delay for show the message and 
 
             try
             {
@@ -60,6 +61,7 @@ namespace AppliedAccounts.Pages.Accounts
 
             MyModel.IsWaiting = false;
             await InvokeAsync(StateHasChanged);
+            await Task.Delay(100);                  // Delay for show the message and 
         }
         #endregion
     }

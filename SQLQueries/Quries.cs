@@ -1,6 +1,4 @@
 ﻿using System.Text;
-using System.Text.RegularExpressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SQLQueries
 {
@@ -317,14 +315,19 @@ namespace SQLQueries
             _Text.AppendLine("SELECT");
             _Text.AppendLine("[A].[Inventory],");
             _Text.AppendLine("[I].[Title] AS [Title],");
-            _Text.AppendLine("SUM([A].[Qty] * [A].[Rate]) AS [Amount]");
+            _Text.AppendLine("SUM(ROUND([A].[Qty] * [A].[Rate])) AS [Amount]");
             _Text.AppendLine("FROM (");
-            _Text.AppendLine($"SELECT * FROM [view_BillReceivable] WHERE [Batch] = '{_Batch}'");
+            _Text.AppendLine($"SELECT * FROM [view_BillReceivable] WHERE [Ref_No] = '{_Batch}'");
             _Text.AppendLine(") [A]");
-            _Text.AppendLine("LEFT JOIN[Inventory] [I] ON[I].[ID] = [A].[Inventory]");
-            _Text.AppendLine("GROUP BY[A].[Inventory]");
+            _Text.AppendLine("LEFT JOIN [Inventory] [I] ON[I].[ID] = [A].[Inventory]");
+            _Text.AppendLine("GROUP BY [A].[Inventory]");
             return _Text.ToString();
 
+        }
+
+        public static string BatchesForGraph()
+        {
+            return "SELECT [Ref_No] AS [Batch] FROM [BillReceivable] GROUP BY [Ref_No] ORDER BY [Ref_No] DESC LIMIT 5;";
         }
         #endregion
 

@@ -52,9 +52,8 @@
 {
     <ShowWaiting MyMessage="Printing Report....."/>
 }
-
-
-
+else
+{
 <EditForm Model="@MyModel">
     <div class="d-flex flex-row mb-3 filter" hidden="@MyModel.IsWaiting">
         <div class="p-2">
@@ -116,13 +115,13 @@
             <table class="table-list">
                 <thead>
                     <tr>
-                        <th>Voucher</th>
-                        <th>Date</th>
-                        <th>Description</th>
-                        <th>Received</th>
-                        <th>Paid</th>
-                        <th>Balance</th>
-                        <th>
+                        <th style="width:10%">Voucher</th>
+                        <th style="width:10%">Date</th>
+                        <th style="width:40%">Description</th>
+                        <th style="width:10%">Received</th>
+                        <th style="width:10%">Paid</th>
+                        <th style="width:10%">Balance</th>
+                        <th style="width:10%">
                             <button class="btn btn-Add"><i class="bi bi-pencil-fill"></i></button>
                         </th>
                     </tr>
@@ -163,3 +162,4 @@
         }
     </div>
 </EditForm>
+}

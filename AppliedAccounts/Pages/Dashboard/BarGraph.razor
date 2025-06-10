@@ -22,7 +22,8 @@
 }
 
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
 <script>
     function renderChart(chartType, labels, dataValues, labelTitle, bgColors, bdrColors) {
         const ctx = document.getElementById('myChart');
@@ -36,17 +37,126 @@
                     data: dataValues,
                     backgroundColor: bgColors,
                     borderColor: bdrColors,
-                    borderWidth: 1
+                    borderWidth: 1,
                 }]
             },
             options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true, // Show the legend
+                    },
+                    datalabels: {
+                        clamp: true,
+                        anchor: 'end',
+                        align: 'bottom',
+                        font: {
+                            size: 12,
+                            weight: 'bold',
+                        },
+                        color: '#000', // Label text color
+                        offset: 8, // Space between the label and anchor
+                    }
+                },
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Amount',
+                            color: '#FFB1C1', // Change title text color
+                            font: {
+                                size: 16,
+                                weight: 'bold',
+                            },
+                        },
+                        ticks: {
+                            display: true,
+                               ticks: {
+                                    // Include a dollar sign in the ticks
+                                        callback: function(value, index, ticks) {
+                                        return '$' + value;
+                                }
+                            },
+                            color: '#000', // Tick color
+                            font: {
+                                size: 12,
+                            },
+                        },
+                    },
+                    x: {
+                        position: 'bottom',
+                        display:true,
+                        title: {
+                            display: false,
+                            text: 'Services',
+                            color: '#4BC0C0', // Change title text color
+                            font: {
+                                size: 16,
+                                weight: 'bold',
+                            },
+                            
+                        },
+                        ticks: {
+                            display:true,
+                            minRotation: 90,   // Prevent any rotation
+                            color: '#000000', // Change tick labels to black
+                        }
                     }
                 }
             }
         });
     }
 </script>
+
+@* <script>
+    function renderChart(chartType, labels, dataValues, labelTitle, bgColors, bdrColors) {
+        const ctx = document.getElementById('myChart');
+
+        new Chart(ctx, {
+            type: chartType,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: labelTitle,
+                    data: dataValues,
+                    backgroundColor: bgColors,
+                    borderColor: bdrColors,
+                    borderWidth: 1,
+                    
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true, // Allow the canvas to stretch to the container
+                 plugins: {
+                    legend: {
+                        display: true // Optional: Hides the legend (dataset label)
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                           backgroundColor: '#FFB1C1',
+                        },
+                    },
+                    x: {
+                        title: {
+                            display: false,
+                        }
+                    }
+                },
+                datalabels: {
+                    clamp: true,
+                    anchor: 'end',
+                    align: 'bottom',
+                            // ...other options
+                }
+            }
+        });
+    }
+</script> *@
 

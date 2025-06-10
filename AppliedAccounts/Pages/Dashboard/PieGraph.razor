@@ -1,7 +1,10 @@
 ﻿@inject IJSRuntime JS
 @inherits ComponentBase
 
-<canvas id="@ChartId" width="400" height="400"></canvas>
+
+<div class="chart-container" height="500" width="500">
+    <canvas id="@ChartId"></canvas>
+</div>
 
 @code {
     [Parameter] public string ChartId { get; set; } = "myChart";
@@ -21,9 +24,14 @@
 }
 
 
+
+
 <script>
-        window.drawChart = (chartId, chartType, labels, data, backgroundColors, chartTitle) => {
-        const ctx = document.getElementById(chartId).getContext('2d');
+    window.drawChart = (chartId, chartType, labels, data, backgroundColors, chartTitle) => {
+        const canvas = document.getElementById(chartId); // Get the canvas element by its ID
+       
+        const ctx = canvas.getContext('2d'); // Get the 2D drawing context
+
         new Chart(ctx, {
             type: chartType,
             data: {
@@ -37,6 +45,7 @@
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false, // Allow the canvas to stretch to the container
                 plugins: {
                     legend: {
                         position: 'right',
@@ -45,10 +54,12 @@
                     title: {
                         display: true,
                         text: chartTitle,
-
+                        font: {
+                            size: 24, // Adjusted font size to be more reasonable
+                        },
                     },
                 },
-            },
+             },
         });
     };
 </script>
