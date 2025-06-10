@@ -1,12 +1,13 @@
-﻿using AppliedDB;
+﻿using AppliedGlobals;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.Security.Claims;
 
+
 namespace AppliedAccounts.Authentication
 {
-    public class UserAuthonticationStateProvider : AuthenticationStateProvider
+    public class UserAuthenticationStateProvider : AuthenticationStateProvider
     {
         private readonly ProtectedSessionStorage _sessionStorage;
         private readonly ClaimsPrincipal AnyOne = new(new ClaimsIdentity());
@@ -14,7 +15,7 @@ namespace AppliedAccounts.Authentication
         public AppUserModel AppUser = new AppUserModel();
         public IEnumerable<Claim> Claims { get; set; }
 
-        public UserAuthonticationStateProvider(ProtectedSessionStorage sessionStorage, NavigationManager NavManager)
+        public UserAuthenticationStateProvider(ProtectedSessionStorage sessionStorage, NavigationManager NavManager)
         {
             _sessionStorage = sessionStorage;
             _navManager = NavManager;
@@ -73,8 +74,6 @@ namespace AppliedAccounts.Authentication
             {
                 return await Task.FromResult(new AuthenticationState(AnyOne));
             }
-
-
         }
 
         public async Task UpdateAuthonticateState(UserSession? userSession)
@@ -149,7 +148,8 @@ namespace AppliedAccounts.Authentication
                 AppUser.SystemFolder = claims?.FirstOrDefault(x => x.Type.Equals("SystemFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "System";
                 AppUser.SessionFolder = claims?.FirstOrDefault(x => x.Type.Equals("SessionFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "Sessions";
                 AppUser.TempDBFolder = claims?.FirstOrDefault(x => x.Type.Equals("TempDBFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "Sessions";
-            };
+            }
+            ;
 
 
         }

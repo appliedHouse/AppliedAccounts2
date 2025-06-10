@@ -1,11 +1,7 @@
-﻿using AppliedDB;
-using AppMessages;
-using AppReports;
+﻿using AppReports;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Microsoft.Reporting.NETCore;
-using static AppMessages.Enums;
-using System.Formats.Asn1;
 
 namespace AppliedAccounts.Services
 {
@@ -14,45 +10,46 @@ namespace AppliedAccounts.Services
         public IJSRuntime JS { get; set; }
         public GlobalService Config { get; set; }
         public NavigationManager NavManager { get; set; }
-        public AppUserModel? UserProfile { get; set; }
+        public AppliedGlobals.AppUserModel? UserProfile { get; set; }
 
         public ReportData Data { get; set; }
         public ReportModel Model { get; set; }
         public ReportType ReportType { get; set; }
         public ReportExtractor Extractor { get; set; }
 
-
-        //public MessageClass MsgClass { get; set; }
         public bool IsError { get; set; } = false;
         public List<string> MyMessage { get; set; } = new();
-      
+
 
         public PrintService(GlobalService _Config)
         {
-            Config = _Config;
-            NavManager = Config.NavManager;
-            JS = Config.JS;
-            //MsgClass = new();
+            if (_Config is not null)
+            {
 
-            Data = new();
-            Model = new();
+                Config = _Config;
+                NavManager = Config.NavManager;
+                JS = Config.JS;
 
-            Model.InputReport.RootPath = Config.AppPaths.RootPath;
-            Model.InputReport.FilePath = Config.AppPaths.ReportPath;
-            
-            Model.OutputReport.BasePath = NavManager.BaseUri;
-            Model.OutputReport.RootPath = Config.AppPaths.RootPath;
-            Model.OutputReport.FilePath = Config.AppPaths.PDFPath;
+                Data = new();
+                Model = new();
 
-            if(string.IsNullOrEmpty(Config.Reporting.ReportTitle)) { Config.Reporting.ReportTitle = "APPLIED SOFTWARE HOUSE"; }
-            if(string.IsNullOrEmpty(Config.Reporting.ReportFooter)) { Config.Reporting.ReportFooter = "APPLIED ACCOUNTS"; }
+                Model.InputReport.RootPath = Config.AppPaths.RootPath;
+                Model.InputReport.FilePath = Config.AppPaths.ReportPath;
+
+                Model.OutputReport.BasePath = NavManager.BaseUri;
+                Model.OutputReport.RootPath = Config.AppPaths.RootPath;
+                Model.OutputReport.FilePath = Config.AppPaths.PDFPath;
+
+                if (string.IsNullOrEmpty(Config.Reporting.ReportTitle)) { Config.Reporting.ReportTitle = "APPLIED SOFTWARE HOUSE"; }
+                if (string.IsNullOrEmpty(Config.Reporting.ReportFooter)) { Config.Reporting.ReportFooter = "APPLIED ACCOUNTS"; }
 
 
-            Model.ReportParameters =
-            [
-                new ReportParameter("CompanyName", Config.Reporting.ReportTitle ),
+                Model.ReportParameters =
+                [
+                    new ReportParameter("CompanyName", Config.Reporting.ReportTitle ),
                 new ReportParameter("Footer", Config.Reporting.ReportFooter)
-            ];
+                ];
+            }
         }
 
         public PrintService()
@@ -65,9 +62,12 @@ namespace AppliedAccounts.Services
         {
             IsError = ReportValidate();
 
+            Model.OutputReport.ReportType = ReportType;
+            Model.ReportDataSource = Data; // Set the data source for the report
+
             if (!IsError)
             {
-                switch (Model.OutputReport.ReportType)
+                switch (ReportType)
                 {
                     case ReportType.Print: await Printer(); break;
                     case ReportType.Preview: await Preview(); break;
@@ -79,16 +79,19 @@ namespace AppliedAccounts.Services
                     default: await Preview(); break;
                 }
             }
-            
+
         }
 
         public async void Print()
         {
             IsError = ReportValidate();
 
+            Model.OutputReport.ReportType = ReportType;
+            Model.ReportDataSource = Data; // Set the data source for the report
+
             if (!IsError)
             {
-                switch (Model.OutputReport.ReportType)
+                switch (ReportType)
                 {
                     case ReportType.Print: await Printer(); break;
                     case ReportType.Preview: await Preview(); break;
@@ -154,7 +157,7 @@ namespace AppliedAccounts.Services
                 MyMessage.Add(error.Message);
             }
 
-            if(Model.ErrorMessage.Length > 0)
+            if (Model.ErrorMessage.Length > 0)
             {
                 MyMessage.Add(Model.ErrorMessage);
             }

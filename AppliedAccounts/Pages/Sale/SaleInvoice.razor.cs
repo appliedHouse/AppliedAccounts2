@@ -1,8 +1,7 @@
 ﻿using AppliedAccounts.Models;
 using AppliedAccounts.Services;
 using AppReports;
-
-//using AppliedReports;
+using Format = AppliedGlobals.AppValues.Format;
 
 namespace AppliedAccounts.Pages.Sale
 {
@@ -78,7 +77,7 @@ namespace AppliedAccounts.Pages.Sale
             //MyModel.CalculateTotal();
         }
         #endregion
-      
+
         public async void SaveAll()
         {
             var IsSaved = await MyModel.SaveAllAsync();
@@ -95,7 +94,7 @@ namespace AppliedAccounts.Pages.Sale
         #region Delete
         public void Delete(int _Sr_No)
         {
-            MyModel.MyVoucher.Detail = MyModel.MyVoucher.Details.Where(row => row.Sr_No==_Sr_No).First();
+            MyModel.MyVoucher.Detail = MyModel.MyVoucher.Details.Where(row => row.Sr_No == _Sr_No).First();
             if (MyModel.MyVoucher.Detail is not null)
             {
                 MyModel.Deleted.Add(MyModel.MyVoucher.Detail);                  // Save in deleted list
@@ -105,7 +104,7 @@ namespace AppliedAccounts.Pages.Sale
 
         }
         #endregion
-       
+
 
         #region Home & Back Buttons
         public void GotoHome()
@@ -137,7 +136,7 @@ namespace AppliedAccounts.Pages.Sale
 
         }
 
-        
+
         #endregion
 
 

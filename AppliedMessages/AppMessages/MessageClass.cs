@@ -76,11 +76,11 @@ namespace AppMessages
         #region Warrning
         public void Warning(string _Text)
         {
-            MessageList.Add(GetMessage(_Text, Class.Warrning));
+            MessageList.Add(GetMessage(_Text, Class.Warning));
         }
         public void Warning(Messages _Code)
         {
-            MessageList.Add(GetMessage(_Code, Class.Warrning));
+            MessageList.Add(GetMessage(_Code, Class.Warning));
         }
         #endregion
 
@@ -178,6 +178,11 @@ namespace AppMessages
                 MessageDate = DateTime.Now,
                 MessageText = _Text
             };
+        }
+
+        public void Add(object classIsNull)
+        {
+            throw new NotImplementedException();
         }
         #endregion
     }

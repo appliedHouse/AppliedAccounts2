@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Services;
 using AppliedDB;
 using ExcelDataReader;
 using Microsoft.AspNetCore.Components.Forms;
@@ -12,15 +13,16 @@ namespace AppliedAccounts.Models
     {
         public IBrowserFile ExcelFile { get; set; }
         public DataSource Source { get; set; }
-        public AppUserModel AppUser { get; set; }
+        public GlobalService AppGlobal { get; set; }
         public DataSet ImportDataSet { get; set; }
         public bool IsImported { get; set; } = false;
         public string MyMessages { get; set; }
 
 
-        public ImportExcelFile(IBrowserFile excelFile, AppUserModel appUser)
+        public ImportExcelFile(IBrowserFile excelFile, GlobalService _AppGlobal)
         {
-            AppUser = appUser;
+            AppGlobal = _AppGlobal;
+            //AppUser = appUser;
             ExcelFile = excelFile;
         }
 
@@ -31,7 +33,8 @@ namespace AppliedAccounts.Models
         {
             try
             {
-                var _Directory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelFiles");
+                var _Path = Path.Combine(AppGlobal.AppPaths.FirstPath, AppGlobal.AppPaths.RootPath);
+                var _Directory = Path.Combine(_Path, "ExcelFiles");
                 if (!Directory.Exists(_Directory)) { Directory.CreateDirectory(_Directory); }
 
                 var _ExcelFile = Path.Combine(_Directory, ExcelFile.Name);
@@ -76,13 +79,15 @@ namespace AppliedAccounts.Models
             string _Path = Connections.GetTempDBPath();
             string _GUID = Guid.NewGuid().ToString();
             string _Title = $"Import file {ExcelFile} dated {DateTime.Now}";
-            string _OldFile = AppRegistry.GetText(AppUser.DataFile, "ExcelImport");
+            string _OldFile = AppRegistry.GetText(AppGlobal.DBFile, "ExcelImport");
             bool _FirstRow = true;
 
             try
             {
                 if (_OldFile.Length > 0)
                 {
+                    if (!Directory.Exists(_Path)) { Directory.CreateDirectory(_Path); }
+
                     var _OldFilePath = Path.Combine(_Path, _OldFile + ".db");
                     if (File.Exists(_OldFilePath)) { File.Delete(_OldFilePath); }
                 }
@@ -91,7 +96,7 @@ namespace AppliedAccounts.Models
 
 
 
-            AppRegistry.SetKey(AppUser.DataFile, "ExcelImport", _GUID, KeyType.Text, _Title);
+            AppRegistry.SetKey(AppGlobal.DBFile, "ExcelImport", _GUID, KeyType.Text, _Title);
 
             string _ConnText = $"";
             string _ImportDBPath = Path.Combine(_Path, _GUID + ".db");

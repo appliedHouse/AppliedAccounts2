@@ -1,5 +1,5 @@
-﻿using System.Data.SQLite;
-using System.Data;
+﻿using System.Data;
+using System.Data.SQLite;
 
 namespace AppliedLanguage
 {
@@ -25,7 +25,7 @@ namespace AppliedLanguage
 
                 foreach (DataRow _Row in _DataTable.Rows)
                 {
-                    _List.Add ((int)_Row["ID"], (string)_Row["Title"]);
+                    _List.Add((int)_Row["ID"], (string)_Row["Title"]);
                 }
             }
 

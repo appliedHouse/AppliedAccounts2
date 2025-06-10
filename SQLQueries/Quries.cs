@@ -1,9 +1,8 @@
 ﻿using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SQLQueries
 {
-    public static class Quries
+    public class Quries
     {
         #region Receipt
         public static string Receipt(int _ReceiptID)
@@ -269,5 +268,68 @@ namespace SQLQueries
         }
 
         #endregion
+
+        #region Chart of Accounts CRUD
+        public static string COA()
+        {
+            var _Text = new StringBuilder();
+            _Text.Append("SELECT");
+            _Text.Append("[COA].*,");
+            _Text.Append("[C].[Title] [TitleClass],");
+            _Text.Append("[T].[Title] [TitleNature],");
+            _Text.Append("[N].[Title] [TitleNote]");
+            _Text.Append("FROM [COA]");
+            _Text.Append("LEFT JOIN[COA_Class]  [C] ON[C].[ID] = [COA].[Class]");
+            _Text.Append("LEFT JOIN[COA_Nature] [T] ON[T].[ID] = [COA].[Nature]");
+            _Text.Append("LEFT JOIN[COA_Notes]  [N] ON[N].[ID] = [COA].[Notes]");
+
+            return _Text.ToString();
+        }
+        #endregion
+
+        #region Inventory
+        public static string Inventory()
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("SELECT [I].*,");
+            _Text.AppendLine("[P].[Title] [TitlePacking],");
+            _Text.AppendLine("[U].[Title] [TitleUOM],");
+            _Text.AppendLine("[S].[Title] [TitleSubCategory],");
+            _Text.AppendLine("[C].[Title] [TitleCategory],");
+            _Text.AppendLine("[Z].[Title] [TitleSize]");
+            _Text.AppendLine("FROM [Inventory] [I]");
+            _Text.AppendLine("LEFT JOIN [Inv_Packing]     [P] ON [P].[ID] = [I].[Packing]");
+            _Text.AppendLine("LEFT JOIN [Inv_UOM]         [U] ON [U].[ID] = [I].[UOM]");
+            _Text.AppendLine("LEFT JOIN [Inv_SubCategory] [S] ON [S].[ID] = [I].[SubCategory]");
+            _Text.AppendLine("LEFT JOIN [Inv_Category]    [C] ON [C].[ID] = [S].[Category]");
+            _Text.AppendLine("LEFT JOIN [Inv_Size]        [Z] ON [Z].[ID] = [I].[Size]");
+            return _Text.ToString();
+
+        }
+        #endregion
+
+        #region Revenue Graph
+        public static string RevenueGraph(string _Batch)
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("SELECT");
+            _Text.AppendLine("[A].[Inventory],");
+            _Text.AppendLine("[I].[Title] AS [Title],");
+            _Text.AppendLine("SUM(ROUND([A].[Qty] * [A].[Rate])) AS [Amount]");
+            _Text.AppendLine("FROM (");
+            _Text.AppendLine($"SELECT * FROM [view_BillReceivable] WHERE [Ref_No] = '{_Batch}'");
+            _Text.AppendLine(") [A]");
+            _Text.AppendLine("LEFT JOIN [Inventory] [I] ON[I].[ID] = [A].[Inventory]");
+            _Text.AppendLine("GROUP BY [A].[Inventory]");
+            return _Text.ToString();
+
+        }
+
+        public static string BatchesForGraph()
+        {
+            return "SELECT [Ref_No] AS [Batch] FROM [BillReceivable] GROUP BY [Ref_No] ORDER BY [Ref_No] DESC LIMIT 5;";
+        }
+        #endregion
+
     }
 }

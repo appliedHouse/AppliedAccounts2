@@ -1,9 +1,10 @@
+using AppliedAccounts.Authentication;
+using AppliedAccounts.Middleware;
+using AppliedAccounts.Services;
 using AppliedDB;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using AppliedAccounts.Authentication;
-using AppliedAccounts.Services;
-using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 
@@ -16,10 +17,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<AppUserModel>();
-builder.Services.AddSingleton<UserProfile>();
+//builder.Services.AddSingleton<AppUserModel>();              // Create a new instance of AppUserModel
+builder.Services.AddSingleton<UserProfile>();               // Create a User Model Class.
 builder.Services.AddScoped<ProtectedSessionStorage>();
-builder.Services.AddScoped<AuthenticationStateProvider, UserAuthonticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
 builder.Services.AddScoped<ToastService>();
 builder.Services.AddScoped<PrintService>();
 builder.Services.AddHttpClient();
@@ -30,9 +31,10 @@ builder.Services.AddScoped<GlobalService>(sp =>
     var config = sp.GetRequiredService<IConfiguration>();
     var navManager = sp.GetRequiredService<NavigationManager>();
     var JSRuntime = sp.GetRequiredService<IJSRuntime>();
+    var StateProvider = sp.GetRequiredService<AuthenticationStateProvider>();
 
     // Initialize GlobalService with dependencies
-    var globalService = new GlobalService(config, navManager, JSRuntime);
+    var globalService = new GlobalService(config, navManager, JSRuntime, StateProvider);
 
     // Set the Language.ID value here
     globalService.Language.ID = 1; // Example: Setting ID to 1
@@ -50,7 +52,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-
+app.UseMiddleware<DatabaseValidation>(); // Custom middleware to validate the database
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

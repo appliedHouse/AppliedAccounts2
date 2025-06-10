@@ -9,7 +9,8 @@
 @inject AuthenticationStateProvider Authorized
 @inject NavigationManager NavManager
 @inject IJSRuntime js
-@inject PrintService PrintReport;
+@inject PrintService PrintReport
+@inject GlobalService AppGlobal
 
 @code {
     private bool IsPageValid = true;
@@ -18,8 +19,8 @@
     {
         try
         {
-            AppUser = ((UserAuthonticationStateProvider)Authorized).AppUser;
-            if (AppUser != null) { MyModel = new(AppUser); }
+            //AppUser = ((UserAuthenticationStateProvider)Authorized).AppUser;
+            if (AppUser != null) { MyModel = new(AppGlobal); }
         }
         catch (Exception)
         {

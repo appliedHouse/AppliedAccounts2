@@ -1,0 +1,274 @@
+﻿@page "/Stock/Stocklist"
+
+@layout PageLayout;
+@attribute [Authorize];
+
+@using AppliedAccounts.Component;
+@using AppliedAccounts.Libs;
+@using AppliedAccounts.Models;
+@using AppliedAccounts.Data;
+@using AppliedAccounts.Services
+@using AppliedDB
+@using System.Data
+
+@inject GlobalService AppGlobal
+@inject ToastService Toaster
+
+@code {
+    private string UserRoll;
+    private string DateFormat = Format.DDMMYY;
+    private string CurrFormat = Format.Currency;
+    private decimal Tot_DR = 0.0M;
+    private decimal Tot_CR = 0.0M;
+
+    protected override void OnInitialized()
+    {
+        MyModel = new(AppGlobal);   // BookID and UserProfile.
+        ShowList = true;
+        ShowForm = false;
+    }
+}
+
+<PageHeading Text="Inventory / Stock / Services" />
+
+<ShowMessages MsgClass="MyModel.MsgClass" />
+
+<EditForm Model="MyModel">
+    @if (ShowForm)
+    {
+        <div class="container mt-2">
+            <div class="row justify-content-center">
+                <div class="col-4">
+                    <div class="form-floating">
+                        <InputText id="txtCode" @bind-Value="MyModel.Record.Code" class="form-control" placeholder="Stock Code" />
+                        <label for="txtCode">Code</label>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-floating">
+                        <InputText id="txtTitle" @bind-Value="MyModel.Record.Title" class="form-control" placeholder="Stock Title" />
+                        <label for="txtTitle">Title of Stock</label>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-floating">
+                        <InputNumber id="txtQtyPack" @bind-Value="MyModel.Record.Qty_Packing" class="form-control" placeholder="Quantity in packing" />
+                        <label for="txtQtyPack">Qty in Packing</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center mt-2">
+                
+                <div class="col-md-4">
+                    @if (MyModel.SubCategory != null)
+                    {
+                        <div class="form-floating d-flex gap-2">
+                            <InputSelect id="ddSubCategory" class="form-control item-height flex-grow-1"
+                                         TValue="int"
+                                         Value="@MyModel.Record.SubCategory"
+                                         ValueChanged="@((e) => SubCategoryChanged(e))"
+                                         ValueExpression="@(() => MyModel.Record.SubCategory)">
+                                @if (MyModel.SubCategory?.Any() == true)
+                                {
+                                    @foreach (var item in MyModel.SubCategory)
+                                    {
+                                        <option value="@item.ID">@item.Title</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="0">No Records - SubCategory</option>
+                                }
+                            </InputSelect>
+                            <Dropdown_Search @onclick="() => BrowseWindow(2)" />
+                            <label for="ddSubCategory">Category</label>
+
+                        </div>
+                    }
+                </div>
+                <div class="col-md-4">
+                    @if (MyModel.Packing != null)
+                    {
+                        <div class="form-floating d-flex gap-2">
+                            <InputSelect id="ddSubCategory" class="form-control item-height flex-grow-1"
+                                         TValue="int"
+                                         Value="@MyModel.Record.Packing"
+                                         ValueChanged="@((e) => PackingChanged(e))"
+                                         ValueExpression="@(() => MyModel.Record.Packing)">
+                                @if (MyModel.Packing?.Any() == true)
+                                {
+                                    @foreach (var item in MyModel.Packing)
+                                    {
+                                        <option value="@item.ID">@item.Title</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="0">No Records - Packing</option>
+                                }
+                            </InputSelect>
+                            <Dropdown_Search @onclick="() => BrowseWindow(3)" />
+                            <label for="ddPacking">Packing</label>
+                        </div>
+                    }
+                </div>
+                <div class="col-md-4">
+                    @if (MyModel.Size != null)
+                    {
+                        <div class="form-floating d-flex gap-2">
+                            <InputSelect id="ddSubSize" class="form-control item-height flex-grow-1"
+                                         TValue="int"
+                                         Value="@MyModel.Record.Size"
+                                         ValueChanged="@((e) => SizeChanged(e))"
+                                         ValueExpression="@(() => MyModel.Record.Size)">
+                                @if (MyModel.Size?.Any() == true)
+                                {
+                                    @foreach (var item in MyModel.Size)
+                                    {
+                                        <option value="@item.ID">@item.Title</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="0">No Records - Size</option>
+                                }
+                            </InputSelect>
+                            <Dropdown_Search @onclick="() => BrowseWindow(3)" />
+                            <label for="ddSize">Size</label>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="filter">
+                <!-- Control Buttons-->
+                <div class="container mt-2 mb-2">
+                    <div class="row">
+                        <div class="col d-flex justify-content-between align-items-center">
+                            <div class="d-flex gap-2">
+                                <Btn_Save @onclick="Save" />
+                                <Btn_Add @onclick="Add" />
+                                <Btn_Delete @onclick="()=>Delete(MyModel.Record.ID)" />
+                            </div>
+                            <button class="btn btn-link btn-sm" title="Back" @onclick="BackPage">
+                                <i class="bi bi-arrow-left-circle"></i>
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (ShowList)
+    {
+       <div class="filter">
+           <!-- Control Buttons-->
+           <div class="container mt-2 mb-2">
+               <div class="row">
+                   <div class="col d-flex justify-content-between align-items-center">
+                       <div class="d-flex gap-2">
+                           <InputText @bind-Value="MyModel.SearchText" />
+                           <Btn_Search @onclick="MyModel.Search" />
+                           <Btn_Refresh @onclick="MyModel.ClearSearch" />
+                           <Btn_Add @onclick="Add" />
+
+
+                       </div>
+                       
+                       <Btn_Back NavTo="/" />
+                   </div>
+               </div>
+           </div>
+       </div>
+
+
+        <div class="container mt-2">
+            <table class="table-list">
+                <thead>
+                    <tr>
+                        <th style="width:10px">Code</th>
+                        <th style="width:40px">Title</th>
+                        <th style="width:10px">Category</th>
+                        <th style="width:10px">Sub Category</th>
+                        <th style="width:10px">Unit</th>
+                        <th style="width:10px">Size</th>
+                        <th style="width:10px"><Btn_Add @onclick="Add" /></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (MyModel.Records.Count > 0)
+                    {
+                        @foreach (var item in MyModel.FilterRecords)
+                        {
+                            <tr @onclick="(()=>Edit(item.ID))">
+                                <td>@item.Code</td>
+                                <td class="left">@item.Title</td>
+                                <td class="left">@item.TitleCategory</td>
+                                <td class="left">@item.TitleSubCategory</td>
+                                <td class="left">@item.TitleUOM</td>
+                                <td class="left">@item.TitleSize</td>
+                                <td>
+                                    <Btn_Edit onClick="(()=>Edit(item.ID))" />
+                                    <Btn_Delete @onclick="(()=>Delete(item.ID))" />
+
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+
+
+</EditForm>
+
+
+
+<!-- Browse Windows -->
+<div class="modal fade" id="winBrowse" tabindex="-1" aria-labelledby="browseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fs-5" id="browseModalLabel">@MyModel.BrowseClass.Heading</h5>
+                <InputText @bind-Value="MyModel.BrowseClass.SearchText"
+                           @oninput="MyModel.BrowseClass.InputHandler"
+                           placeholder="Search..."
+                           class="form-control" />
+
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th style="width:15%">Code</th>
+                                <th style="width:70%">Title</th>
+                                <th style="width:15%">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in @MyModel.BrowseClass.GetBrowseList())
+                            {
+                                <tr>
+                                    <td>@item.Code</td>
+                                    <td>@item.Title</td>
+                                    <td>
+                                        <button class="btn btn-link" data-bs-dismiss="modal" @onclick="(e) =>  SelectedBrowse(item.ID)">
+                                            <i class="bi bi-mouse"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,65 @@
+﻿@inject IJSRuntime JS
+@inherits ComponentBase
+
+
+<div class="chart-container" height="500" width="500">
+    <canvas id="@ChartId"></canvas>
+</div>
+
+@code {
+    [Parameter] public string ChartId { get; set; } = "myChart";
+    [Parameter] public string ChartType { get; set; } = "doughnut"; // or 'pie'
+    [Parameter] public List<string> Labels { get; set; }
+    [Parameter] public List<decimal> DataPie { get; set; }
+    [Parameter] public List<string> BackgroundColors { get; set; }
+    [Parameter] public string ChartTitle { get; set; } = "Sample Chart";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("drawChart", ChartId, ChartType, Labels, DataPie, BackgroundColors, ChartTitle);
+        }
+    }
+}
+
+
+
+
+<script>
+    window.drawChart = (chartId, chartType, labels, data, backgroundColors, chartTitle) => {
+        const canvas = document.getElementById(chartId); // Get the canvas element by its ID
+       
+        const ctx = canvas.getContext('2d'); // Get the 2D drawing context
+
+        new Chart(ctx, {
+            type: chartType,
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        data: data,
+                        backgroundColor: backgroundColors,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Allow the canvas to stretch to the container
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        display: true,
+                    },
+                    title: {
+                        display: true,
+                        text: chartTitle,
+                        font: {
+                            size: 24, // Adjusted font size to be more reasonable
+                        },
+                    },
+                },
+             },
+        });
+    };
+</script>

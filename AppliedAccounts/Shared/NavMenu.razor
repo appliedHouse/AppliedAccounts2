@@ -1,4 +1,7 @@
 ﻿@* @using AppliedAccounts.Authentication; *@
+
+@using AppliedAccounts.Pages.Dashboard
+@using AppliedAccounts.Data.ChartData
 @inject NavigationManager NavManager
 @inject AuthenticationStateProvider authStateProvider
 @inject IJSRuntime js
@@ -12,7 +15,7 @@
 
     protected override void OnInitialized()
     {
-        AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        AppUser = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
         if (AppUser.Role == "Administrator")
         {
             IsAdmin = true;
@@ -26,7 +29,7 @@
 
     public async Task Logout()
     {
-        var AppAuthState = (UserAuthonticationStateProvider)authStateProvider;
+        var AppAuthState = (UserAuthenticationStateProvider)authStateProvider;
         await AppAuthState.UpdateAuthonticateState(null);
 
         NavManager.NavigateTo($"/", true);
@@ -81,10 +84,18 @@
             <button type="submit" id="byn-login" class="btn btn-menu btn-link" @onclick="Login">login</button>
         </NotAuthorized>
         <Authorizing>
-            <h5>Wait.....</h5>
+            <div class="alert alert-info" role="alert" onclick=""  >
+                <h5>Wait. Page Loading...</h5>
+            </div>
+
         </Authorizing>
     </AuthorizeView>
 </div>
+
+@if (AppUser?.UserID == "CDC")
+{
+   <HomeDBoard></HomeDBoard>
+}
 
 
 <script>

@@ -6,6 +6,6 @@ namespace AppliedAccounts.Pages.Accounts
     {
         public COANotesModel Model { get; set; } = new();
         public COANotes() { }
-        
+
     }
 }

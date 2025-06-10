@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AppReports
+﻿namespace AppReports
 {
     interface IInputReport
     {
@@ -20,12 +14,12 @@ namespace AppReports
         public string BasePath { get; set; } = Directory.GetCurrentDirectory();
         public string RootPath { get; set; } = "wwwroot";
 
-        public string FileFullName { get => GetFullName(); } 
+        public string FileFullName { get => GetFullName(); }
         public bool IsFileExist { get => GetFileExist(); }
-       
+
 
         public InputReport() { }
-        public InputReport(string _FilePath, string _FileName) 
+        public InputReport(string _FilePath, string _FileName)
         {
             FilePath = _FilePath;
             FileName = _FileName;
@@ -33,7 +27,7 @@ namespace AppReports
 
         public string GetFileExtention()
         {
-            if(FileName.Length > 0)
+            if (FileName.Length > 0)
             {
                 return Path.GetExtension(FileName);
             }

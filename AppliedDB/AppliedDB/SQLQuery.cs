@@ -599,7 +599,7 @@ namespace AppliedDB
         {
             var _Text = new StringBuilder();
             _Text.AppendLine("SELECT * FROM [View_Book]");
-            if(!string.IsNullOrEmpty(_Filter))
+            if (!string.IsNullOrEmpty(_Filter))
             {
                 _Text.AppendLine($" WHERE {_Filter}");
             }
@@ -629,7 +629,7 @@ namespace AppliedDB
             if (_SQLQuery.Equals(Query.Chk_BillReceivable2)) { return new QueryClass { QueryText = Chk_BillReceivable2(), TableName = Tables.Chk_BillReceivable2.ToString() }; }
             if (_SQLQuery.Equals(Query.Book)) { return new QueryClass { QueryText = Book(), TableName = Tables.Book.ToString() }; }
             if (_SQLQuery.Equals(Query.Book2)) { return new QueryClass { QueryText = Book2(), TableName = Tables.Book2.ToString() }; }
-            
+
 
             return new QueryClass();
         }

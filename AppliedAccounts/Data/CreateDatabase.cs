@@ -1,8 +1,8 @@
-﻿using System;
+﻿using AppliedDB;
+using AppliedGlobals;
 using System.Data;
 using System.Data.SQLite;
 using System.Text;
-using AppliedDB;
 using static AppliedDB.Enums;
 
 namespace AppliedAccounts.Data
@@ -12,18 +12,19 @@ namespace AppliedAccounts.Data
         public Connections ConnectionClass { get; set; }
         public SQLiteConnection MyConnection { get; set; }
         public List<DataRow> TableList { get; set; }
-        public UserProfile AppUser { get; set; }
+        public AppValues.AppPath AppPaths { get; set; }
         public AppUserModel UserModel { get; set; }
         private string TableName { get; set; }
         private string UserName { get; set; }
         private string DBFile { get; set; }
         private List<string> MyMessages { get; set; }
 
-        public CreateDatabase(AppUserModel _UserModel)
+
+        public CreateDatabase(AppValues.AppPath _Paths)
         {
-            UserModel = _UserModel;
+            AppPaths = _Paths;
             MyMessages = new List<string>();
-            ConnectionClass = new(UserModel);
+            ConnectionClass = new(AppPaths);
 
             MyConnection = ConnectionClass.GetSQLiteUsers() ?? new();
 
@@ -179,6 +180,9 @@ namespace AppliedAccounts.Data
                     break;
                 case Tables.Inv_UOM:
                     break;
+                case Tables.Inv_Size:
+                    _CommandText = ItemSize();
+                    break;
                 case Tables.StockCategory:
                     _CommandText = StockCategory();
                     break;
@@ -290,15 +294,6 @@ namespace AppliedAccounts.Data
 
 
         #endregion
-
-
-
-        /// <Queries>
-        /// Start SQL Query Text  //////////////////////////////////////////////////////////////////////
-        /// Start SQL Query Text  //////////////////////////////////////////////////////////////////////
-        /// </summary>
-
-
 
 
         #region Sale Return
@@ -452,7 +447,6 @@ namespace AppliedAccounts.Data
 
         #endregion
 
-
         #region Stock Position Data
         public string StockPositionData()
         {
@@ -595,26 +589,6 @@ namespace AppliedAccounts.Data
         }
         #endregion
 
-        #region Stock Category View
-        private string StockCategory()
-        {
-            var Text = new StringBuilder();
-            Text.AppendLine("CREATE VIEW [StockCategory] AS ");
-            Text.AppendLine("SELECT ");
-            Text.AppendLine("[S].[ID],");
-            Text.AppendLine("[S].[Code],");
-            Text.AppendLine("[S].[Title],");
-            Text.AppendLine("[S].[Category],");
-            Text.AppendLine("[C].[Code] [CatCode],");
-            Text.AppendLine("[C].[Title] [CatTitle]");
-            Text.AppendLine("FROM [Inv_SubCategory] [S]");
-            Text.AppendLine("LEFT JOIN [Inv_Category] [C] ");
-            Text.AppendLine("ON [C].[ID] = [S].[Category]");
-            return Text.ToString();
-        }
-
-        #endregion
-
         #region Stock in Hand
         private string StockInHand()
         {
@@ -748,6 +722,37 @@ namespace AppliedAccounts.Data
         }
         #endregion
 
+        #region Inventory, Category, UOM, Size etc.
+
+
+        private static string ItemSize()
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("CREATE TABLE [Inv_Size] (");
+            _Text.AppendLine("[ID] INT PRIMARY KEY NOT NULL UNIQUE, ");
+            _Text.AppendLine("[Code] NVARCHAR(6) NOT NULL UNIQUE, ");
+            _Text.AppendLine("[Title] NVARCHAR(30) NOT NULL UNIQUE) ");
+
+            return _Text.ToString();
+        }
+
+        private static string StockCategory()
+        {
+            var Text = new StringBuilder();
+            Text.AppendLine("CREATE VIEW [StockCategory] AS ");
+            Text.AppendLine("SELECT ");
+            Text.AppendLine("[S].[ID],");
+            Text.AppendLine("[S].[Code],");
+            Text.AppendLine("[S].[Title],");
+            Text.AppendLine("[S].[Category],");
+            Text.AppendLine("[C].[Code] [CatCode],");
+            Text.AppendLine("[C].[Title] [CatTitle]");
+            Text.AppendLine("FROM [Inv_SubCategory] [S]");
+            Text.AppendLine("LEFT JOIN [Inv_Category] [C] ");
+            Text.AppendLine("ON [C].[ID] = [S].[Category]");
+            return Text.ToString();
+        }
+        #endregion
 
     }
 }

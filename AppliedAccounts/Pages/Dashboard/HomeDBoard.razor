@@ -1,0 +1,205 @@
+﻿@using AppliedAccounts.Data.ChartData
+@using AppliedAccounts.Services
+@using System.Data
+@using static AppliedGlobals.AppErums
+
+@inject GlobalService AppGlobal
+@inject IJSRuntime JS
+
+@code {
+    public double Alpha = 0.7;   // Color ocapacity for the chart colors
+
+    public AppliedDB.DataSource Source { get; set; }
+    private string ChartType = "bar";
+    private List<string> Labels = new();
+    private List<int> DataValues = new();
+    private List<decimal> DataPie = new();
+    private string labelTitle = "Revenue";
+    private List<string> BackgroundColors => new()
+    {
+    $"rgba(255, 99, 132, {Alpha})",   // Red
+    $"rgba(54, 162, 235, {Alpha})",  // Blue
+    $"rgba(255, 206, 86, {Alpha})",  // Yellow
+    $"rgba(75, 192, 192, {Alpha})",  // Green
+    $"rgba(153, 102, 255, {Alpha})", // Purple
+    $"rgba(255, 159, 64, {Alpha})",  // Orange
+    $"rgba(201, 203, 207, {Alpha})", // Gray
+    $"rgba(255, 105, 180, {Alpha})", // Pink
+    $"rgba(144, 238, 144, {Alpha})", // Light Green
+    $"rgba(173, 216, 230, {Alpha})", // Light Blue
+    $"rgba(255, 192, 203, {Alpha})", // Light Pink
+    $"rgba(240, 230, 140, {Alpha})"  // Khaki
+    };
+    private List<string> BorderColors = new()
+    {
+    "rgba(255, 99, 132, 1)",   // Red
+    "rgba(54, 162, 235, 1)",  // Blue
+    "rgba(255, 206, 86, 1)",  // Yellow
+    "rgba(75, 192, 192, 1)",  // Green
+    "rgba(153, 102, 255, 1)", // Purple
+    "rgba(255, 159, 64, 1)",  // Orange
+    "rgba(201, 203, 207, 1)", // Gray
+    "rgba(255, 105, 180, 1)", // Pink
+    "rgba(144, 238, 144, 1)", // Light Green
+    "rgba(173, 216, 230, 1)", // Light Blue
+    "rgba(255, 192, 203, 1)", // Light Pink
+    "rgba(240, 230, 140, 1)"  // Khaki
+};
+    private List<string> BatchList = [];
+    private SearchModel MyModel { get; set; } = new();
+
+    private class SearchModel
+    {
+        public string SearchText { get; set; }
+    }
+
+    protected override void OnInitialized()
+    {
+        Source = new(AppGlobal.AppPaths);
+
+        var _Batch = Source.GetText("Batch");
+
+        BatchList = GetBatchList();
+        if (BatchList.Contains(_Batch) == false || _Batch.Length > 0) { BatchList.Add(_Batch); }
+
+        if (_Batch.Length == 0)
+        {
+            if (BatchList.Count > 0)
+            {
+                _Batch = BatchList.First();
+            }
+        }
+
+        GetData(_Batch);
+
+    }
+
+    private List<string> GetBatchList()
+    {
+        string _Query = SQLQueries.Quries.BatchesForGraph();
+        DataTable _DataTable = Source.GetTable(_Query);
+        var _BatchList = _DataTable.AsEnumerable().Select(row => row.Field<string>("Batch") ?? "").ToList();
+        return _BatchList;
+    }
+    private void GetData(string _Batch)
+    {
+        string _Query = SQLQueries.Quries.RevenueGraph(_Batch);
+        DataTable _DataTable = Source.GetTable(_Query, "", "Amount Desc");
+        int count = _DataTable.Rows.Count;
+        int counter = 0;
+        int OtherAmount = 0;
+        decimal OtherPie = 0.00M;
+
+        Labels.Clear();
+        DataValues.Clear();
+        DataPie.Clear();
+
+        foreach (DataRow row in _DataTable.Rows)
+        {
+            if (counter < 8)
+            {
+                Labels.Add(row["Title"].ToString()!);
+                DataValues.Add(Conversion.ToInteger(row["Amount"]));
+                DataPie.Add(decimal.Parse(row["Amount"].ToString() ?? ""));
+                counter++;
+            }
+            else
+            {
+                OtherAmount += Conversion.ToInteger(row["Amount"]);
+                OtherPie += decimal.Parse(row["Amount"].ToString() ?? "");
+            }
+        }
+
+        if (count >= 8)
+        {
+            Labels.Add("Other");
+            DataValues.Add(OtherAmount);
+            DataPie.Add(OtherPie);
+        }
+    }
+
+
+    private string BatchNull = "Null";
+    private void LoadData(string _Batch)
+    {
+        Source.SetKey("Batch", _Batch, KeyTypes.Text, "Graph Batch");
+        AppGlobal.NavManager.NavigateTo("/", true);
+    }
+}
+
+
+<EditForm Model="MyModel">
+    <div class="container">
+        <div class="d-flex">
+            @foreach (var _Batch in BatchList)
+            {
+                <div class="p-1">
+                    <button class="btn btn-primary btn-sm" @onclick="(() => LoadData(_Batch))">@_Batch</button>
+                </div>
+
+            }
+            <div class="P-1">
+                <InputText @bind-Value="MyModel.SearchText" @onblur="(() => LoadData(MyModel.SearchText))" />
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+<div class="container">
+    <!-- First Row -->
+    <div class="row mt-2 mb-2">
+        <div class="col-md-6 col-12 mb-5 top-left">
+            <BarGraph ChartType="bar"
+                      labelTitle="Revenue"
+                      Labels="Labels"
+                      DataValues="DataValues"
+                      BackgroundColors="BackgroundColors"
+                      BorderColors="BorderColors" />
+        </div>
+        <div class="col-md-6 col-12 mb-5 top-right">
+            <PieGraph ChartId="myDoughnutChart"
+                      ChartType="doughnut"
+                      Labels="Labels"
+                      DataPie=DataPie
+                      BackgroundColors="BackgroundColors"
+                      ChartTitle="Revenue" />
+        </div>
+    </div>
+
+    @*  <!-- Second Row -->
+    <div class="row">
+        <div class="col-md-6 col-12 mb-1 bottom-left"></div>
+        <div class="col-md-6 col-12 mb-1 bottom-right"></div>
+    </div> *@
+</div>
+
+<style>
+    :root {
+        --ChartHeight: 400px; /* Define the CSS variable for chart height */
+    }
+
+    .top-left {
+        height: var(--ChartHeight);
+        background-color: cornsilk;
+        border: 1px solid rgba(86, 61, 124, 0.15);
+    }
+
+    .top-right {
+        height: var(--ChartHeight);
+        background-color: lightcyan;
+        border: 1px solid rgba(86, 61, 124, 0.15);
+    }
+
+    .bottom-left {
+        height: var(--ChartHeight);
+        background-color: lightskyblue;
+        border: 1px solid rgba(86, 61, 124, 0.15);
+    }
+
+    .bottom-right {
+        height: var(--ChartHeight);
+        background-color: honeydew;
+        border: 1px solid rgba(86, 61, 124, 0.15);
+    }
+</style>

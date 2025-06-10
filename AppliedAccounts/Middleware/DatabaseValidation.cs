@@ -1,9 +1,4 @@
-﻿using AppliedAccounts.Pages.ErrorPages;
-using AppliedAccounts.Services;
-using Microsoft.AspNetCore.Components;
-using System.Data.Entity;
-
-namespace AppliedAccounts.Middleware
+﻿namespace AppliedAccounts.Middleware
 {
     public class DatabaseValidation
     {
@@ -29,7 +24,7 @@ namespace AppliedAccounts.Middleware
                 string dbPath = Path.Combine(Directory.GetCurrentDirectory(),
                     "wwwroot",
                     "SQLiteDB",
-                    "AppliedUsers3.db");
+                    "AppliedUsers2.db");
 
                 // Check if the database file exists
                 _isDatabaseValid = File.Exists(dbPath);

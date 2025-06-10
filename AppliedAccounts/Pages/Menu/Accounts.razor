@@ -9,11 +9,11 @@
 
 
 @inject NavigationManager NavManager;
-@inject GlobalService GlobalService;
+@inject GlobalService AppGlobal;
 
 
 @code {
-    public GlobalService AppValues { get; set; }
+
     public MenuCardModel? CardMenuModel { get; set; }
     public string COAText = "A chart of accounts is a documents that list all the transactions.";
     public string ClassText = "Classification of accounts are groups of chart of accounts.";
@@ -24,11 +24,11 @@
     public string BankBookText = "Daily bank transactions.";
     public string ReceiptText = "Receipts";
     public DataSet MyDataset = new();
-
+    public bool IsWaiting { get; set; } = false;
+    public string MyMessage = "Loading....";
 
     protected override void OnInitialized()
     {
-        AppValues = GlobalService;
         CardMenuModel = new() { TextMsg = "", NavTo = "", PicPath = "" };
     }
 
@@ -42,6 +42,16 @@
         {
             Count = _DataSet.Tables.Count;
         }
+    }
+
+    private async Task Migration()
+    {
+
+        AppliedAccounts.Data.DataMigration _MigrationClass = new(AppGlobal);
+        MyMessage = "Migrating Cash Book Data...";
+        await InvokeAsync(StateHasChanged);
+        await Task.Run(()=>_MigrationClass.Cash2Book());
+
     }
 }
 
@@ -58,60 +68,79 @@
     }
 </style>
 
-<div class="fixed-background">
-    <div class="container-fluid mt-1">
-        <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-            <div class="btn-group" role="group">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    Directories
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/Accounts/COA1">Chart of Accout</a></li>
-                    <li><a class="dropdown-item" href="/Accounts/COAClass">Accounts Class</a></li>
-                    <li><a class="dropdown-item" href="/Accounts/COANature">Accounts Nature</a></li>
-                    <li><a class="dropdown-item" href="/Accounts/COANotes">Accounts Notes</a></li>
-                </ul>
-            </div>
-            <button type="button" class="btn btn-primary" @onclick="QuotationsList">Quotation</button>
-            <div class="btn-group" role="group">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    Reports
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/Reporting/GL">General Ledger</a></li>
-                    <li><a class="dropdown-item" href="#">Expense Sheet</a></li>
-                    <li><a class="dropdown-item" href="#">Trial Balance</a></li>
-                    <li><a class="dropdown-item" href="#">Project Balance</a></li>
-                    <li><a class="dropdown-item" href="#">Accounts Receivable</a></li>
-                    <li><a class="dropdown-item" href="#">Accounts Payable</a></li>
-                </ul>
-            </div>
-            <button type="button" class="btn btn-primary">Cash Book</button>
-            <button type="button" class="btn btn-primary">Bank Book</button>
-            <button type="button" class="btn btn-primary">Import</button>
+
+@if (IsWaiting)
+{
+    <div class="text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">@MyMessage</span>
         </div>
     </div>
+}
+else
+{
+    <div class="fixed-background">
+        <div class="container-fluid mt-1">
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Directories
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/Accounts/COA">Chart of Accout</a></li>
+                        <li><a class="dropdown-item" href="/Accounts/COAClass">Accounts Class</a></li>
+                        <li><a class="dropdown-item" href="/Accounts/COANature">Accounts Nature</a></li>
+                        <li><a class="dropdown-item" href="/Accounts/COANotes">Accounts Notes</a></li>
+                    </ul>
+                </div>
+                <button type="button" class="btn btn-primary" @onclick="QuotationsList">Quotation</button>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Reports
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/Reporting/GL">General Ledger</a></li>
+                        <li><a class="dropdown-item" href="#">Expense Sheet</a></li>
+                        <li><a class="dropdown-item" href="#">Trial Balance</a></li>
+                        <li><a class="dropdown-item" href="#">Project Balance</a></li>
+                        <li><a class="dropdown-item" href="#">Accounts Receivable</a></li>
+                        <li><a class="dropdown-item" href="#">Accounts Payable</a></li>
+                    </ul>
+                </div>
+                <button type="button" class="btn btn-primary">Cash Book</button>
+                <button type="button" class="btn btn-primary">Bank Book</button>
+                <button type="button" class="btn btn-primary">Import</button>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Migration
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><button class="btn btn-primary btn-link" @onclick="Migration">Cash Book</button></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
 
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <MenuCard Message=@COAText NavTo="/Accounts/COA1" PicPath="./Images/Cards/COA.jpg" />
-                <MenuCard Message=@ImportText NavTo="/ImportData/ImportSalesInvoice" PicPath="./Images/Cards/ImportExport.png" />
-            </div>
-            <div class="col-md-4">
-                <MenuCard Message=@ClassText NavTo="/Accounts/COAClass" PicPath="./Images/Cards/COANature.png" />
-                <MenuCard Message=@CategoryText NavTo="/Accounts/COANature" PicPath="./Images/Cards/COACategory.png" />
-                <MenuCard Message=@NotesText NavTo="/Accounts/COANotes" PicPath="./Images/Cards/COANotes.png" />
-            </div>
-            <div class="col-md-4">
-                <MenuCard Message=@CashBookText NavTo="/Accounts/BooksList" PicPath="./Images/Cards/CashbookPencil.jpg" />
-                <MenuCard Message=@ReceiptText NavTo="/Accounts/ReceiptList" PicPath="./Images/Cards/Receipt.jpg" />
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <MenuCard Message=@COAText NavTo="/Accounts/COA" PicPath="./Images/Cards/COA.jpg" />
+                    <MenuCard Message=@ImportText NavTo="/ImportData/ImportSalesInvoice" PicPath="./Images/Cards/ImportExport.png" />
+                </div>
+                <div class="col-md-4">
+                    <MenuCard Message=@ClassText NavTo="/Accounts/COAClass" PicPath="./Images/Cards/COANature.png" />
+                    <MenuCard Message=@CategoryText NavTo="/Accounts/COANature" PicPath="./Images/Cards/COACategory.png" />
+                    <MenuCard Message=@NotesText NavTo="/Accounts/COANotes" PicPath="./Images/Cards/COANotes.png" />
+                </div>
+                <div class="col-md-4">
+                    <MenuCard Message=@CashBookText NavTo="/Accounts/BooksList" PicPath="./Images/Cards/CashbookPencil.jpg" />
+                    <MenuCard Message=@ReceiptText NavTo="/Accounts/ReceiptList" PicPath="./Images/Cards/Receipt.jpg" />
+                </div>
             </div>
         </div>
     </div>
-</div>
-
+}
 
 @if (MyDataset.Tables.Count > 0)
 {

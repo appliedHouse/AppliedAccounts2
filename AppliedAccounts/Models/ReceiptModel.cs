@@ -1,12 +1,13 @@
-﻿using AppliedAccounts.Data;
+﻿using Applied_WebApplication.Data;
+using AppliedAccounts.Data;
 using AppliedAccounts.Models.Interface;
-using AppliedDB;
-using AppMessages;
-using System.Data;
-using SQLQueries;
 using AppliedAccounts.Services;
+using AppliedDB;
+using AppliedGlobals;
+using AppMessages;
 using AppReports;
-using Applied_WebApplication.Data;
+using SQLQueries;
+using System.Data;
 using static AppliedDB.Enums;
 using MESSAGE = AppMessages.Enums.Messages;
 
@@ -32,7 +33,7 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> Accounts { get; set; }
         public List<CodeTitle> PayCOA { get; set; }
         public List<CodeTitle> InvoiceList { get; set; }
-        public string DataFile { get; set; }
+        //public string DataFile => AppGlobal.DBFile;
 
         public AppUserModel? UserProfile { get; set; }
         public int Index { get; set; }
@@ -45,30 +46,32 @@ namespace AppliedAccounts.Models
         public bool IsWaiting { get; set; } = false;
         public ReportType rptType { get; set; }
 
-        public GlobalService AppGlobals { get; set; }
+        public GlobalService AppGlobal { get; set; }
 
 
         #endregion
 
         #region Constructor
-        public ReceiptModel() { }
-        public ReceiptModel(AppUserModel _UserProfile)
+
+        public ReceiptModel(GlobalService _AppGlobal)
         {
-            UserProfile = _UserProfile;
+            AppGlobal = _AppGlobal;
+            ReportService = new(AppGlobal);
 
         }
-        public ReceiptModel(AppUserModel _UserProfile, int _ReceiptID)
+        public ReceiptModel(GlobalService _AppGlobal, int _ReceiptID)
         {
-            UserProfile = _UserProfile;
+            AppGlobal = _AppGlobal;
             ReceiptID = _ReceiptID;
+            ReportService = new(AppGlobal);
             Start(ReceiptID);
-           
+
 
         }
         public void Start(int _ReceiptID)
         {
-            if (UserProfile is null) { return; }
-            Source ??= new(UserProfile);
+            //if (UserProfile is null) { return; }
+            Source ??= new(AppGlobal.AppPaths);
 
             MsgClass = new();
             MyVoucher = new();
@@ -77,12 +80,12 @@ namespace AppliedAccounts.Models
             try
             {
                 ReceiptID = _ReceiptID;
-                DataFile = UserProfile?.DataFile ?? "";
+                //DataFile = UserProfile?.DataFile ?? "";
 
-                if (UserProfile != null && !string.IsNullOrEmpty(DataFile))
+                if (AppGlobal != null && !string.IsNullOrEmpty(AppGlobal.DBFile))
                 {
-                    Source = new(UserProfile);
-                    LastVoucherDate = AppRegistry.GetDate(DataFile, "LastRecDate");
+                    Source ??= new(AppGlobal.AppPaths);
+                    LastVoucherDate = AppRegistry.GetDate(AppGlobal.DBFile, "LastRecDate");
 
                     if (ReceiptID == 0) { MyVoucher = NewVoucher(); }   // Create a new voucher;
                     if (ReceiptID > 0)
@@ -412,7 +415,7 @@ namespace AppliedAccounts.Models
                             Deleted ??= [];
                             if (Deleted.Count > 0)
                             {
-                                foreach(var item in Deleted)
+                                foreach (var item in Deleted)
                                 {
                                     DataRow RowDeleted = Source.GetNewRow(Tables.Receipt2);
                                     RowDeleted["ID"] = item.ID2;
@@ -428,16 +431,16 @@ namespace AppliedAccounts.Models
                                     RowDeleted["Description"] = item.Description;
 
                                     _Command = new(RowDeleted, Source.DBFile);
-                                    if(!_Command.DeleteRow())
+                                    if (!_Command.DeleteRow())
                                     {
                                         MsgClass.Add(MESSAGE.RowNotDeleted);
                                     }
                                 }
 
                                 int _SRNO = 1;
-                                foreach(var item in MyVoucher.Details)
+                                foreach (var item in MyVoucher.Details)
                                 {
-                                    item.Sr_No =_SRNO++;        // Reset Serial No after deleted row process 
+                                    item.Sr_No = _SRNO++;        // Reset Serial No after deleted row process 
                                 }
                             }
 
@@ -591,7 +594,7 @@ namespace AppliedAccounts.Models
                 {
                     SetKeys();
                     ReceiptID = reportAction.VoucherID;
-                    ReportService = new(AppGlobals); ;                      // Initialize Report Service
+                    ReportService = new(AppGlobal); ;                      // Initialize Report Service
                     ReportService.ReportType = reportAction.PrintType;      // Assign Report Type 
                     GetReportData();                                        // Report Data Source Setup
                     UpdateReportModel();                                    // Update Report Model
@@ -638,8 +641,8 @@ namespace AppliedAccounts.Models
 
             var _Amount = (decimal)ReportService.Data.ReportTable.Rows[0]["Amount"];
             var _NumInWords = new NumInWords();
-            var _Currency = AppGlobals.Currency.Sign ?? "$";
-            var _CurrencyDigit = AppGlobals.Currency.DigitTitle ?? "";
+            var _Currency = AppGlobal.Currency.Sign ?? "$";
+            var _CurrencyDigit = AppGlobal.Currency.DigitTitle ?? "";
             var _AmountinWord = _NumInWords.ChangeCurrencyToWords(_Amount, _Currency, _CurrencyDigit);
             var ShowImage = false;
 
@@ -650,7 +653,7 @@ namespace AppliedAccounts.Models
             ReportService.Model.AddReportParameter("Heading1", _Heading1);
             ReportService.Model.AddReportParameter("Heading2", _Heading2);
             ReportService.Model.AddReportParameter("InWord", _AmountinWord);
-            ReportService.Model.AddReportParameter("CurrencySign", AppGlobals.Currency.Sign ?? "$");
+            ReportService.Model.AddReportParameter("CurrencySign", AppGlobal.Currency.Sign ?? "$");
             ReportService.Model.AddReportParameter("PayerTitle", "Donor");
             ReportService.Model.AddReportParameter("ShowImages", ShowImage.ToString());
 
@@ -661,12 +664,12 @@ namespace AppliedAccounts.Models
         public void SetKeys()
         {
             AppRegistry.SetKey(Source.DBFile, "Receipt", MyVoucher.Master.Vou_Date, KeyType.Date, "Receipt Page");
-            
+
         }
 
         public void GetKeys()
         {
-            
+
         }
         #endregion
 

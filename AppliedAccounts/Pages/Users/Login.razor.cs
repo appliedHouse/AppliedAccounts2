@@ -1,15 +1,14 @@
 ﻿using AppliedAccounts.Authentication;
 using AppliedDB;
-using System.Data.SQLite;
 using System.Data;
-using AppliedAccounts.Services;
+using System.Data.SQLite;
 
 namespace AppliedAccounts.Pages.Users
 {
     public partial class Login
     {
-        GlobalService AppGlobals { get; set; } = new();
-        private AppUserModel MyModel = new();
+
+        private AppliedGlobals.AppUserModel MyModel = new();
         bool IsLogin { get; set; } = true;
         bool IsError { get; set; } = false;
         bool IsUserFound { get; set; } = false;
@@ -29,7 +28,7 @@ namespace AppliedAccounts.Pages.Users
                 if (IsUser && IsPSW)     // Validate the User Id and Password are equal.
                 {
                     var _newGUID = Guid.NewGuid();
-                    var userAuthStateProvider = (UserAuthonticationStateProvider)authStateProvider;
+                    var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
                     await userAuthStateProvider.UpdateAuthonticateState(new UserSession
                     {
                         UserName = AppUser.Profile.UserID,
@@ -42,19 +41,6 @@ namespace AppliedAccounts.Pages.Users
                         PIN = "0000",
                         SessionGuid = _newGUID,
                         LanguageID = LanguageID,
-
-                        // Default Application Foler
-                        RootFolder = AppGlobals.AppPaths.RootPath ?? "wwwroot",
-                        ClientsFolder = AppGlobals.AppPaths.ClientPath ?? "SQLiteDB",
-                        UsersFolder = AppGlobals.AppPaths.UsersPath ?? "SQLiteDB",
-                        ReportFolder = AppGlobals.AppPaths.ReportPath ?? "Reports",
-                        LanguageFolder = AppGlobals.AppPaths.LanguagesPath ?? "Languages",
-                        MessageFolder = AppGlobals.AppPaths.MessagesPath ?? "Messages",
-                        ImageFolder = AppGlobals.AppPaths.ImagesPath ?? "Images",
-                        PDFFolder = AppGlobals.AppPaths.PDFPath ?? "PDFReport",
-                        SystemFolder = AppGlobals.AppPaths.SystemPath ?? "System",
-                        SessionFolder = AppGlobals.AppPaths.SessionPath ?? "Sessions",
-
                     });
 
                     NavManager.NavigateTo("/", true);
@@ -76,19 +62,19 @@ namespace AppliedAccounts.Pages.Users
             IsLogin = true;
             return;
         }
-        private UserProfile GetUserProfile(AppUserModel _UserModel)
+        private UserProfile GetUserProfile(AppliedGlobals.AppUserModel _UserModel)
         {
             var _UserProfile = new UserProfile();
             try
             {
-                var _Profile = new AppUserModel();
+                var _Profile = new AppliedGlobals.AppUserModel();
                 var _UserID = _UserModel.UserID;
                 if (_UserModel != null)
                 {
                     var UsersDBFile = Path.Combine(
-                        AppGlobals.AppPaths.FirstPath,
-                        AppGlobals.AppPaths.RootPath,
-                        AppGlobals.AppPaths.UsersPath, "AppliedUsers2.db");
+                        AppGlobal.AppPaths.FirstPath,
+                        AppGlobal.AppPaths.RootPath,
+                        AppGlobal.AppPaths.UsersPath, "AppliedUsers2.db");
 
                     var _CommandText = $"SELECT * FROM [Users] WHERE [UserID] = '{_UserID}'";
                     var _Connection = Connections.GetSQLiteConnection(UsersDBFile); _Connection?.Open();
@@ -117,6 +103,11 @@ namespace AppliedAccounts.Pages.Users
                                     Session = Guid.NewGuid().ToString(),
                                     DataFile = _UserData["DataFile"].ToString() ?? "",
                                     Company = _UserData["Company"].ToString() ?? "",
+                                    Address1 = _UserData["Address1"].ToString() ?? "",
+                                    Address2 = _UserData["Address2"].ToString() ?? "",
+                                    City = _UserData["City"].ToString() ?? "",
+                                    Country = _UserData["Country"].ToString() ?? "",
+                                    Contact = _UserData["Contact"].ToString() ?? ""
                                 };
                                 IsUserFound = true;
                             }

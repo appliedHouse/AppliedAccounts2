@@ -1,9 +1,14 @@
 ﻿@layout HomeLayout
 @page "/"
+@using AppliedAccounts.Services
+@using AppliedGlobals
 @using AppliedDB;
+@using AppliedAccounts.Pages.HomePage
+
 @attribute [AllowAnonymous];
 @inject IJSRuntime js;
 @inject AuthenticationStateProvider authStateProvider;
+@inject GlobalService AppGlobal;
 
 
 <PageTitle>Index</PageTitle>
@@ -19,9 +24,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if(AppAuthState.Result.User.Identity.IsAuthenticated)
+        if(AppAuthState.Result.User.Identity!.IsAuthenticated)
         {
-            UserModel = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+            UserModel = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
         }
     }
 
@@ -57,7 +62,7 @@
         {
             await Task.Run(() =>
             {
-                _ = new CreateDatabase(UserModel);         
+                _ = new CreateDatabase(AppGlobal.AppPaths);         
             });
         }
     }
@@ -70,12 +75,14 @@
             <AppHeader />
         </header>
         <NavMenu />
-        <AppliedAccounts.Pages.HomePage.HomePageAuthorized />
+        <HomePageAuthorized />
     </Authorized>
     <NotAuthorized>
-        <AppliedAccounts.Pages.HomePage.HomePageNotAuthorized />
+        <HomePageNotAuthorized />
     </NotAuthorized>
     <Authorizing>
-        <h3>Wait......</h3>
+        <div class="alert alert-info" role="alert">
+            <p>Wait......</p>
+        </div>
     </Authorizing>
 </AuthorizeView>

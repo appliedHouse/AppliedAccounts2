@@ -1,10 +1,7 @@
-﻿using AppliedAccounts.Data;
+﻿using AppliedAccounts.Services;
 using AppliedDB;
-using Microsoft.VisualBasic;
 using System.Data;
-using static AppliedAccounts.Pages.Accounts.COA1;
 using static AppliedDB.Enums;
-using AppMessages;
 using MESSAGES = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Models
@@ -12,7 +9,7 @@ namespace AppliedAccounts.Models
     public class COAModel
     {
         #region Valiables
-        public AppUserModel? AppUser { get; set; }
+        public GlobalService AppGlobal { get; set; }
         public DataSource? Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public COARecord Record { get; set; } = new();
@@ -22,33 +19,34 @@ namespace AppliedAccounts.Models
         public int CountRecord => Records.Count;
         public int Count => Data.Count;
 
-        public List<Dictionary<int, string>> ClassList { get; set; } = new();
-        public List<Dictionary<int, string>> NatureList { get; set; } = new();
-        public List<Dictionary<int, string>> NotesList { get; set; } = new();
+        public List<CodeTitle> ClassList { get; set; } = new();
+        public List<CodeTitle> NatureList { get; set; } = new();
+        public List<CodeTitle> NotesList { get; set; } = new();
 
         public string SelectedClass { get; set; } = "Select..";
         public string SelectedNature { get; set; } = "Select..";
         public string SelectedNotes { get; set; } = "Select..";
         public string SearchText { get; set; } = string.Empty;
         public AppMessages.MessageClass MsgClass { get; set; } = new();
+        public BrowseModel BrowseClass { get; set; } = new();
 
         #endregion
 
         #region Constructor
         public COAModel() { }
-        public COAModel(AppUserModel UserProfile)
+        public COAModel(GlobalService _AppGlobal)
         {
-            AppUser = UserProfile;
-            DBFile = AppUser.DataFile;
-            Source = new(AppUser);
-            Data = Source.GetList(Query.COAList);
+            AppGlobal = _AppGlobal;
+            Source = new(AppGlobal.AppPaths);
+            Data = Source.GetTable(SQLQueries.Quries.COA()).AsEnumerable().ToList();
             Records = GetFilterRecords();
+
+            ClassList = Source.GetAccClass();
+            NatureList = Source.GetAccNature();
+            NotesList = Source.GetAccNotes();
 
             if (Count > 0) { Record = Records.First(); } else { Record = new COARecord(); }
 
-            ClassList = DataSource.GetDataList(DBFile, Tables.COA_Class);
-            NatureList = DataSource.GetDataList(DBFile, Tables.COA_Nature);
-            NotesList = DataSource.GetDataList(DBFile, Tables.COA_Notes);
             // = MessageClass.Messages;
         }
         #endregion
@@ -120,24 +118,21 @@ namespace AppliedAccounts.Models
         #region Filter List
         private List<COARecord> GetFilterRecords()
         {
-            List<COARecord> _FilterRecords = new List<COARecord>();
-            foreach (DataRow _Row in Data)
-            {
-                if (SearchText.Length == 0)
-                {
-                    _FilterRecords.Add(GetRecord(_Row));
-                }
-                else
-                {
-                    if (_Row.Field<string>("Code").Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                    if (_Row["Title"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                    if (_Row["TitleClass"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                    if (_Row["TitleNature"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                    if (_Row["TitleNote"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                }
+            var OIC = StringComparison.OrdinalIgnoreCase;
 
-            }
-            return _FilterRecords;
+            var filteredData = Data.AsEnumerable()
+                .Where(row =>
+                    (row.Field<string>("Code")?.Contains(SearchText, OIC) ?? false)
+                  || (row.Field<string>("Title")?.Contains(SearchText, OIC) ?? false)
+                  || (row.Field<string>("TitleClass")?.Contains(SearchText, OIC) ?? false)
+                  || (row.Field<string>("TitleNature")?.Contains(SearchText, OIC) ?? false)
+                  || (row.Field<string>("TitleNote")?.Contains(SearchText, OIC) ?? false))
+                .Select(GetRecord)
+                .ToList();
+
+            return filteredData;
+
+
         }
         #endregion
 
@@ -167,11 +162,23 @@ namespace AppliedAccounts.Models
         #region Save
         internal bool Save()
         {
-            var _NewRow = GetDataRow(Record);
+            var _NewRow = Source!.GetNewRow(Tables.COA);
+
+            _NewRow["ID"] = Record.ID;
+            _NewRow["Code"] = Record.Code;
+            _NewRow["Title"] = Record.Title;
+            _NewRow["Class"] = Record.Class;
+            _NewRow["Nature"] = Record.Nature;
+            _NewRow["Notes"] = Record.Notes;
+            _NewRow["OPENING_BALANCE"] = Record.OBal;
+
             if (Validate(_NewRow))
             {
-                var _Commands = new CommandClass(_NewRow, DBFile);
-                return _Commands.SaveChanges();
+                Source!.Save(_NewRow);
+                return true;
+
+                //var _Commands = new CommandClass(_NewRow, DBFile);
+                //return _Commands.SaveChanges();
             }
 
             return false;
@@ -205,9 +212,6 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-
-
-
         #region Validate
         private bool Validate(DataRow _Row)
         {
@@ -215,22 +219,23 @@ namespace AppliedAccounts.Models
             if (_Row["ID"] is null) { _Validated = false; MsgClass.Add(MESSAGES.IDIsNull); }
             if (_Row["Code"] is null) { _Validated = false; MsgClass.Add(MESSAGES.CodeIsNull); }
             if (_Row["Title"] is null) { _Validated = false; MsgClass.Add(MESSAGES.TitleIsNull); }
-            if (_Row["Class"] is null) { _Validated = false; MsgClass.Add(MESSAGES.ColumnIsNull); }
-            if (_Row["Nature"] is null) { _Validated = false; MsgClass.Add(MESSAGES.ColumnIsNull); }
-            if (_Row["Notes"] is null) { _Validated = false; MsgClass.Add(MESSAGES.ColumnIsNull); }
+            if (_Row["Class"] is null) { _Validated = false; MsgClass.Add(MESSAGES.ClassIsNull); }
+            if (_Row["Nature"] is null) { _Validated = false; MsgClass.Add(MESSAGES.NatureIsNull); }
+            if (_Row["Notes"] is null) { _Validated = false; MsgClass.Add(MESSAGES.NotesIsNull); }
 
             if (_Row["Code"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.CodeIsZero); }
             if (_Row["Title"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.TitleIsZero); }
             if (_Row["Class"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.AccClassZero); }
             if (_Row["Nature"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.AccNatureZero); }
             if (_Row["Notes"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.AccNotesZero); }
-
             if (_Row["Code"].ToString()?.Length != 6) { _Validated = false; MsgClass.Add(MESSAGES.CodeLength6); }
 
 
             return _Validated;
         }
         #endregion
+
+
 
     }
 

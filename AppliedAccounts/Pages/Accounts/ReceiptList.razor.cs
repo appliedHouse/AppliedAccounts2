@@ -1,14 +1,12 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
-using AppliedDB;
-using Microsoft.JSInterop;
 
 
 namespace AppliedAccounts.Pages.Accounts
 {
     public partial class ReceiptList
     {
-        public AppUserModel UserProfile { get; set; }
+        public AppliedGlobals.AppUserModel UserProfile { get; set; }
         public ReceiptListModel MyModel { get; set; }
 
         public bool IsWaiting { get; set; }
@@ -40,7 +38,7 @@ namespace AppliedAccounts.Pages.Accounts
             }
         }
 
-        
+
 
     }
 }

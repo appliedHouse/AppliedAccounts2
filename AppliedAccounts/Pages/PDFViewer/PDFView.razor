@@ -16,7 +16,7 @@
     public AppUserModel AppUser { get; set; }
     protected override void OnInitialized()
     {
-        AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        AppUser = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
         //AppRegistry.GetText(AppUser.DataFile, "PDFFile");
     }
 }

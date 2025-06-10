@@ -10,7 +10,7 @@
 
 @inject AuthenticationStateProvider authorized
 @inject PrintService PrintService
-@inject GlobalService AppGlobals
+@inject GlobalService AppGlobal
 
 @code {
     private string UserRoll;
@@ -20,14 +20,12 @@
     private decimal Tot_CR = 0.0M;
     protected override void OnInitialized()
     {
-        UserProfile = ((UserAuthonticationStateProvider)authorized).AppUser;
-        MyModel = new(UserProfile ?? new());   // BookID and UserProfile.
-        MyModel.Source = new(UserProfile ?? new());
-        MyModel.AppGlobals = AppGlobals;
+        UserProfile = ((UserAuthenticationStateProvider)authorized).AppUser;
+        MyModel = new(AppGlobal);   
         MyModel.GetKeys();
 
         MyModel.PageIsValid = true;
-        if (MyModel.UserProfile is null) { MyModel.PageIsValid = false; return; }
+        if (AppGlobal is null) { MyModel.PageIsValid = false; return; }
         if (MyModel.Source is null) { MyModel.PageIsValid = false; return; }
     }
 
@@ -39,12 +37,12 @@
 
     private void Edit(int ReceiptID)
     {
-        AppGlobals.NavManager.NavigateTo($"/Accounts/Receipt/{ReceiptID}");
+        AppGlobal.NavManager.NavigateTo($"/Accounts/Receipt/{ReceiptID}");
     }
 
     private void AddNew()
     {
-        AppGlobals.NavManager.NavigateTo($"/Accounts/Receipt");
+        AppGlobal.NavManager.NavigateTo($"/Accounts/Receipt");
     }
 }
 

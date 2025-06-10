@@ -1,0 +1,296 @@
+﻿@page "/Accounts/COA"
+@attribute [Authorize];
+@using AppliedAccounts.Libs
+@using AppliedAccounts.Models
+@using AppliedAccounts.Services
+
+@inject GlobalService AppGlobal
+
+@code {
+    private string[] BrowseList = { "Class", "Nature", "Notes" };
+
+
+    protected override void OnInitialized()
+    {
+        MyModel = new(AppGlobal);
+        IsPageValid = GetPageIsValid();
+    }
+}
+
+<PageHeading Text="Chart of Accounts" />
+
+@* Page Errors Show *@
+@if (MyModel.MsgClass.Count > 0)
+{
+    <PageErrors Messages="@MyModel.MsgClass"></PageErrors>
+}
+
+@if (IsPageValid)
+{
+
+    <EditForm Model="@MyModel">
+        <div class="container">
+            <div class="accordion accordion-flush" id="accordionRecordDisplay">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-RecordDetail">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                            Chart of Accounts - Details
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                        <InputNumber @bind-Value="@MyModel.Record.ID" placeholder="ID" id="ID" hidden></InputNumber>
+                        <div class="row mt-2">
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3 txt">
+                                    <InputText @bind-Value="@MyModel.Record.Code" class="form-control" id="txtCode" placeholder="Account Code" />
+                                    <label for="txtCode">Code</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3 txt">
+                                    <InputText @bind-Value="@MyModel.Record.Title" class="form-control" id="txtTitle" placeholder="Account Title" />
+                                    <label for="txtTitle">Title of Account</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3 txt">
+                                    <InputNumber @bind-Value="@MyModel.Record.OBal" class="form-control" id="txtOBal" placeholder="Voucher No" />
+                                    <label for="txtOBal">Opening Balance</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Class, Nature and Notes Dropdown-->
+                        <div class="row mt-2">
+                            <div class="col-md-4">
+                                @if (MyModel.ClassList != null)
+                                {
+                                    <div class="form-floating d-flex gap-2">
+                                        <InputSelect id="ddAccounts" class="form-control item-height flex-grow-1"
+                                                     TValue="int"
+                                                     Value="@MyModel.Record.Class"
+                                                     ValueChanged="@((e) => ClassChanged(e))"
+                                                     ValueExpression="@(() => MyModel.Record.Class)">
+                                            @if (MyModel.ClassList?.Any() == true)
+                                            {
+                                                @foreach (var item in MyModel.ClassList)
+                                                {
+                                                    <option value="@item.ID">@item.Title</option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <option value="0">No Records - Accounts</option>
+                                            }
+                                        </InputSelect>
+
+                                        <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(1)">
+                                            <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
+                                        </button>
+
+                                        <label for="ddAccounts">Account</label>
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-4">
+                                @if (MyModel.NatureList != null)
+                                {
+                                    <div class="form-floating d-flex gap-2">
+                                        <InputSelect id="ddNature" class="form-control item-height flex-grow-1"
+                                                     TValue="int"
+                                                     Value="@MyModel.Record.Nature"
+                                                     ValueChanged="@((e) => NatureChanged(e))"
+                                                     ValueExpression="@(() => MyModel.Record.Nature)">
+                                            @if (MyModel.ClassList?.Any() == true)
+                                            {
+                                                @foreach (var item in MyModel.NatureList)
+                                                {
+                                                    <option value="@item.ID">@item.Title</option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <option value="0">No Records - Accounts Nature</option>
+                                            }
+                                        </InputSelect>
+
+                                        <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(2)">
+                                            <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
+                                        </button>
+
+                                        <label for="ddNature">Nature</label>
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-4">
+                                @if (MyModel.NotesList != null)
+                                {
+                                    <div class="form-floating d-flex gap-2">
+                                        <InputSelect id="ddNotes" class="form-control item-height flex-grow-1"
+                                                     TValue="int"
+                                                     Value="@MyModel.Record.Notes"
+                                                     ValueChanged="@((e) => NotesChanged(e))"
+                                                     ValueExpression="@(() => MyModel.Record.Notes)">
+                                            @if (MyModel.ClassList?.Any() == true)
+                                            {
+                                                @foreach (var item in MyModel.NotesList)
+                                                {
+                                                    <option value="@item.ID">@item.Title</option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <option value="0">No Records - Accounts Notes</option>
+                                            }
+                                        </InputSelect>
+
+                                        <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(3)">
+                                            <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
+                                        </button>
+
+                                        <label for="ddNotes">Notes</label>
+                                    </div>
+                                }
+                            </div>
+                            
+                        </div>
+                      
+                        <!-- Control Buttons-->
+                        <div class="container mt-2 mb-2">
+                            <div class="row">
+                                <div class="col">
+                                    <button type="button" class="btn btn-Save" @onclick="()=>MyModel.Save()">Save</button>
+                                    <button type="button" class="btn btn-New" @onclick="()=>MyModel.Add()">New</button>
+                                    <button type="button" class="btn btn-Back" @onclick="Back">Back</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter -->
+        <div class="container mb-2">
+            <div class="row row-filter">
+                <div class="col-4">
+                    <InputText @bind-Value="@MyModel.SearchText" class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
+                </div>
+                <div class="col-2">
+                    <button type="button" class="btn btn-primary btn-sm" @onclick="()=>MyModel.Search()">Search</button>
+                    
+                </div>
+                <div class="col-2 justify-content-end">
+                    @if (MyModel.SearchText.Length > 0)
+                    {
+                        <button type="button" style="margin-top:5px; margin-left:5px" class="btn btn-primary btn-sm" @onclick="()=>MyModel.ClearText()">Clear</button>
+                    }
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="container">
+            <table class="table-list">
+                <thead >
+                    <tr class="tb-head-row tb-row-center">
+                        <th style="Width:10%">Code</th>
+                        <th style="Width:30%">Title</th>
+                        <th style="Width:15%">Class</th>
+                        <th style="Width:15%">Nature</th>
+                        <th style="Width:15%">Notes</th>
+                        <th style="Width:10%" rowspan="2">
+                            Opening Balance
+                        </th>
+                        <th style="Width:10%" class="td-btn">
+                            <button id="btnAdd" class="btn-Add" @onclick="Add"><i class="bi bi-plus-circle-fill"></i></button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody >
+                    @foreach (COARecord _Record in MyModel.Records)
+                    {
+                        <tr class="tb-body-row">
+                            <td class="tb-col-center">@_Record.Code</td>
+                            <td class="tb-col-left">@_Record.Title</td>
+                            <td class="tb-col-left">@_Record.TitleClass</td>
+                            <td class="tb-col-left">@_Record.TitleNature</td>
+                            <td class="tb-col-left">@_Record.TitleNote</td>
+                            <td class="amount">@_Record.OBal</td>
+                            <td clas class="tb-col-left" s="td-btn">
+                                <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(()=> Edit((int)_Record.ID))"><i class="bi bi-pencil-fill"></i></button>
+                                <label style="padding-left:5px; padding-right:5px;"> | </label>
+                                <button id="btnDel" type="submit" class="btn-Del" @onclick="(()=> MyModel.Delete((int)_Record.ID))"><i class="bi bi-trash-fill"></i></button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </EditForm>
+}
+else
+{
+    <div class="alert alert-danger d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill" /></svg>
+        <div>
+            <p>The page is invalid or could not be loaded. An error may have occurred.</p>
+        </div>
+    </div>
+}
+
+
+<div class="modal fade" id="winBrowse" tabindex="-1" aria-labelledby="browseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fs-5" id="browseModalLabel">@MyModel.BrowseClass.Heading</h5>
+                    <InputText @bind-Value="MyModel.BrowseClass.SearchText"
+                               @oninput="MyModel.BrowseClass.InputHandler"
+                               placeholder="Search..."
+                               class="form-control" />
+                   
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width:15%">Code</th>
+                                    <th style="width:70%">Title</th>
+                                    <th style="width:15%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in @MyModel.BrowseClass.GetBrowseList())
+                                {
+                                    <tr>
+                                        <td>@item.Code</td>
+                                        <td>@item.Title</td>
+                                        <td>
+                                            <button class="btn btn-link" data-bs-dismiss="modal" @onclick="(e) =>  SelectedBrowse(item.ID)">
+                                                <i class="bi bi-mouse"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<style>
+
+    .table-container {
+        height: 600px;
+        overflow: auto;
+    }
+    
+</style>

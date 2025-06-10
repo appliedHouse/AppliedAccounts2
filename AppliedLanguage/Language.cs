@@ -5,7 +5,7 @@ namespace AppLanguages
     public class Language
     {
         //private DataTable? LanguageDataTable { get; set; }
-        public readonly List<DataRow> Languages = new LanguageList().LangList ;
+        public readonly List<DataRow> Languages = new LanguageList().LangList;
         public int LanguagesCount => Languages.Count;
         public List<DataRow> LanguageText { get; set; } = new();
 
@@ -38,7 +38,7 @@ namespace AppLanguages
         private static List<DataRow> GetLanguageList()
         {
             List<DataRow> _List = new();
-            DataTable _Table = new AppliedDB.Languages().GetLanguageList();
+            DataTable _Table = AppliedDB.Languages.GetLanguageList();
 
             if (_Table.Rows.Count > 0)
             {

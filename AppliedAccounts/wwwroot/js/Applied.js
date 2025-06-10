@@ -96,3 +96,4 @@ function printPDF(pdfUrl) {
         win.print();
     };
 }
+

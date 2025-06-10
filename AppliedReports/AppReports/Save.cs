@@ -17,7 +17,7 @@ namespace AppReports
                 if (File.Exists(_FileName))
                 {
                     File.Delete(_FileName);
-            
+
                 }
                 using (FileStream fstream = new FileStream(_FileName, FileMode.Create))
                 {

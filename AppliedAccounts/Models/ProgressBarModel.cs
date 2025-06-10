@@ -12,7 +12,7 @@
         #region Constructors
         public ProgressBarModel()
         {
-        
+
         }
 
         public ProgressBarModel(double minValue, double maxValue)
@@ -38,7 +38,7 @@
         #region Get Anumated and Striped
         public string GetAnumated()
         {
-            if(IsAnimated)
+            if (IsAnimated)
             {
                 return "progress-bar-animated";
             }

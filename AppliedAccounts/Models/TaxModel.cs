@@ -1,5 +1,4 @@
-﻿using AppliedAccounts.Data;
-using System.Data;
+﻿using System.Data;
 
 namespace AppliedAccounts.Models
 {

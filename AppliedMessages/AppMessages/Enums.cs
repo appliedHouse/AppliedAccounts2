@@ -8,20 +8,20 @@
             NoMessage,
             Default = 1,
             Save = 2,
-            NotSave =5 ,
+            NotSave = 5,
             Delete = 4,
             NotDelete = 6,
             Insert = 3,
             NotInsert = 7,
 
-            RowInserted = 52 ,
+            RowInserted = 52,
             RowNotInserted = 54,
             RowDeleted = 56,
             RowNotDeleted = 58,
 
             // Reports
             prtReportError = 600101,
-            rptRDLCNotExist= 600102,
+            rptRDLCNotExist = 600102,
             rptOutputFileIsZero = 600103,
             rptDataTableIsNull = 600104,
             rptDataRowIsZero = 600105,
@@ -34,8 +34,8 @@
             Row_RateZero = 31,
             Row_COAIsZero = 95,
             Row_IDZero = 97,
-            Row_TaxIDZero,
-            Row_UnitIDZero,
+            Row_TaxIDZero = 220,
+            Row_UnitIDZero = 219,
             Row_GrossAmountZero = 33,
             Row_TaxAmountZero = 32,
             Row_CompanyIDZero = 99,
@@ -57,8 +57,10 @@
 
             ColumnIsNull = 14,
             ColumnDBNullValue = 117,
-            ColumnValueZero  = 15,
-
+            ColumnValueZero = 15,
+            ClassIsNull = 16,
+            NatureIsNull = 17,
+            NotesIsNull = 18,
 
             //Sale Invoice
             Sale_PayLessInvDate = 119,
@@ -92,7 +94,6 @@
             RecordNotValidated = 137,
             DataLoadSucesscully = 48,
             DataLoadFailed = 49,
-
 
             SQLQueryError = 139,
             CodeLength6 = 10,
@@ -147,14 +148,14 @@
             DetailRecordsisNull = 203,
             DetailRecordsAreZero = 205,
             AmountNotEqual = 218
-            
+
         }
 
         public enum Class
         {
-            Sucess,
+            Success,
             Alert,
-            Warrning,
+            Warning,
             Critical,
             Danger,
             Error,

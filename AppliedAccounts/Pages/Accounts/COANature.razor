@@ -1,16 +1,19 @@
 ﻿@page "/Accounts/COANature"
 @attribute [Authorize]
-@using AppliedAccounts.Libs;
-@using AppliedAccounts.Models;
-@inject AuthenticationStateProvider authStateProvider;
-@inject NavigationManager NavManager;
+@using AppliedAccounts.Libs
+@using AppliedAccounts.Models
+@using AppliedAccounts.Services
+
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager NavManager
 @inject IJSRuntime js
+@inject GlobalService AppGlobal
 
 @code {
     protected override void OnInitialized()
     {
-        var AppUserProfile = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
-        if (AppUserProfile != null) { Model = new(AppUserProfile); }
+        var AppUserProfile = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
+        if (AppUserProfile != null) { Model = new(AppGlobal); }
         else { Model = new(); }
     }
 

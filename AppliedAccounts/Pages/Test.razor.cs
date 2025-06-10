@@ -3,10 +3,10 @@
     public partial class Test
     {
 
-        public IConfiguration MyConfig { get; set; } 
+        public IConfiguration MyConfig { get; set; }
         public IWebHostEnvironment MyEnvir { get; set; }
-        public string? Value1 { get; set; } 
-        public string? Value2 { get; set; } 
+        public string? Value1 { get; set; }
+        public string? Value2 { get; set; }
 
         public Test() { }
 

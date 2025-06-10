@@ -1,34 +1,33 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models.Interface;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
 using System.Data;
+using static AppliedDB.Enums;
 
 namespace AppliedAccounts.Models
 {
     public class PurchaseListModel : IVoucherRecords<PurchaseRecord>
     {
-        public AppUserModel AppUser { get; set; }
+        public GlobalService AppGlobal { get; set; }
         public DataSource Source { get; set; }
         public NavigationManager NavManager { get; set; }
-        public string DBFile { get; set; }
         public ListFilter FilterClass { get; set; }
         public List<PurchaseRecord> Records { get; set; }
         public PurchaseRecord Record { get; set; }
-
         public MessageClass MsgClass { get; set; }
         public AppliedDB.Enums.Tables Table { get; set; }
         public bool SelectAll { get; set; }
 
-        public PurchaseListModel(AppUserModel _AppUser)
+        public PurchaseListModel(GlobalService _AppGlobal)
         {
-            AppUser = _AppUser;
-            DBFile = AppUser.DataFile;
-            Source = new DataSource(AppUser);
+            AppGlobal = _AppGlobal;
+            Source = new(AppGlobal.AppPaths);
             MsgClass = new();
-            FilterClass = new(DBFile);
-            Table = AppliedDB.Enums.Tables.view_BillPayable;
+            FilterClass = new(AppGlobal.DBFile);
+            Table = Tables.view_BillPayable;
             Records = LoadData();
         }
 
@@ -72,7 +71,7 @@ namespace AppliedAccounts.Models
                     Batch = item.Field<string>("Batch") ?? "",
                     Qty = item.Field<decimal>("Qty"),
                     Rate = item.Field<decimal>("Rate"),
-                    
+
                     TaxID = item.Field<int>("Tax"),
                     TaxRate = item.Field<decimal>("Tax_Rate"),
                     Description = item.Field<string>("Description") ?? "",
@@ -111,7 +110,7 @@ namespace AppliedAccounts.Models
         public decimal Qty { get; set; }
         public decimal Rate { get; set; }
         public decimal Gross => Qty * Rate;
-        
+
         public int TaxID { get; set; }
         public decimal TaxRate { get; set; }
         public decimal TaxAmount { get; set; }

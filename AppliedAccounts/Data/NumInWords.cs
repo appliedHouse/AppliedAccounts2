@@ -9,7 +9,7 @@ namespace Applied_WebApplication.Data
         public string ChangeNumericToWords(double Amount)
         {
             string _Amount = Amount.ToString();
-            return ChangeToWords(_Amount, false, "","");
+            return ChangeToWords(_Amount, false, "", "");
         }
         public string ChangeNumericToWords(decimal Amount)
         {
@@ -51,9 +51,9 @@ namespace Applied_WebApplication.Data
         {
 
             string val = "";
-            string wholeNo = numb; 
-            string points = ""; 
-            string andStr = ""; 
+            string wholeNo = numb;
+            string points = "";
+            string andStr = "";
             string unitStr = "";
             string endStr = "Only";
 
@@ -63,22 +63,22 @@ namespace Applied_WebApplication.Data
                 Unit = "";
                 andStr = "";
             }
-            
+
             try
             {
                 int decimalPlace = numb.IndexOf(".");
-                
-                if(decimalPlace <=0)
+
+                if (decimalPlace <= 0)
                 {
                     unitStr = $"and No {Unit} ";
                 }
-                
+
                 if (decimalPlace > 0)
                 {
                     wholeNo = numb.Substring(0, decimalPlace);
                     points = numb.Substring(decimalPlace + 1);
 
-                    if(points.Length == 1) { points += "0"; }
+                    if (points.Length == 1) { points += "0"; }
 
                     if (Convert.ToInt32(points) > 0)
                     {

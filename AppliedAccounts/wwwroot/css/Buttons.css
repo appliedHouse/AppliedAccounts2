@@ -21,6 +21,12 @@
     border: none;
 }
 
+    .btn-print:disabled {
+        color: gray; 
+        cursor: not-allowed; 
+    }
+
+
 .btn-Search {
     content: "Search";
     font-size: 2rem;
@@ -62,16 +68,20 @@
     width: 80px
 }
 
+
+
 .btn-New {
     color: white;
     background-color: royalblue;
-    width: 80px
+    width: 45px;
+    height: 16px;
 }
 
 .btn-Save {
     color: white;
     background-color: forestgreen;
-    width: 80px
+    width: 45px;
+    height: 16px;
 }
 
 
@@ -79,26 +89,32 @@
     font-size: 1rem;
     color: ghostwhite;
     background-color: red;
-    border: none;
+    width: 45px;
+    height: 16px;
 }
 
 
 .btn-Back {
     color: red;
     background-color: gold;
-    width: 80px
+    width: 45px;
+    height: 16px;
 }
 
 .btn-trash {
     color: red;
     background-color: transparent;
     border: none;
+    width: 45px;
+    height: 16px;
 }
 
 .btn-pencil {
     color: blue;
     background-color: transparent;
     border: none;
+    width: 45px;
+    height: 16px;
 }
 
 .btn-post {
@@ -106,6 +122,8 @@
     color: green;
     border: none;
     background-color: transparent;
+    width: 45px;
+    height: 16px;
 }
 
 .btn-center {
@@ -141,15 +159,16 @@
 
 
 
-
 .control-buttons {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0px;
     padding: 3px;
     background-color: var(--control-bg);
 }
+
+
+
 
     .control-buttons .ctrl-gap {
         background-color: transparent;

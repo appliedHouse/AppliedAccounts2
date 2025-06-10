@@ -1,23 +1,65 @@
 ﻿@page "/Menu/SaleCDC";
 @inject NavigationManager NavManager;
 
+@using AppliedAccounts.Models
+@using AppliedAccounts.Component
 
 @code {
 
-    private void CustomerList()
+    private void CustomerList() { NavManager.NavigateTo("/CustomerList", true); }
+    private void LoadExcel() { NavManager.NavigateTo("/ImportData/ImportSalesInvoice", true); }
+    private void SaleInvoices() { NavManager.NavigateTo("/Sale/SaleInvoiceList", true); }
+    private void StockList() { NavManager.NavigateTo("/Stock/StockList", true); }
+
+    private Mnu_CardModel CardCustomer { get; set; }
+    private Mnu_CardModel CardServices { get; set; }
+    private Mnu_CardModel CardDataImport { get; set; }
+    private Mnu_CardModel CardInvoices { get; set; }
+
+    protected override void OnInitialized()
     {
-        NavManager.NavigateTo("/CustomerList", true);
+        CardCustomer = new()
+        {
+            Heading = "Customer",
+            PictureUrl = "/Images/Card/COA.jpg",
+            CardIcon = "bi bi-person-badge",
+            CardTitle = "Cusotmer List",
+            Description = "Click below to explore your client list and make updates in just a few clicks.",
+            BtnText = "Click"
+        };
+
+        CardServices = new()
+        {
+            Heading = "Services",
+            PictureUrl = "/Images/Card/COA.jpg",
+            CardIcon = "bi bi-tools",
+            CardTitle = "Services List",
+            Description = "Great service is invisible when perfect, but unforgettable when personalized.",
+            BtnText = "Click"
+        };
+
+        CardDataImport = new()
+        {
+            Heading = "Data Import",
+            PictureUrl = "/Images/Card/COA.jpg",
+            CardIcon = "bi bi-filetype-xls",
+            CardTitle = "Excel Data Imports",
+            Description = "A seamless Excel import bridges the gap between manual entry and automated efficiency.",
+            BtnText = "Click"
+        };
+
+        CardInvoices = new()
+        {
+            Heading = "Invoices",
+            PictureUrl = "/Images/Card/COA.jpg",
+            CardIcon = "bi bi-printer",
+            CardTitle = "Sales Invoices",
+            Description = "A well-managed sales invoice system keeps customers accountable and businesses solvent.",
+            BtnText = "Click"
+        };
     }
 
-    private void LoadExcel()
-    {
-        NavManager.NavigateTo("/ImportData/ImportSalesInvoice", true);
-    }
 
-    private void SaleInvoices()
-    {
-        NavManager.NavigateTo("/Sale/SaleInvoiceList", true);
-    }
 }
 
 <style>
@@ -43,50 +85,20 @@
 </style>
 
 
-<div class="container-fluid container1">
-    <div class="row flex-row">
-        <div class="col-md-4">
-            <div class="card text-bg-light shadow-sm mb-3" style="height: 250px;">
-                <div class="card-header fw-bold">Client List</div>
-                <div class="card-body">
-                    <h5 class="card-title">Manage Clients</h5>
-                    <p class="card-text">Easily add, edit, and remove client details.</p>
-                    <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" @onclick="CustomerList" aria-label="Go to Customer List">
-                        <i class="bi bi-arrow-right-square"></i> View Clients
-                    </button>
-                </div>
-            </div>
+<div class="container-fluid container1 text-center">
+    <div class="d-flex flex-wrap justify-content-center">
+        <div class="m-2" style="width: 300px;">
+            <Mnu_Card @onclick="CustomerList" Card="CardCustomer" />
         </div>
-        <div class="col-md-4">
-            <div class="card text-bg-light shadow-sm mb-3" style="height: 250px;">
-                <div class="card-header fw-bold">Excel Sheet</div>
-                <div class="card-body">
-                    <h5 class="card-title">Upload Excel Sheet</h5>
-                    <p class="card-text">Upload Excel sheet for generate bulk invocies of client for the month.</p>
-                    <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" @onclick="LoadExcel" aria-label=" Go to Customer List">
-                        <i class="bi bi-arrow-right-square"></i> View Clients
-                    </button>
-                </div>
-            </div>
+        <div class="m-2" style="width: 300px;">
+            <Mnu_Card @onclick="StockList" Card="CardServices" />
         </div>
-        
-        <div class="col-md-4">
-            <div class="card text-bg-light shadow-sm mb-3" style="height: 250px;">
-                <div class="card-header fw-bold">Sale Invoice</div>
-                <div class="card-body">
-                    <h5 class="card-title">Print Sale Invoice</h5>
-                    <p class="card-text">Generate and print sales invoices of clients.</p>
-                    <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" @onclick="SaleInvoices" aria-label=" Go to Customer List">
-                       
-                        
-                        <i class="bi bi-arrow-right-square"></i> View Clients
-                    </button>
-                </div>
-            </div>
+        <div class="m-2" style="width: 300px;">
+            <Mnu_Card @onclick="LoadExcel" Card="CardDataImport" />
         </div>
-
-
-        
-        
+        <div class="m-2" style="width: 300px;">
+            <Mnu_Card @onclick="SaleInvoices" Card="CardInvoices" />
+        </div>
     </div>
 </div>
+

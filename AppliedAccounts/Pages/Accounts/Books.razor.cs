@@ -1,8 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
-using AppliedAccounts.Models.Interface;
 using AppliedAccounts.Services;
-using AppliedDB;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -11,12 +9,12 @@ using System.Data;
 
 namespace AppliedAccounts.Pages.Accounts
 {
-    public partial class Books 
+    public partial class Books
     {
         [Parameter] public int ID { get; set; }
         [Parameter] public int BookID { get; set; }
 
-        public AppUserModel UserProfile { get; set; }
+        public AppliedGlobals.AppUserModel UserProfile { get; set; }
         public BookModel MyModel { get; set; } = new();
         public MessageClass MsgClass { get; set; }
 
@@ -36,8 +34,8 @@ namespace AppliedAccounts.Pages.Accounts
         {
             MsgClass = new();
             MyToastClass = new();
-            MyModel = new(ID,BookID, UserProfile); ;
-            MyModel.AppGlobals = AppGlobals;
+            MyModel = new(ID, BookID, AppGlobal); ;
+            //MyModel.AppGlobal = AppGlobal;
             MyModel.ReportService = ReportService;
 
             if (MyModel == null) { IsPageValid = false; MsgClass.Add("Model is null"); return; }
@@ -104,14 +102,14 @@ namespace AppliedAccounts.Pages.Accounts
         #endregion
 
         #region BackPage
-        public void BackPage() { NavManager.NavigateTo("/Accounts/BooksList");}
+        public void BackPage() { NavManager.NavigateTo("/Accounts/BooksList"); }
         #endregion
 
         #region Print
         private async void Print(ReportActionClass reportAction)
         {
             MyModel.IsWaiting = true; await InvokeAsync(StateHasChanged);
-            await Task.Run(()=> { MyModel.Print(reportAction); });
+            await Task.Run(() => { MyModel.Print(reportAction); });
             MyModel.IsWaiting = false; await InvokeAsync(StateHasChanged);
         }
         #endregion

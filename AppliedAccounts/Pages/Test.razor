@@ -1,7 +1,10 @@
 ﻿@page "/Test";
+@using AppliedAccounts.Services
+
 
 
 @inject AuthenticationStateProvider authStateProvider
+@inject GlobalService AppGlobal
 
 @code {
    
@@ -10,8 +13,8 @@
 
     protected override void OnInitialized()
     {
-        var UserAuthentication = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
-        DBClass = new(UserAuthentication);
+        //var UserAuthentication = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
+        DBClass = new(AppGlobal);
         Value1 = MyConfig.GetValue("Paths:DBPath","").ToString();
         Value2 = MyEnvir.ContentRootPath;
 

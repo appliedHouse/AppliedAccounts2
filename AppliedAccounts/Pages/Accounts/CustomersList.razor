@@ -2,18 +2,20 @@
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
+@using AppliedAccounts.Services
 
 @inject AuthenticationStateProvider Authorized;
 @inject NavigationManager NavManager;
 @inject IJSRuntime js
+@inject GlobalService AppGlobal;
 
 
 
 @code {
     protected override void OnInitialized()
     {
-        var AppUserProfile = ((UserAuthonticationStateProvider)Authorized).AppUser;
-        if (AppUserProfile != null) { Model = new(AppUserProfile); }
+        var AppUserProfile = ((UserAuthenticationStateProvider)Authorized).AppUser;
+        if (AppUserProfile != null) { Model = new(AppGlobal); }
         else { Model = new(); }
     }
 
@@ -28,12 +30,17 @@
 
 <EditForm Model="@Model" OnSubmit="Submit">
     <div class="container mb-2">
-        <div class="row row-filter">
+        <div class="row row-filter align-items-center">
             <div class="col-4">
-                <InputText @bind-Value="@Model.SearchText" class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
+                <InputText @bind-Value="@Model.SearchText" class="form-control input-sm" placeholder="Type here to search" />
             </div>
-            <div class="col-2">
-                <button style="margin-top:5px;" class="btn btn-primary btn-sm" @onclick="()=>Model.Search()">Search</button>
+            <div class="col-1">
+                <Btn_Search @onclick="()=>Model.Search()"/>
+                @*<button class="btn btn-primary btn-sm" @onclick="()=>Model.Search()">Search</button>*@
+            </div>
+            <div class="col-1 ms-auto">
+                <!-- ms-auto = margin-start auto -->
+                <Btn_Back NavTo="/" />
             </div>
         </div>
     </div>
@@ -65,12 +72,14 @@
                         <td rowspan="2">
                             <div>
                                 <!-- Edit Button -->
-                                <button id="btnEdit" type="button" class="btn-Edit" aria-label="Edit Record" @onclick="() => Edit(_Record.ID)">
+                                <Btn_Edit @onclick="() => Edit(_Record.ID)"/>
+                                <Btn_Delete @onclick="() => Delete(_Record.ID * -1)"/>
+                                @*<button id="btnEdit" type="button" class="btn-Edit" aria-label="Edit Record" @onclick="() => Edit(_Record.ID)">
                                     <i class="bi bi-pencil-fill"></i>
                                 </button>
                                 <button id="btnDel" type="button" class="btn-Del" aria-label="Delete Record" @onclick="() => Delete(_Record.ID * -1)">
                                     <i class="bi bi-trash-fill"></i>
-                                </button>
+                                </button>*@
                             </div>
                         </td>
                     </tr>

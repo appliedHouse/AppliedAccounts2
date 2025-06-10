@@ -2,15 +2,15 @@
 @inject NavigationManager NavManager;
 @using AppliedAccounts.Data
 @using AppliedAccounts.Services
-@inject GlobalService GlobalService;
+@inject GlobalService AppGlobal;
 
 @code {
-    public GlobalService AppGlobals { get; set; }
+    
     public string? BusinessPic { get; set; }
     protected override void OnInitialized()
     {
-        AppGlobals = GlobalService;
-        BusinessPic = $"{AppGlobals.AppPaths.ImagesPath}/Accounts3.jpg";
+        BusinessPic = $"{AppGlobal.AppPaths.ImagesPath}/Accounts3.jpg";
+        Database_Patches DBPatches = new(new AppliedDB.DataSource(AppGlobal.AppPaths));
     }
 }
 <div class="HomeDiv">

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace AppliedAccounts.Models
 {
-    public class BrowseListModel 
+    public class BrowseListModel
     {
         public BrowseListModel()
         {
@@ -60,7 +60,7 @@ namespace AppliedAccounts.Models
         {
             OutputValue = _ID;
         }
-              
+
 
     }
 }

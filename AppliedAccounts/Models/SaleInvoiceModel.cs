@@ -1,17 +1,17 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models.Interface;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using AppReports;
 using Microsoft.AspNetCore.Components;
+using SQLQueries;
 using System.Data;
 using static AppliedAccounts.Data.AppRegistry;
+using static AppliedDB.Enums.Status;
+using Format = AppliedGlobals.AppValues.Format;
 using MESSAGE = AppMessages.Enums.Messages;
 using Tables = AppliedDB.Enums.Tables;
-using static AppliedDB.Enums.Status;
-using AppliedAccounts.Services;
-using SQLQueries;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AppliedAccounts.Models
 {
@@ -19,10 +19,9 @@ namespace AppliedAccounts.Models
     {
         #region Variables
         public int SaleInvoiceID { get; set; }
-        public AppUserModel? UserProfile { get; set; }
         public DataSource Source { get; set; }
         public Voucher MyVoucher { get; set; } = new();
-        public List<Detail> Deleted { get; set; }
+        public List<Detail> Deleted { get; set; } = new();
         public Total Totals { get; set; } = new();
 
         public List<CodeTitle> Companies { get; set; }
@@ -44,24 +43,24 @@ namespace AppliedAccounts.Models
         public bool IsWaiting { get; set; }             // Page is wait for completion of process like save or data load
         public int Count => MyVoucher.Details.Count;    // total records in detail list.
         public int ListType { get; set; }               // List type for display in View Table at page
-        public GlobalService AppGlobals { get; set; }
+        public GlobalService AppGlobal { get; set; }
 
 
         #endregion
 
         #region Constructor
         public SaleInvoiceModel() { }
-        public SaleInvoiceModel(AppUserModel _UserProfile)
+        public SaleInvoiceModel(GlobalService _AppGlobal)
         {
-            UserProfile = _UserProfile;
-            Source = new DataSource(UserProfile);
+            AppGlobal = _AppGlobal;
+            Source = new DataSource(AppGlobal.AppPaths);
         }
 
-        public SaleInvoiceModel(AppUserModel _UserProfile, int _SaleInvoiceID)
+        public SaleInvoiceModel(GlobalService _AppGlobal, int _SaleInvoiceID)
         {
-            UserProfile = _UserProfile;
+            AppGlobal = _AppGlobal;
             SaleInvoiceID = _SaleInvoiceID;
-            Source = new DataSource(UserProfile);
+            Source = new DataSource(AppGlobal.AppPaths);
             Start(SaleInvoiceID);
 
         }
@@ -72,15 +71,15 @@ namespace AppliedAccounts.Models
         {
             try
             {
-                if (UserProfile is null) { return; }
-                Source ??= new(UserProfile);
+                if (AppGlobal is null) { return; }
+                Source ??= new(AppGlobal.AppPaths);
 
-                MsgClass = new();
+                MsgClass = new(Msg.GetMessages());
                 MyVoucher = new();
                 LastVoucherDate = GetDate(Source.DBFile, "SInvDate");           // Sale Invoice Date
 
                 SaleInvoiceID = _SaleInvoiceID;
-                DataFile = UserProfile.DataFile;
+                //DataFile = UserProfile.DataFile;
                 Companies = Source.GetCustomers();
                 Accounts = Source.GetAccounts();
                 Employees = Source.GetEmployees();
@@ -105,38 +104,38 @@ namespace AppliedAccounts.Models
 
         private Voucher NewVoucher()
         {
-                var _MyVoucher = new Voucher();
-                _MyVoucher.Master.ID1 = 0;
-                _MyVoucher.Master.Vou_No = "NEW";
-                _MyVoucher.Master.Vou_Date = DateTime.Now;
-                _MyVoucher.Master.Company = 0;
-                _MyVoucher.Master.Employee = 0;
-                _MyVoucher.Master.Ref_No = "";
-                _MyVoucher.Master.Inv_No = "";
-                _MyVoucher.Master.Inv_Date = DateTime.Now;
-                _MyVoucher.Master.Pay_Date = DateTime.Now;
-                _MyVoucher.Master.Remarks = "";
-                _MyVoucher.Master.Comments = "";
-                _MyVoucher.Master.Status = Submitted.ToString();
-                _MyVoucher.Master.TitleCompany = "";
-                _MyVoucher.Master.TitleEmployee = "";
+            var _MyVoucher = new Voucher();
+            _MyVoucher.Master.ID1 = 0;
+            _MyVoucher.Master.Vou_No = "NEW";
+            _MyVoucher.Master.Vou_Date = DateTime.Now;
+            _MyVoucher.Master.Company = 0;
+            _MyVoucher.Master.Employee = 0;
+            _MyVoucher.Master.Ref_No = "";
+            _MyVoucher.Master.Inv_No = "";
+            _MyVoucher.Master.Inv_Date = DateTime.Now;
+            _MyVoucher.Master.Pay_Date = DateTime.Now;
+            _MyVoucher.Master.Remarks = "";
+            _MyVoucher.Master.Comments = "";
+            _MyVoucher.Master.Status = Submitted.ToString();
+            _MyVoucher.Master.TitleCompany = "";
+            _MyVoucher.Master.TitleEmployee = "";
 
 
-                _MyVoucher.Detail.ID2 = 0;
-                _MyVoucher.Detail.Sr_No = 1;
-                _MyVoucher.Detail.Inventory = 0;
-                _MyVoucher.Detail.Batch = "";
-                _MyVoucher.Detail.Qty = 0.00M;
-                _MyVoucher.Detail.Rate = 0.00M;
-                _MyVoucher.Detail.TaxID = 0;
-                _MyVoucher.Detail.TaxRate = 0.00M;
-                _MyVoucher.Detail.Description = "";
-                _MyVoucher.Detail.Project = 0;
-                _MyVoucher.Detail.TitleInventory = "";
-                _MyVoucher.Detail.TitleProject = "";
-                _MyVoucher.Detail.TitleTaxID = "";
+            _MyVoucher.Detail.ID2 = 0;
+            _MyVoucher.Detail.Sr_No = 1;
+            _MyVoucher.Detail.Inventory = 0;
+            _MyVoucher.Detail.Batch = "";
+            _MyVoucher.Detail.Qty = 0.00M;
+            _MyVoucher.Detail.Rate = 0.00M;
+            _MyVoucher.Detail.TaxID = 0;
+            _MyVoucher.Detail.TaxRate = 0.00M;
+            _MyVoucher.Detail.Description = "";
+            _MyVoucher.Detail.Project = 0;
+            _MyVoucher.Detail.TitleInventory = "";
+            _MyVoucher.Detail.TitleProject = "";
+            _MyVoucher.Detail.TitleTaxID = "";
 
-                return _MyVoucher;
+            return _MyVoucher;
         }
         #endregion
 
@@ -211,23 +210,23 @@ namespace AppliedAccounts.Models
 
                         MyVoucher.Details = [.. VoucherData.Select(row => new Detail()
                         {
-                            ID2 = row.Field<int>("ID2"),
-                            TranID = row.Field<int>("TranID"),
-                            Sr_No = row.Field<int>("Sr_No"),
-                            Inventory = row.Field<int>("Inventory"),
+                            ID2 = row.Field<int?>("ID2") ?? 0,
+                            TranID = row.Field<int?>("TranID") ?? 0,
+                            Sr_No = row.Field<int?>("Sr_No") ?? 0,
+                            Inventory = row.Field<int?>("Inventory") ?? 0,
                             Batch = row.Field<string>("Batch") ?? "",
-                            Unit = row.Field<int>("Unit"),
-                            Qty = row.Field<decimal>("Qty"),
-                            Rate = row.Field<decimal>("Rate"),
-                            TaxID = row.Field<int>("Tax"),
-                            TaxRate = row.Field<decimal>("Tax_Rate"),
+                            Unit = row.Field<int?>("Unit") ?? 0,
+                            Qty = row.Field<decimal?>("Qty") ?? 0.00M,
+                            Rate = row.Field<decimal?>("Rate") ?? 0.00M,
+                            TaxID = row.Field<int?>("Tax") ?? 0,
+                            TaxRate = row.Field<decimal?>("Tax_Rate") ?? 0.00M,
                             Description = row.Field<string>("Description") ?? "",
-                            Project = row.Field<int>("Project"),
+                            Project = row.Field<int?>("Project") ?? 0,
 
                             TitleInventory = row.Field<string>("TitleStock") ?? "",
-                            TitleProject = row.Field < string >("TitleProject") ?? "",
-                            TitleTaxID = row.Field < string >("TitleTax") ?? "",
-                            TitleUnit = row.Field < string >("TitleUnit") ?? "",
+                            TitleProject = row.Field<string>("TitleProject") ?? "",
+                            TitleTaxID = row.Field<string>("TitleTax") ?? "",
+                            TitleUnit = row.Field<string>("TitleUnit") ?? "",
 
                             })];
 
@@ -253,7 +252,8 @@ namespace AppliedAccounts.Models
         public bool IsVoucherValidated()
         {
             bool IsValid = true;
-            MsgClass = new();
+            MsgClass ??= new(Msg.GetMessages());
+            MsgClass.ClearMessages();
 
             if (MyVoucher.Master == null) { MsgClass.Add(MESSAGE.MasterRecordisNull); return false; }
             if (MyVoucher.Details == null) { MsgClass.Add(MESSAGE.DetailRecordsisNull); return false; }
@@ -261,7 +261,7 @@ namespace AppliedAccounts.Models
             if (MyVoucher.Master.Vou_No.Length == 0) { MsgClass.Add(MESSAGE.VouNoNotDefine); }
             if (!MyVoucher.Master.Vou_No.ToLower().Equals("new"))
             {
-                if (MyVoucher.Master.Vou_No.Length != 11) { MsgClass.Add(MESSAGE.VouNoNotDefineProperly); }
+                if (MyVoucher.Master.Vou_No.Length < 11) { MsgClass.Add(MESSAGE.VouNoNotDefineProperly); }
             }
             if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgClass.Add(MESSAGE.VouDateLess); }
             if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgClass.Add(MESSAGE.VouDateMore); }
@@ -303,7 +303,7 @@ namespace AppliedAccounts.Models
             MyVoucher.Details ??= [];           // Construct new if found null;
 
             var _SrNo = 1;
-            if(MyVoucher.Details.Count > 0)
+            if (MyVoucher.Details.Count > 0)
             {
                 _SrNo = MyVoucher.Details.Max(x => x.Sr_No) + 1;
             }
@@ -364,14 +364,12 @@ namespace AppliedAccounts.Models
 
         public List<Detail> GetDisplayList(bool _Deleted)
         {
-
             if (_Deleted)
             {
                 return Deleted;
             }
             return MyVoucher.Details;
         }
-
 
         #region Remove
         public void Remove()
@@ -424,7 +422,7 @@ namespace AppliedAccounts.Models
                 if (!IsSrNo)
                 {
                     MyVoucher.Detail.Action = "save";
-                    MyVoucher.Details.Add(MyVoucher.Detail);
+                    MyVoucher.Details.Add(MyVoucher.Detail);            
                 }
             }
             else
@@ -438,7 +436,7 @@ namespace AppliedAccounts.Models
         public async Task<bool> SaveAllAsync()
         {
             MsgClass = new();
-            
+
 
             var IsSaved = true;
             if (!IsWaiting)
@@ -569,7 +567,7 @@ namespace AppliedAccounts.Models
             return true;
         }
         #endregion
-        
+
 
         #region Calculations
 
@@ -594,7 +592,7 @@ namespace AppliedAccounts.Models
         {
             await Task.Run(() =>
             {
-                ReportService = new(AppGlobals); ;
+                ReportService = new(AppGlobal); ;
                 ReportService.ReportType = _rptType;
                 ReportService.Data = GetReportData();
                 ReportService.Model = CreateReportModel();
@@ -625,8 +623,8 @@ namespace AppliedAccounts.Models
         {
             var _Heading1 = "Sale Invoice";
             var _Heading2 = $"{_Heading1} [{MyVoucher.Master.Vou_No}]";
-            var _ReportPath = UserProfile!.ReportFolder;
-            var _CompanyName = UserProfile.Company;
+            var _ReportPath = AppGlobal.AppPaths.ReportPath;
+            var _CompanyName = AppGlobal.Client.Name;
             var _ReportFooter = AppFunctions.ReportFooter();
 
             ReportModel rptModel = new();
@@ -643,9 +641,9 @@ namespace AppliedAccounts.Models
             return rptModel;
         }
 
-       
 
-        
+
+
         #endregion
 
         #region Model

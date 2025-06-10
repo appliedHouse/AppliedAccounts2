@@ -5,17 +5,17 @@ using Microsoft.AspNetCore.Components;
 
 namespace AppliedAccounts.Pages.Accounts
 {
-    public partial class BooksList 
+    public partial class BooksList
     {
 
-        public AppUserModel UserProfile { get; set; }
+        public AppliedGlobals.AppUserModel UserProfile { get; set; }
         public BookListModel MyModel { get; set; } = new();
         public NavigationManager NavManager { get; set; }
 
         public BooksList() { }
 
         #region Back Page
-        public void Back() { AppGlobals.NavManager.NavigateTo("/Menu/Accounts"); }
+        public void Back() { AppGlobal.NavManager.NavigateTo("/Menu/Accounts"); }
         #endregion
 
         #region New Voucher
@@ -37,9 +37,9 @@ namespace AppliedAccounts.Pages.Accounts
 
         public string GetTitle(List<CodeTitle> _List, int _Value)
         {
-            if (_List == null || _List.Count == 0) {return string.Empty; }
+            if (_List == null || _List.Count == 0) { return string.Empty; }
             return _List.FirstOrDefault(x => x.ID == _Value)!.Title ?? "";
-            
+
         }
 
         #region Print
@@ -47,6 +47,7 @@ namespace AppliedAccounts.Pages.Accounts
         {
             MyModel.IsWaiting = true;
             await InvokeAsync(StateHasChanged);
+            await Task.Delay(100);                  // Delay for show the message and 
 
             try
             {
@@ -60,6 +61,7 @@ namespace AppliedAccounts.Pages.Accounts
 
             MyModel.IsWaiting = false;
             await InvokeAsync(StateHasChanged);
+            await Task.Delay(100);                  // Delay for show the message and 
         }
         #endregion
     }

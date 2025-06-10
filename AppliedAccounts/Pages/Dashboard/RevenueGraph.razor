@@ -1,0 +1,10 @@
+﻿@page "/dashboard"
+
+<ShowGraph CanvasId="myChart" ChartData="chartData" />
+
+@code {
+    private object chartData = Data.ChartData.RevenueChartData.Revenue;
+}
+
+
+

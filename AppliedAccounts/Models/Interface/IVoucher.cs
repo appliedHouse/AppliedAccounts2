@@ -1,24 +1,22 @@
 ﻿using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
-using AppReports;
-using Microsoft.AspNetCore.Components;
 
 namespace AppliedAccounts.Models.Interface
 {
     public interface IVoucher
     {
+        GlobalService AppGlobal { get; set; }
         DateTime LastVoucherDate { get; set; }
         DateTime MaxVouDate { get; set; }
         MessageClass MsgClass { get; set; }
         PrintService ReportService { get; set; }
         DataSource Source { get; set; }
-        List<CodeTitle> Companies { get; set; } 
-        List<CodeTitle> Employees { get; set; } 
-        List<CodeTitle> Projects { get; set; } 
-        List<CodeTitle> Accounts { get; set; } 
-        string DataFile { get; set; }
-        AppUserModel? UserProfile { get; set; }
+        List<CodeTitle> Companies { get; set; }
+        List<CodeTitle> Employees { get; set; }
+        List<CodeTitle> Projects { get; set; }
+        List<CodeTitle> Accounts { get; set; }
+
         int Index { get; set; }
         int Count { get; }
 
@@ -26,8 +24,6 @@ namespace AppliedAccounts.Models.Interface
         decimal Tot_CR { get; set; }
 
         bool IsWaiting { get; set; }
-
-        GlobalService AppGlobals { get; set; }
 
 
         void CalculateTotal();

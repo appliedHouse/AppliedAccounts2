@@ -13,7 +13,7 @@
 @inject AuthenticationStateProvider Authorized
 @inject ToastService ToastService
 @inject PrintService ReportService
-@inject GlobalService AppGlobals
+@inject GlobalService AppGlobal
 
 @code {
     decimal LedgerBalance;
@@ -22,7 +22,7 @@
 
     protected override void OnInitialized()
     {
-        var AppUser = ((UserAuthonticationStateProvider)Authorized).AppUser;
+        var AppUser = ((UserAuthenticationStateProvider)Authorized).AppUser;
 
         Start(AppUser);
 

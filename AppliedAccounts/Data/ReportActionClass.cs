@@ -9,5 +9,5 @@ namespace AppliedAccounts.Data
         public string Vou_No { get; set; }
     }
 
-    
+
 }

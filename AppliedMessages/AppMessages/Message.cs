@@ -40,7 +40,7 @@ namespace AppMessages
         public string Code { get; set; } = string.Empty;
         public int RowEffected { get; set; } = 0;
         public string MessageText { get; set; } = "Empty...";
-        public Class MessageClass { get; set; } = new();
+        public Class MessageClass { get; set; } = Class.Error;
         public DateTime MessageDate { get; set; } = DateTime.Now;
         public string WebPage { get; set; } = string.Empty;
         public string Method { get; set; } = string.Empty;

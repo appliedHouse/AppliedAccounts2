@@ -1,4 +1,4 @@
-﻿using AppliedAccounts.Data;
+﻿using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using System.ComponentModel.DataAnnotations;
@@ -9,25 +9,26 @@ namespace AppliedAccounts.Models
 {
     public class CustomersModel
     {
-        public AppUserModel? AppUser { get; set; }
-        public DataSource? Source { get; set; }
+        public GlobalService AppGlobal { get; set; }
+        public DataSource Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public CustomerRecord Record { get; set; } = new();
         public List<CustomerRecord> Records { get; set; } = [];
         public List<DataRow> Data { get; set; } = new();
         public DataRow? MyDataRow { get; set; }
-        public MessageClass MyMessages { get; set; } 
+        public MessageClass MsgClass { get; set; }
         public bool RecordNotFound { get; set; } = false;
         public string SearchText { get; set; } = string.Empty;
 
 
         #region Constructor
         public CustomersModel() { }
-        public CustomersModel(AppUserModel UserProfile)
+
+        public CustomersModel(GlobalService _AppGlobal)
         {
-            AppUser = UserProfile;
-            DBFile = AppUser.DataFile;
-            Source = new(AppUser);
+            AppGlobal = _AppGlobal;
+            MsgClass = new();
+            Source = new(AppGlobal.AppPaths);
             Data = Source.GetList(Query.CustomersList);
             MyDataRow = Source.Seek(Tables.Customers, 0);
 
@@ -40,11 +41,12 @@ namespace AppliedAccounts.Models
                 Record = GetRecord(MyDataRow);
             }
         }
-        public CustomersModel(AppUserModel UserProfile, int ID)
+        public CustomersModel(GlobalService _AppGlobal, int ID)
         {
-            AppUser = UserProfile;
-            DBFile = AppUser.DataFile;
-            Source = new(AppUser);
+            AppGlobal = _AppGlobal;
+            //AppUser = UserProfile;
+            //DBFile = AppUser.DataFile;
+            Source = new(AppGlobal.AppPaths);
             MyDataRow = Source.Seek(Tables.Customers, ID);
             Record = GetRecord(MyDataRow);
         }
@@ -90,19 +92,32 @@ namespace AppliedAccounts.Models
 
         private DataRow GetDataRow(CustomerRecord _Record)
         {
-            DataRow _DataRow = MyDataRow.Table.NewRow();
-            _DataRow["Id"] = _Record.ID;
-            _DataRow["Code"] = _Record.Code;
-            _DataRow["Title"] = _Record.Title;
-            _DataRow["Address1"] = _Record.Address1;
-            _DataRow["Address2"] = _Record.Address2;
-            _DataRow["City"] = _Record.City;
-            _DataRow["Country"] = _Record.Country;
-            _DataRow["Phone"] = _Record.Phone;
-            _DataRow["Mobile"] = _Record.Mobile;
-            _DataRow["Email"] = _Record.Email;
-            _DataRow["NTN"] = _Record.NTN;
-            _DataRow["CNIC"] = _Record.CNIC;
+            DataRow _DataRow = MyDataRow!.Table.NewRow();
+            if (MyDataRow is not null)
+            {
+                //_DataRow = MyDataRow.Table.NewRow();
+                _DataRow["Id"] = _Record.ID;
+                _DataRow["Code"] = _Record.Code;
+                _DataRow["Title"] = _Record.Title;
+                _DataRow["Address1"] = _Record.Address1;
+                _DataRow["Address2"] = _Record.Address2;
+                _DataRow["Address3"] = _Record.Address3;
+                _DataRow["City"] = _Record.City;
+                _DataRow["State"] = _Record.State;
+                _DataRow["Country"] = _Record.Country;
+                _DataRow["Phone"] = _Record.Phone;
+                _DataRow["Mobile"] = _Record.Mobile;
+                _DataRow["Email"] = _Record.Email;
+                _DataRow["NTN"] = _Record.NTN;
+                _DataRow["CNIC"] = _Record.CNIC;
+                _DataRow["Notes"] = _Record.Notes;
+               
+               
+            }
+            else
+            {
+                MsgClass.Alert(AppMessages.Enums.Messages.RecordNotSaved);
+            }
             return _DataRow;
         }
         #endregion
@@ -148,7 +163,7 @@ namespace AppliedAccounts.Models
                     _Commands.DeleteRow();
                     if (_Commands.Effected > 0)
                     {
-                        MyMessages = _Commands.MyMessages;
+                        MsgClass = _Commands.MyMessages;
                         Data = Source.GetList(Query.CustomersList);
                         if (Data is not null) { Records = GetFilterRecords(""); }
                         return true;
@@ -165,23 +180,28 @@ namespace AppliedAccounts.Models
             var _NewRow = GetDataRow(Record);
             if (Validate(_NewRow))
             {
-                var _Commands = new CommandClass(_NewRow, DBFile);
+                Source ??= new(AppGlobal.AppPaths);
+                Source.Save(_NewRow);
 
-                return _Commands.SaveChanges();
+                //var _Commands = new CommandClass(_NewRow, DBFile);
+
+
+
+                return true;
             }
             return false;
         }
 
         private bool Validate(DataRow _Row)
         {
-            if (_Row["ID"] == null) { MyMessages.Add(AppMessages.Enums.Messages.IDIsNull); }
-            if (_Row["Code"] == null) { MyMessages.Add(AppMessages.Enums.Messages.CodeIsNull); }
-            if (_Row["Title"] == null) { MyMessages.Add(AppMessages.Enums.Messages.TitleIsNull); }
-            if (_Row["City"] == null) { MyMessages.Add(AppMessages.Enums.Messages.CityIsZero); }
+            if (_Row["ID"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.IDIsNull); }
+            if (_Row["Code"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.CodeIsNull); }
+            if (_Row["Title"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.TitleIsNull); }
+            if (_Row["City"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.CityIsZero); }
 
-            if (((string)_Row["Code"]).Length == 0) { MyMessages.Add(AppMessages.Enums.Messages.CodeIsZero); }
-            if (((string)_Row["Title"]).Length == 0) { MyMessages.Add(AppMessages.Enums.Messages.TitleIsZero); }
-            if (((string)_Row["City"]).Length == 0) { MyMessages.Add(AppMessages.Enums.Messages.CityIsZero); }
+            if (((string)_Row["Code"]).Length == 0) { MsgClass.Alert(AppMessages.Enums.Messages.CodeIsZero); }
+            if (((string)_Row["Title"]).Length == 0) { MsgClass.Alert(AppMessages.Enums.Messages.TitleIsZero); }
+            if (((string)_Row["City"]).Length == 0) { MsgClass.Alert(AppMessages.Enums.Messages.CityIsZero); }
 
             return true;
         }
@@ -221,7 +241,7 @@ namespace AppliedAccounts.Models
         [Required]
         public string Address1 { get; set; } = string.Empty;
         public string Address2 { get; set; } = string.Empty;
-        [Required]
+        public string Address3 { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
         public string State { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;

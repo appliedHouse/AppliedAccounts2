@@ -1,20 +1,21 @@
-﻿using AppliedDB;
-using Messages = AppMessages.Enums.Messages;
-using System.Data;
-using AppliedAccounts.Services;
-using AppliedAccounts.Data;
+﻿using AppliedAccounts.Data;
 using AppliedAccounts.Pages.Accounts;
+using AppliedAccounts.Services;
+using AppliedDB;
 using AppReports;
+using System.Data;
+using Format = AppliedGlobals.AppValues.Format;
+using Messages = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Models
 {
     public class BookListModel  // : IVoucherList
     {
-        public GlobalService AppGlobals { get; set; }
+        public GlobalService AppGlobal { get; set; }
         public List<CodeTitle> BookList { get; set; }
         public List<CodeTitle> NatureAccountsList { get; set; }
         public DataSource Source { get; set; }
-        public AppUserModel? UserProfile { get; set; }
+        public AppliedGlobals.AppUserModel? UserProfile { get; set; }
         public AppMessages.MessageClass MsgClass { get; set; }
         public PrintService ReportService { get; set; }
 
@@ -30,11 +31,11 @@ namespace AppliedAccounts.Models
         public bool IsWaiting { get; set; } = false;
 
         public BookListModel() { }
-        public BookListModel(int _BookID, AppUserModel _AppUserProfile)
+        public BookListModel(int _BookID, GlobalService _AppGlobal)
         {
+            AppGlobal = _AppGlobal;
             MsgClass = new();
-            UserProfile = _AppUserProfile;
-            Source = new(UserProfile);
+            Source = new(AppGlobal.AppPaths);
             GetKeys();
 
             try
@@ -48,7 +49,7 @@ namespace AppliedAccounts.Models
                 BookNatureID = (int)result;
 
                 BookID = _BookID;
-                UserProfile = _AppUserProfile;
+                //UserProfile = _AppUserProfile;
 
                 NatureAccountsList =
                 [
@@ -82,7 +83,7 @@ namespace AppliedAccounts.Models
 
         public List<BookView> LoadBookRecords(int _BookID)     // Load List of Cash / Bank Book record in Table
         {
-            if(_BookID == 0) { return []; }      
+            if (_BookID == 0) { return []; }
             var _List = new List<BookView>();
             var _Data = Source.GetBookList(_BookID);
 
@@ -131,10 +132,10 @@ namespace AppliedAccounts.Models
         #region Print
         public void Print(ReportType _ReportType)
         {
-            
+
             try
             {
-                ReportService = new(AppGlobals);
+                ReportService = new(AppGlobal);
                 ReportService.ReportType = _ReportType;
                 GetReportData();
                 ReportModel();                              // Add / update Report model data.
@@ -166,7 +167,7 @@ namespace AppliedAccounts.Models
             ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
             ReportService.Model.OutputReport.FileName = $"Book_{_VoucherNo}" +
                 $"{ReportService.Model.OutputReport.FileExt}";          // without Extention
-            
+
             ReportService.Model.AddReportParameter("Heading1", _Heading1);
             ReportService.Model.AddReportParameter("Heading2", _Heading2);
             ReportService.Model.AddReportParameter("InWords", "Words");
@@ -180,7 +181,7 @@ namespace AppliedAccounts.Models
         public void Edit(int _ID)
         {
             SetKeys();
-            AppGlobals.NavManager.NavigateTo($"/Accounts/Books/{BookID}/{BookNatureID}");
+            AppGlobal.NavManager.NavigateTo($"/Accounts/Books/{BookID}/{BookNatureID}");
         }
         #endregion
 

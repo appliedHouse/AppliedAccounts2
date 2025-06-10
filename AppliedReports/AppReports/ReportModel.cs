@@ -1,5 +1,4 @@
 ﻿using Microsoft.Reporting.NETCore;
-using System.Data;
 
 namespace AppReports
 {
@@ -67,7 +66,7 @@ namespace AppReports
                 Messages.Add($"{DateTimeNow}: Output File Full Name is {OutputReport.FileFullName}");
                 Messages.Add($"{DateTimeNow}: Output File download link is {OutputReport.FileLink}");
                 Messages.Add($"{DateTimeNow}: OutPut MimeType is {OutputReport.MimeType}");
-                Messages.Add($"{DateTimeNow}: OutPut File Extention is {OutputReport.FileExt}");
+                Messages.Add($"{DateTimeNow}: OutPut File Extension is {OutputReport.FileExt}");
                 Messages.Add($"{DateTimeNow}: OutPut Report Type {OutputReport.ReportType}");
 
                 Messages.Add($"{DateTimeNow}: Report DataSet Name is {ReportDataSource.DataSetName}");
@@ -90,7 +89,7 @@ namespace AppReports
                     Messages.Add($"{DateTimeNow}: Report Type is {OutputReport.ReportType}");
 
                     OutputReport.MimeType = ReportMime.Get(OutputReport.ReportType);
-                    
+
                     var _ReportFile = InputReport.FileFullName;
                     var _DataSource = ReportDataSource.DataSource;
                     var _ReportStream = new StreamReader(_ReportFile);
@@ -117,28 +116,24 @@ namespace AppReports
                     }
                     else
                     {
-                        if(!ReportParameters.Equals(Extractor.MyParameters.Count))
+                        if (!ReportParameters.Equals(Extractor.MyParameters.Count))
                         {
                             Messages.Add($"{DateTimeNow}: Parameters {ReportParameters.Count} != {Extractor.MyParameters.Count} ");
                         }
 
                         Messages.Add($"{DateTimeNow}: Report {ReportParameters.Count} Parameters are not valid");
                     }
-
-
                 }
                 else
                 {
                     ErrorMessage = $"{DateTimeNow}: Report file NOT found {InputReport.FileFullName}";
                     Messages.Add(ErrorMessage);
                 }
-
             }
             catch (Exception error)
             {
                 ErrorMessage = error.Message;
                 IsReportRendered = false;
-
             }
             return IsReportRendered;
         }

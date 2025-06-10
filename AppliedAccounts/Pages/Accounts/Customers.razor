@@ -3,13 +3,11 @@
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
-
-
+@using AppliedAccounts.Services;
 
 @inject AuthenticationStateProvider authStateProvider;
-@inject NavigationManager NavManager;
-@inject IJSRuntime js
-
+@inject GlobalService AppGlobal;
+@inject ToastService ToastService
 
 @code {
 
@@ -19,18 +17,18 @@
 
     protected override void OnInitialized()
     {
-        var AppUserProfile = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
+        var AppUserProfile = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
 
         if (ID < 0) { IsDelete = true; ID = Math.Abs(ID); }
 
-        if (AppUserProfile != null) { Model = new(AppUserProfile, ID); }
-        else { Model = new(); }
+        if (AppUserProfile != null) { MyModel = new(AppGlobal, ID); }
+        else { MyModel = new(); }
     }
 
-    public void Back() { NavManager.NavigateTo("/CustomerList"); }
+    
     public void Delete(int ID)
     {
-        if (Model.Delete(ID)) { NavManager.NavigateTo("/CustomerList"); }
+        if (MyModel.Delete(ID)) { AppGlobal.NavManager.NavigateTo("/CustomerList"); }
     }
 }
 
@@ -45,125 +43,128 @@
 <PageHeading Text="Customer / Client Detail" />
 
 @* Show Messages if any *@
-@if (Model.MyMessages.Count > 0)
-{
-    <ShowMessages Messages="@Model.MyMessages"></ShowMessages>
-}
+<ShowMessages MsgClass="MyModel.MsgClass"></ShowMessages>
 
-@if (!Model.RecordNotFound)
+@if (!MyModel.RecordNotFound)
 {
-        <EditForm Model="@Model">
+    <EditForm Model="@MyModel">
         <div class="container">
-            <InputNumber @bind-Value="@Model.Record.ID" placeholder="ID" id="ID" hidden></InputNumber>
-            <div class="row">
+            <InputNumber @bind-Value="@MyModel.Record.ID" placeholder="ID" id="ID" hidden></InputNumber>
+            <div class="row justify-content-center">
                 <div class="col-md-3">
                     <div class="form-floating mb-3 txt">
-                        <InputText @bind-Value="@Model.Record.Code" class="form-control" id="txtCode" placeholder="Customer Code" />
+                        <InputText @bind-Value="@MyModel.Record.Code" class="form-control" id="txtCode" placeholder="Customer Code" />
                         <label for="txtCode">Code</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3 txt">
-                        <InputText @bind-Value="@Model.Record.Title" class="form-control" id="txtTitle" placeholder="Customer Name" />
+                        <InputText @bind-Value="@MyModel.Record.Title" class="form-control" id="txtTitle" placeholder="Customer Name" />
                         <label for="txtTitle">Customer Name</label>
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row justify-content-center">
                 <div class="col-md-3">
                     <div class="form-floating mb-3 txt">
-                        <InputText @bind-Value="@Model.Record.Address1" class="form-control" id="txtAdd1" placeholder="Address Line 1" />
-                        <label for="txtVouNo">Address Line 1</label>
+                        <InputText @bind-Value="@MyModel.Record.Address1" class="form-control" id="txtAddress1" placeholder="Address Line 1" />
+                        <label for="txtAddress1">Address Line 1</label>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3 txt">
-                        <InputText @bind-Value="@Model.Record.Address2" class="form-control" id="txtAdd2" placeholder="Address Line 1" />
-                        <label for="txtVouNo">Address Line 2</label>
+                        <InputText @bind-Value="@MyModel.Record.Address2" class="form-control" id="txtAddress2" placeholder="Address Line 1" />
+                        <label for="txtAddress2">Address Line 2</label>
                     </div>
                 </div>
-                <div class="col-md-3">
+                 <div class="col-md-3">
                     <div class="form-floating mb-3 txt">
-                        <InputText @bind-Value="@Model.Record.City" class="form-control" id="txtCity" placeholder="City" />
-                        <label for="txtVouNo">City</label>
+                        <InputText @bind-Value="@MyModel.Record.Address3" class="form-control" id="txtAddress3" placeholder="Address Line 1" />
+                        <label for="txtAddress3">Address Line 3</label>
                     </div>
                 </div>
+                
 
             </div>
-            <div class="row">
+            <div class="row justify-content-center">
                 <div class="col-md-3">
                     <div class="form-floating mb-3 txt">
-                        <InputText @bind-Value="@Model.Record.Country" class="form-control" id="txtCountry" placeholder="Country" />
+                        <InputText @bind-Value="@MyModel.Record.City" class="form-control" id="txtCity" placeholder="City" />
+                        <label for="txtCity">City</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@MyModel.Record.State" class="form-control" id="txtState" placeholder="City" />
+                        <label for="txtState">State</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@MyModel.Record.Country" class="form-control" id="txtCountry" placeholder="Country" />
                         <label for="txtVouNo">Country</label>
                     </div>
                 </div>
+                
+            </div>
+            <div class="row justify-content-center">
                 <div class="col-md-3">
                     <div class="form-floating mb-3 txt">
-                        <InputText @bind-Value="@Model.Record.Phone" class="form-control" id="txtPhone" placeholder="Phone" />
+                        <InputText @bind-Value="@MyModel.Record.Phone" class="form-control" id="txtPhone" placeholder="Phone" />
                         <label for="txtPhone">Phone No.</label>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3 txt">
-                        <InputText @bind-Value="@Model.Record.Mobile" class="form-control" id="txtMobile" placeholder="Mobile" />
+                        <InputText @bind-Value="@MyModel.Record.Mobile" class="form-control" id="txtMobile" placeholder="Mobile" />
                         <label for="txtMobile">Mobile No.</label>
                     </div>
                 </div>
-
-            </div>
-            <div class="row">
-                <div class="col-md-3">
+                 <div class="col-md-3">
                     <div class="form-floating mb-3 txt">
-                        <InputText @bind-Value="@Model.Record.Email" class="form-control" id="txtEmail" placeholder="Email Address" />
+                        <InputText @bind-Value="@MyModel.Record.NTN" class="form-control" id="txtNTN" placeholder="Income Tax Number" />
+                        <label for="txtNTN">Income Tax No.</label>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3 txt">
+                        <InputText @bind-Value="@MyModel.Record.Email" class="form-control" id="txtEmail" placeholder="Email Address" />
                         <label for="txtEmail">Email Address</label>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3 txt">
-                        <InputText @bind-Value="@Model.Record.NTN" class="form-control" id="txtNTN" placeholder="Income Tax Number" />
-                        <label for="txtNTN">Income Tax No.</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating mb-3 txt">
-                        <InputText @bind-Value="@Model.Record.CNIC" class="form-control" id="txtCNIC" placeholder="Personal Identity Number" />
+                        <InputText @bind-Value="@MyModel.Record.CNIC" class="form-control" id="txtCNIC" placeholder="Personal Identity Number" />
                         <label for="txtNTN">Personal Identity No.</label>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-9">
                     <div class="form-floating mb-3 txt">
-                        <InputText @bind-Value="@Model.Record.Notes" class="form-control" id="txtNotes" placeholder="Notes, if any" />
+                        <InputText @bind-Value="@MyModel.Record.Notes" class="form-control" id="txtNotes" placeholder="Notes, if any" />
                         <label for="txtNotes">Remarks</label>
                     </div>
                 </div>
             </div>
+            
         </div>
-        <div class="container mt-2">
-            <div class="row">
-                <div class="col">
-                    <button type="submit" id="btn-save" @onclick="()=>Model.Save()"
-                            class="btn btn-success">
-                        <i class="bi bi-check-square"></i> SAVE
-                    </button>
-
-                    <button type="submit" id="btn-back" @onclick="Back"
-                            class="btn btn-primary">
-                        <i class="bi bi-box-arrow-left"></i>
-                        BACK
-                    </button>
-
-                    @if (IsDelete)
-                    {
-                        <button type="submit" id="btn-Delet" @onclick="()=>Delete(Model.Record.ID)"
-                                class="btn btn-danger">
-                            <i class="bi bi-box-trash-fill"></i>
-                            DELETE
-                        </button>
-                    }
-                </div>
+        <div class="container  mt-2 d-flex">
+            <div class="col filter">
+            <div class="p-2">
+                <Btn_Save onclick="Save"/>
             </div>
+            <div class="p-2">
+                 @if (IsDelete)
+                    {
+                        <Btn_Delete onclick="()=>Delete(MyModel.Record.ID)"/>
+                    }
+            </div>
+            <div class="p-2 ms-auto">
+                <Btn_Back NavTo="/CustomerList"/>
+            </div>
+        </div>
         </div>
     </EditForm>
 }

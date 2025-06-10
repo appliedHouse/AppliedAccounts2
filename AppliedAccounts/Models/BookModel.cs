@@ -1,13 +1,12 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Models.Interface;
+using AppliedAccounts.Services;
 using AppliedDB;
-using System.Data;
 using AppMessages;
+using Microsoft.AspNetCore.Components;
+using System.Data;
 using MESSAGE = AppMessages.Enums.Messages;
 using Tables = AppliedDB.Enums.Tables;
-using AppliedAccounts.Models.Interface;
-using Microsoft.AspNetCore.Components;
-using AppliedAccounts.Services;
-using AppReports;
 
 namespace AppliedAccounts.Models
 {
@@ -28,8 +27,8 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> Projects { get; set; } = [];
         public List<CodeTitle> Accounts { get; set; } = [];
         public List<CodeTitle> BookList { get; set; } = [];
-
-        public AppUserModel? UserProfile { get; set; }
+        public GlobalService AppGlobal { get; set; }
+        //public AppliedGlobals.AppUserModel? UserProfile { get; set; }
         public DataSource Source { get; set; }
         public MessageClass MsgClass { get; set; }
 
@@ -46,9 +45,8 @@ namespace AppliedAccounts.Models
         public decimal Tot_CR { get; set; }
         public bool IsWaiting { get; set; }
         public bool IsSaved { get; set; }
-        public NavigationManager NavManager => AppGlobals.NavManager;
+        public NavigationManager NavManager => AppGlobal.NavManager;
         public PrintService ReportService { get; set; }
-        public GlobalService AppGlobals { get; set; }
 
         private int CashNatureID = 0;
         private int BankNatureID = 0;
@@ -61,8 +59,9 @@ namespace AppliedAccounts.Models
         {
 
         }
-        public BookModel(int _VoucherID, int _BookID, AppUserModel _AppUserProfile)
+        public BookModel(int _VoucherID, int _BookID, GlobalService _AppGlobal)
         {
+            AppGlobal = _AppGlobal;
             MsgClass = new();
             MyVoucher = new();
 
@@ -70,15 +69,15 @@ namespace AppliedAccounts.Models
             {
                 BookID = _BookID;
                 VoucherID = _VoucherID;
-                UserProfile = _AppUserProfile;
-                DataFile = _AppUserProfile.DataFile;
+                //UserProfile = _AppUserProfile;
+                DataFile = AppGlobal.DBFile;
 
                 CashNatureID = AppRegistry.GetNumber(DataFile, "CashBKNature");
                 BankNatureID = AppRegistry.GetNumber(DataFile, "BankBKNature");
 
-                if (UserProfile != null)
+                if (AppGlobal.AppPaths != null)
                 {
-                    Source = new(UserProfile);
+                    Source = new(AppGlobal.AppPaths);
                     LastVoucherDate = AppRegistry.GetDate(Source.DBFile, "LastBKDate");
 
                     if (VoucherID == 0) { MyVoucher = NewVoucher(); }   // Create a new voucher;
@@ -303,12 +302,12 @@ namespace AppliedAccounts.Models
                         {
                             if (BookNature == CashNatureID)         // Cash Book Nature
                             {
-                                MyVoucher.Master.Vou_No = NewVoucherNo.GetCashVoucher(UserProfile!.DataFile, MyVoucher.Master.Vou_Date);
+                                MyVoucher.Master.Vou_No = NewVoucherNo.GetCashVoucher(AppGlobal.DBFile, MyVoucher.Master.Vou_Date);
                             }
 
                             if (BookNature == BankNatureID)         // Bank Book Nature
                             {
-                                MyVoucher.Master.Vou_No = NewVoucherNo.GetBankVoucher(UserProfile!.DataFile, MyVoucher.Master.Vou_Date);
+                                MyVoucher.Master.Vou_No = NewVoucherNo.GetBankVoucher(AppGlobal.DBFile, MyVoucher.Master.Vou_Date);
                             }
                         }
 
@@ -467,7 +466,7 @@ namespace AppliedAccounts.Models
         {
             try
             {
-                ReportService = new(AppGlobals); ;
+                ReportService = new(AppGlobal); ;
                 ReportService.ReportType = _ReportAction.PrintType;
 
                 GetReportDataAsync();

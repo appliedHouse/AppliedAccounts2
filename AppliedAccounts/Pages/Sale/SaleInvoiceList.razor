@@ -5,37 +5,25 @@
 @using AppliedAccounts.Models
 @using AppliedAccounts.Services
 
-
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager NavManager
 @inject IJSRuntime js
-@inject GlobalService AppGlobals
-@inject PrintService DIPrintReport
+@inject GlobalService AppGlobal
+@inject PrintService ReportService
 @inject HttpClient Http
-
 
 @code {
     private Timer MyTime { get; set; }
     private string CurrentTime { get; set; }
 
+
+
     protected override void OnInitialized()
     {
         try
         {
-
-            AppUser = ((UserAuthonticationStateProvider)authStateProvider).AppUser;
-            if (AppUser != null)
-            {
-                MyModel = new(AppUser);
-                
-            }
-            else { MyModel = new(); }
-
-            
-
+            MyModel = new(AppGlobal);
             IsDataLoad = true;
-
-            ReportService = new();
         }
         catch (Exception)
         {
@@ -50,8 +38,6 @@
         {
             await DeletePrintedReports();
         }
-
-
     }
 
     private async Task DeletePrintedReports()
@@ -70,55 +56,63 @@
         }
     }
 
-
     bool IsDataLoad = false;
     string NoRecordFound = "No Record Found....";
     string NavToNew = $"/Sale/SaleInvoice/New";
 }
 
 
-
 @if (IsDataLoad)
 {
-    if (!IsPrinting)
+    <PageHeading Text="List of Sale Invoices" />
+    <PageErrors Messages="@MyModel.MsgClass"></PageErrors>
+    @if (IsPrinting)
     {
+        <div class="alert alert-info justify-content-center align-items-center" role="alert" style="height:100px">
+            <div class="d-flex align-items-center">
 
-        <PageHeading Text="List of Sale Invoices" />
+                <div class="p-1">
+                    <div class="spinner-border text-warning" role="status"></div>
+                </div>
 
-        @* Page Errors Show *@
-        @if (@MyModel.MsgClass.Count > 0)
-        {
-            <PageErrors Messages="@MyModel.MsgClass"></PageErrors>
-        }
+                <div class="p-1 text-success">
+                    <i class="bi bi-printer fs-1"></i>
+                </div>
 
-        <EditForm Model=@MyModel>
-
-            <div class="container mb-2">
-                <div class="d-flex flex-row mb-3 filter">
-                    <div class="p-2">
-                        <InputText @bind-Value="@MyModel.SearchText" class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
-                    </div>
-                    <div class="p-2">
-                        <button type="button" class="btn btn-primary btn-sm" @onclick="()=>MyModel.Search()">Search</button>
-
-                    </div>
-                    <div class="p-2">
-                        @if (MyModel.SearchText.Length > 0)
-                        {
-                            <button type="button" style="margin-top:5px; margin-left:5px" class="btn btn-primary btn-sm" @onclick="()=>MyModel.ClearText()">Clear</button>
-                        }
-                    </div>
-                    <div class="p-2 mx-auto button-group">
-                        @if (MyModel.Records.Count > 0)
-                        {
-                            <button type="submit" class="btn-print" @onclick="(()=>PrintAll())"><i class="bi bi-printer-fill"></i> All</button>
-                            <button type="submit" class="btn-print" @onclick="(()=>PrintOnePDF())"><i class="bi bi-printer-fill"></i> All</button>
-                        }
-                    </div>
+                <div class="p-1 fw-bolder">
+                    @PrintingMessage
                 </div>
             </div>
 
+        </div>
+    }
+    else
+    {
+        <EditForm Model=@MyModel>
 
+            <div class="container">
+                <div class="d-flex filter">
+                    <div class="p-2 flex-grow-1">
+                        <div class="p-2">
+                            <InputText @bind-Value="@MyModel.SearchText"
+                                       class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
+
+                        </div>
+                    </div>
+                    <div class="p-2">
+                        <button type="button" class="btn btn-primary btn-sm" @onclick="() => MyModel.Search()">Search</button>
+                    </div>
+                    <div class="p-2">
+                        <button type="button" disabled="@(MyModel.SearchText.Length == 0)" class="btn btn-primary btn-sm" @onclick="() => MyModel.ClearText()">Clear</button>
+                    </div>
+
+                    <div class="p-2">
+                        <button type="submit" disabled="@(MyModel.Records.Count ==0)" class="btn-print" @onclick="(() => PrintAll())"><i class="bi bi-printer-fill"></i> Selected</button>
+                        <button type="submit" disabled="@(MyModel.Records.Count ==0)" class="btn-print" @onclick="(() => PrintOnePDF())"><i class="bi bi-printer-fill"></i> One PDF</button>
+                    </div>
+
+                </div>
+            </div>
         </EditForm>
 
         <div class="container">
@@ -135,7 +129,7 @@
                         <th style="width:9%">City</th>
                         <th style="width:10%">Amount</th>
                         <th style="width:8%" class="td-btn center-btn">
-                            <button id="btnAdd" class="tb-btn-add" @onclick="()=>Edit(0)"><i class="bi bi-plus-circle-fill"></i></button>
+                            <button id="btnAdd" class="tb-btn-add" @onclick="() => Edit(0)"><i class="bi bi-plus-circle-fill"></i></button>
                         </th>
                         <th style="width:4%; justify-items:center">
                             All
@@ -143,7 +137,6 @@
                         </th>
                     </tr>
                 </thead>
-
                 <tbody>
                     @if (MyModel.Records.Count > 0)
                     {
@@ -166,7 +159,7 @@
                                 <td>
                                     <EditButton NavTo="@_NavTo" Title="Edit" />
                                     @* <button type="submit" class="btn-Edit" @onclick="()=>Edit(_Record.Id)"><i class="bi bi-pencil-fill"></i></button> *@
-                                    <button type="submit" class="btn-Del" @onclick="()=>Delete(_Record.Id)"><i class="bi bi-trash-fill"></i></button>
+                                    <button type="submit" class="btn-Del" @onclick="() => Delete(_Record.Id)"><i class="bi bi-trash-fill"></i></button>
 
                                     <PrintButton ReturnValue="Print" VoucherID="@_Record.Id" />
                                 </td>
@@ -180,12 +173,9 @@
                     else
                     {
                         <tr>
-                            <td>@NoRecordFound</td>
+                            <td colspan="10">@NoRecordFound</td>
                         </tr>
-
-
                     }
-
 
                 </tbody>
                 <tfoot>
@@ -201,7 +191,7 @@
                         <td class="amount">@MyModel.TotalAmount.ToString("###,###,##0.00")</td>
                         @if (MyModel.Records.Count > 0)
                         {
-                            <td colspan="2" class="bg-light center-txt"><button type="submit" class="btn-print" @onclick="(()=>PrintAll())"><i class="bi bi-printer-fill"></i> All</button></td>
+                            <td colspan="2" class="bg-light center-txt"><button type="submit" class="btn-print" @onclick="(() => PrintAll())"><i class="bi bi-printer-fill"></i> All</button></td>
                         }
                         else
                         {
@@ -212,92 +202,10 @@
             </table>
         </div>
     }
-    else
-    {
-        <div class="container mt-5">
-            <div class="row justify-content-center">
-                <div class="col-4">
-                    <p class="fw-medium">Printing Reports</p>
-                    <p>Wait..... Bulk Sales invoices are being printned..!!!</p>
-                    <p>@PrintingMessage</p>
-                </div>
-                <div class="col-1 center-txt">
-                    <div class="spinner-border text-warning" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    }
 }
 else
 {
-    <p>Data Not Load....</p>
+    <div class="alert alert-danger" role="alert">
+        <p>Data Not Load....</p>
+    </div>
 }
-
-<style>
-
-    /* Main container styling */
-    .container {
-        font-family: Arial, sans-serif;
-        padding: 20px;
-        max-width: 100%;
-        margin: 0 auto;
-    }
-
-    /* Header styling */
-    .header {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 20px;
-    }
-
-    /* Button group styling */
-    .button-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 20px;
-        align-items: center;
-    }
-
-    /* General button styling */
-    .button {
-        padding: 8px 16px;
-        border: 1px solid #ccc;
-        background-color: #f8f8f8;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.3s;
-    }
-
-        .button:hover {
-            background-color: #e8e8e8;
-        }
-
-    /* Print buttons container - right aligned */
-    .print-buttons {
-        margin-left: auto;
-        display: flex;
-        gap: 10px;
-    }
-
-    /* Print button specific styling */
-    .print-button {
-        padding: 8px 16px;
-        background-color: #4a90e2;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.3s;
-    }
-
-        .print-button:hover {
-            background-color: #3a7bc8;
-        }
-
-</style>

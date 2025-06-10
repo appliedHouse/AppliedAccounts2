@@ -1,8 +1,7 @@
-﻿using AppliedAccounts.Services;
-using AppliedDB;
+﻿using AppliedDB;
 using AppMessages;
 using System.Data;
-using Messages = AppMessages.Enums.Messages;
+using Format = AppliedGlobals.AppValues.Format;
 
 namespace AppliedAccounts.Data
 {
@@ -116,7 +115,36 @@ namespace AppliedAccounts.Data
         }
 
 
+        public static object RemoveNull(object _Value)
+        {
+            var _Type = _Value.GetType();
+
+
+            if (_Value == null || _Value == DBNull.Value)
+            {
+                if (_Type == typeof(string))
+                {
+                    return string.Empty;
+                }
+                else if (_Type == typeof(int) || _Type == typeof(long) || _Type == typeof(short))
+                {
+                    return 0;
+                }
+                else if (_Type == typeof(decimal) || _Type == typeof(double) || _Type == typeof(float))
+                {
+                    return 0.0;
+                }
+                else if (_Type == typeof(DateTime))
+                {
+                    return DateTime.MinValue;
+                }
+
+                return string.Empty;
+            }
+            return _Value;
+        }
+
     }
 
-    
+
 }

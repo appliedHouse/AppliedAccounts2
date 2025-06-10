@@ -1,27 +1,23 @@
 ﻿using AppliedAccounts.Data;
-using AppliedAccounts.Models.Interface;
-using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
-using AppReports;
 using Microsoft.AspNetCore.Components;
 using System.Data;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Format = AppliedGlobals.AppValues.Format;
 using MESSAGES = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Pages.Reporting
 {
     public partial class GeneralLedger
     {
-        public AppUserModel UserModel { get; set; }
         public DataSource Source { get; set; }
-        public GLModel MyModel { get; set; } 
+        public GLModel MyModel { get; set; }
         public MessageClass MsgClass { get; set; }
         public string DBFile { get; set; }
         public bool IsPageValid { get; set; }
         public bool IsPrinting { get; set; }
         string IsPageValidMessage { get; set; } = "Page has some error. Consult to Administrator";
-        NavigationManager NavManager => AppGlobals.NavManager;
+        NavigationManager NavManager => AppGlobal.NavManager;
 
         public List<CodeTitle> Accounts { get; set; }
 
@@ -30,15 +26,15 @@ namespace AppliedAccounts.Pages.Reporting
             MyModel = new();
         }
 
-        public void Start(AppUserModel _UserModel)
+        public void Start(AppliedGlobals.AppUserModel _UserModel)
         {
             if (_UserModel != null)
             {
 
                 MsgClass = new();
-                UserModel = _UserModel;
-                Source = new(UserModel);
-                DBFile = UserModel.DataFile;
+                //UserModel = _UserModel;
+                Source = new(AppGlobal.AppPaths);
+                //DBFile = UserModel.DataFile;
                 Accounts = Source.GetAccounts();            // Get List of Accounts
 
 
@@ -100,7 +96,7 @@ namespace AppliedAccounts.Pages.Reporting
                 SetKeys();
                 await Task.Run(() =>
                 {
-                    ReportService = new(AppGlobals); ;
+                    ReportService = new(AppGlobal); ;
                     ReportService.ReportType = PrintAction.PrintType;
                     GetReportData();
                     CreateReportModel();
@@ -109,7 +105,7 @@ namespace AppliedAccounts.Pages.Reporting
                     {
                         ReportService.Print();
                     }
-                    
+
                 });
 
             }
@@ -122,7 +118,7 @@ namespace AppliedAccounts.Pages.Reporting
             await InvokeAsync(StateHasChanged);
         }
 
-        
+
 
         public void GetReportData()
         {
@@ -134,7 +130,7 @@ namespace AppliedAccounts.Pages.Reporting
             var _Filter = $"[COA] = {MyModel.COAID} AND (Date([Vou_Date]) BETWEEN Date('{_DateFrom}') AND Date('{_DateTo}'))";
             var _GroupBy = "[COA]";
             var _SortBy = "[Vou_date], [Vou_no]";
-            var _Query = SQLQueries.Quries.GeneralLedger(MyModel.COAID, _OBDate, _FilterOB, _GroupBy, _Filter,  _SortBy);
+            var _Query = SQLQueries.Quries.GeneralLedger(MyModel.COAID, _OBDate, _FilterOB, _GroupBy, _Filter, _SortBy);
 
             DataTable _Table = Source.GetTable(_Query);
 
@@ -153,9 +149,9 @@ namespace AppliedAccounts.Pages.Reporting
 
         public void CreateReportModel()
         {
-                       
+
             var _Heading1 = $"General Ledger " + Source.SeekTitle(AppliedDB.Enums.Tables.COA, MyModel.COAID);
-            var _Heading2 = $"[{MyModel.Date_From.ToString(Format.DDMMMYY)}] to [{MyModel.Date_To.ToString(Format.DDMMMYY)}] "; 
+            var _Heading2 = $"[{MyModel.Date_From.ToString(Format.DDMMMYY)}] to [{MyModel.Date_To.ToString(Format.DDMMMYY)}] ";
 
             ReportService.Model.InputReport.FileName = "Ledger.rdl";
             ReportService.Model.ReportDataSource = ReportService.Data;                   // Load Reporting Data to Report Model
@@ -163,7 +159,7 @@ namespace AppliedAccounts.Pages.Reporting
             ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
             ReportService.Model.AddReportParameter("Heading1", _Heading1);
             ReportService.Model.AddReportParameter("Heading2", _Heading2);
-            
+
         }
         #endregion
     }

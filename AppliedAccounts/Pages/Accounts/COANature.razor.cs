@@ -6,6 +6,6 @@ namespace AppliedAccounts.Pages.Accounts
     {
         public COANatureModel Model { get; set; } = new();
         public COANature() { }
-       
+
     }
 }
