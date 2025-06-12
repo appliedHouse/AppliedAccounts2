@@ -906,6 +906,21 @@ namespace AppliedDB
             return _Table;
         }
 
+        public DataTable GetBookList(int BookID, string Filter)
+        {
+            DataTable _Table = new DataTable();
+            if (AppPaths is not null)
+            {
+                string _SQLQuery = SQLQuery.View_Book($"BookID = {BookID} ");
+                string _Sort = "Vou_Date DESC, ID DESC";
+
+                _Table = GetTable(_SQLQuery,Filter, _Sort);
+            }
+            return _Table;
+        }
+
+
+
         public List<CodeTitle> GetBookAccounts(int NatureID)
         {
             // Get Book Account list from COA.
@@ -1075,6 +1090,14 @@ namespace AppliedDB
 
         #endregion
 
+        public int RecordCound(Tables _Table, string _Filter)
+        {
+            string _Query = $"SELECT COUNT(*) FROM {_Table} WHERE {_Filter}";
+            using var command = new SQLiteCommand(_Query, MyConnection);
+            if(MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
+            var result = Convert.ToInt32(command.ExecuteScalar()); MyConnection.Close();
+            return result;
+        }
     }
 
     public class CodeTitle

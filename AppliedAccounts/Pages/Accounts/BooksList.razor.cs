@@ -1,5 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
+using AppliedAccounts.Services;
 using AppliedDB;
 using Microsoft.AspNetCore.Components;
 
@@ -8,7 +9,7 @@ namespace AppliedAccounts.Pages.Accounts
     public partial class BooksList
     {
 
-        public AppliedGlobals.AppUserModel UserProfile { get; set; }
+        //public AppliedGlobals.AppUserModel UserProfile { get; set; }
         public BookListModel MyModel { get; set; } = new();
         public NavigationManager NavManager { get; set; }
 
