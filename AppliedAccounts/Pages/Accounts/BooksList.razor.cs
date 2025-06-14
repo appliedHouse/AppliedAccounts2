@@ -30,9 +30,12 @@ namespace AppliedAccounts.Pages.Accounts
         #endregion
 
         #region Refresh Page
-        public void Refresh()
+        public async void Refresh()
         {
-            MyModel.SetKeys();
+            MyModel.SetKeys();              // Save the current page setting in Registry 
+            MyModel.Pages = new();          // Reset the page model
+            //MyModel.LoadData();             // Load Data according to dates and search text.
+            await InvokeAsync(StateHasChanged);
         }
         #endregion
 

@@ -17,6 +17,7 @@ namespace AppliedAccounts.Models
         public DataSource Source { get; set; }
         public AppMessages.MessageClass MsgClass { get; set; }
         public PrintService ReportService { get; set; }
+        public PageModel Pages { get; set; } = new();
 
         public int BookID { get; set; }
         public int BookNatureID { get; set; }
@@ -64,20 +65,6 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-        #region Pagination
-        public int CurrentPage { get; set; } = 1;
-        public int PageSize { get; set; } = 12; // Items per page
-        public int TotalPages { get; set; } = 0;
-        public int PageButtons { get; set; } = 5; // Number of page buttons to show in Pagination tags
-
-        public void ChangePage(int page)
-        {
-            if (page > 0 && page <= TotalPages)
-            {
-                CurrentPage = page;
-            }
-        }
-        #endregion
 
         public bool LoadData()
         {
@@ -126,7 +113,7 @@ namespace AppliedAccounts.Models
                     TBalance = _OBal.ToString(Format.Digit)
                 };
 
-                if (CurrentPage == 1)
+                if (Pages.Current == 1)
                 {
                     _List.Add(_OBalRecord);         // Add opening balance record in first page
                 }
@@ -136,14 +123,15 @@ namespace AppliedAccounts.Models
             // Fatch Book Records between Date Range
 
             string _Filter = $"Date([Vou_Date]) BETWEEN '{_Date1}' AND '{_Date2}'";
-            if(SearchText.Length > 0)
+            if (SearchText.Length > 0)
             {
                 _Filter += $" AND ([Vou_No] LIKE '%{SearchText}%' OR [Description] LIKE '%{SearchText}%')";
             }
-            string _Sorting = $"[Vou_Date], [Vou_No] LIMIT {PageSize} OFFSET {(CurrentPage - 1) * PageSize}";
+            string _Sorting = $"[Vou_Date], [Vou_No] ";
+            string _Limit = $"LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
 
             TotalRecord = Source.RecordCound(Enums.Tables.view_Book, _Filter) + 1;   // +1 for Opening Balance
-            var _Data = Source.GetTable(_Query, _Filter, _Sorting);
+            var _Data = Source.GetTable(_Query, _Filter, _Sorting + _Limit);
 
             if (_Data != null)
             {
@@ -174,23 +162,15 @@ namespace AppliedAccounts.Models
 
                     _List.Add(_Record);
                 }
-               
 
-                TotalPages = (int)Math.Ceiling(TotalRecord / (double)PageSize);
-               
+                
+                Pages.Refresh(TotalRecord);
 
                 return _List;
             }
             return [];
         }
-
-
-        #region Filter on Data List showing in table
-        public string GetFilterText()
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
+               
 
         #region Print
         public void Print(ReportType _ReportType)
@@ -247,8 +227,6 @@ namespace AppliedAccounts.Models
             AppGlobal.NavManager.NavigateTo($"/Accounts/Books/{BookID}/{BookNatureID}");
         }
         #endregion
-
-
 
         #region Get & Set Keys
         internal void SetKeys()
