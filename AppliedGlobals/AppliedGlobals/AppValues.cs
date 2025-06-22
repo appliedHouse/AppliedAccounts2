@@ -30,6 +30,7 @@ namespace AppliedGlobals
             public string LanguagesPath { get; set; } = string.Empty;
             public string MessagesPath { get; set; } = string.Empty;
             public string SessionPath { get; set; } = string.Empty;
+            public string ExcelFilesPath { get; set; } = string.Empty;
             public string DBFile { get; set; } = string.Empty;
 
         }

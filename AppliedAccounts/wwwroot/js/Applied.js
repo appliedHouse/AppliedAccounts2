@@ -4,14 +4,13 @@ const screenHeight = screen.height;
 document.documentElement.style.setProperty('--hight-screen', `${screenHeight}px`)
 
 
-
-
 // Show Bootstrap Modol Class.
 function showModol(ModalID) {
     var myModal = new bootstrap.Modal(document.getElementById(ModalID));
     myModal.show();
 }
 
+// Close Bootstrap Modal Class.
 function closeModal(ModalID) {
     var modalElement = document.getElementById(ModalID);
     if (modalElement) {
@@ -46,6 +45,7 @@ function showAcordion() {
     });
 }
 
+// Show Toast Notification
 window.showBlazorToast = () => {
     var toastEl = document.getElementById('blazorToast');
     toastEl.style.display = "block"; // Ensure it's visible
@@ -78,8 +78,6 @@ function printPage() {
     // Print the entire page
     window.print();
 }
-
-
 function printDiv(divId) {
     var content = document.getElementById(divId).innerHTML;
     var originalContent = document.body.innerHTML;
@@ -88,7 +86,6 @@ function printDiv(divId) {
     document.body.innerHTML = originalContent;
     location.reload(); // Restore the page
 }
-
 function printPDF(pdfUrl) {
     // Open PDF File in New Browser Tab and print it
     var win = window.open(pdfUrl, '_blank');

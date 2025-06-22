@@ -2,11 +2,12 @@
 
 @using AppliedAccounts.Pages.Dashboard
 @using AppliedAccounts.Data.ChartData
+@using AppliedAccounts.Services
 @inject NavigationManager NavManager
 @inject AuthenticationStateProvider authStateProvider
 @inject IJSRuntime js
+@inject GlobalService AppGlobal 
 @using AppliedDB;
-
 
 @code {
 
@@ -15,8 +16,7 @@
 
     protected override void OnInitialized()
     {
-        AppUser = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
-        if (AppUser.Role == "Administrator")
+        if (AppGlobal.UserRole == "Administrator")
         {
             IsAdmin = true;
         }
@@ -31,9 +31,7 @@
     {
         var AppAuthState = (UserAuthenticationStateProvider)authStateProvider;
         await AppAuthState.UpdateAuthonticateState(null);
-
         NavManager.NavigateTo($"/", true);
-
     }
 
     public void Login() => NavManager.NavigateTo("/Users/Login");
@@ -50,6 +48,7 @@
     public void Config() { NavManager.NavigateTo($"/Config", true); }
     public void Accounts() { NavManager.NavigateTo($"/Menu/Accounts", true); }
     public void Sale() { NavManager.NavigateTo($"/Menu/Sale", true); }
+    public void Import() { NavManager.NavigateTo($"/ImportCOA", true); }
 }
 
 <div class="topnav bg-white">
@@ -57,7 +56,7 @@
     <AuthorizeView>
         <Authorized>
 
-            @if (AppUser?.UserID == "CDC")
+            @if(AppGlobal.UserID == "CDC")
             {
                 <CDCMenu></CDCMenu>
             }
@@ -76,6 +75,7 @@
             @if (IsAdmin)
             {
                 <button type="submit" class="btn-Menu" id="btn-logout" @onclick="Config">Config</button>
+                <button type="submit" class="btn-Menu" id="btn-logout" @onclick="Import">Import</button>
             }
 
             <button type="submit" class="btn-Menu" id="btn-logout" @onclick="LogOut">logout</button>

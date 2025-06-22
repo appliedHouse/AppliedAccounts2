@@ -3,7 +3,6 @@ using AppliedAccounts.Models;
 using AppliedAccounts.Services;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using System.Data;
 
 
@@ -93,7 +92,6 @@ namespace AppliedAccounts.Pages.Accounts
             var IsSaved = false;
             MyModel.MyMessage = "Saving....";
             IsSaved = await MyModel.SaveAllAsync(); // Ensure save operation completes successfully
-            await js.InvokeVoidAsync("closeModal", "SaveVoucher"); // Pass the ID as a string
 
             if (IsSaved)
             {
@@ -117,11 +115,5 @@ namespace AppliedAccounts.Pages.Accounts
             MyModel.IsWaiting = false; await InvokeAsync(StateHasChanged);
         }
         #endregion
-
-
-
     }
-
-
-
 }

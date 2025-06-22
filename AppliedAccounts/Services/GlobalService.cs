@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
+using System.Security.Claims;
 using static AppliedGlobals.AppValues;
 
 namespace AppliedAccounts.Services
@@ -21,6 +22,7 @@ namespace AppliedAccounts.Services
         public PrintReport Reporting { get; set; } = new();
         public string DBFile => AppPaths.DBFile;
         public string UserID = string.Empty;
+        public string UserRole = string.Empty;
 
         public GlobalService() { }
 
@@ -33,6 +35,7 @@ namespace AppliedAccounts.Services
             var _AppUser = ((UserAuthenticationStateProvider)_StateProvider).AppUser;
             AppPaths.DBFile = _AppUser.DataFile;
             UserID = _AppUser.UserID;
+            UserRole = _AppUser.Role;
 
             AppPaths.BaseUri = NavManager.BaseUri;
             AppPaths.FirstPath = Directory.GetCurrentDirectory();
@@ -48,6 +51,7 @@ namespace AppliedAccounts.Services
             AppPaths.UsersPath = Config.GetValue<string>("Paths:UsersPath") ?? "SQLiteDB";
             AppPaths.DBTempPath = Config.GetValue<string>("Paths:DBTempPath") ?? "SQLiteTemp";
             AppPaths.SessionPath = Config.GetValue<string>("Paths:SessionPath") ?? "Sessions";
+            AppPaths.ExcelFilesPath = Config.GetValue<string>("Paths:ExcelFilesPath") ?? "ExcelFiles";
 
             Author = new()
             {
@@ -100,6 +104,7 @@ namespace AppliedAccounts.Services
             };
 
         }
+
     }
 }
 

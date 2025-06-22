@@ -47,8 +47,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\ExcelFiles\2025-04 - April CDC.xlsx" />
-    <None Include="wwwroot\ExcelFiles\2025-05 - May CDC.xlsx" />
     <None Include="wwwroot\Icon200.ico" />
   </ItemGroup>
 
@@ -66,6 +64,10 @@
     <ProjectReference Include="..\AppliedMessages\AppMessages\AppMessages.csproj" />
     <ProjectReference Include="..\AppliedReports\AppReports\AppReports.csproj" />
     <ProjectReference Include="..\SQLQueries\SQLQueries.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\ExcelFiles\" />
   </ItemGroup>
 
 </Project>

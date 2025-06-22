@@ -17,12 +17,11 @@ namespace AppliedAccounts.Models
         public DataSet ImportDataSet { get; set; }
         public bool IsImported { get; set; } = false;
         public string MyMessages { get; set; }
-
+        public string ExcelImportRegistry {get; set; } = "ExcelImport";
 
         public ImportExcelFile(IBrowserFile excelFile, GlobalService _AppGlobal)
         {
             AppGlobal = _AppGlobal;
-            //AppUser = appUser;
             ExcelFile = excelFile;
         }
 
@@ -34,7 +33,7 @@ namespace AppliedAccounts.Models
             try
             {
                 var _Path = Path.Combine(AppGlobal.AppPaths.FirstPath, AppGlobal.AppPaths.RootPath);
-                var _Directory = Path.Combine(_Path, "ExcelFiles");
+                var _Directory = Path.Combine(_Path, AppGlobal.AppPaths.ExcelFilesPath);
                 if (!Directory.Exists(_Directory)) { Directory.CreateDirectory(_Directory); }
 
                 var _ExcelFile = Path.Combine(_Directory, ExcelFile.Name);
@@ -72,14 +71,14 @@ namespace AppliedAccounts.Models
 
         #region Save Imported DataSet into SQL Lite DB Temp with GUID Name.
 
-        internal bool SaveInTable(DataSet importDataSet)
+        public bool SaveInTable(DataSet importDataSet)
         {
             bool _Result = false;
             int _Records = 0;
             string _Path = Connections.GetTempDBPath();
             string _GUID = Guid.NewGuid().ToString();
             string _Title = $"Import file {ExcelFile} dated {DateTime.Now}";
-            string _OldFile = AppRegistry.GetText(AppGlobal.DBFile, "ExcelImport");
+            string _OldFile = AppRegistry.GetText(AppGlobal.DBFile, ExcelImportRegistry);
             bool _FirstRow = true;
 
             try
@@ -94,9 +93,7 @@ namespace AppliedAccounts.Models
             }
             catch (Exception) { }
 
-
-
-            AppRegistry.SetKey(AppGlobal.DBFile, "ExcelImport", _GUID, KeyType.Text, _Title);
+            AppRegistry.SetKey(AppGlobal.DBFile, ExcelImportRegistry, _GUID, KeyType.Text, _Title);
 
             string _ConnText = $"";
             string _ImportDBPath = Path.Combine(_Path, _GUID + ".db");
@@ -141,7 +138,6 @@ namespace AppliedAccounts.Models
                         {
                             _Text.AppendLine($"[{_Column.ColumnName}] ");
                             _Text.Append($"NVARCHAR");
-                            //_Text.Append($"[{_Column.DataType}]");
 
                             if (_Column.ColumnName != _LastColumn) { _Text.Append(','); }
                         }
