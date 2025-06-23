@@ -111,25 +111,23 @@ namespace AppliedAccounts.Models
                     _Text.Append($"CREATE TABLE [{_Table.TableName}] (");
 
                     string _TableName = _Table.TableName;
-                    string _LastColumn = _Table.Columns[_Table.Columns.Count - 1].ColumnName;
-
+                    string _LastColumn = string.Empty;
                     if (_FirstRow)
                     {
-                        int _ColumnNo = 1;
+                        //int _ColumnNo = 1;
                         DataRow _FirstDataRow = _Table.Rows[0];
-                        foreach (DataColumn _Column in _Table.Columns)
+                        _LastColumn = (string)_FirstDataRow.ItemArray.LastOrDefault();
+                        foreach (string? _Column in _FirstDataRow.ItemArray)
                         {
-                            string? _ColumnValue = _FirstDataRow[_Column.ColumnName].ToString();
+                            //string? _ColumnValue = _Column;
 
-                            if (string.IsNullOrEmpty(_ColumnValue))
-                            {
-                                _ColumnValue = $"Column{_ColumnNo}";
-                                _ColumnNo++;
-                            }
-                            _Text.Append($"[{_ColumnValue}] ");
+                            if(!string.IsNullOrEmpty(_Column))
+                            //{
+                            //    _ColumnValue = $"Column{_ColumnNo}";
+                            //    _ColumnNo++;
+                            _Text.Append($"[{_Column}] ");
                             _Text.Append($"NVARCHAR");
-
-                            if (_Column.ColumnName != _LastColumn) { _Text.Append(','); }
+                            if (_Column != _LastColumn) { _Text.Append(','); }
                         }
                     }
                     else

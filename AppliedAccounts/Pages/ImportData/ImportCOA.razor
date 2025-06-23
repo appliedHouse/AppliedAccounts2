@@ -1,15 +1,15 @@
 ﻿@page "/ImportCOA"
 @using AppliedAccounts.Services
+@using System.Data
 @attribute [Authorize]
 @inject GlobalService AppGlobal
-
 
 @code {
     public bool IsExcelLoaded { get; set; } = false;
 
     protected override void OnInitialized()
     {
-        
+
     }
 
     private async Task TriggerFileInput()
@@ -19,45 +19,84 @@
 
 }
 
-<ShowPageHeading PageTitle="Import Chart of Accounts"/>
+<ShowPageHeading PageTitle="Import Chart of Accounts" />
 
-@if(ShowSpinner)
+@if (ShowSpinner)
 {
-   <h3>Spinner</h3>
+    <div class="spinner-border text-warning" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
 }
 
 
-@if(!IsExcelLoaded)
+@if (!IsExcelLoaded)
 {
-
-<div class="container">
-    <div class="d-flex flex-row mb-3">
-        <div class="p-2">
-            <button class="btn btn-primary w1" disabled="@(IsExcelLoaded ? true : ShowSpinner)"
-                    title="Upload Excel file" @onclick="TriggerFileInput">
-                Upload Excel file
-            </button>
-            <InputFile id="inputFile" class="d-none" OnChange="GetExcelFile" />
-
-
-        </div>
-        <div class="p-2">
-            <label>@ExcelFileName</label>
-        </div>
-        @if (IsExcelLoaded)
-        {
+    <div class="container">
+        <div class="d-flex flex-row mb-3">
             <div class="p-2">
-                <label>Excel File has been loaded successfully.</label>
+                <button class="btn btn-primary w1" disabled="@(IsExcelLoaded ? true : ShowSpinner)"
+                        title="Upload Excel file" @onclick="TriggerFileInput">
+                    Upload Excel file
+                </button>
+                <InputFile id="inputFile" class="d-none" OnChange="GetExcelFile" />
             </div>
-        }
-
-    </div>
+        </div>
     </div>
 }
 else
 {
-    <div class="alert alert-info" rolw="alert">
-        File has been loaded
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="myAlert">
+        This is a Bootstrap 5 alert. It will close after 10 seconds.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    
+
+    @if (ImportCOAModel.ImportDataSet is not null)
+    {
+        @if (ImportCOAModel.ImportDataSet.Tables.Count > 0)
+        {
+
+            @if (ImportCOAModel.ImportDataSet.Tables[0].TableName == "COA")
+            {
+                <div class="tableContainer">
+                    <table class="table-list">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Title</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (DataRow Row in ImportCOAModel.ImportDataSet.Tables[0].Rows)
+                            {
+                                <tr>
+                                    <td>@Row["Code"]</td>
+                                    <td>@Row["Title"]</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot></tfoot>
+                    </table>
+
+                </div>
+            }
+
+        }
+
+
+    }
+
+
+
 }
+
+
+<script>
+    // Close the alert after 10 seconds
+    setTimeout(() => {
+        const alertElement = document.getElementById('myAlert');
+        if (alertElement) {
+            const bootstrapAlert = bootstrap.Alert.getOrCreateInstance(alertElement);
+            bootstrapAlert.close();
+        }
+    }, 10000); // 10000ms = 10 seconds
+</script>
