@@ -4,8 +4,6 @@
 @using AppliedDB
 @using AppliedGlobals
 
-@inject IConfiguration Config;
-@inject AuthenticationStateProvider authStateProvider;
 @inject GlobalService AppGlobal;
 
 @code {
@@ -33,24 +31,24 @@
 
     protected override void OnInitialized()
     {
-        var UserModel = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
+        //var UserModel = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
 
         Source = new(AppGlobal.AppPaths);
 
         BasePath = Directory.GetCurrentDirectory();
-        RootPath = UserModel.RootFolder;
-        UsersPath = UserModel.UsersFolder;
-        ClientPath = UserModel.ClientFolder;
-        ImagesPath = UserModel.ImagesFolder;
-        LanguagePath = UserModel.LanguageFolder;
-        MessagePath = UserModel.MessageFolder;
-        ReportPath = UserModel.ReportFolder;
-        PDFPath = UserModel.PDFFolder;
-        SystemPath = UserModel.SystemFolder;
-        SessionPath = UserModel.SessionFolder;
-        Session = UserModel.Session;
-        ClientDB = UserModel.DataFile;
-        TempDBPath = UserModel.TempDBFolder;
+        RootPath =  AppGlobal.AppPaths.RootPath;
+        UsersPath = AppGlobal.AppPaths.UsersPath;
+        ClientPath = AppGlobal.AppPaths.ClientPath;
+        ImagesPath = AppGlobal.AppPaths.ImagesPath;
+        LanguagePath = AppGlobal.AppPaths.LanguagesPath;
+        MessagePath = AppGlobal.AppPaths.MessagesPath;
+        ReportPath = AppGlobal.AppPaths.ReportPath;
+        PDFPath = AppGlobal.AppPaths.PDFPath;
+        SystemPath = AppGlobal.AppPaths.SystemPath;
+        SessionPath = AppGlobal.AppPaths.SessionPath;
+        Session = AppGlobal.Client.Session;
+        ClientDB = AppGlobal.AppPaths.DBFile;
+        TempDBPath = AppGlobal.AppPaths.DBTempPath;
 
         _Connections = new(AppGlobal.AppPaths);
         _true = true;

@@ -6,7 +6,7 @@
 @inject NavigationManager NavManager
 @inject AuthenticationStateProvider authStateProvider
 @inject IJSRuntime js
-@inject GlobalService AppGlobal 
+@inject GlobalService AppGlobal
 @using AppliedDB;
 
 @code {
@@ -56,7 +56,7 @@
     <AuthorizeView>
         <Authorized>
 
-            @if(AppGlobal.UserID == "CDC")
+            @if (AppGlobal.UserID == "CDC")
             {
                 <CDCMenu></CDCMenu>
             }
@@ -84,7 +84,7 @@
             <button type="submit" id="byn-login" class="btn btn-menu btn-link" @onclick="Login">login</button>
         </NotAuthorized>
         <Authorizing>
-            <div class="alert alert-info" role="alert" onclick=""  >
+            <div class="alert alert-info" role="alert" onclick="">
                 <h5>Wait. Page Loading...</h5>
             </div>
 
@@ -94,7 +94,7 @@
 
 @if (AppUser?.UserID == "CDC")
 {
-   <HomeDBoard></HomeDBoard>
+    <HomeDBoard></HomeDBoard>
 }
 
 
@@ -104,3 +104,9 @@
         audio.play();
     }
 </script>
+
+<style>
+    .bg-Image {
+        background-image: url("Images/Accounts2.jpg");
+    }
+</style>

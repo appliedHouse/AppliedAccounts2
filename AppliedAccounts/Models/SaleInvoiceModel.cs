@@ -624,7 +624,7 @@ namespace AppliedAccounts.Models
             var _Heading1 = "Sale Invoice";
             var _Heading2 = $"{_Heading1} [{MyVoucher.Master.Vou_No}]";
             var _ReportPath = AppGlobal.AppPaths.ReportPath;
-            var _CompanyName = AppGlobal.Client.Name;
+            var _CompanyName = AppGlobal.Client.Company;
             var _ReportFooter = AppFunctions.ReportFooter();
 
             ReportModel rptModel = new();

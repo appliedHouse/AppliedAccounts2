@@ -1,34 +1,30 @@
-﻿@attribute [Authorize]
-@inject NavigationManager NavManager;
-@using AppliedAccounts.Data
-@using AppliedAccounts.Services
-@inject GlobalService AppGlobal;
+﻿@attribute [Authorize]  
+@inject NavigationManager NavManager;  
+@using AppliedAccounts.Data  
+@using AppliedAccounts.Services  
+@inject GlobalService AppGlobal;  
 
-@code {
-    
-    public string? BusinessPic { get; set; }
-    protected override void OnInitialized()
-    {
-        BusinessPic = $"{AppGlobal.AppPaths.ImagesPath}/Accounts3.jpg";
-        Database_Patches DBPatches = new(new AppliedDB.DataSource(AppGlobal.AppPaths));
-    }
-}
+@code {  
+    public string? BusinessPic { get; set; }  
+    protected override void OnInitialized()  
+    {  
+        BusinessPic = $"{AppGlobal.AppPaths.ImagesPath}/Accounts3.jpg";  
+        Database_Patches DBPatches = new(new AppliedDB.DataSource(AppGlobal.AppPaths));  
+    }  
+}  
 <div class="HomeDiv">
-   
-
+    <div id="FullContainer" style="overflow:auto;">
+        <!-- Your table content -->
+    </div>
 </div>
 
 
-<style>
-    .HomeDiv{
-        width:100%;
-        Height:100%;
-        background-image:@BusinessPic;
-    }
+<style>  
+    .HomeDiv {  
+        width: 100%;  
+        height: 100vh;  
+        background-image: url("/Images/Accounts3.jpg"); /* Fixed the invalid value */  
+        background-size: cover; /* Ensures the image covers the entire div */  
 
-    .HomePic{
-        object-fit:fill;
-
-    }
-
+    }  
 </style>
