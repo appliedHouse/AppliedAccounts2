@@ -8,7 +8,6 @@
 
 @inject NavigationManager NavManager;
 @inject AuthenticationStateProvider authStateProvider;
-
 @inject GlobalService AppGlobal;
 
 
@@ -18,7 +17,7 @@
         
         MyModel.UserID = "";
         MyModel.Password = "";
-        MyModel.IsSaved = false;
+        MyModel.RememberMe = false;
         MyModel.DataFile = "";
         MyModel.Designation = "";
         MyModel.Company = "";
@@ -55,7 +54,7 @@ else
 
                     <div class="options">
                         <label>
-                            <InputCheckbox @bind-Value="MyModel.IsSaved" /> Remember Me
+                            <InputCheckbox @bind-Value="MyModel.RememberMe" /> Remember Me
                         </label>
                         <a class="forgot-link" href="/Users/Resetpw">Forgot Password?</a>
                     </div>

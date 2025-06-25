@@ -10,7 +10,8 @@ namespace AppliedAccounts.Pages.Purchase
 {
     public partial class PurchaseList
     {
-        public AppliedGlobals.AppUserModel AppUser { get; set; }
+        //public AppliedGlobals.AppUserModel AppUser { get; set; }
+        
         public Models.PurchaseListModel MyModel { get; set; }
         public PrintService ReportService { get; set; }
         private bool IsPrinted { get; set; } = false;
@@ -25,7 +26,7 @@ namespace AppliedAccounts.Pages.Purchase
         #region Edit
         public void Edit(int ID)
         {
-            NavManager.NavigateTo($"/Purchase/Purchased/{ID}");
+            AppGlobal.NavManager.NavigateTo($"/Purchase/Purchased/{ID}");
         }
         #endregion
 
@@ -86,14 +87,14 @@ namespace AppliedAccounts.Pages.Purchase
             ReportService.Model = CreateReportModel(ID);         // and then generate report parameters
             ReportService.ReportType = ReportType.Preview;
             //var ReportList = ReportService.GetReportLink();
-            await js.InvokeVoidAsync("downloadPDF", _FileName, ReportService.Model.ReportBytes);
+            await AppGlobal.JS.InvokeVoidAsync("downloadPDF", _FileName, ReportService.Model.ReportBytes);
 
         }
         private ReportData GetReportData(int ID)
         {
             ReportData _Result = new();
             string _Query = ReportQuery.SaleInvoiceQuery($"[B2].[TranID]={ID}");
-            var _DataTable = DataSource.GetDataTable(AppUser.DataFile, _Query, "ReportData");
+            var _DataTable = DataSource.GetDataTable(AppGlobal.DBFile, _Query, "ReportData");
 
             _Result.ReportTable = _DataTable;
             _Result.DataSetName = "ds_PurchaseInvoice";
@@ -110,9 +111,9 @@ namespace AppliedAccounts.Pages.Purchase
                 var _InvoiceNo = "INV-Testing";
                 var _Heading1 = "Purchase Invoice";
                 var _Heading2 = $"Invoice No. {_InvoiceNo}";
-                var _ReportPath = AppUser.ReportFolder;
+                var _ReportPath = AppGlobal.AppPaths.ReportPath;
                 var _ReportOption = ReportType.Excel;
-                var _CompanyName = AppUser.Company;
+                var _CompanyName = AppGlobal.Client.Company;
                 var _ReportFooter = AppFunctions.ReportFooter();
 
                 _Reportmodel.InputReport.FileName = "PurchasedInvoice";

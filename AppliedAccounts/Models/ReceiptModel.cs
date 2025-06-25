@@ -635,8 +635,8 @@ namespace AppliedAccounts.Models
             var _InvoiceNo = "Receipt";
             var _Heading1 = "Receipt";
             var _Heading2 = $"Receipt No. {_InvoiceNo}";
-            var _ReportPath = UserProfile!.ReportFolder;
-            var _CompanyName = UserProfile.Company;
+            var _ReportPath = AppGlobal.AppPaths.ReportPath;
+            var _CompanyName = AppGlobal.Client.Company;
             var _ReportFooter = AppFunctions.ReportFooter();
 
             var _Amount = (decimal)ReportService.Data.ReportTable.Rows[0]["Amount"];
