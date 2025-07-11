@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using System.Data;
 using Format = AppliedGlobals.AppValues.Format;
 using MESSAGES = AppMessages.Enums.Messages;
+using KeyType = AppliedGlobals.AppErums.KeyTypes;
 
 namespace AppliedAccounts.Pages.Reporting
 {

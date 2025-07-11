@@ -26,18 +26,6 @@ namespace AppliedAccounts.Models
                     if(i<=MaxButtons)
                     { PageList.Add(i); }
                 }
-
-
-                //PageList.Add(1);
-                //PageList.Add(2);
-                //PageList.Add(3);
-                //PageList.Add(4);
-                //PageList.Add(5);
-                //PageList.Add(6);
-                //PageList.Add(7);
-                //PageList.Add(8);
-                //PageList.Add(9);
-                //PageList.Add(10);
             }
             else
             {

@@ -9,6 +9,7 @@ using System.Text;
 using static AppliedDB.Enums;
 using Format = AppliedGlobals.AppValues.Format;
 using MESSAGES = AppMessages.Enums.Messages;
+using KeyType = AppliedGlobals.AppErums.KeyTypes;
 
 namespace AppliedAccounts.Models
 {

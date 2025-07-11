@@ -203,7 +203,7 @@ namespace AppliedDB
 
         #region Get Table Static
 
-        private static DataTable GetDataTable(Tables _Table, SQLiteCommand _Command)
+        public static DataTable GetDataTable(Tables _Table, SQLiteCommand _Command)
         {
             try
             {

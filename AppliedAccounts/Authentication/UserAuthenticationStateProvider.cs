@@ -66,7 +66,7 @@ namespace AppliedAccounts.Authentication
                     var _Result = await Task.FromResult(new AuthenticationState(ClaimPrincipal));
                     GetAppUser(_Result);
 
-                    Claims = _Result.User.Claims.ToList();
+                    Claims = [.. _Result.User.Claims]; 
                     return _Result;
                 }
             }
@@ -154,7 +154,7 @@ namespace AppliedAccounts.Authentication
             Administrator = 1,
             Manager = 2,
             User = 3,
-            Viewer = 4,
+            Guest = 4,
         }
 
     }

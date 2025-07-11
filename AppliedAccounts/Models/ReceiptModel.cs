@@ -10,6 +10,7 @@ using SQLQueries;
 using System.Data;
 using static AppliedDB.Enums;
 using MESSAGE = AppMessages.Enums.Messages;
+using KeyType = AppliedGlobals.AppErums.KeyTypes;
 
 
 namespace AppliedAccounts.Models

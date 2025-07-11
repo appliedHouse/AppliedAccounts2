@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using Format = AppliedGlobals.AppValues.Format;
 using Tables = AppliedDB.Enums.Tables;
+using KeyType = AppliedGlobals.AppErums.KeyTypes;
 
 namespace AppliedAccounts.Data
 {
@@ -295,17 +296,17 @@ namespace AppliedAccounts.Data
         public static readonly string FormatDateM2 = string.Empty;
     }
 
-    public enum KeyType
-    {
-        Number,
-        Currency,
-        Date,
-        Boolean,
-        Text,
-        UserName,
-        From,
-        To,
-        FromTo
-    }
+    //public enum KeyType
+    //{
+    //    Number,
+    //    Currency,
+    //    Date,
+    //    Boolean,
+    //    Text,
+    //    UserName,
+    //    From,
+    //    To,
+    //    FromTo
+    //}
 
 }

@@ -5,17 +5,18 @@
 @using AppliedDB;
 @using AppliedAccounts.Pages.HomePage
 
-@attribute [AllowAnonymous];
-@inject IJSRuntime js;
-@inject AuthenticationStateProvider authStateProvider;
-@inject GlobalService AppGlobal;
+
+@attribute [AllowAnonymous]
+@inject IJSRuntime js
+@inject AuthenticationStateProvider authStateProvider
+@inject GlobalService AppGlobal
 
 
 <PageTitle>Index</PageTitle>
 
 @code {
     [CascadingParameter]
-    private Task<AuthenticationState>? AppAuthState { get; set; }
+    private Task<AuthenticationState> AppAuthState { get; set; }
     private Task<AppUserModel>? UserProfile { get; set; }
     private AppUserModel? UserModel { get; set; }
     private string _Message = string.Empty;
@@ -26,7 +27,7 @@
     {
         if(AppAuthState.Result.User.Identity!.IsAuthenticated)
         {
-            UserModel = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
+            UserModel = await Task.Run(()=> ((UserAuthenticationStateProvider)authStateProvider).AppUser);
         }
     }
 

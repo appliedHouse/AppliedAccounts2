@@ -180,3 +180,27 @@ body {
     font-weight: 700;
     font-style: normal;
 }
+
+
+
+/* Show picture on all page */
+.HomeDiv {
+    position: relative; /* Ensure positioning for the pseudo-element */
+    width: 100%;
+    height: 100vh;
+    overflow: hidden; /* Prevent the pseudo-element from overflowing */
+}
+
+    .HomeDiv::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("/Images/Accounts3.jpg");
+        background-size: cover;
+        background-position: center;
+        opacity: 0.05; /* Apply opacity to the background */
+        z-index: -1; /* Place it behind the content */
+    }

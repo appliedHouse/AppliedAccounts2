@@ -19,20 +19,6 @@
             <li class="page-item @(Paging.Current == pageNum ? "active" : "")">
                     <button class="page-link" @onclick="() => Paging.ChangePage(pageNum)">@pageNum</button>
                 </li>
-
-            @* if (Paging.PageList.Count > 10)
-            {
-                <li class="page-item @(Paging.Current == pageNum ? "active" : "")">
-                    <button class="page-link" @onclick="() => Paging.ChangePage(pageNum)">@pageNum</button>
-                </li>
-            }
-            else
-            {
-                <li class="page-item @(Paging.Current == pageNum ? "active" : "")">
-                    <button class="page-link" @onclick="() => Paging.ChangePage(pageNum)">@pageNum</button>
-                </li>
-
-            } *@
         }
 
         <li class="page-item @(Paging.Current == Paging.Count ? "disabled" : "")">

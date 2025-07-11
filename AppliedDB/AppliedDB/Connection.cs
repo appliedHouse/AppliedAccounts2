@@ -51,27 +51,6 @@ namespace AppliedDB
             DB_Client = _AppPaths.DBFile;
             DB_Session = _AppPaths.DBFile;
         }
-        //public Connections(AppUserModel _UserProfile)
-        //{
-        //    AppUserProfile = _UserProfile;
-        //    BasePath = _UserProfile.BasePath;
-        //    DB_Client = AppUserProfile.DataFile;
-        //    DB_Session = AppUserProfile.Session;
-
-        //    RootPath = AppUserProfile.RootFolder;
-        //    UsersPath = AppUserProfile.UsersFolder;
-        //    ClientPath = AppUserProfile.ClientFolder;
-        //    ImagesPath = AppUserProfile.ImagesFolder;
-        //    LanguagePath = AppUserProfile.LanguageFolder;
-        //    MessagePath = AppUserProfile.MessageFolder;
-        //    ReportPath = AppUserProfile.ReportFolder;
-        //    PDFPath = AppUserProfile.PDFFolder;
-        //    SystemPath = AppUserProfile.SystemFolder;
-        //    SessionPath = AppUserProfile.SessionFolder;
-        //    TempDBPath = AppUserProfile.TempDBFolder;
-        //}
-
-
 
         #region Connection non static
         public SQLiteConnection? GetSQLiteUsers()

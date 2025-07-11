@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using System.Data;
 using System.Data.SQLite;
 using System.Text;
+using KeyType = AppliedGlobals.AppErums.KeyTypes;
 
 namespace AppliedAccounts.Models
 {
@@ -17,14 +18,24 @@ namespace AppliedAccounts.Models
         public DataSet ImportDataSet { get; set; }
         public bool IsImported { get; set; } = false;
         public string MyMessages { get; set; }
-        public string ExcelImportRegistry {get; set; } = "ExcelImport";
+        public string ExcelImportRegistry { get; set; }       // Default Name. From Registry it will change.
 
+        #region Constructors
         public ImportExcelFile(IBrowserFile excelFile, GlobalService _AppGlobal)
         {
             AppGlobal = _AppGlobal;
             ExcelFile = excelFile;
+            ExcelImportRegistry = "ExcelImport";  // Default Name. From Registry it will change.
+
         }
 
+        public ImportExcelFile(IBrowserFile excelFile, GlobalService _AppGlobal, string _FileGuid)
+        {
+            AppGlobal = _AppGlobal;
+            ExcelFile = excelFile;
+            ExcelImportRegistry = _FileGuid; 
+        }
+        #endregion
 
         #region Import Data From Excel file into DataSet
 
@@ -111,23 +122,25 @@ namespace AppliedAccounts.Models
                     _Text.Append($"CREATE TABLE [{_Table.TableName}] (");
 
                     string _TableName = _Table.TableName;
-                    string _LastColumn = string.Empty;
+                    string _LastColumn = _Table.Columns[_Table.Columns.Count - 1].ColumnName;
+
                     if (_FirstRow)
                     {
-                        //int _ColumnNo = 1;
+                        int _ColumnNo = 1;
                         DataRow _FirstDataRow = _Table.Rows[0];
-                        _LastColumn = (string)_FirstDataRow.ItemArray.LastOrDefault();
-                        foreach (string? _Column in _FirstDataRow.ItemArray)
+                        foreach (DataColumn _Column in _Table.Columns)
                         {
-                            //string? _ColumnValue = _Column;
+                            string? _ColumnValue = _FirstDataRow[_Column.ColumnName].ToString();
 
-                            if(!string.IsNullOrEmpty(_Column))
-                            //{
-                            //    _ColumnValue = $"Column{_ColumnNo}";
-                            //    _ColumnNo++;
-                            _Text.Append($"[{_Column}] ");
+                            if (string.IsNullOrEmpty(_ColumnValue))
+                            {
+                                _ColumnValue = $"Column{_ColumnNo}";
+                                _ColumnNo++;
+                            }
+                            _Text.Append($"[{_ColumnValue}] ");
                             _Text.Append($"NVARCHAR");
-                            if (_Column != _LastColumn) { _Text.Append(','); }
+
+                            if (_Column.ColumnName != _LastColumn) { _Text.Append(','); }
                         }
                     }
                     else
@@ -178,5 +191,12 @@ namespace AppliedAccounts.Models
 
         }
         #endregion
+
+        
+
+        internal void GetImportedData(string tableName)
+        {
+           
+        }
     }
 }

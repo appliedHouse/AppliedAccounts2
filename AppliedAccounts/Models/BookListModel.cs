@@ -6,6 +6,7 @@ using AppReports;
 using System.Data;
 using Format = AppliedGlobals.AppValues.Format;
 using Messages = AppMessages.Enums.Messages;
+using KeyType = AppliedGlobals.AppErums.KeyTypes;
 
 namespace AppliedAccounts.Models
 {
@@ -65,7 +66,7 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-
+        #region Load Data
         public bool LoadData()
         {
             try
@@ -170,7 +171,7 @@ namespace AppliedAccounts.Models
             }
             return [];
         }
-               
+        #endregion
 
         #region Print
         public void Print(ReportType _ReportType)

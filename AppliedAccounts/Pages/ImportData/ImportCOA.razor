@@ -1,14 +1,32 @@
 ﻿@page "/ImportCOA"
+@using AppliedAccounts.Models
 @using AppliedAccounts.Services
 @using System.Data
+@using MESSAGES = AppMessages.Enums.Messages;
+
 @attribute [Authorize]
 @inject GlobalService AppGlobal
 
 @code {
-    public bool IsExcelLoaded { get; set; } = false;
+    private bool PageIsValid { get; set; }
+    private string MyMessage { get; set; } = string.Empty;
+
 
     protected override void OnInitialized()
     {
+        MyModel = new ImportCOAModel(AppGlobal);
+
+
+        PageIsValid = true;
+        if (AppGlobal is null) { PageIsValid = false; }
+        if (MyModel is null) { PageIsValid = false; }
+        // else
+        // {
+        //     if(MyModel.ImportedData is null)  { PageIsValid = false; }
+        //     else { if (MyModel.ImportedData.Count == 0)
+        //         { PageIsValid = false; } }
+        // }
+
 
     }
 
@@ -16,6 +34,9 @@
     {
         await AppGlobal.JS.InvokeVoidAsync("triggerFileUpload");
     }
+
+    
+
 
 }
 
@@ -29,35 +50,42 @@
 }
 
 
-@if (!IsExcelLoaded)
+@if (PageIsValid)
 {
-    <div class="container">
-        <div class="d-flex flex-row mb-3">
-            <div class="p-2">
-                <button class="btn btn-primary w1" disabled="@(IsExcelLoaded ? true : ShowSpinner)"
-                        title="Upload Excel file" @onclick="TriggerFileInput">
-                    Upload Excel file
-                </button>
-                <InputFile id="inputFile" class="d-none" OnChange="GetExcelFile" />
+
+    @if (!MyModel.IsExcelLoaded)
+    {
+        <div class="container">
+            <div class="d-flex flex-row mb-3">
+                <div class="p-2">
+                    <button class="btn btn-primary w1" disabled="@(MyModel.IsExcelLoaded ? true : ShowSpinner)"
+                            title="Upload Excel file" @onclick="TriggerFileInput">
+                        Upload Excel file
+                    </button>
+                    <InputFile id="inputFile" class="d-none" OnChange="GetExcelFile" />
+                </div>
+                <div class="p-2">
+                    <button class="btn btn-primary w1" disabled="@(MyModel.IsExcelLoaded ? true : ShowSpinner)"
+                            title="Load Imported Data" @onclick="(() => MyModel.LoadImportedData())">
+                        Excel is Already loaded
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-}
-else
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert" id="myAlert">
-        This is a Bootstrap 5 alert. It will close after 10 seconds.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-
-    @if (ImportCOAModel.ImportDataSet is not null)
+    }
+    else
     {
-        @if (ImportCOAModel.ImportDataSet.Tables.Count > 0)
-        {
+        <div class="alert alert-success alert-dismissible fade show" role="alert" id="myAlert">
+            Data From Excel File has been imported sucesscully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
 
-            @if (ImportCOAModel.ImportDataSet.Tables[0].TableName == "COA")
+        @if (MyModel.FilterData is not null)
+        {
+            @if (MyModel.FilterData.Count > 0)
             {
-                <div class="tableContainer">
+
+                <div class="container">
                     <table class="table-list">
                         <thead>
                             <tr>
@@ -66,28 +94,63 @@ else
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (DataRow Row in ImportCOAModel.ImportDataSet.Tables[0].Rows)
+                            @foreach (DataRow Row in GetFilteredData("COA"))
                             {
                                 <tr>
-                                    <td>@Row["Code"]</td>
-                                    <td>@Row["Title"]</td>
+                                    <td>@Row[1]</td>
+                                    <td>@Row[2]</td>
                                 </tr>
                             }
                         </tbody>
                         <tfoot></tfoot>
                     </table>
+                    <div class="d-flex">
+                        <div class="p-1" style="height:40px">
+                            <NavPageBar Paging="MyModel.Pages"></NavPageBar>
+                        </div>
+                    </div>
 
                 </div>
+
             }
-
         }
-
-
+        <!-- Toast -->
+        <div class="toast-container position-fixed @Toast.GetPosition()">
+            @if (Toast.ShowToast)
+            {
+                <ShowToastMessage toastClass="@Toast"></ShowToastMessage>
+            }
+        </div>
     }
-
-
-
+    
 }
+else
+{
+    <div class="alert alert-danger" role="alert">
+        <strong>Information: </strong> The page is not valid. Please check the application state.
+        <br />
+        <strong>Details: </strong>
+        @if (AppGlobal is null)
+        {
+            <span>Global Service is not initialized.</span>
+        }
+        @if (MyModel is null)
+        {
+            <span>ImportCOAModel is not initialized.</span>
+        }
+        @if (MyModel?.ImportedData is null)
+        {
+            <span>No data imported.</span>
+        }
+        @if (MyModel?.ImportedData?.Count == 0)
+        {
+            <span>No data available to display.</span>
+        }
+    </div>
+    
+}
+
+
 
 
 <script>

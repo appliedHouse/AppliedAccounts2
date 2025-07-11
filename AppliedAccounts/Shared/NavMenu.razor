@@ -29,6 +29,7 @@
 
     public async Task Logout()
     {
+
         var AppAuthState = (UserAuthenticationStateProvider)authStateProvider;
         await AppAuthState.UpdateAuthonticateState(null);
         NavManager.NavigateTo($"/", true);
@@ -105,8 +106,3 @@
     }
 </script>
 
-<style>
-    .bg-Image {
-        background-image: url("Images/Accounts2.jpg");
-    }
-</style>
