@@ -127,43 +127,16 @@ body {
 /*Aamir CSS */
 
 :root {
-    --height-Heading: 75px;
-    --height-SubHeading: 20px;
     --height-NavMenu: auto;
 }
 
-.AppHeader {
-    text-align: center;
-    padding: 20px;
-    height: var(--height-Heading);
-    background-color: aliceblue;
-    justify-content: center;
-    justify-items: center;
-    align-items: center;
-    display: flex;
-}
 
-.SubHeading {
-    width: 100%;
-    text-align: center;
-    padding-top: 1px;
-    padding-right: 5px;
-    margin: 0px;
-    height: var(--height-SubHeading);
-    background-color: burlywood;
-    display: flex;
-    font-size: small;
-}
+
 
 .topnav {
     height: var(--height-NavMenu);
 }
 
-.AppTitle {
-    color: brown;
-    font-size: xx-large;
-    font-family: Calibri;
-}
 
 
 .div-login {

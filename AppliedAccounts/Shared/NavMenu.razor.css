@@ -60,3 +60,65 @@
         display: block;
     }
 }
+
+
+/*Site Bar*/
+
+:root {
+    --sidebar-width:220px;
+    --logo-height: 140px
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    /*position: fixed;*/
+    /*top: 0;
+    left: 0;*/
+    background-color: #f8f9fa;
+    padding-top: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+/* Menu buttons after Site Bar*/
+.menus {
+    /*position: relative;
+    margin-top: var(--logo-height);
+    background-color: transparent;*/
+}
+
+
+/* Menu Buttons*/
+.btn-Menu {
+    display: block;
+    width: calc(var(--sidebar-width) - 20px);
+    text-align: left;
+    padding: 10px 15px;
+    border: none;
+    background: none;
+    font-size: 16px;
+    color: #333;
+}
+
+    .btn-Menu:hover {
+        background-color: #e2e6ea;
+        color: #000;
+    }
+
+.main-content {
+    margin-left: 230px;
+    padding: 20px;
+}
+
+
+.logo-img {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: var(--logo-height);
+    background-color: transparent;
+}
+
+

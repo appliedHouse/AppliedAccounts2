@@ -1,4 +1,5 @@
-﻿@attribute [Authorize]  
+﻿@layout HomeLayout
+@attribute [Authorize]  
 @inject NavigationManager NavManager;  
 @using AppliedAccounts.Data  
 @using AppliedAccounts.Services  
@@ -11,10 +12,13 @@
         BusinessPic = $"{AppGlobal.AppPaths.ImagesPath}/Accounts3.jpg";  
         Database_Patches DBPatches = new(new AppliedDB.DataSource(AppGlobal.AppPaths));  
     }  
-}  
-<div class="HomeDiv">
+} 
+
+@* <NavMenu></NavMenu> *@
+
+@* <div class="HomeDiv">
     <div id="FullContainer" style="overflow:auto;">
-        <!-- Your table content -->
+        @Body
     </div>
 </div>
-
+ *@

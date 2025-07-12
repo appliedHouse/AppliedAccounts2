@@ -108,4 +108,9 @@ function printPDF(pdfUrl) {
 }
 
 
+window.playBeep = function () {
+    const audio = new Audio('/Sound/beep.mp3');
+    audio.play();
+};
+
 

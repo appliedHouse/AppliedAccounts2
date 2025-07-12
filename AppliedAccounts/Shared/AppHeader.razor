@@ -30,20 +30,103 @@
     public string GetAppUserName() => AppUser.DisplayName ?? "";
 }
 
-
-
-<div class="AppHeader">
-    <div class="AppTitle merienda-font">
-        <a href="/"><h3 style="font-size:larger">@GetCompanyName()</h3></a>
+<header class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow" data-bs-theme="dark">
+    <div class="logo-img">
+        <img src="Images/ASH3.png" class="img-thumbnail" alt="..." />
     </div>
-</div>
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white"
+       href="/">@GetCompanyName()</a>
+    @* <ul class="navbar-nav flex-row d-md-none">
+        
+        <li class="nav-item text-nowrap">
+            <button class="nav-link px-3 text-white"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarSearch"
+                    aria-controls="navbarSearch"
+                    aria-expanded="false"
+                    aria-label="Toggle search">
+                <svg class="bi" aria-hidden="true">
+                    <use xlink:href="#search"></use>
+                </svg>
+            </button>
+        </li>
+        <li class="nav-item text-nowrap">
+            <button class="nav-link px-3 text-white"
+                    type="button"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#sidebarMenu"
+                    aria-controls="sidebarMenu"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <svg class="bi" aria-hidden="true">
+                    <use xlink:href="#list"></use>
+                </svg>
+            </button>
+        </li>
+    </ul>
+    <div id="navbarSearch"
+         class="navbar-search w-100 collapse">
+        <input class="form-control w-100 rounded-0 border-0"
+               type="text"
+               placeholder="Search"
+               aria-label="Search"> 
+    </div>*@
+</header>
+
+
+
 
 <AuthorizeView>
     <Authorized>
-        <div class="SubHeading d-flex align-items-center">
-            <div class="p-1"><a href="/">Home</a></div>
-            <div class="p-1 ms-auto"><h5 class="SubHeading">Hello @GetAppUserName()</h5></div>
+        <div class="continer-fluid>">
+            <div class="row">
+                <div class="col-12">
+
+                    <div class="AppHeader">
+                        <div class="AppTitle merienda-font">
+                            <a href="/"><h3 style="font-size:larger">@GetCompanyName()</h3></a>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <NavMenu />
+                </div>
+                <div class="col-9">
+                    <div class="col-12">
+                        <div class="SubHeading d-flex align-items-center">
+                            <div class="p-1"><a type="button" href="/">Home</a></div>
+
+                            <div class="ms-auto d-flex align-items-center">
+                                <div class="p-1"><h5 class="SubHeading mb-0">Hello @GetAppUserName()</h5></div>
+                                <div class="p-1">
+                                    <span class="bg-info p-2 rounded-circle"
+                                          type="button"
+                                          data-bs-toggle="offcanvas"
+                                          data-bs-target="#offcanvasRight"
+                                          aria-controls="offcanvasRight">
+                                        <i class="bi bi-gear text-white"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
+
+        <div class="left-side">
+            
+        </div>
+
+        
+            
+       
+        <ShowRightPane />
 
     </Authorized>
     <NotAuthorized>
@@ -51,12 +134,8 @@
             <div class="p-1"><a href="/">Home</a></div>
             <div class="p-1 ms-auto"><h5 class="SubHeading">Hello Guest!</h5></div>
         </div>
-
     </NotAuthorized>
 </AuthorizeView>
-
-
-
 
 <footer class="footer">
     <div class="container-fluid h-100 d-flex justify-content-center align-items-center">
@@ -69,37 +148,3 @@
     </div>
 </footer>
 
-<style>
-    .footer {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        height: 20px;
-        font-family: 'Berlin Sans FB';
-        background-color: linen; /* Example background color */
-        text-align: center; /* Align text to the right */
-        padding: 10px; /* Adjust padding as necessary */
-        opacity: .5;
-    }
-
-    .merienda-font {
-        font-family: "Eczar", serif;
-        font-optical-sizing: auto;
-        font-weight: 900;
-        font-style: normal;
-        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-    }
-
-    .gradient-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 75px;
-        text-align: center;
-    }
-
-        .gradient-container h1 {
-            font-size: clamp(2rem, 5vw, 4rem); /* Responsive font size */
-        }
-
-</style>

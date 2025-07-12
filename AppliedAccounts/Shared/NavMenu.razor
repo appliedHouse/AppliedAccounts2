@@ -1,5 +1,4 @@
-﻿@* @using AppliedAccounts.Authentication; *@
-
+﻿@layout HomeLayout
 @using AppliedAccounts.Pages.Dashboard
 @using AppliedAccounts.Data.ChartData
 @using AppliedAccounts.Services
@@ -13,12 +12,21 @@
 
     public AppUserModel? AppUser { get; set; }
     public bool IsAdmin { get; set; } = false;
+    private bool IsSidebarVisible { set; get; } = true;
+    private bool _jsReady;
 
     protected override void OnInitialized()
     {
         if (AppGlobal.UserRole == "Administrator")
         {
             IsAdmin = true;
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _jsReady = true;
         }
     }
 
@@ -35,10 +43,28 @@
         NavManager.NavigateTo($"/", true);
     }
 
+    private void SideBarClose()
+    {
+        IsSidebarVisible = !IsSidebarVisible;
+    }
+
     public void Login() => NavManager.NavigateTo("/Users/Login");
     public void LogOut() => Task.Run(() => Logout());
 
-    public void Home() { NavManager.NavigateTo($"/", true); }
+    public async Task Home()
+    {
+        if (_jsReady)
+        {
+            Console.WriteLine("playBepp is ready yet.");
+            await js.InvokeVoidAsync("playBeep");
+            await Task.Delay(1500); // optional, gives time for beep
+            NavManager.NavigateTo("/", true);
+        }
+        else
+        {
+            Console.WriteLine("JS not ready yet.");
+        }
+    }
 
     public void Inventory() { NavManager.NavigateTo($"/Menu/Stock", true); }
     public void Production() { NavManager.NavigateTo($"/Menu/Production", true); }
@@ -52,45 +78,71 @@
     public void Import() { NavManager.NavigateTo($"/ImportCOA", true); }
 }
 
-<div class="topnav bg-white">
-    <button type="submit" id="btn-Home" class="btn-Menu" @onclick="Home">Home</button>
-    <AuthorizeView>
-        <Authorized>
 
-            @if (AppGlobal.UserID == "CDC")
-            {
-                <CDCMenu></CDCMenu>
-            }
-            else
-            {
-                <button type="submit" class="btn-Menu" id="btn-account" @onclick="async () => { await Beep(); Accounts(); }">Accounts</button>
-                <button type="submit" class="btn-Menu" id="btn-Sale" @onclick="Sale">Sale</button>
-                <button type="submit" class="btn-Menu" id="btn-Purchase" @onclick="Purchase">Purchase</button>
-                <button type="submit" class="btn-Menu" id="btn-Stock" @onclick="Inventory">Stock</button>
-                <button type="submit" class="btn-Menu" id="btn-Production" @onclick="Production">Production</button>
-                <button type="submit" class="btn-Menu" id="btn-Payroll" @onclick="Payroll">Payroll</button>
-                <button type="submit" class="btn-Menu" id="btn-Taxation" @onclick="Taxation">Taxation</button>
-                <button type="submit" class="btn-Menu" id="btn-Admin" @onclick="Admin">Admin</button>
-            }
+@* <div class="container">
+    <div class="row bg-light">
+        <button class="btn btn-primary" @onclick="SideBarClose"><i class="bi bi-arrow-bar-left"></i></button>
 
-            @if (IsAdmin)
-            {
-                <button type="submit" class="btn-Menu" id="btn-logout" @onclick="Config">Config</button>
-                <button type="submit" class="btn-Menu" id="btn-logout" @onclick="Import">Import</button>
-            }
+    </div>
+</div> *@
 
-            <button type="submit" class="btn-Menu" id="btn-logout" @onclick="LogOut">logout</button>
-        </Authorized>
-        <NotAuthorized>
-            <button type="submit" id="byn-login" class="btn btn-menu btn-link" @onclick="Login">login</button>
-        </NotAuthorized>
-        <Authorizing>
-            <div class="alert alert-info" role="alert" onclick="">
-                <h5>Wait. Page Loading...</h5>
-            </div>
 
-        </Authorizing>
-    </AuthorizeView>
+@if (IsSidebarVisible)
+{
+    <div class="sidebar">
+        
+
+        <div class="menus">
+            <button type="submit" id="btn-Home" class="btn-Menu" @onclick="Home">Home</button>
+
+            <AuthorizeView>
+                <Authorized>
+
+
+                    @if (AppGlobal.UserID == "CDC")
+                    {
+                        <CDCMenu></CDCMenu>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn-Menu" id="btn-account" @onclick="async () => { await Beep(); Accounts(); }">Accounts</button>
+                        <button type="submit" class="btn-Menu" id="btn-Sale" @onclick="Sale">Sale</button>
+                        <button type="submit" class="btn-Menu" id="btn-Purchase" @onclick="Purchase">Purchase</button>
+                        <button type="submit" class="btn-Menu" id="btn-Stock" @onclick="Inventory">Stock</button>
+                        <button type="submit" class="btn-Menu" id="btn-Production" @onclick="Production">Production</button>
+                        <button type="submit" class="btn-Menu" id="btn-Payroll" @onclick="Payroll">Payroll</button>
+                        <button type="submit" class="btn-Menu" id="btn-Taxation" @onclick="Taxation">Taxation</button>
+                        <button type="submit" class="btn-Menu" id="btn-Admin" @onclick="Admin">Admin</button>
+                    }
+
+                    @if (IsAdmin)
+                    {
+                        <button type="submit" class="btn-Menu" id="btn-config" @onclick="Config">Config</button>
+                        <button type="submit" class="btn-Menu" id="btn-import" @onclick="Import">Import</button>
+                    }
+
+                    <button type="submit" class="btn-Menu" id="btn-logout" @onclick="LogOut">Logout</button>
+
+                </Authorized>
+                <NotAuthorized>
+                    <button type="submit" id="btn-login" class="btn-Menu" @onclick="Login">Login</button>
+                </NotAuthorized>
+                <Authorizing>
+                    <div class="alert alert-info p-2 m-2">
+                        <h5>Wait. Page Loading...</h5>
+                    </div>
+                </Authorizing>
+            </AuthorizeView>
+        </div>
+    </div>
+}
+
+
+<div class="main-content">
+    @if (AppUser?.UserID == "CDC")
+    {
+        <HomeDBoard></HomeDBoard>
+    }
 </div>
 
 @if (AppUser?.UserID == "CDC")
@@ -99,10 +151,5 @@
 }
 
 
-<script>
-    function playBeep() {
-        const audio = new Audio('/Sound/beep.mp3');
-        audio.play();
-    }
-</script>
+
 

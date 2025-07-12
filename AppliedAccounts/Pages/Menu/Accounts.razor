@@ -1,16 +1,14 @@
 ﻿@page "/Menu/Accounts"
 @attribute [Authorize];
-@layout MainLayout;
+@* @layout MainLayout; *@
 
 @using AppliedAccounts.Models;
 @using AppliedAccounts.Services;
 @using ExcelDataReader
 @using System.Data
 
-
 @inject NavigationManager NavManager;
 @inject GlobalService AppGlobal;
-
 
 @code {
 
