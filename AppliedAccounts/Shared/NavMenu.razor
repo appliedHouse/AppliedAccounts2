@@ -78,54 +78,54 @@
     public void Import() { NavManager.NavigateTo($"/ImportCOA", true); }
 }
 
+<style>
+    .sidebar{
+        min-width: var(--sidebarMin_Width);
+        max-width: var(--sidebarMax_Width);
+    }
 
-@* <div class="container">
-    <div class="row bg-light">
-        <button class="btn btn-primary" @onclick="SideBarClose"><i class="bi bi-arrow-bar-left"></i></button>
+    .mw{
+        min-width: var(--sidebarMnu_Width);
+        max-width: var(--sidebarMnu_Width);
+    }
+</style>
 
-    </div>
-</div> *@
 
 
 @if (IsSidebarVisible)
 {
     <div class="sidebar">
-        
-
         <div class="menus">
-            <button type="submit" id="btn-Home" class="btn-Menu" @onclick="Home">Home</button>
-
+            <button type="submit" id="btn-Home" class="btn-Menu mw" @onclick="Home">Home</button>
             <AuthorizeView>
                 <Authorized>
-
-
                     @if (AppGlobal.UserID == "CDC")
                     {
                         <CDCMenu></CDCMenu>
                     }
                     else
                     {
-                        <button type="submit" class="btn-Menu" id="btn-account" @onclick="async () => { await Beep(); Accounts(); }">Accounts</button>
-                        <button type="submit" class="btn-Menu" id="btn-Sale" @onclick="Sale">Sale</button>
-                        <button type="submit" class="btn-Menu" id="btn-Purchase" @onclick="Purchase">Purchase</button>
-                        <button type="submit" class="btn-Menu" id="btn-Stock" @onclick="Inventory">Stock</button>
-                        <button type="submit" class="btn-Menu" id="btn-Production" @onclick="Production">Production</button>
-                        <button type="submit" class="btn-Menu" id="btn-Payroll" @onclick="Payroll">Payroll</button>
-                        <button type="submit" class="btn-Menu" id="btn-Taxation" @onclick="Taxation">Taxation</button>
-                        <button type="submit" class="btn-Menu" id="btn-Admin" @onclick="Admin">Admin</button>
+                        <button type="submit" class="btn-Menu mw" id="btn-account" @onclick="async () => { await Beep(); Accounts(); }">Accounts</button>
+                        <button type="submit" class="btn-Menu mw" id="btn-Sale" @onclick="Sale">Sale</button>
+                        <button type="submit" class="btn-Menu mw" id="btn-Purchase" @onclick="Purchase">Purchase</button>
+                        <button type="submit" class="btn-Menu mw" id="btn-Stock" @onclick="Inventory">Stock</button>
+                        <button type="submit" class="btn-Menu mw" id="btn-Production" @onclick="Production">Production</button>
+                        <button type="submit" class="btn-Menu mw" id="btn-Payroll" @onclick="Payroll">Payroll</button>
+                        <button type="submit" class="btn-Menu mw" id="btn-Taxation" @onclick="Taxation">Taxation</button>
+                        <button type="submit" class="btn-Menu mw" id="btn-Admin" @onclick="Admin">Admin</button>
                     }
 
                     @if (IsAdmin)
                     {
-                        <button type="submit" class="btn-Menu" id="btn-config" @onclick="Config">Config</button>
-                        <button type="submit" class="btn-Menu" id="btn-import" @onclick="Import">Import</button>
+                        <button type="submit" class="btn-Menu mw" id="btn-config" @onclick="Config">Config</button>
+                        <button type="submit" class="btn-Menu mw" id="btn-import" @onclick="Import">Import</button>
                     }
 
-                    <button type="submit" class="btn-Menu" id="btn-logout" @onclick="LogOut">Logout</button>
+                    <button type="submit" class="btn-Menu mw" id="btn-logout" @onclick="LogOut">Logout</button>
 
                 </Authorized>
                 <NotAuthorized>
-                    <button type="submit" id="btn-login" class="btn-Menu" @onclick="Login">Login</button>
+                    <button type="submit" id="btn-login" class="btn-Menu  mw" @onclick="Login">Login</button>
                 </NotAuthorized>
                 <Authorizing>
                     <div class="alert alert-info p-2 m-2">
@@ -136,7 +136,6 @@
         </div>
     </div>
 }
-
 
 <div class="main-content">
     @if (AppUser?.UserID == "CDC")

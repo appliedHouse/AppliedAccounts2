@@ -1,5 +1,13 @@
 /*@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');*/
 
+
+:root{
+    --sidebarMin_Width:200px;
+    --sidebarMax_Width:200px;
+    --sidebarMnu_Width:150px;
+}
+
+
 * {
     box-sizing: border-box;
 }

@@ -150,7 +150,8 @@
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
-    min-width: 100px
+    min-width: 120px;
+    max-width: 120px;
 }
 
     .btn-Menu:hover {
