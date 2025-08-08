@@ -24,6 +24,7 @@
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await Task.Delay(100);
         if (firstRender)
         {
             _jsReady = true;
@@ -79,12 +80,12 @@
 }
 
 <style>
-    .sidebar{
+    .sidebar {
         min-width: var(--sidebarMin_Width);
         max-width: var(--sidebarMax_Width);
     }
 
-    .mw{
+    .mw {
         min-width: var(--sidebarMnu_Width);
         max-width: var(--sidebarMnu_Width);
     }
@@ -97,42 +98,29 @@
     <div class="sidebar">
         <div class="menus">
             <button type="submit" id="btn-Home" class="btn-Menu mw" @onclick="Home">Home</button>
-            <AuthorizeView>
-                <Authorized>
-                    @if (AppGlobal.UserID == "CDC")
-                    {
-                        <CDCMenu></CDCMenu>
-                    }
-                    else
-                    {
-                        <button type="submit" class="btn-Menu mw" id="btn-account" @onclick="async () => { await Beep(); Accounts(); }">Accounts</button>
-                        <button type="submit" class="btn-Menu mw" id="btn-Sale" @onclick="Sale">Sale</button>
-                        <button type="submit" class="btn-Menu mw" id="btn-Purchase" @onclick="Purchase">Purchase</button>
-                        <button type="submit" class="btn-Menu mw" id="btn-Stock" @onclick="Inventory">Stock</button>
-                        <button type="submit" class="btn-Menu mw" id="btn-Production" @onclick="Production">Production</button>
-                        <button type="submit" class="btn-Menu mw" id="btn-Payroll" @onclick="Payroll">Payroll</button>
-                        <button type="submit" class="btn-Menu mw" id="btn-Taxation" @onclick="Taxation">Taxation</button>
-                        <button type="submit" class="btn-Menu mw" id="btn-Admin" @onclick="Admin">Admin</button>
-                    }
+            @if (AppGlobal.UserID == "CDC")
+            {
+                <CDCMenu></CDCMenu>
+            }
+            else
+            {
+                <button type="submit" class="btn-Menu mw" id="btn-account" @onclick="async () => { await Beep(); Accounts(); }">Accounts</button>
+                <button type="submit" class="btn-Menu mw" id="btn-Sale" @onclick="Sale">Sale</button>
+                <button type="submit" class="btn-Menu mw" id="btn-Purchase" @onclick="Purchase">Purchase</button>
+                <button type="submit" class="btn-Menu mw" id="btn-Stock" @onclick="Inventory">Stock</button>
+                <button type="submit" class="btn-Menu mw" id="btn-Production" @onclick="Production">Production</button>
+                <button type="submit" class="btn-Menu mw" id="btn-Payroll" @onclick="Payroll">Payroll</button>
+                <button type="submit" class="btn-Menu mw" id="btn-Taxation" @onclick="Taxation">Taxation</button>
+                <button type="submit" class="btn-Menu mw" id="btn-Admin" @onclick="Admin">Admin</button>
+            }
 
-                    @if (IsAdmin)
-                    {
-                        <button type="submit" class="btn-Menu mw" id="btn-config" @onclick="Config">Config</button>
-                        <button type="submit" class="btn-Menu mw" id="btn-import" @onclick="Import">Import</button>
-                    }
+            @if (IsAdmin)
+            {
+                <button type="submit" class="btn-Menu mw" id="btn-config" @onclick="Config">Config</button>
+                <button type="submit" class="btn-Menu mw" id="btn-import" @onclick="Import">Import</button>
+            }
 
-                    <button type="submit" class="btn-Menu mw" id="btn-logout" @onclick="LogOut">Logout</button>
-
-                </Authorized>
-                <NotAuthorized>
-                    <button type="submit" id="btn-login" class="btn-Menu  mw" @onclick="Login">Login</button>
-                </NotAuthorized>
-                <Authorizing>
-                    <div class="alert alert-info p-2 m-2">
-                        <h5>Wait. Page Loading...</h5>
-                    </div>
-                </Authorizing>
-            </AuthorizeView>
+            <button type="submit" class="btn-Menu mw" id="btn-logout" @onclick="LogOut">Logout</button>
         </div>
     </div>
 }

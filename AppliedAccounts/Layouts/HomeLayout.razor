@@ -1,8 +1,16 @@
 ﻿@inherits LayoutComponentBase
-@attribute [AllowAnonymous]
+@using AppliedAccounts.Pages.HomePage
 
-<div>
+<div class="container-fluid">
+    <header>
+        <AppHeader />
+    </header>
     <content>
-        @Body
+        <div class="HomeDiv">
+            <div id="FullContainer" style="overflow:auto;">
+                @Body
+            </div>
+        </div>
     </content>
+    <AppFooter />
 </div>

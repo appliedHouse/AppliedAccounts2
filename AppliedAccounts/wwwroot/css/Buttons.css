@@ -134,19 +134,22 @@
     transform: translateY(-50%);
 }
 
+
 .btn-Menu {
-    background-image: linear-gradient(#0dccea, #0d70ea);
-    border: 0;
+    display: block;
+    width: calc(var(--sidebar-width) - 20px);
+    text-align: left;
+    padding: 10px 15px;
+    border: none;
+    background: none;
+    font-size: 16px;
+    color: #333;
     border-radius: 4px;
     box-shadow: rgba(0, 0, 0, .3) 0 5px 15px;
     box-sizing: border-box;
-    color: #fff;
     cursor: pointer;
     font-family: "Exo 2", sans-serif; /*Montserrat, sans-serif;*/
-    font-size: .9em;
     margin: 5px;
-    padding: 10px 5px;
-    text-align: center;
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
@@ -156,6 +159,8 @@
 
     .btn-Menu:hover {
         transform: rotate(5deg); /* Rotates the button by 15 degrees */
+        background-color: #e2e6ea;
+        color: #000;
     }
 
 
@@ -167,9 +172,6 @@
     padding: 3px;
     background-color: var(--control-bg);
 }
-
-
-
 
     .control-buttons .ctrl-gap {
         background-color: transparent;

@@ -1,10 +1,11 @@
 /*@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');*/
 
 
-:root{
-    --sidebarMin_Width:200px;
-    --sidebarMax_Width:200px;
-    --sidebarMnu_Width:150px;
+:root {
+    --sidebarMin_Width: 170px;
+    --sidebarMax_Width: 170px;
+    --sidebarMnu_Width: 150px;
+    --navbar_Size: 60px;
 }
 
 

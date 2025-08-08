@@ -1,16 +1,14 @@
-﻿@layout HomeLayout
-@page "/"
+﻿@page "/"
+@layout HomeLayout
 @using AppliedAccounts.Services
 @using AppliedGlobals
 @using AppliedDB;
 @using AppliedAccounts.Pages.HomePage
 
-
 @attribute [AllowAnonymous]
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
 @inject GlobalService AppGlobal
-
 
 <PageTitle>Index</PageTitle>
 
@@ -51,8 +49,6 @@
                 var authState = AppAuthState;
                 UserName = AppAuthState.Result.User.Identity?.Name ?? "";
             });
-
-
         }
     }
 
@@ -67,23 +63,13 @@
             });
         }
     }
-
 }
 
 <AuthorizeView>
     <Authorized>
-        <header>
-            <AppHeader />
-        </header>
-        @* <NavMenu /> *@
-        <HomePageAuthorized />
+        <HomePageAuthorized/>
     </Authorized>
     <NotAuthorized>
-        <HomePageNotAuthorized />
+       <HomePageNotAuthorized/>
     </NotAuthorized>
-    <Authorizing>
-        <div class="alert alert-info" role="alert">
-            <p>Wait......</p>
-        </div>
-    </Authorizing>
 </AuthorizeView>

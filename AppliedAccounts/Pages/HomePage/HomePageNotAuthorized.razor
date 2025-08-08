@@ -51,6 +51,8 @@
     //Language 1 = Englist 2= Urdu  & 3 = Arabic
 }
 
+<PageTitle>NOT AUTH</PageTitle>
+
 @if (!UserDBFileExist)
 {
     <div class="alert alert-danger" role="alert">
@@ -63,31 +65,6 @@ else
         <div class="container py-3">
             <!-- ----Navbar---- -->
 
-            <div class="d-md-flex align-items-center justify-content-between">
-                <div>
-                    <img src="@btnLogo" alt="logo" />
-                    @* <p>@_Language.GetValue("Test")</p> *@
-                </div>
-
-                <div class="mt-3 mt-lg-0 mt-md-0 nav-btns" style="background-color:beige; padding:3px">
-                    <!-- <a href="./Login/index.html"> -->
-                    <button class="global-btn-bg" @onclick="Login">
-                        <span>
-                            <img src="@btnSignin" alt="loginIcon" />
-                        </span>
-                        Log In
-                    </button>
-                    <!-- </a> -->
-                    <!-- <a href="./SignUpAndLogin/index.html"> -->
-                    <button class="global-btn-bg">
-                        <span>
-                            <img src="@btnSignup" alt="loginIcon" />
-                        </span>
-                        Sign Up
-                    </button>
-                    <!-- </a> -->
-                </div>
-            </div>
             <!-- ------BANNER------- -->
             <section class="hero-banner">
                 <div class="container text-white text-center">
@@ -181,50 +158,46 @@ else
                 </div>
             </section>
             <!-- --------TESTIMONIAL--------- -->
-            <section class="testimonial-main">
-                <div class="container py-5">
-                    <h1 class="text-center text-theme-dark">
-                        Companies We Are <span class="d-lg-block">Working With</span>
+            <section class="testimonial-main py-5 bg-light">
+                <div class="container">
+                    <h1 class="text-center text-theme-dark mb-5">
+                        Clients Who Trust Our <span class="text-success">Solutions</span>
                     </h1>
-                    <div class="row pt-4 justify-content-center">
-                        <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
-                            <div class="inner text-white p-3 p-lg-5 p-md-5">
-                                <h3>Company 1</h3>
-                                <p class="m-0 pt-2 line-height">
-                                    Lorem Ipsum is simply dummy text of the printing and typesetting
-                                    industry. Lorem Ipsum has been the industry's standard dummy
-                                    text
+                    <div class="row justify-content-center align-items-stretch">
+                        <div class="col-lg-4 col-md-6 mb-4 d-flex">
+                            <div class="inner p-4 p-lg-5 w-100 h-100 rounded shadow text-dark bg-gradient bg-info bg-opacity-10">
+                                <h3 class="fw-bold text-primary mb-3">HFS Steel - <spin class="fs-5">Mozambique</spin></h3>
+                                <p class="m-0 line-height">
+                                    As the first manufacturing company to implement our Applied Accounts system, HFS Steel effectively manages its accounts, production, and inventory. They now enjoy powerful, comprehensive reporting that supports better decision-making.
                                 </p>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
-                            <div class="inner text-white p-3 p-lg-5 p-md-5">
-                                <h3>Company 2</h3>
-                                <p class="m-0 pt-2 line-height">
-                                    Lorem Ipsum is simply dummy text of the printing and typesetting
-                                    industry. Lorem Ipsum has been the industry's standard dummy
-                                    text
+                        <div class="col-lg-4 col-md-6 mb-4 d-flex">
+                            <div class="inner p-4 p-lg-5 w-100 h-100 rounded shadow text-dark bg-gradient bg-success bg-opacity-10">
+                                <h3 class="fw-bold text-success mb-3">AMCORP</h3>
+                                <p class="m-0 line-height">
+                                    AMCORP Engineering and Construction (Pvt.) Limited is a valued client that uses our Applied Accounts system to manage petty cash transactions at its construction sites. The system also helps them effectively control cash and monitor cash flow.
                                 </p>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
-                            <div class="inner text-white p-3 p-lg-5 p-md-5">
-                                <h3>Company 3</h3>
-                                <p class="m-0 pt-2 line-height">
-                                    Lorem Ipsum is simply dummy text of the printing and typesetting
-                                    industry. Lorem Ipsum has been the industry's standard dummy
-                                    text
+                        <div class="col-lg-4 col-md-6 mb-4 d-flex">
+                            <div class="inner p-4 p-lg-5 w-100 h-100 rounded shadow text-dark bg-gradient bg-warning bg-opacity-10">
+                                <h3 class="fw-bold text-warning mb-3">CDC</h3>
+                                <p class="m-0 line-height">
+                                    CDC Share Registrar Services Limited uses our Applied Accounts system to manage invoicing for its clients. Applied Accounts streamlines the entire invoicing process, enabling the generation and printing of all client invoices in a single click—either as PDFs or directly to a printer.
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
+
+
             <!-- ----FOOTER----- -->
             <section class="footer-main bg-black text-white">
                 <div class="container py-3">
                     <div class="addres-box d-md-flex align-items-center justify-content-between">
-                        <span>© 2024 - Applied Software House ABOUT US</span>
+                        <span>© 2024 2025 - Applied Software House ABOUT US</span>
                         <span>©All Rights Reserved Jahangir.com</span>
                     </div>
                 </div>

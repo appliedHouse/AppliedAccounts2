@@ -1,24 +1,55 @@
 ﻿@layout HomeLayout
-@attribute [Authorize]  
-@inject NavigationManager NavManager;  
-@using AppliedAccounts.Data  
-@using AppliedAccounts.Services  
-@inject GlobalService AppGlobal;  
+@attribute [Authorize]
+@inject NavigationManager NavManager;
+@using AppliedAccounts.Data
+@using AppliedAccounts.Services
+@using AppliedAccounts.Pages.Dashboard;
+@inject GlobalService AppGlobal;
 
-@code {  
-    public string? BusinessPic { get; set; }  
-    protected override void OnInitialized()  
-    {  
-        BusinessPic = $"{AppGlobal.AppPaths.ImagesPath}/Accounts3.jpg";  
-        Database_Patches DBPatches = new(new AppliedDB.DataSource(AppGlobal.AppPaths));  
-    }  
-} 
+@code {
+    public string? BusinessPic { get; set; }
+    protected override void OnInitialized()
+    {
+        BusinessPic = $"{AppGlobal.AppPaths.ImagesPath}/Accounts3.jpg";
+        Database_Patches DBPatches = new(new AppliedDB.DataSource(AppGlobal.AppPaths));
+    }
+}
 
-@* <NavMenu></NavMenu> *@
+<style>
+    .layout {
+        display: flex;
+        height: 100vh; /* optional if you want full height */
+    }
 
-@* <div class="HomeDiv">
-    <div id="FullContainer" style="overflow:auto;">
-        @Body
+    .part-1 {
+        width: var(--sidebarMin_Width);
+        background-color: #f5f5f5; /* optional */
+    }
+
+    .part-2 {
+        flex: 1; /* fills remaining space */
+        padding: 1rem; /* optional */
+    }
+</style>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="part-1">
+            <NavMenu></NavMenu>
+        </div>
+        <div class="part-2">
+            @if (AppGlobal.UserID == "CDC")
+            {
+                <HomeDBoard/>
+            }
+            else
+            {
+                <p>I am not CDC</p>
+            }
+        </div>
     </div>
 </div>
- *@
+
+
+

@@ -90,21 +90,7 @@
 
 
 /* Menu Buttons*/
-.btn-Menu {
-    display: block;
-    width: calc(var(--sidebar-width) - 20px);
-    text-align: left;
-    padding: 10px 15px;
-    border: none;
-    background: none;
-    font-size: 16px;
-    color: #333;
-}
 
-    .btn-Menu:hover {
-        background-color: #e2e6ea;
-        color: #000;
-    }
 
 .main-content {
     margin-left: 230px;

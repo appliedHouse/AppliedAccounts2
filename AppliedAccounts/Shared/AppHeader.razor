@@ -1,5 +1,6 @@
 ﻿@using AppliedAccounts.Data;
 @using System.Security.Claims;
+@inject NavigationManager NavManager;
 
 @inject AuthenticationStateProvider Authorized;
 
@@ -28,40 +29,48 @@
     }
     public string GetCompanyName() { return AppUser.Company ?? ""; }
     public string GetAppUserName() => AppUser.DisplayName ?? "";
+    public void GoHome() { NavManager.NavigateTo("/"); }
 }
 
-<header class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow" data-bs-theme="dark">
-    <div class="logo-img">
-        <img src="Images/ASH3.png" class="img-thumbnail brand-Width" alt="..." />
+<header class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow sticky-top" data-bs-theme="dark">
+    <div class="logo-img" @onclick="GoHome">
+        <img src="Images/ASH3.png" class="img-thumbnail brand-Width" alt="..." title="Go Home" />
     </div>
-    <div class="text-white font-monospace p-2">APPLIED SOFTWARE HOUSE</div>
+    <div class="text-white font-monospace p-2 fs-3">APPLIED ACCOUNTS 2</div>
 
     <div class="ms-auto d-flex align-items-center">
-        <div class="justify-content-end text-white">
-            @GetCompanyName()
-        </div>
-        <div class="p-1">
-            <span class="p-2 rounded-circle"
-                  type="button"
-                  data-bs-toggle="offcanvas"
-                  data-bs-target="#offcanvasRight"
-                  aria-controls="offcanvasRight">
-                <i class="bi bi-gear text-white"></i>
-            </span>
-        </div>
-    </div>
 
+        <AuthorizeView>
+            <NotAuthorized>
+                <Btn_Login />
+            </NotAuthorized>
+            <Authorized>
+                <div class="justify-content-end text-white">
+                    @GetCompanyName()
+                </div>
+                <div class="p-1">
+                    <span class="p-2 rounded-circle"
+                          type="button"
+                          data-bs-toggle="offcanvas"
+                          data-bs-target="#offcanvasRight"
+                          aria-controls="offcanvasRight">
+                        <i class="bi bi-gear text-white"></i>
+                    </span>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+    </div>
 </header>
 
 
 <style>
     .navbar {
-        max-height: 60px;
+        max-height: var(--navbar_Size);
     }
 
     .brand-Width {
-        min-height: 60px;
-        max-width: 60px;
+        min-height: var(--navbar_Size);
+        max-width: var(--navbar_Size);
     }
 
     .sidebar-width {
@@ -70,38 +79,4 @@
     }
 
 </style>
-
-
-<AuthorizeView>
-    <Authorized>
-        <div class="continer-fluid>">
-           <div class="row">
-                <div class="col-3 sidebar-width">
-                    <NavMenu />
-                </div>
-                @* <SubHeading></SubHeading> *@
-            </div>
-        </div>
-
-        <ShowRightPane />
-
-    </Authorized>
-    <NotAuthorized>
-        <div class="SubHeading d-flex align-items-center">
-            <div class="p-1"><a href="/">Home</a></div>
-            <div class="p-1 ms-auto"><h5 class="SubHeading">Hello Guest!</h5></div>
-        </div>
-    </NotAuthorized>
-</AuthorizeView>
-
-<footer class="footer">
-    <div class="container-fluid h-100 d-flex justify-content-center align-items-center">
-        <div class="row">
-            <div class="col">
-                Applied Software House V2.1.2
-            </div>
-        </div>
-
-    </div>
-</footer>
 
