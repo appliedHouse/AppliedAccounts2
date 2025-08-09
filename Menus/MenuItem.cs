@@ -11,4 +11,6 @@ namespace Menus
         public int ParentID { get; set; }
         public string NavigateTo { get; set; }
     }
+
+    
 }

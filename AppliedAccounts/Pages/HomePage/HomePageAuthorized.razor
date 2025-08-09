@@ -4,10 +4,13 @@
 @using AppliedAccounts.Data
 @using AppliedAccounts.Services
 @using AppliedAccounts.Pages.Dashboard;
+@using AppliedAccounts.Pages.Menu
+@using Menus
 @inject GlobalService AppGlobal;
 
 @code {
     public string? BusinessPic { get; set; }
+    public MenusClass AppMenus { get; set; } = new MenusClass();
     protected override void OnInitialized()
     {
         BusinessPic = $"{AppGlobal.AppPaths.ImagesPath}/Accounts3.jpg";
@@ -36,7 +39,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="part-1">
-            <NavMenu></NavMenu>
+            <MainMenu AppMenus="AppMenus"/>
         </div>
         <div class="part-2">
             @if (AppGlobal.UserID == "CDC")

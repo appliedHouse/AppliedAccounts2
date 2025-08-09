@@ -9,7 +9,7 @@ namespace Menus
         public Task MenuActive(int TopMenuID);
     }
 
-    public class MenusClass : IMenusClass
+        public class MenusClass : IMenusClass
     {
         public List<MenuItem> MyMenus { get; set; }
 

@@ -42,6 +42,9 @@ namespace Menus
             _Menus.Add(new MenuItem { ID = 62, Title = "Events", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 6, NavigateTo = "" });
             _Menus.Add(new MenuItem { ID = 63, Title = "Attendence", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 6, NavigateTo = "" });
             
+
+
+
             return _Menus;
         }
     }

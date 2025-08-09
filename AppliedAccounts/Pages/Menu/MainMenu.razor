@@ -1,0 +1,62 @@
+﻿@using Menus;
+@inject IJSRuntime js
+
+@code {
+    [Parameter] public MenusClass AppMenus { get; set; } = new MenusClass();
+
+    private int ActiveMenu { get; set; } = 0;
+    private async Task Beep() { await js.InvokeVoidAsync("playBeep"); }
+    private async Task TopLevelClick(int MenuID) 
+    {
+        await Task.Delay(100);
+        ActiveMenu = MenuID; 
+    }
+    private async Task SubMenuClick(int MenuID)
+    {
+        await Task.Delay(100);
+    }
+}
+
+<EditForm Model="AppMenus">
+    <div class="sidebar">
+        <div class="Menu mt-2">
+            @foreach (var Menu in AppMenus.GetTopLevel())
+            {
+                <button type="submit" class="btn-Menu mw" id="btn-TopLevel" @onclick="async () => { await Beep(); await TopLevelClick(Menu.ID); }"><i class="@Menu.Icon"></i>  @Menu.Title</button>
+                @foreach (var SubMenu in AppMenus.GetSubMenu(2, Menu.ID))
+                {
+                    if(Menu.ID == ActiveMenu)
+                    {
+                        <button type="submit" class="btn-Menu subMenu" id="btn-SubMenu" @onclick="async () => { await Beep(); await SubMenuClick(SubMenu.ID); }"><i class="@Menu.Icon text-success"></i>  @SubMenu.Title</button>
+                    }
+                }
+            }
+        </div>
+    </div>
+
+</EditForm>
+
+
+<style>
+    .sidebar {
+        min-width: var(--sidebarMin_Width);
+        max-width: var(--sidebarMax_Width);
+        height: 100vh;
+    }
+
+    .mw {
+        min-width: var(--sidebarMnu_Width);
+        max-width: var(--sidebarMnu_Width);
+    }
+
+    .subMenu {
+        min-width: var(--sidebarMnu_Width);
+        max-width: var(--sidebarMnu_Width);
+        margin-left: 25px;
+        margin-bottom: 0px;
+        margin-top: 0px;
+       color:darkred
+    }
+
+    
+</style>
