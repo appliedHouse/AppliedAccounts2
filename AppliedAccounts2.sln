@@ -36,6 +36,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLQueries", "SQLQueries\SQ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppliedGlobals", "AppliedGlobals\AppliedGlobals\AppliedGlobals.csproj", "{C425AE4E-58F5-478E-8E0D-E26AECFA8A30}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Menus", "Menus\Menus.csproj", "{7B54E336-BD16-4D10-8ECC-311FD6B38774}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +74,10 @@ Global
 		{C425AE4E-58F5-478E-8E0D-E26AECFA8A30}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C425AE4E-58F5-478E-8E0D-E26AECFA8A30}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C425AE4E-58F5-478E-8E0D-E26AECFA8A30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B54E336-BD16-4D10-8ECC-311FD6B38774}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B54E336-BD16-4D10-8ECC-311FD6B38774}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B54E336-BD16-4D10-8ECC-311FD6B38774}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B54E336-BD16-4D10-8ECC-311FD6B38774}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,6 +90,7 @@ Global
 		{99621E99-A721-4F00-B148-C79B2B12031B} = {6F3081C7-DEC2-4AF6-8177-58F74CD0044F}
 		{2B20A705-1C66-4925-A0C8-FB97F7202B5B} = {FE768FAB-5B90-415D-A177-E711E746D594}
 		{C425AE4E-58F5-478E-8E0D-E26AECFA8A30} = {FE768FAB-5B90-415D-A177-E711E746D594}
+		{7B54E336-BD16-4D10-8ECC-311FD6B38774} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7430CBA5-E179-4FBF-B19B-CA7BA44112D2}
