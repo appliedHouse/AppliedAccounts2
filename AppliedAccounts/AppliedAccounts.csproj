@@ -64,6 +64,7 @@
     <ProjectReference Include="..\AppliedLanguage\AppLanguages.csproj" />
     <ProjectReference Include="..\AppliedMessages\AppMessages\AppMessages.csproj" />
     <ProjectReference Include="..\AppliedReports\AppReports\AppReports.csproj" />
+    <ProjectReference Include="..\Menus\Menus.csproj" />
     <ProjectReference Include="..\SQLQueries\SQLQueries.csproj" />
   </ItemGroup>
 
