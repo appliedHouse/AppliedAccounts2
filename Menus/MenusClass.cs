@@ -55,9 +55,12 @@ namespace Menus
         public List<MenuItem> SelectedMenu(int MenuID)
         {
             List<MenuItem> _Menus = [];
-            _Menus = MyMenus.Where(m => m.ID == MenuID || m.ParentID == MenuID).ToList();
+            var menu1 = MyMenus.FirstOrDefault(m => m.ID == 1);
+            if (menu1 != null)  { _Menus.Add(menu1); }
 
-            foreach(var Menu in _Menus)
+            _Menus = [.. MyMenus.Where(m => m.ID == MenuID || m.ParentID == MenuID)];
+
+            foreach (var Menu in _Menus)
             {
                 Menu.Level = Menu.Level - 1;
             }

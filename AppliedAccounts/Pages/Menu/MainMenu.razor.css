@@ -8,13 +8,13 @@
     padding: 10px 15px;
     border: none;
     background: none;
-    font-size: 16px;
     color: #1b00d4;
     border-radius: 4px;
     box-shadow: rgba(0, 0, 0, .3) 0 5px 15px;
     box-sizing: border-box;
     cursor: pointer;
     font-family: "Exo 2", sans-serif; /*Montserrat, sans-serif;*/
+    font-size: 16px;
     margin: 5px;
     user-select: none;
     -webkit-user-select: none;
@@ -33,7 +33,13 @@
 .sidebar {
     min-width: var(--sidebarMin_Width);
     max-width: var(--sidebarMax_Width);
-    height: 100vh;
+    height: auto;
+    min-height:100vh;
+    background-color:azure;
+    margin:0px;
+    
+    padding-left:10px;
+    padding-top:10px;
 }
 
 .mw {

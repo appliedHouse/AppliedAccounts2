@@ -10,7 +10,8 @@
     private async Task TopLevelClick(int MenuID)
     {
         await Task.Delay(100);
-        ActiveMenu = MenuID;
+        if (ActiveMenu != MenuID) { ActiveMenu = MenuID; } else { ActiveMenu = 0; }
+
     }
     private async Task SubMenuClick(int MenuID)
     {
@@ -25,11 +26,6 @@
     {
         MenuClass ??= new();
     }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        bool stop = false;
-    }
 }
 
 
@@ -42,7 +38,7 @@
             {
                 if (Menu.ID == ActiveMenu)
                 {
-                    <button type="button" class="btn-Menu subMenu" id="btn-SubMenu" @onclick="async () => { await Beep(); await SubMenuClick(SubMenu.ID); }"><i class="@Menu.Icon text-success"></i>  @SubMenu.Title</button>
+                    <button type="button" class="btn-Menu subMenu" id="btn-SubMenu" @onclick="async () => { await Beep(); await SubMenuClick(SubMenu.ID); }"><i class="@SubMenu.Icon text-success"></i>  @SubMenu.Title</button>
                 }
             }
         }

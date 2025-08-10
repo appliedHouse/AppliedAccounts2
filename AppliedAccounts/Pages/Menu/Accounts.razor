@@ -1,73 +1,29 @@
 ﻿@page "/Menu/Accounts"
 @attribute [Authorize]
+@inject GlobalService AppGlobal
 
-@using AppliedAccounts.Models;
-@using AppliedAccounts.Services;
-@using ExcelDataReader
-@using System.Data
-
-@inject NavigationManager NavManager;
-@inject GlobalService AppGlobal;
 
 @code {
-    public MenuCardModel? CardMenuModel { get; set; }
-
-    private Menus.MenusClass MenuClass { get; set; } = new();
-    public bool IsAdmin { get; set; } = false;
-    private bool IsSidebarVisible { set; get; } = true;
+    public Menus.MenusClass MenusClass { get; set; }
 
     protected override void OnInitialized()
     {
-        if (AppGlobal.UserRole == "Administrator") { IsAdmin = true; }
-        CardMenuModel = new() { TextMsg = "", NavTo = "", PicPath = "" };
-        MenuClass.MyMenus = MenuClass.Selected(22).Result;
-    }
-
-    public void LoadFiles() { NavManager.NavigateTo("/DownLoad"); }
-    public void QuotationsList() { NavManager.NavigateTo("/Sale/QuotationsList"); }
-
-    public void SetDataSet(DataSet? _DataSet)
-    {
-        int Count = 0;
-        if (_DataSet is not null)
-        {
-            Count = _DataSet.Tables.Count;
-        }
-    }
-
-    private async Task Migration()
-    {
-
-        AppliedAccounts.Data.DataMigration _MigrationClass = new(AppGlobal);
-
-        await InvokeAsync(StateHasChanged);
-        await Task.Run(() => _MigrationClass.Cash2Book());
-
+        MenusClass = new();
+        MenusClass.MyMenus = MenusClass.SelectedMenu(22);
     }
 }
 
-<style>
-    .fixed-background {
-        /*  background-image: url('/images/TypeWriter.jpg'); */
-        background: no-repeat; /* Ensures the image fills the div */
-        background-position: center; /* Centers the image */
-        background-repeat: no-repeat; /* Prevents tiling */
-        position: relative; /* Keeps the div positioned within the document flow */
-        width: 100%; /* Set the div's width */
-        height: 100vh; /* Set the div's height */
-        overflow: hidden; /* Ensures content within the div stays visible */
-    }
-</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="part-1">
+            <MainMenu MenuClass="MenusClass" />
+        </div>
+        <div class="part-2">
 
-
-@if (IsSidebarVisible)
-{
-    <div class="sidebar">
-        <div class="menus">
-            @* <MainMenu MenuClass="MenuClass" /> *@
+            <p>Welcome Applied Accounts V2<a href="#"></a></p>
+            <p>Accounts Page Authorized<a href="#"></a></p>
         </div>
     </div>
-}
+</div>
 
-
-<p>This is Accounts page</p>
+<p>Transaction Menu</p>
