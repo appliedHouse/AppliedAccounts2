@@ -135,34 +135,6 @@
 }
 
 
-.btn-Menu {
-    display: block;
-    width: calc(var(--sidebar-width) - 20px);
-    text-align: left;
-    padding: 10px 15px;
-    border: none;
-    background: none;
-    font-size: 16px;
-    color: #1538d4;
-    border-radius: 4px;
-    box-shadow: rgba(0, 0, 0, .3) 0 5px 15px;
-    box-sizing: border-box;
-    cursor: pointer;
-    font-family: "Exo 2", sans-serif; /*Montserrat, sans-serif;*/
-    margin: 5px;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
-    min-width: 120px;
-    max-width: 120px;
-}
-
-    .btn-Menu:hover {
-        transform: rotate(5deg); /* Rotates the button by 15 degrees */
-        background-color: #e2e6ea;
-        color: #000;
-    }
-
 
 
 .control-buttons {

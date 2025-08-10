@@ -1,5 +1,5 @@
 ﻿@page "/Menu/Accounts"
-@attribute [Authorize];
+@attribute [Authorize]
 
 @using AppliedAccounts.Models;
 @using AppliedAccounts.Services;
@@ -11,29 +11,16 @@
 
 @code {
     public MenuCardModel? CardMenuModel { get; set; }
-    public string COAText = "A chart of accounts is a documents that list all the transactions.";
-    public string ClassText = "Classification of accounts are groups of chart of accounts.";
-    public string CategoryText = "Category of Accounts are gategory of charts of accounts";
-    public string NotesText = "Notes to the financial Accounts.";
-    public string ImportText = "Import an excel file and generate sales invoice";
-    public string CashBookText = "Daily cash transactions.";
-    public string BankBookText = "Daily bank transactions.";
-    public string ReceiptText = "Receipts";
-    public DataSet MyDataset = new();
-    public bool IsWaiting { get; set; } = true;
-    public string MyMessage = "Loading....";
 
+    private Menus.MenusClass MenuClass { get; set; } = new();
     public bool IsAdmin { get; set; } = false;
     private bool IsSidebarVisible { set; get; } = true;
 
     protected override void OnInitialized()
     {
-        if (AppGlobal.UserRole == "Administrator")
-        {
-            IsAdmin = true;
-        }
-
+        if (AppGlobal.UserRole == "Administrator") { IsAdmin = true; }
         CardMenuModel = new() { TextMsg = "", NavTo = "", PicPath = "" };
+        MenuClass.MyMenus = MenuClass.Selected(22).Result;
     }
 
     public void LoadFiles() { NavManager.NavigateTo("/DownLoad"); }
@@ -52,7 +39,7 @@
     {
 
         AppliedAccounts.Data.DataMigration _MigrationClass = new(AppGlobal);
-        MyMessage = "Migrating Cash Book Data...";
+
         await InvokeAsync(StateHasChanged);
         await Task.Run(() => _MigrationClass.Cash2Book());
 
@@ -77,7 +64,10 @@
 {
     <div class="sidebar">
         <div class="menus">
-
+            @* <MainMenu MenuClass="MenuClass" /> *@
         </div>
     </div>
 }
+
+
+<p>This is Accounts page</p>

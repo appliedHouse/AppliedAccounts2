@@ -20,8 +20,8 @@ namespace Menus
             _Menus.Add(new MenuItem { ID = 13, Title = "Import", Active = true, Icon = "bi bi-gear", Level = 2, ParentID = 1, NavigateTo = "/Home/Import" });
             
             _Menus.Add(new MenuItem { ID = 21, Title = "Dictionery", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 2, NavigateTo = "" });
-            _Menus.Add(new MenuItem { ID = 22, Title = "Transaction", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 2, NavigateTo = "" });
-            _Menus.Add(new MenuItem { ID = 23, Title = "Reports", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 2, NavigateTo = "" });
+            _Menus.Add(new MenuItem { ID = 22, Title = "Transaction", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 2, NavigateTo = "/Menu/Accounts" });
+            _Menus.Add(new MenuItem { ID = 23, Title = "Reports", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 2, NavigateTo = "/Menu/Reports" });
             _Menus.Add(new MenuItem { ID = 24, Title = "Balances", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 2, NavigateTo = "" });
             _Menus.Add(new MenuItem { ID = 25, Title = "Post", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 2, NavigateTo = "" });
             _Menus.Add(new MenuItem { ID = 26, Title = "Unpost", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 2, NavigateTo = "" });
@@ -41,7 +41,16 @@ namespace Menus
             _Menus.Add(new MenuItem { ID = 61, Title = "Circulars", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 6, NavigateTo = "" });
             _Menus.Add(new MenuItem { ID = 62, Title = "Events", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 6, NavigateTo = "" });
             _Menus.Add(new MenuItem { ID = 63, Title = "Attendence", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 6, NavigateTo = "" });
-            
+
+            _Menus.Add(new MenuItem { ID = 2201, Title = "Cash Book", Active = true, Icon = "bi bi-printer", Level = 3, ParentID = 22, NavigateTo = "" });
+            _Menus.Add(new MenuItem { ID = 2202, Title = "Bank book", Active = true, Icon = "bi bi-printer", Level = 3, ParentID = 22, NavigateTo = "" });
+            _Menus.Add(new MenuItem { ID = 2203, Title = "Cheque / Payment", Active = true, Icon = "bi bi-printer", Level = 3, ParentID = 22, NavigateTo = "" });
+            _Menus.Add(new MenuItem { ID = 2204, Title = "Cheque Return", Active = true, Icon = "bi bi-printer", Level = 3, ParentID = 22, NavigateTo = "" });
+            _Menus.Add(new MenuItem { ID = 2205, Title = "Sale Invoice", Active = true, Icon = "bi bi-printer", Level = 3, ParentID = 22, NavigateTo = "" });
+            _Menus.Add(new MenuItem { ID = 2206, Title = "Purchase Invoice", Active = true, Icon = "bi bi-printer", Level = 3, ParentID = 22, NavigateTo = "" });
+            _Menus.Add(new MenuItem { ID = 2207, Title = "Receipt", Active = true, Icon = "bi bi-printer", Level = 3, ParentID = 22, NavigateTo = "" });
+            _Menus.Add(new MenuItem { ID = 2208, Title = "Journal Voucher", Active = true, Icon = "bi bi-printer", Level = 3, ParentID = 22, NavigateTo = "" });
+            _Menus.Add(new MenuItem { ID = 2209, Title = "Vouchers", Active = true, Icon = "bi bi-printer", Level = 3, ParentID = 22, NavigateTo = "" });
 
 
 

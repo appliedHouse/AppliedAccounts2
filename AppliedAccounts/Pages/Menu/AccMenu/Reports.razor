@@ -1,0 +1,17 @@
+﻿@page "/Menu/Reports"
+
+<p>Reports</p>
+
+@code{
+    public Menus.MenusClass MenusClass { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        MenusClass = new();
+        MenusClass.MyMenus = MenusClass.SelectedMenu(22);
+    }
+}
+
+
+<MainMenu MenuClass="MenusClass"/>

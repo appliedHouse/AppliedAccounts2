@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace Menus
 {
     public interface IMenusClass
@@ -9,7 +11,7 @@ namespace Menus
         public Task MenuActive(int TopMenuID);
     }
 
-        public class MenusClass : IMenusClass
+    public class MenusClass : IMenusClass
     {
         public List<MenuItem> MyMenus { get; set; }
 
@@ -35,6 +37,34 @@ namespace Menus
                 item.Active = !item.Active;
             }
             await Task.Delay(1000);
+        }
+
+        public async Task<List<MenuItem>> Selected(int MenuID)
+        {
+
+            List<MenuItem> _Menus = [];
+            await Task.Run(() =>
+            {
+                _Menus = MyMenus.Where(m => m.ID == MenuID || m.ParentID == MenuID).ToList();
+            });
+            return _Menus;
+
+
+        }
+
+        public List<MenuItem> SelectedMenu(int MenuID)
+        {
+            List<MenuItem> _Menus = [];
+            _Menus = MyMenus.Where(m => m.ID == MenuID || m.ParentID == MenuID).ToList();
+
+            foreach(var Menu in _Menus)
+            {
+                Menu.Level = Menu.Level - 1;
+            }
+
+            return _Menus;
+
+
         }
     }
 }
