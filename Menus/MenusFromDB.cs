@@ -54,9 +54,13 @@ namespace Menus
             _Menus.Add(new MenuItem { ID = 2208, Title = "J.Voucher", Active = true, Icon = "bi bi-journal", Level = 3, ParentID = 22, NavigateTo = "" });
             _Menus.Add(new MenuItem { ID = 2209, Title = "Vouchers", Active = true, Icon = "bi bi-journals", Level = 3, ParentID = 22, NavigateTo = "" });
 
-
-
             return _Menus;
         }
+    }
+
+    public enum AppMenu
+    {
+        Home = 1,
+        Logout = 7
     }
 }

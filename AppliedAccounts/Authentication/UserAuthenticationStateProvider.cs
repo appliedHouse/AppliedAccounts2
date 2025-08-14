@@ -138,6 +138,11 @@ namespace AppliedAccounts.Authentication
             };
         }
 
+        public async Task Logout()
+        {
+            await UpdateAuthonticateState(null);
+        }
+
         public enum UserRolls
         {
             Administrator = 1,

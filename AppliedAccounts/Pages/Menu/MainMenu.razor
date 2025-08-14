@@ -1,6 +1,7 @@
 ﻿@using Menus;
 @inject IJSRuntime js
 @inject NavigationManager NavManager
+@inject AuthenticationStateProvider AuthState;
 
 @code {
     [Parameter] public MenusClass MenuClass { get; set; }
@@ -9,7 +10,19 @@
     private async Task Beep() { await js.InvokeVoidAsync("playBeep"); }
     private async Task TopLevelClick(int MenuID)
     {
-        await Task.Delay(100);
+        if (MenuID == (int)AppMenu.Home)
+        {
+            MenuClass.Reset();          // Refresh Main Menu 
+
+        }
+
+        if (MenuID == (int)AppMenu.Logout)
+        {
+            var UserService = (UserAuthenticationStateProvider)AuthState;
+            await UserService.UpdateAuthonticateState(null);
+            NavManager.NavigateTo("/");
+        }
+
         if (ActiveMenu != MenuID) { ActiveMenu = MenuID; } else { ActiveMenu = 0; }
 
     }

@@ -14,11 +14,19 @@ namespace Menus
     public class MenusClass : IMenusClass
     {
         public List<MenuItem> MyMenus { get; set; }
+        private List<MenuItem> FullMenus { get; set; }
 
         public MenusClass()
         {
+            FullMenus = MenusFromDB.Get();
             MyMenus = MenusFromDB.Get();
         }
+
+        public void Reset()
+        {
+            MyMenus = FullMenus;
+        }
+
 
         public List<MenuItem> GetSubMenu(int _Level, int _Parent)
         {
@@ -39,35 +47,25 @@ namespace Menus
             await Task.Delay(1000);
         }
 
-        public async Task<List<MenuItem>> Selected(int MenuID)
-        {
-
-            List<MenuItem> _Menus = [];
-            await Task.Run(() =>
-            {
-                _Menus = MyMenus.Where(m => m.ID == MenuID || m.ParentID == MenuID).ToList();
-            });
-            return _Menus;
-
-
-        }
-
         public List<MenuItem> SelectedMenu(int MenuID)
         {
             List<MenuItem> _Menus = [];
             var menu1 = MyMenus.FirstOrDefault(m => m.ID == 1);
             if (menu1 != null)  { _Menus.Add(menu1); }
 
-            _Menus = [.. MyMenus.Where(m => m.ID == MenuID || m.ParentID == MenuID)];
+            var menus2 = MyMenus.Where(m => m.ID == MenuID || m.ParentID == MenuID).ToList();
+
+            _Menus.AddRange(menus2);
 
             foreach (var Menu in _Menus)
             {
-                Menu.Level = Menu.Level - 1;
+                if(Menu.Level > 1)
+                {
+                    Menu.Level = Menu.Level - 1;
+                }
             }
 
             return _Menus;
-
-
         }
     }
 }
