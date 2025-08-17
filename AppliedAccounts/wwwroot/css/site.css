@@ -2,9 +2,9 @@
 
 
 :root {
-    --sidebarMin_Width: 200px;
-    --sidebarMax_Width: 200px;
-    --sidebarMnu_Width: 150px;
+    --sidebarMin_Width: 230px;
+    --sidebarMax_Width: 230px;
+    --sidebarMnu_Width: 180px;
     --navbar_Size: 60px;
 }
 

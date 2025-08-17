@@ -19,7 +19,7 @@ namespace Menus
             _Menus.Add(new MenuItem { ID = 12, Title = "Config", Active = true, Icon = "bi bi-sliders", Level = 2, ParentID = 1, NavigateTo = "/Home/Config" });
             _Menus.Add(new MenuItem { ID = 13, Title = "Import", Active = true, Icon = "bi bi-database-down", Level = 2, ParentID = 1, NavigateTo = "/Home/Import" });
             
-            _Menus.Add(new MenuItem { ID = 21, Title = "Dictionery", Active = true, Icon = "bi bi-journal-code", Level = 2, ParentID = 2, NavigateTo = "" });
+            _Menus.Add(new MenuItem { ID = 21, Title = "Dictionery", Active = true, Icon = "bi bi-journal-code", Level = 2, ParentID = 2, NavigateTo = "/Accounts/Dictionery" });
             _Menus.Add(new MenuItem { ID = 22, Title = "Transaction", Active = true, Icon = "bi bi-stack-overflow", Level = 2, ParentID = 2, NavigateTo = "/Menu/Accounts" });
             _Menus.Add(new MenuItem { ID = 23, Title = "Reports", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 2, NavigateTo = "/Menu/Reports" });
             _Menus.Add(new MenuItem { ID = 24, Title = "Balances", Active = true, Icon = "bi bi-wallet2", Level = 2, ParentID = 2, NavigateTo = "" });
@@ -43,9 +43,16 @@ namespace Menus
             _Menus.Add(new MenuItem { ID = 63, Title = "Attendence", Active = true, Icon = "bi bi-clock", Level = 2, ParentID = 6, NavigateTo = "" });
 
 
+            // Accounts - Dictionery
+            
+            _Menus.Add(new MenuItem { ID = 2101, Title = "Accounts", Active = true, Icon = "bi bi-book", Level = 3, ParentID = 21, NavigateTo = "/Accounts/COA" });
+            _Menus.Add(new MenuItem { ID = 2102, Title = "Nature", Active = true, Icon = "bi bi-tags", Level = 3, ParentID = 21, NavigateTo = "/Accounts/COANature" });
+            _Menus.Add(new MenuItem { ID = 2103, Title = "Class", Active = true, Icon = "bi bi-layers", Level = 3, ParentID = 21, NavigateTo = "/Accounts/COAClass" });
+            _Menus.Add(new MenuItem { ID = 2104, Title = "Notes", Active = true, Icon = "bi bi-journal-text", Level = 3, ParentID = 21, NavigateTo = "/Accounts/COANotes" });
+
             // Accounts - Trancaction
-            _Menus.Add(new MenuItem { ID = 2201, Title = "Cash Book", Active = true, Icon = "bi bi-cash-coin", Level = 3, ParentID = 22, NavigateTo = "/Accounts/BooksList" });
-            _Menus.Add(new MenuItem { ID = 2202, Title = "Bank book", Active = true, Icon = "bi bi-bank", Level = 3, ParentID = 22, NavigateTo = "/Accounts/BooksList" });
+            _Menus.Add(new MenuItem { ID = 2201, Title = "Cash Book", Active = true, Icon = "bi bi-cash-coin", Level = 3, ParentID = 22, NavigateTo = "/Accounts/BooksList/1" });
+            _Menus.Add(new MenuItem { ID = 2202, Title = "Bank book", Active = true, Icon = "bi bi-bank", Level = 3, ParentID = 22, NavigateTo = "/Accounts/BooksList/2" });
             _Menus.Add(new MenuItem { ID = 2203, Title = "Payment", Active = true, Icon = "bi bi-credit-card-2-front", Level = 3, ParentID = 22, NavigateTo = "" });
             _Menus.Add(new MenuItem { ID = 2204, Title = "Chq. Return", Active = true, Icon = "bi bi-arrow-90deg-down", Level = 3, ParentID = 22, NavigateTo = "" });
             _Menus.Add(new MenuItem { ID = 2205, Title = "Receivables", Active = true, Icon = "bi bi-file-text", Level = 3, ParentID = 22, NavigateTo = "" });
@@ -53,6 +60,17 @@ namespace Menus
             _Menus.Add(new MenuItem { ID = 2207, Title = "Receipts", Active = true, Icon = "bi bi-receipt", Level = 3, ParentID = 22, NavigateTo = "" });
             _Menus.Add(new MenuItem { ID = 2208, Title = "J.Voucher", Active = true, Icon = "bi bi-journal", Level = 3, ParentID = 22, NavigateTo = "" });
             _Menus.Add(new MenuItem { ID = 2209, Title = "Vouchers", Active = true, Icon = "bi bi-journals", Level = 3, ParentID = 22, NavigateTo = "" });
+
+            // Accounts - Reports
+            _Menus.Add(new MenuItem { ID = 2301, Title = "Ledger", Active = true, Icon = "bi bi-journals", Level = 3, ParentID = 23, NavigateTo = "/Accounts/Reports/Ledgers" });
+            _Menus.Add(new MenuItem { ID = 2302, Title = "Trial Balance", Active = true, Icon = "bi bi-table", Level = 3, ParentID = 23, NavigateTo = "/Accounts/Reports/TrialBalance" });
+            _Menus.Add(new MenuItem { ID = 2303, Title = "Expense Sheet", Active = true, Icon = "bi bi-file-spreadsheet", Level = 3, ParentID = 23, NavigateTo = "/Accounts/Reports/ExpenseSheet" });
+            _Menus.Add(new MenuItem { ID = 2304, Title = "Receivable", Active = true, Icon = "bi bi-file-text", Level = 3, ParentID = 23, NavigateTo = "/Accounts/Reports/ReceivablePayable/1" });
+            _Menus.Add(new MenuItem { ID = 2305, Title = "Payable", Active = true, Icon = "bi bi-file-earmark-post", Level = 3, ParentID = 23, NavigateTo = "/Accounts/Reports/ReceivablePayable/2" });
+            _Menus.Add(new MenuItem { ID = 2305, Title = "Profit & Loss", Active = true, Icon = "bi bi-coin", Level = 3, ParentID = 23, NavigateTo = "/Accounts/Reports/ProfitnLoss" });
+            _Menus.Add(new MenuItem { ID = 2305, Title = "Balanse Sheet", Active = true, Icon = "bi bi-grid-1x2", Level = 3, ParentID = 23, NavigateTo = "/Accounts/Reports/BalanceSheet" });
+
+
 
             return _Menus;
         }

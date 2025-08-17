@@ -21,6 +21,7 @@ namespace AppliedAccounts.Data
         {
             var _DataTable = Source.GetTable(AppliedDB.Enums.Tables.BillReceivable2);
             if (_DataTable.Columns.Contains("Unit")) return true; // Column already exists
+            if(Source.MyConnection == null) { return false; }
 
             try
             {
@@ -50,6 +51,7 @@ namespace AppliedAccounts.Data
         {
             var _DataTable = Source.GetTable(AppliedDB.Enums.Tables.BillPayable2);
             if (_DataTable.Columns.Contains("Unit")) return true; // Column already exists
+            if (Source.MyConnection == null) { return false; }
 
             try
             {

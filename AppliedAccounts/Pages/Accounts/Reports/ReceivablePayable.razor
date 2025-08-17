@@ -1,0 +1,23 @@
+﻿@page "/Accounts/Reports/ReceivablePayable/{rptType:int}"
+@code {
+    [Parameter] public int rptType { get; set; }
+
+
+}
+
+@if(rptType == 1)
+{
+    <h3>Receivable Report</h3>
+    <p>This is the Receivable Report section.</p>
+}
+else if(rptType == 2)
+{
+    <h3>Payable Report</h3>
+    <p>This is the Payable Report section.</p>
+}
+else
+{
+    <h3>Invalid Report Type</h3>
+    <p>Please select a valid report type.</p>
+}
+)

@@ -1,5 +1,6 @@
 ﻿@layout PageLayout;
 @page "/Accounts/BooksList";
+@page "/Accounts/BooksList/{Nature:int}";
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
@@ -15,6 +16,7 @@
 
 @code {
 
+    [Parameter] public int? Nature { get; set; } = 0;
     private string UserRoll;
     private string DateFormat = Format.DDMMYY;
     private string CurrFormat = Format.Currency;
@@ -27,18 +29,14 @@
         MyModel = new(0, AppGlobal);   // BookID and UserProfile.
         MyModel.GetKeys();
         NavManager = AppGlobal.NavManager;
+
+        if(Nature != null)
+        {
+            BookNatureChanged((int)Nature); 
+        }
     }
-
-    // protected override void OnAfterRender(bool firstRender)
-    // {
-    //     if (firstRender)
-    //     {
-    //         MyModel.Pages.Count = (int)Math.Ceiling(MyModel.TotalRecord / (double)MyModel.Pages.Size);
-    //     }
-    // }
-
-
-    private void BookNatureChanged(int _NatureID)
+        
+       private void BookNatureChanged(int _NatureID)
     {
         MyModel.BookNatureID = _NatureID;
         MyModel.BookID = MyModel.Source.GetBookAccounts(MyModel.BookNatureID).First()?.ID ?? 0;
