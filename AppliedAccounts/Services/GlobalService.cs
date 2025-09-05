@@ -3,7 +3,6 @@ using AppliedGlobals;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
-using System.Security.Claims;
 using static AppliedGlobals.AppValues;
 
 namespace AppliedAccounts.Services
