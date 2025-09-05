@@ -42,6 +42,38 @@ namespace AppliedAccounts.Models
             }
         }
 
+        public void ChangePage1(int page)
+        {
+            // Ensure Count is at least 1 to avoid division by zero
+            int pageCount = Math.Max(Count, 1);
+
+            // Clamp the requested page between 1 and pageCount
+            if (page < 1)
+                Current = 1;
+            else if (page > pageCount)
+                Current = pageCount;
+            else
+                Current = page;
+
+            PageList.Clear();
+
+            if (Current <= MaxButtons)
+            {
+                for (int i = 1; i <= pageCount && i <= MaxButtons; i++)
+                {
+                    PageList.Add(i);
+                }
+            }
+            else
+            {
+                for (int i = Current - MaxButtons + 1; i <= Current; i++)
+                {
+                    if (i > 0 && i <= pageCount)
+                        PageList.Add(i);
+                }
+            }
+        }
+
         public void Refresh(int _TotalRecords)
         {
             TotalRecords = _TotalRecords;
