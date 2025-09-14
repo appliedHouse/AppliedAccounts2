@@ -1,5 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
+using AppliedAccounts.Services;
 using AppliedDB;
 using Microsoft.AspNetCore.Components;
 
@@ -8,7 +9,7 @@ namespace AppliedAccounts.Pages.Accounts
     public partial class BooksList
     {
 
-        public AppliedGlobals.AppUserModel UserProfile { get; set; }
+        //public AppliedGlobals.AppUserModel UserProfile { get; set; }
         public BookListModel MyModel { get; set; } = new();
         public NavigationManager NavManager { get; set; }
 
@@ -29,9 +30,12 @@ namespace AppliedAccounts.Pages.Accounts
         #endregion
 
         #region Refresh Page
-        public void Refresh()
+        public async void Refresh()
         {
-            MyModel.SetKeys();
+            MyModel.SetKeys();              // Save the current page setting in Registry 
+            MyModel.Pages = new();          // Reset the page model
+            //MyModel.LoadData();             // Load Data according to dates and search text.
+            await InvokeAsync(StateHasChanged);
         }
         #endregion
 

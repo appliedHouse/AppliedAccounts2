@@ -1,0 +1,165 @@
+﻿@page "/ImportCOA"
+@using AppliedAccounts.Models
+@using AppliedAccounts.Services
+@using System.Data
+@using MESSAGES = AppMessages.Enums.Messages;
+
+@attribute [Authorize]
+@inject GlobalService AppGlobal
+
+@code {
+    private bool PageIsValid { get; set; }
+    private string MyMessage { get; set; } = string.Empty;
+
+
+    protected override void OnInitialized()
+    {
+        MyModel = new ImportCOAModel(AppGlobal);
+
+
+        PageIsValid = true;
+        if (AppGlobal is null) { PageIsValid = false; }
+        if (MyModel is null) { PageIsValid = false; }
+        // else
+        // {
+        //     if(MyModel.ImportedData is null)  { PageIsValid = false; }
+        //     else { if (MyModel.ImportedData.Count == 0)
+        //         { PageIsValid = false; } }
+        // }
+
+
+    }
+
+    private async Task TriggerFileInput()
+    {
+        await AppGlobal.JS.InvokeVoidAsync("triggerFileUpload");
+    }
+
+    
+
+
+}
+
+<ShowPageHeading PageTitle="Import Chart of Accounts" />
+
+@if (ShowSpinner)
+{
+    <div class="spinner-border text-warning" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+}
+
+
+@if (PageIsValid)
+{
+
+    @if (!MyModel.IsExcelLoaded)
+    {
+        <div class="container">
+            <div class="d-flex flex-row mb-3">
+                <div class="p-2">
+                    <button class="btn btn-primary w1" disabled="@(MyModel.IsExcelLoaded ? true : ShowSpinner)"
+                            title="Upload Excel file" @onclick="TriggerFileInput">
+                        Upload Excel file
+                    </button>
+                    <InputFile id="inputFile" class="d-none" OnChange="GetExcelFile" />
+                </div>
+                <div class="p-2">
+                    <button class="btn btn-primary w1" disabled="@(MyModel.IsExcelLoaded ? true : ShowSpinner)"
+                            title="Load Imported Data" @onclick="(() => MyModel.LoadImportedData())">
+                        Excel is Already loaded
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert" id="myAlert">
+            Data From Excel File has been imported sucesscully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        @if (MyModel.FilterData is not null)
+        {
+            @if (MyModel.FilterData.Count > 0)
+            {
+
+                <div class="container">
+                    <table class="table-list">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Title</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (DataRow Row in GetFilteredData("COA"))
+                            {
+                                <tr>
+                                    <td>@Row[1]</td>
+                                    <td>@Row[2]</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot></tfoot>
+                    </table>
+                    <div class="d-flex">
+                        <div class="p-1" style="height:40px">
+                            <NavPageBar Paging="MyModel.Pages"></NavPageBar>
+                        </div>
+                    </div>
+
+                </div>
+
+            }
+        }
+        <!-- Toast -->
+        <div class="toast-container position-fixed @Toast.GetPosition()">
+            @if (Toast.ShowToast)
+            {
+                <ShowToastMessage toastClass="@Toast"></ShowToastMessage>
+            }
+        </div>
+    }
+    
+}
+else
+{
+    <div class="alert alert-danger" role="alert">
+        <strong>Information: </strong> The page is not valid. Please check the application state.
+        <br />
+        <strong>Details: </strong>
+        @if (AppGlobal is null)
+        {
+            <span>Global Service is not initialized.</span>
+        }
+        @if (MyModel is null)
+        {
+            <span>ImportCOAModel is not initialized.</span>
+        }
+        @if (MyModel?.ImportedData is null)
+        {
+            <span>No data imported.</span>
+        }
+        @if (MyModel?.ImportedData?.Count == 0)
+        {
+            <span>No data available to display.</span>
+        }
+    </div>
+    
+}
+
+
+
+
+<script>
+    // Close the alert after 10 seconds
+    setTimeout(() => {
+        const alertElement = document.getElementById('myAlert');
+        if (alertElement) {
+            const bootstrapAlert = bootstrap.Alert.getOrCreateInstance(alertElement);
+            bootstrapAlert.close();
+        }
+    }, 10000); // 10000ms = 10 seconds
+</script>

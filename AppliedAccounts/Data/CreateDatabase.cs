@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SQLite;
 using System.Text;
 using static AppliedDB.Enums;
+using KeyType = AppliedGlobals.AppErums.KeyTypes;
 
 namespace AppliedAccounts.Data
 {

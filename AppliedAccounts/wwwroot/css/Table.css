@@ -18,14 +18,14 @@
     width: 100%;
     overflow: auto; /* Enables scrolling */
     border: 1px solid var(--Border); /* Optional border */
-    margin-left: 15px;
-    margin-right: 15px;
+    margin-left: 0px;
+    margin-right: 0px;
 }
 
 .table-list {
     display: table;
     overflow-x: auto;
-    width: 99%; /* Adjust width as needed */
+    width: 100%; /* Adjust width as needed */
     border-collapse: collapse;
     border-radius: 6px;
     overflow: hidden;
@@ -170,5 +170,12 @@
     justify-content: center;
     text-align: center;
     align-content: center;
+}
+
+.middle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }
 

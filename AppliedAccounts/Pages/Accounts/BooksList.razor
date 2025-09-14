@@ -1,5 +1,6 @@
 ﻿@layout PageLayout;
 @page "/Accounts/BooksList";
+@page "/Accounts/BooksList/{Nature:int}";
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Models;
@@ -8,13 +9,14 @@
 @using AppliedDB
 @using System.Data
 
-@inject AuthenticationStateProvider authorized;
+<!-- inject AuthenticationStateProvider authorized;-->
 
 @inject IJSRuntime js
 @inject GlobalService AppGlobal;
 
 @code {
 
+    [Parameter] public int? Nature { get; set; } = 0;
     private string UserRoll;
     private string DateFormat = Format.DDMMYY;
     private string CurrFormat = Format.Currency;
@@ -24,14 +26,17 @@
 
     protected override void OnInitialized()
     {
-        UserProfile = ((UserAuthenticationStateProvider)authorized).AppUser;
         MyModel = new(0, AppGlobal);   // BookID and UserProfile.
         MyModel.GetKeys();
-        //MyModel.ReportService = new();
         NavManager = AppGlobal.NavManager;
-    }
 
-    private void BookNatureChanged(int _NatureID)
+        if(Nature != null)
+        {
+            BookNatureChanged((int)Nature); 
+        }
+    }
+        
+       private void BookNatureChanged(int _NatureID)
     {
         MyModel.BookNatureID = _NatureID;
         MyModel.BookID = MyModel.Source.GetBookAccounts(MyModel.BookNatureID).First()?.ID ?? 0;
@@ -40,7 +45,11 @@
     private void BookListChanged(int _BookID)
     {
         MyModel.BookID = _BookID; //result;
-        MyModel.BookRecords = MyModel.LoadBookRecords(MyModel.BookID);
+    }
+
+    private void PageClick(MouseEventArgs e)
+    {
+        
     }
 }
 
@@ -102,16 +111,16 @@ else
             </label>
         </div>
         <div class="p-2">
-            <button type="submit" class="btn btn-refresh" @onclick="Refresh" title="Refresh"></button>
-            <button type="submit" class="btn btn-new" @onclick="New" title="New"></button>
+            <Btn_Refresh OnClick="Refresh"/>
+            <Btn_Add OnClick="New"/>
+            @* <button type="submit" class="btn btn-refresh" @onclick="Refresh" title="Refresh"></button>
+            <button type="submit" class="btn btn-new" @onclick="New" title="New"></button> *@
         </div>
-        <div class="p-2">
-        </div>
+        
     </div>
 
     <div class="container">
-        @if (MyModel.BookRecords != null)
-        {
+       
             <table class="table-list">
                 <thead>
                     <tr>
@@ -145,21 +154,14 @@ else
                     }
                 </tbody>
             </table>
-        }
-        else
-        {
-            <div class="container">
-                <div class="row">
-                    <div class="alert alert-warning" role="alert">
-                        No records found
-                    </div>
 
-                </div>
-                <div class="row">
-                    <button type="submit" class="btn btn-primary" @onclick="New"></button>
-                </div>
+             <div class="d-flex">
+                   <div class="p-1" style="height:40px">
+                       <NavPageBar Paging="MyModel.Pages"></NavPageBar>
+                   </div>
             </div>
-        }
+       
     </div>
+    
 </EditForm>
 }

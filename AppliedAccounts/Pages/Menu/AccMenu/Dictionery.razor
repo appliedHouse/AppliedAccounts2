@@ -1,0 +1,28 @@
+﻿@page "/Accounts/Dictionery"
+@attribute [Authorize]
+@inject GlobalService AppGlobal
+
+
+@code {
+    public Menus.MenusClass MenusClass { get; set; }
+
+    protected override void OnInitialized()
+    {
+        MenusClass = new();
+        MenusClass.MyMenus = MenusClass.SelectedMenu(21);
+    }
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="part-1">
+            <MainMenu MenuClass="MenusClass" />
+        </div>
+        <div class="part-2">
+
+            <p>Welcome Applied Accounts V2<a href="#"></a></p>
+            <p>Accounts Dictionery Page Authorized<a href="#"></a></p>
+        </div>
+    </div>
+</div>
+

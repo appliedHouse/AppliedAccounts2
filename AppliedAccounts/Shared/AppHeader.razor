@@ -1,5 +1,6 @@
 ﻿@using AppliedAccounts.Data;
 @using System.Security.Claims;
+@inject NavigationManager NavManager;
 
 @inject AuthenticationStateProvider Authorized;
 
@@ -26,85 +27,59 @@
 
         });
     }
-
     public string GetCompanyName() { return AppUser.Company ?? ""; }
     public string GetAppUserName() => AppUser.DisplayName ?? "";
-
-
-
+    public void GoHome() { NavManager.NavigateTo("/"); }
 }
 
-<style>
-    .merienda-font {
-        font-family: "Eczar", serif;
-        font-optical-sizing: auto;
-        font-weight: 900;
-        font-style: normal;
-        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-    }
-
-    .gradient-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 75px;
-        text-align: center;
-    }
-
-        .gradient-container h1 {
-            font-size: clamp(2rem, 5vw, 4rem); /* Responsive font size */
-        }
-
-</style>
-
-<div class="AppHeader">
-    <div class="AppTitle merienda-font">
-        <a href="/"><h3 style="font-size:larger">@GetCompanyName()</h3></a>
+<header class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow sticky-top" data-bs-theme="dark">
+    <div class="logo-img" @onclick="GoHome">
+        <img src="Images/ASH3.png" class="img-thumbnail brand-Width" alt="..." title="Go Home" />
     </div>
-</div>
+    <div class="text-white p-2 fs-3 fw-bold ComTitle">APPLIED ACCOUNTS 2</div>
 
-<AuthorizeView>
-    <Authorized>
-        <div class="SubHeading d-flex align-items-center">
-            <div class="p-1"><a href="/">Home</a></div>
-            <div class="p-1 ms-auto"><h5 class="SubHeading">Hello @GetAppUserName()</h5></div>
-        </div>
+    <div class="ms-auto d-flex align-items-center">
 
-    </Authorized>
-    <NotAuthorized>
-        <div class="SubHeading d-flex align-items-center">
-            <div class="p-1"><a href="/">Home</a></div>
-            <div class="p-1 ms-auto"><h5 class="SubHeading">Hello Guest!</h5></div>
-        </div>
-
-    </NotAuthorized>
-</AuthorizeView>
-
-
-
-
-<footer class="footer">
-    <div class="container-fluid h-100 d-flex justify-content-center align-items-center">
-        <div class="row">
-            <div class="col">
-                Applied Software House V2.1.2
-            </div>
-        </div>
-
+        <AuthorizeView>
+            <NotAuthorized>
+                <Btn_Login />
+            </NotAuthorized>
+            <Authorized>
+                <div class="justify-content-end text-white">
+                    @GetCompanyName()
+                </div>
+                <div class="p-1">
+                    <span class="p-2 rounded-circle"
+                          type="button"
+                          data-bs-toggle="offcanvas"
+                          data-bs-target="#offcanvasRight"
+                          aria-controls="offcanvasRight">
+                        <i class="bi bi-gear text-white"></i>
+                    </span>
+                </div>
+            </Authorized>
+        </AuthorizeView>
     </div>
-</footer>
+</header>
+
 
 <style>
-    .footer {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        height: 20px;
-        font-family: 'Berlin Sans FB';
-        background-color: linen; /* Example background color */
-        text-align: center; /* Align text to the right */
-        padding: 10px; /* Adjust padding as necessary */
-        opacity: .5;
+    .navbar {
+        max-height: var(--navbar_Size);
     }
 
+    .brand-Width {
+        min-height: var(--navbar_Size);
+        max-width: var(--navbar_Size);
+    }
+
+    .sidebar-width {
+        max-height: var(--sidebarMin_Width);
+        max-width: var(--sidebarMax_Width);
+    }
+
+    .ComTitle{
+        font-family: "Exo 2", sans-serif;
+    }
 </style>
+

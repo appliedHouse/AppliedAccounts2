@@ -3,7 +3,6 @@ using AppliedAccounts.Models;
 using AppliedAccounts.Services;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using System.Data;
 
 
@@ -91,12 +90,14 @@ namespace AppliedAccounts.Pages.Accounts
         public async void SaveAll()
         {
             var IsSaved = false;
+            MyModel.MyMessage = "Saving....";
             IsSaved = await MyModel.SaveAllAsync(); // Ensure save operation completes successfully
-            await js.InvokeVoidAsync("closeModal", "SaveVoucher"); // Pass the ID as a string
 
             if (IsSaved)
             {
+                MyModel.IsWaiting = false;
                 ToastService.ShowToast(ToastClass.SaveToast, MyModel.MyVoucher.Master.Vou_No);
+                await InvokeAsync(StateHasChanged);
             }
         }
         #endregion
@@ -108,16 +109,11 @@ namespace AppliedAccounts.Pages.Accounts
         #region Print
         private async void Print(ReportActionClass reportAction)
         {
+            MyModel.MyMessage = "Please wait... The report is being generated.";
             MyModel.IsWaiting = true; await InvokeAsync(StateHasChanged);
             await Task.Run(() => { MyModel.Print(reportAction); });
             MyModel.IsWaiting = false; await InvokeAsync(StateHasChanged);
         }
         #endregion
-
-
-
     }
-
-
-
 }

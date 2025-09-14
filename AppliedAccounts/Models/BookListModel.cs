@@ -6,6 +6,7 @@ using AppReports;
 using System.Data;
 using Format = AppliedGlobals.AppValues.Format;
 using Messages = AppMessages.Enums.Messages;
+using KeyType = AppliedGlobals.AppErums.KeyTypes;
 
 namespace AppliedAccounts.Models
 {
@@ -15,22 +16,27 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> BookList { get; set; }
         public List<CodeTitle> NatureAccountsList { get; set; }
         public DataSource Source { get; set; }
-        public AppliedGlobals.AppUserModel? UserProfile { get; set; }
         public AppMessages.MessageClass MsgClass { get; set; }
         public PrintService ReportService { get; set; }
+        public PageModel Pages { get; set; } = new();
 
         public int BookID { get; set; }
         public int BookNatureID { get; set; }
         public int VoucherID { get; set; }
+        public int TotalRecord { get; set; } = 0;
         public DateTime DT_Start { get; set; }
         public DateTime DT_End { get; set; }
         public string SearchText { get; set; }
         public string BookNatureTitle = "Book Title";
-        public List<BookView> BookRecords { get; set; }
+        //public List<BookView> BookRecords { get; set; }
         public bool PageIsValid { get; set; } = false;
         public bool IsWaiting { get; set; } = false;
 
-        public BookListModel() { }
+        #region Constructor
+        public BookListModel()
+        {
+
+        }
         public BookListModel(int _BookID, GlobalService _AppGlobal)
         {
             AppGlobal = _AppGlobal;
@@ -40,16 +46,10 @@ namespace AppliedAccounts.Models
 
             try
             {
-
                 if (_BookID == 0) { BookID = 1; } else { BookID = _BookID; }
-
-
-                // Get a Nature of Book.  It is Cash Book  or Bank book...
                 var result = Source?.SeekValue(Enums.Tables.COA, BookID, "Nature") ?? 0;
                 BookNatureID = (int)result;
-
                 BookID = _BookID;
-                //UserProfile = _AppUserProfile;
 
                 NatureAccountsList =
                 [
@@ -64,14 +64,15 @@ namespace AppliedAccounts.Models
                 MsgClass.Add(Messages.PageIsNotValid);
             }
         }
+        #endregion
 
-
+        #region Load Data
         public bool LoadData()
         {
             try
             {
-                BookRecords = LoadBookRecords(BookID);
-                return true;
+                LoadBookRecords(BookID);
+                return false;
             }
             catch (Exception)
             {
@@ -80,16 +81,62 @@ namespace AppliedAccounts.Models
             }
         }
 
-
         public List<BookView> LoadBookRecords(int _BookID)     // Load List of Cash / Bank Book record in Table
         {
             if (_BookID == 0) { return []; }
-            var _List = new List<BookView>();
-            var _Data = Source.GetBookList(_BookID);
+
+            string _Date1 = DT_Start.ToString(Format.YMD);
+            string _Date2 = DT_End.ToString(Format.YMD);
+            string _Query = $"SELECT * FROM [view_Book]";
+            decimal _OBal = 0.00M; // Opening Balance
+            List<BookView> _List = [];
+
+            // Get Opening Balance
+            #region Opening Balance
+            string _QueryOB = $"{_Query} WHERE Date([Vou_Date]) < '{_Date1}' AND [BookID] = {_BookID}";
+            DataTable _OBalTable = Source.GetTable(_QueryOB);
+            if (_OBalTable != null && _OBalTable.Rows.Count > 0)
+            {
+                decimal _TotDR = _OBalTable.AsEnumerable().Sum(x => x.Field<decimal>("DR"));
+                decimal _TotCR = _OBalTable.AsEnumerable().Sum(x => x.Field<decimal>("CR"));
+                _OBal = _TotCR - _TotDR;
+                BookView _OBalRecord = new()
+                {
+                    ID = 0,
+                    Vou_No = "OBAL",
+                    Vou_Date = DT_Start,
+                    Recevied = _TotCR,
+                    Paid = _TotDR,
+                    Balance = _OBal,
+                    Description = "Opening Balance",
+                    TReceived = _TotCR.ToString(Format.Digit),
+                    TPaid = _TotDR.ToString(Format.Digit),
+                    TBalance = _OBal.ToString(Format.Digit)
+                };
+
+                if (Pages.Current == 1)
+                {
+                    _List.Add(_OBalRecord);         // Add opening balance record in first page
+                }
+            }
+            #endregion
+
+            // Fatch Book Records between Date Range
+
+            string _Filter = $"Date([Vou_Date]) BETWEEN '{_Date1}' AND '{_Date2}'";
+            if (SearchText.Length > 0)
+            {
+                _Filter += $" AND ([Vou_No] LIKE '%{SearchText}%' OR [Description] LIKE '%{SearchText}%')";
+            }
+            string _Sorting = $"[Vou_Date], [Vou_No] ";
+            string _Limit = $"LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
+
+            TotalRecord = Source.RecordCound(Enums.Tables.view_Book, _Filter) + 1;   // +1 for Opening Balance
+            var _Data = Source.GetTable(_Query, _Filter, _Sorting + _Limit);
 
             if (_Data != null)
             {
-                decimal _Bal = 0.00M;
+                decimal _Bal = _OBal;
                 decimal _DR = 0.00M;
                 decimal _CR = 0.00M;
 
@@ -116,16 +163,13 @@ namespace AppliedAccounts.Models
 
                     _List.Add(_Record);
                 }
+
+                
+                Pages.Refresh(TotalRecord);
+
                 return _List;
             }
             return [];
-        }
-
-
-        #region Filter on Data List showing in table
-        public string GetFilterText()
-        {
-            throw new NotImplementedException();
         }
         #endregion
 
@@ -184,8 +228,6 @@ namespace AppliedAccounts.Models
             AppGlobal.NavManager.NavigateTo($"/Accounts/Books/{BookID}/{BookNatureID}");
         }
         #endregion
-
-
 
         #region Get & Set Keys
         internal void SetKeys()

@@ -39,7 +39,7 @@ namespace AppliedAccounts.Authentication
                             {
                                 new (ClaimTypes.Name, userSession.UserName),
                                 new (ClaimTypes.Role, userSession.Role),
-                                new (ClaimTypes.Email, userSession.Email),
+                                new (ClaimTypes.Actor, userSession.Email),
                                 new ("DBFile",userSession.SQLiteFile),
                                 new ("Company",userSession.CompanyName),
                                 new ("Designation",userSession.Designation),
@@ -66,7 +66,7 @@ namespace AppliedAccounts.Authentication
                     var _Result = await Task.FromResult(new AuthenticationState(ClaimPrincipal));
                     GetAppUser(_Result);
 
-                    Claims = _Result.User.Claims.ToList();
+                    Claims = [.. _Result.User.Claims]; 
                     return _Result;
                 }
             }
@@ -113,9 +113,10 @@ namespace AppliedAccounts.Authentication
                 await _sessionStorage.DeleteAsync("UserSession");
                 claimsPrincipal = AnyOne;
             }
+
+
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
         }
-
 
         public void GetAppUser(AuthenticationState _AuthState)
         {
@@ -126,32 +127,20 @@ namespace AppliedAccounts.Authentication
                 AppUser.Password = "";
                 AppUser.DisplayName = claims?.FirstOrDefault(x => x.Type.Equals("DisplayName", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
                 AppUser.Designation = claims?.FirstOrDefault(x => x.Type.Equals("Designation", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
-                AppUser.UserEmail = claims?.FirstOrDefault(x => x.Type.Equals("UserEmail", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
-                AppUser.Role = claims?.FirstOrDefault(x => x.Type.Equals("Role", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
+                AppUser.UserEmail = claims?.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Email, StringComparison.OrdinalIgnoreCase))?.Value ?? "";
+                AppUser.Role = claims?.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Role, StringComparison.OrdinalIgnoreCase))?.Value ?? "";
                 AppUser.LastLogin = claims?.FirstOrDefault(x => x.Type.Equals("Lastlogin", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
                 AppUser.DataFile = claims?.FirstOrDefault(x => x.Type.Equals("DBFile", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
                 AppUser.Company = claims?.FirstOrDefault(x => x.Type.Equals("Company", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
                 AppUser.PIN = claims?.FirstOrDefault(x => x.Type.Equals("PIN", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
                 AppUser.LanguageID = int.Parse(claims?.FirstOrDefault(x => x.Type.Equals("LanguageID", StringComparison.OrdinalIgnoreCase))?.Value ?? "");
                 AppUser.Session = claims?.FirstOrDefault(x => x.Type.Equals("Session", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
+            };
+        }
 
-
-                // Default values
-                AppUser.RootFolder = claims?.FirstOrDefault(x => x.Type.Equals("RootFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "SQLiteDB";
-                AppUser.UsersFolder = claims?.FirstOrDefault(x => x.Type.Equals("UsersFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "SQLiteDB";
-                AppUser.ClientFolder = claims?.FirstOrDefault(x => x.Type.Equals("ClientFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "SQLiteDB";
-                AppUser.ReportFolder = claims?.FirstOrDefault(x => x.Type.Equals("ReportFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "Reports";
-                AppUser.PDFFolder = claims?.FirstOrDefault(x => x.Type.Equals("PDFFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "PDFReports";
-                AppUser.MessageFolder = claims?.FirstOrDefault(x => x.Type.Equals("MessageFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "Messages";
-                AppUser.LanguageFolder = claims?.FirstOrDefault(x => x.Type.Equals("LanguageFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "Languages";
-                AppUser.ImagesFolder = claims?.FirstOrDefault(x => x.Type.Equals("ImageFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "Images";
-                AppUser.SystemFolder = claims?.FirstOrDefault(x => x.Type.Equals("SystemFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "System";
-                AppUser.SessionFolder = claims?.FirstOrDefault(x => x.Type.Equals("SessionFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "Sessions";
-                AppUser.TempDBFolder = claims?.FirstOrDefault(x => x.Type.Equals("TempDBFolder", StringComparison.OrdinalIgnoreCase))?.Value ?? "Sessions";
-            }
-            ;
-
-
+        public async Task Logout()
+        {
+            await UpdateAuthonticateState(null);
         }
 
         public enum UserRolls
@@ -159,7 +148,7 @@ namespace AppliedAccounts.Authentication
             Administrator = 1,
             Manager = 2,
             User = 3,
-            Viewer = 4,
+            Guest = 4,
         }
 
     }

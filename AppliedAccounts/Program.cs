@@ -17,7 +17,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-//builder.Services.AddSingleton<AppUserModel>();              // Create a new instance of AppUserModel
 builder.Services.AddSingleton<UserProfile>();               // Create a User Model Class.
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();

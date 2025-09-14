@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Authentication;
+using AppliedGlobals;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
@@ -14,13 +15,14 @@ namespace AppliedAccounts.Services
 
         public AppPath AppPaths { get; set; } = new();
         public AuthorClass Author { get; set; } = new();
-        public ClientClass Client { get; set; } = new();
+        public AppUserModel Client { get; set; } = new();
         public LanguageClass Language { get; set; } = new();
         public CurrencyClass Currency { get; set; } = new();
         public Format Format { get; set; } = new();
         public PrintReport Reporting { get; set; } = new();
         public string DBFile => AppPaths.DBFile;
         public string UserID = string.Empty;
+        public string UserRole = string.Empty;
 
         public GlobalService() { }
 
@@ -30,9 +32,11 @@ namespace AppliedAccounts.Services
             NavManager = _NavManager;
             JS = _JS;
 
-            var _AppUser = ((UserAuthenticationStateProvider)_StateProvider).AppUser;
-            AppPaths.DBFile = _AppUser.DataFile;
-            UserID = _AppUser.UserID;
+            Client = ((UserAuthenticationStateProvider)_StateProvider).AppUser;
+
+            AppPaths.DBFile = Client.DataFile;
+            UserID = Client.UserID;
+            UserRole = Client.Role;
 
             AppPaths.BaseUri = NavManager.BaseUri;
             AppPaths.FirstPath = Directory.GetCurrentDirectory();
@@ -48,6 +52,7 @@ namespace AppliedAccounts.Services
             AppPaths.UsersPath = Config.GetValue<string>("Paths:UsersPath") ?? "SQLiteDB";
             AppPaths.DBTempPath = Config.GetValue<string>("Paths:DBTempPath") ?? "SQLiteTemp";
             AppPaths.SessionPath = Config.GetValue<string>("Paths:SessionPath") ?? "Sessions";
+            AppPaths.ExcelFilesPath = Config.GetValue<string>("Paths:ExcelFilesPath") ?? "ExcelFiles";
 
             Author = new()
             {
@@ -61,21 +66,6 @@ namespace AppliedAccounts.Services
                 Url = Config.GetValue<string>("Author:Url") ?? "",
                 Url2 = Config.GetValue<string>("Author:Url2") ?? "",
             };
-
-            Client = new()
-            {
-                DisplayName = _AppUser.DisplayName,
-                Name = _AppUser.Company,
-                Address1 = _AppUser.Address1,
-                Address2 = _AppUser.Address2,
-                City = _AppUser.City,
-                Country = _AppUser.Country,
-                Contact = _AppUser.Contact,
-                Email = _AppUser.UserEmail,
-                Url = _AppUser.Url,
-                PIN = _AppUser.PIN
-            };
-
 
             Language = new()
             {
@@ -100,6 +90,7 @@ namespace AppliedAccounts.Services
             };
 
         }
+
     }
 }
 

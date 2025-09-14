@@ -1,12 +1,19 @@
-﻿using AppliedAccounts.Data;
+﻿using AppliedAccounts.Component;
+using AppliedAccounts.Data;
+using AppliedAccounts.Models;
 using AppliedDB;
 using AppMessages;
+using BlazorJS;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using System.Data;
+using System.Drawing;
 using Format = AppliedGlobals.AppValues.Format;
+using KeyType = AppliedGlobals.AppErums.KeyTypes;
 using MESSAGES = AppMessages.Enums.Messages;
 
-namespace AppliedAccounts.Pages.Reporting
+namespace AppliedAccounts.Pages.Accounts.Reports
 {
     public partial class GeneralLedger
     {
@@ -20,6 +27,8 @@ namespace AppliedAccounts.Pages.Reporting
         NavigationManager NavManager => AppGlobal.NavManager;
 
         public List<CodeTitle> Accounts { get; set; }
+        public List<CodeTitle> Companies { get; set; }
+        public List<CodeTitle> Employees { get; set; }
 
         public GeneralLedger()
         {
@@ -34,8 +43,10 @@ namespace AppliedAccounts.Pages.Reporting
                 MsgClass = new();
                 //UserModel = _UserModel;
                 Source = new(AppGlobal.AppPaths);
-                //DBFile = UserModel.DataFile;
+                DBFile = AppGlobal.DBFile;
                 Accounts = Source.GetAccounts();            // Get List of Accounts
+                Companies = Source.GetCustomers();          // Get List of Costomer/Clients
+                Employees = Source.GetEmployees();        // Get List of Employees
 
 
             }
@@ -56,6 +67,14 @@ namespace AppliedAccounts.Pages.Reporting
             MyModel.Date_From = AppRegistry.GetFrom(DBFile, "GL_COA");
             MyModel.Date_To = AppRegistry.GetTo(DBFile, "GL_COA");
             MyModel.SortBy = AppRegistry.GetText(DBFile, "GL_COA");
+
+            MyModel.CompanyID = AppRegistry.GetNumber(DBFile, "GL_Company");
+            MyModel.DtFrom_Com = AppRegistry.GetFrom(DBFile, "GL_Company");
+            MyModel.DtTo_Com = AppRegistry.GetTo(DBFile, "GL_Company");
+
+            MyModel.EmployeeID = AppRegistry.GetNumber(DBFile, "GL_Employee");
+            MyModel.DtFrom_Emp = AppRegistry.GetFrom(DBFile, "GL_Employee");
+            MyModel.DtTo_Emp = AppRegistry.GetTo(DBFile, "GL_Employee");
         }
 
         private void SetKeys()
@@ -64,6 +83,17 @@ namespace AppliedAccounts.Pages.Reporting
             AppRegistry.SetKey(DBFile, "GL_COA", MyModel.Date_From, KeyType.From);
             AppRegistry.SetKey(DBFile, "GL_COA", MyModel.Date_To, KeyType.To);
             AppRegistry.SetKey(DBFile, "GL_COA", MyModel.SortBy, KeyType.Text);
+
+            AppRegistry.SetKey(DBFile, "GL_Company", MyModel.CompanyID, KeyType.Number, "Company Ledger ID,From,To,Sort");
+            AppRegistry.SetKey(DBFile, "GL_Company", MyModel.DtFrom_Com, KeyType.From);
+            AppRegistry.SetKey(DBFile, "GL_Company", MyModel.DtTo_Emp, KeyType.To);
+            AppRegistry.SetKey(DBFile, "GL_Company", MyModel.SortBy, KeyType.Text);
+
+            AppRegistry.SetKey(DBFile, "GL_Employee", MyModel.EmployeeID, KeyType.Number, "Company Ledger ID,From,To,Sort");
+            AppRegistry.SetKey(DBFile, "GL_Employee", MyModel.DtFrom_Emp, KeyType.From);
+            AppRegistry.SetKey(DBFile, "GL_Employee", MyModel.DtTo_Emp, KeyType.To);
+            AppRegistry.SetKey(DBFile, "GL_Employee", MyModel.SortBy, KeyType.Text);
+
         }
         #endregion
 
@@ -72,6 +102,9 @@ namespace AppliedAccounts.Pages.Reporting
         public void Refresh()
         {
             SetKeys();
+            
+
+
             //GetReportData();
             //if (_ReportData.ReportTable != null)
             //{
@@ -88,6 +121,7 @@ namespace AppliedAccounts.Pages.Reporting
         #region Print
         public async void Print(ReportActionClass PrintAction)
         {
+            MsgClass = new();           // Clear all previous messages - refresh
             IsPrinting = true;
             await InvokeAsync(StateHasChanged);
 
@@ -118,10 +152,15 @@ namespace AppliedAccounts.Pages.Reporting
             await InvokeAsync(StateHasChanged);
         }
 
-
-
-        public void GetReportData()
+        public async void GetReportData()
         {
+            if(MyModel.COAID == 0)
+            {
+                ReportService.IsError = true;
+                MsgClass.Add(MESSAGES.AccountIDIsZero);
+                return;
+            }
+
             var _OBDate = MyModel.Date_From.AddDays(-1).ToString(Format.YMD);
             var _DateFrom = MyModel.Date_From.ToString(Format.YMD);
             var _DateTo = MyModel.Date_To.ToString(Format.YMD);
@@ -132,19 +171,26 @@ namespace AppliedAccounts.Pages.Reporting
             var _SortBy = "[Vou_date], [Vou_no]";
             var _Query = SQLQueries.Quries.GeneralLedger(MyModel.COAID, _OBDate, _FilterOB, _GroupBy, _Filter, _SortBy);
 
-            DataTable _Table = Source.GetTable(_Query);
+            MyModel.PagingQuery.Query = _Query;
+            MyModel.PagingQuery.Source = Source;
+             
+            MyModel.PagingQuery.Pages = MyModel.PagingQuery.Pages ?? new PageModel();
 
-            if (_Table.Columns.Count == 0)
+            DataTable _ReportTable = Source.GetTable(_Query);
+            MyModel.PagingQuery.Pages.TotalRecords = _ReportTable.Rows.Count;
+            DataTable _DisplayTable = await MyModel.PagingQuery.GetPageData();
+
+            if (_ReportTable.Columns.Count == 0)
             {
                 ReportService.IsError = false;
                 MsgClass.Add(MESSAGES.NoRecordFound);
             }
 
-            ReportService.Data.ReportTable = _Table;
+            
+            ReportService.Data.ReportTable = _ReportTable;
             ReportService.Data.DataSetName = "dsname_Ledger";
 
-
-
+            MyModel.Ledger = _DisplayTable;
         }
 
         public void CreateReportModel()
@@ -162,6 +208,22 @@ namespace AppliedAccounts.Pages.Reporting
 
         }
         #endregion
+
+        #region Open Dialog windows
+
+        private async Task HandleClick(MouseEventArgs e)
+        {
+            // Prevent default using JS interop
+            await AppGlobal.JS.InvokeVoidAsync("eval", "event.preventDefault()");
+            opnCompanies();
+        }
+
+        public void opnCompanies()
+        {
+            AppGlobal.JS.AlertAsync("Open Companies Dialog Box");
+
+        }
+        #endregion
     }
 
     public class GLModel
@@ -170,12 +232,21 @@ namespace AppliedAccounts.Pages.Reporting
         public int COAID { get; set; }
         public int CompanyID { get; set; }
         public int ProjectID { get; set; }
-        public int EmployeeId { get; set; }
+        public int EmployeeID { get; set; }
 
         public DateTime Date_From { get; set; }
         public DateTime Date_To { get; set; }
         public string SortBy { get; set; }
         public DataTable Ledger { get; set; }
+
+        public DateTime DtFrom_Com { get; set; }            // Date for (Companies/Clients)
+        public DateTime DtTo_Com { get; set; }
+
+        public DateTime DtFrom_Emp { get; set; }            // Date for (Employees)
+        public DateTime DtTo_Emp { get; set; }
+
+        public PageQuery PagingQuery { get; set; } = new();
+
 
     }
 }

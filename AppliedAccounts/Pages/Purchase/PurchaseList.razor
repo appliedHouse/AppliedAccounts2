@@ -6,9 +6,6 @@
 @using AppliedAccounts.Models
 @using AppliedAccounts.Services
 
-@inject AuthenticationStateProvider Authorized
-@inject NavigationManager NavManager
-@inject IJSRuntime js
 @inject PrintService PrintReport
 @inject GlobalService AppGlobal
 
@@ -19,8 +16,7 @@
     {
         try
         {
-            //AppUser = ((UserAuthenticationStateProvider)Authorized).AppUser;
-            if (AppUser != null) { MyModel = new(AppGlobal); }
+            { MyModel = new(AppGlobal); }
         }
         catch (Exception)
         {

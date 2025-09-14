@@ -21,25 +21,21 @@ namespace AppliedAccounts.Models
 
         public Voucher MyVoucher { get; set; }
         public List<Detail> Deleted { get; set; } = [];
-
         public List<CodeTitle> Companies { get; set; } = [];
         public List<CodeTitle> Employees { get; set; } = [];
         public List<CodeTitle> Projects { get; set; } = [];
         public List<CodeTitle> Accounts { get; set; } = [];
         public List<CodeTitle> BookList { get; set; } = [];
         public GlobalService AppGlobal { get; set; }
-        //public AppliedGlobals.AppUserModel? UserProfile { get; set; }
         public DataSource Source { get; set; }
         public MessageClass MsgClass { get; set; }
-
         public DateTime LastVoucherDate { get; set; }
         public DateTime MinVouDate = AppRegistry.MinDate;
         public DateTime MaxVouDate { get; set; }
         public int Index { get; set; } = 0;
-
         public string DataFile { get; set; }
-
         public int Count => MyVoucher.Details.Count;
+        public string MyMessage { get; set; }
 
         public decimal Tot_DR { get; set; }
         public decimal Tot_CR { get; set; }
@@ -167,12 +163,10 @@ namespace AppliedAccounts.Models
                                 TitleEmployee = row.Field<string>("TitleEmployee") ?? "",
                                 TitleProject = row.Field<string>("TitleProject") ?? ""
 
-
-                                //TitleAccount = Accounts.Where(e=> e.ID == row.Field<int>("COA")).Select(e=> e.Title).First() ?? "",
-                                //TitleCompany = Companies.Where(e=> e.ID == row.Field<int>("Company")).Select(e=> e.Title).First() ?? "",
-                                //TitleProject = Projects.Where(e => e.ID == row.Field < int >("Project")).Select(e => e.Title).First() ?? "",
-                                //TitleEmployee = Employees.Where(e => e.ID == row.Field < int >("Employee")).Select(e => e.Title).First() ?? "",
                             })];
+
+
+                            if(MyVoucher.Details.Count > 0) { MyVoucher.Detail = MyVoucher.Details.First(); }
 
                             return true;
                         }
@@ -390,10 +384,10 @@ namespace AppliedAccounts.Models
             MsgClass = new();
             if (MyVoucher.Master.BookID == 0) { MsgClass.Add(MESSAGE.BookIDIsZero); }
             if (MyVoucher.Master.Vou_No.Length == 0) { MsgClass.Add(MESSAGE.VouNoNotDefine); }
-            if (!MyVoucher.Master.Vou_No.ToLower().Equals("new"))
-            {
-                if (MyVoucher.Master.Vou_No.Length != 11) { MsgClass.Add(MESSAGE.VouNoNotDefineProperly); }
-            }
+            //if (!MyVoucher.Master.Vou_No.ToLower().Equals("new"))
+            //{
+            //    if (MyVoucher.Master.Vou_No.Length != 11) { MsgClass.Add(MESSAGE.VouNoNotDefineProperly); }
+            //}
             if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgClass.Add(MESSAGE.VouDateLess); }
             if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgClass.Add(MESSAGE.VouDateMore); }
             if (MyVoucher.Master.Remarks.Length == 0) { MsgClass.Add(MESSAGE.Row_NoRemarks); }
@@ -402,7 +396,7 @@ namespace AppliedAccounts.Models
             if (MyVoucher.Detail.COA == 0) { MsgClass.Add(MESSAGE.Row_COAIsZero); }
             if (MyVoucher.Detail.DR > 0 && MyVoucher.Detail.CR > 0) { MsgClass.Add(MESSAGE.DRnCRHaveValue); }
             if (MyVoucher.Detail.DR == 0 && MyVoucher.Detail.CR == 0) { MsgClass.Add(MESSAGE.DRnCRAreZero); }
-            if (MyVoucher.Detail.Description.Length == 0) { MsgClass.Add(MESSAGE.DescriptionIsNothing); }
+            if (string.IsNullOrEmpty(MyVoucher.Detail.Description)) { MsgClass.Add(MESSAGE.DescriptionIsNothing); }
             if (MsgClass.Count > 0) { IsValid = false; }
 
             return IsValid;

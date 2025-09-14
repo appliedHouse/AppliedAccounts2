@@ -7,6 +7,12 @@
 
 <component type="typeof(App)" render-mode="Server" />
 
-<script src="chartInterop.js" defer></script>
+
+<script>
+    window.playBeep = function () {
+        const audio = new Audio('/Sound/beep.mp3');
+        audio.play();
+    };
+</script>
 
 

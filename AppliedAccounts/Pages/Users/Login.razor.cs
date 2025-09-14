@@ -29,19 +29,20 @@ namespace AppliedAccounts.Pages.Users
                 {
                     var _newGUID = Guid.NewGuid();
                     var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
-                    await userAuthStateProvider.UpdateAuthonticateState(new UserSession
-                    {
-                        UserName = AppUser.Profile.UserID,
-                        Role = AppUser.Profile.Role,
-                        DisplayName = AppUser.Profile.DisplayName,
-                        Designation = AppUser.Profile.Designation,
-                        Email = AppUser.Profile.UserEmail,
-                        SQLiteFile = AppUser.Profile.DataFile,
-                        CompanyName = AppUser.Profile.Company,
-                        PIN = "0000",
-                        SessionGuid = _newGUID,
-                        LanguageID = LanguageID,
-                    });
+                    var _UserData = new UserSession();
+
+                    _UserData.UserName = AppUser.Profile.UserID;
+                    _UserData.Role = AppUser.Profile.Role;
+                    _UserData.DisplayName = AppUser.Profile.DisplayName;
+                    _UserData.Designation = AppUser.Profile.Designation;
+                    _UserData.Email = AppUser.Profile.UserEmail;
+                    _UserData.SQLiteFile = AppUser.Profile.DataFile;
+                    _UserData.CompanyName = AppUser.Profile.Company;
+                    _UserData.PIN = "0000";
+                    _UserData.SessionGuid = _newGUID;
+                    _UserData.LanguageID = LanguageID;
+
+                    await userAuthStateProvider.UpdateAuthonticateState(_UserData);
 
                     NavManager.NavigateTo("/", true);
 

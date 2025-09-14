@@ -1,0 +1,31 @@
+﻿@using AppliedAccounts.Models;
+@using AppliedAccounts.Libs;
+@using AppliedAccounts.Services;
+@using AppliedAccounts.Data;
+
+
+@code {
+    [Parameter] public AppliedDB.PageModel Paging { get; set; }
+
+}
+
+
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <li class="page-item @(Paging.Current == 1 ? "disabled" : "")">
+            <button class="page-link" @onclick="() => Paging.ChangePage(Paging.Current - 1)">Previous</button>
+        </li>
+
+        @foreach (var pageNum in Paging.PageList)
+        {
+            <li class="page-item @(Paging.Current == pageNum ? "active" : "")">
+                    <button class="page-link" @onclick="() => Paging.ChangePage(pageNum)">@pageNum</button>
+                </li>
+        }
+
+        <li class="page-item @(Paging.Current == Paging.Count ? "disabled" : "")">
+            <button class="page-link" @onclick="() => Paging.ChangePage(Paging.Current + 1)">Next</button>
+        </li>
+    </ul>
+</nav>

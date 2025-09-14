@@ -1,0 +1,19 @@
+﻿
+.pageLayout {
+    position: sticky;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    padding: 5px;
+}
+
+.home-link {
+    position: absolute;
+    left: 10px;
+}
+
+.title {
+    font-weight: bold;
+}

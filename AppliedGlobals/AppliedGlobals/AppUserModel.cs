@@ -17,7 +17,7 @@ namespace AppliedGlobals
         public string LastLogin { get; set; } = string.Empty;
         public string Session { get; set; } = string.Empty;
         public string DataFile { get; set; } = string.Empty;
-        public string DataPath { get; set; } = string.Empty;
+        //public string DataPath { get; set; } = string.Empty;
 
         public string Company { get; set; } = string.Empty;
         public string Address1 { get; set; } = string.Empty;
@@ -29,20 +29,7 @@ namespace AppliedGlobals
         public string Url { get; set; } = string.Empty;
         public string PIN { get; set; } = "0000";
 
-        public bool IsSaved { get; set; }
+        public bool RememberMe { get; set; }
         public int LanguageID { get; set; } = 1;                // Default Language English.
-
-        public string BasePath { get; set; } = string.Empty;
-        public string RootFolder { get; set; } = string.Empty;
-        public string ClientFolder { get; set; } = string.Empty;
-        public string UsersFolder { get; set; } = string.Empty;
-        public string ReportFolder { get; set; } = string.Empty;
-        public string PDFFolder { get; set; } = string.Empty;
-        public string MessageFolder { get; set; } = string.Empty;
-        public string LanguageFolder { get; set; } = string.Empty;
-        public string ImagesFolder { get; set; } = string.Empty;
-        public string SystemFolder { get; set; } = string.Empty;
-        public string SessionFolder { get; set; } = string.Empty;
-        public string TempDBFolder { get; set; } = string.Empty;
     }
 }

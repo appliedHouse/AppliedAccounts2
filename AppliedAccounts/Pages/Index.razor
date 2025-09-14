@@ -1,21 +1,20 @@
-﻿@layout HomeLayout
-@page "/"
+﻿@page "/"
+@layout NotAuthorizedLayout
 @using AppliedAccounts.Services
 @using AppliedGlobals
 @using AppliedDB;
 @using AppliedAccounts.Pages.HomePage
 
-@attribute [AllowAnonymous];
-@inject IJSRuntime js;
-@inject AuthenticationStateProvider authStateProvider;
-@inject GlobalService AppGlobal;
-
+@attribute [AllowAnonymous]
+@inject IJSRuntime js
+@inject AuthenticationStateProvider authStateProvider
+@inject GlobalService AppGlobal
 
 <PageTitle>Index</PageTitle>
 
 @code {
     [CascadingParameter]
-    private Task<AuthenticationState>? AppAuthState { get; set; }
+    private Task<AuthenticationState> AppAuthState { get; set; }
     private Task<AppUserModel>? UserProfile { get; set; }
     private AppUserModel? UserModel { get; set; }
     private string _Message = string.Empty;
@@ -26,7 +25,7 @@
     {
         if(AppAuthState.Result.User.Identity!.IsAuthenticated)
         {
-            UserModel = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
+            UserModel = await Task.Run(()=> ((UserAuthenticationStateProvider)authStateProvider).AppUser);
         }
     }
 
@@ -50,8 +49,6 @@
                 var authState = AppAuthState;
                 UserName = AppAuthState.Result.User.Identity?.Name ?? "";
             });
-
-
         }
     }
 
@@ -66,23 +63,13 @@
             });
         }
     }
-
 }
 
 <AuthorizeView>
     <Authorized>
-        <header>
-            <AppHeader />
-        </header>
-        <NavMenu />
-        <HomePageAuthorized />
+        <HomePageAuthorized/>
     </Authorized>
     <NotAuthorized>
-        <HomePageNotAuthorized />
+       <HomePageNotAuthorized/>
     </NotAuthorized>
-    <Authorizing>
-        <div class="alert alert-info" role="alert">
-            <p>Wait......</p>
-        </div>
-    </Authorizing>
 </AuthorizeView>

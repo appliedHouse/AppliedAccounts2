@@ -638,7 +638,7 @@ namespace AppliedAccounts.Pages.ImportData
                     MsgClass.Add($"{DateTime.Now} ERROR : Sales Date is not valid to post...");
                 }
 
-                await Task.Delay(3000); // Simulate some delay for UI update
+                await Task.Delay(100); // Simulate some delay for UI update
                 await InvokeAsync(StateHasChanged);
             }
 
