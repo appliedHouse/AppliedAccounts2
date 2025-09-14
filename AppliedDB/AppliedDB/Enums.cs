@@ -4,6 +4,7 @@
     {
         public enum Tables
         {
+            Nothing = 0,
             Registry = 1,
 
             COA = 101,
@@ -43,10 +44,6 @@
             Project = 204,
             Employees = 205,
             Directories = 206,
-
-
-
-
 
             Inventory = 301,
             Inv_Category = 302,

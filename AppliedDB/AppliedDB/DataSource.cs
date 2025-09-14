@@ -201,6 +201,14 @@ namespace AppliedDB
         }
         #endregion
 
+        #region Get Table for List as per paging model
+        public static DataTable GetPageQuery(PageQuery _PageQuery)
+        {
+            return _PageQuery.GetPageData().Result;
+        }
+        #endregion
+
+
         #region Get Table Static
 
         public static DataTable GetDataTable(Tables _Table, SQLiteCommand _Command)
@@ -433,10 +441,11 @@ namespace AppliedDB
 
         public string SeekTitle(Tables _Table, int ID)
         {
+            if(_Table == 0 || ID == 0) { return string.Empty; }
+
             DataTable _DataTable = GetTable(_Table);
 
-            if (_DataTable is null)
-                return string.Empty;
+            if (_DataTable is null) { return string.Empty; }
 
             try
             {

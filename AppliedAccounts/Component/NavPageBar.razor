@@ -3,10 +3,13 @@
 @using AppliedAccounts.Services;
 @using AppliedAccounts.Data;
 
+
 @code {
-    [Parameter] public PageModel Paging { get; set; }
+    [Parameter] public AppliedDB.PageModel Paging { get; set; }
 
 }
+
+
 
 <nav aria-label="Page navigation example">
     <ul class="pagination">

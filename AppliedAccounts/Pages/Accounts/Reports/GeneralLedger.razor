@@ -1,0 +1,293 @@
+﻿@page "/Accounts/Reports/Ledgers"
+@attribute [Authorize]
+@layout PageLayout
+
+@using AppReports
+@using AppliedDB;
+@using AppliedAccounts.Data
+@using AppliedAccounts.Models
+@using AppliedAccounts.Libs
+@using AppliedAccounts.Services
+@using System.Data
+
+@inject AuthenticationStateProvider Authorized
+@inject ToastService ToastService
+@inject PrintService ReportService
+@inject GlobalService AppGlobal
+
+@code {
+    decimal LedgerBalance;
+    decimal TotalDR;
+    decimal TotalCR;
+
+    protected override void OnInitialized()
+    {
+        var AppUser = ((UserAuthenticationStateProvider)Authorized).AppUser;
+
+        Start(AppUser);
+
+        IsPageValid = true;
+        if (Source is null) { IsPageValid = false; IsPageValidMessage += " Source is null"; }
+        //if (ReportService is null) { IsPageValid = false; IsPageValidMessage += " Report Service is null"; }
+
+        decimal LedgerBalance = 0.00M;
+        decimal TotalDR = 0.00M;
+        decimal TotalCR = 0.00M;
+
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        LedgerBalance = 0.00M;
+        if (firstRender)
+        {
+
+        }
+    }
+
+
+}
+
+@if (IsPrinting)
+{
+    <div class="alert alert-primary d-flex align-items-center" role="alert">
+        <div class="spinner-border text-primary me-2" role="status" aria-hidden="true"></div>
+        <div>
+            Loading data, please wait...
+        </div>
+    </div>
+}
+
+@if (MsgClass.Count > 0)
+{
+    <PageErrors Messages="@MsgClass" />
+}
+
+<style>
+    .accordion {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+</style>
+
+@if (IsPageValid)
+{
+    <div class="accordion mt-2" id="accordionExample">
+        <div class="accordion-item mt-1">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    General Ledger
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <div class="w-100">
+                        <div class="row g-2 p-1">
+                            <div class="col-3">
+                                <div class="form-floating">
+                                    <InputDate id="DateFrom" class="form-control" @bind-Value="MyModel.Date_From"></InputDate>
+                                    <label for="DateFrom">From</label>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-floating">
+                                    <InputDate id="DateTo" class="form-control" @bind-Value="MyModel.Date_To"></InputDate>
+                                    <label for="DateFrom">To</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-floating">
+
+                                    <InputSelect id="coa_nature" @bind-Value="@MyModel.COAID" class="form-control">
+                                        @foreach (var item in Accounts)
+                                        {
+                                            <option value=@item.ID>@item.Title</option>
+                                        }
+                                    </InputSelect>
+                                    <label for="coa_nature">Account Head</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-2 p1-">
+                            <div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div>
+                                        <button class="btn btn-primary" @onclick="Refresh">Refresh</button>
+                                    </div>
+                                    <div style="display: flex; justify-content: flex-end;">
+                                        @if (!IsPrinting)
+                                        {
+                                            <ReportingButtons ReturnValue="Print" ID="@MyModel.COAID" />
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item mt-1">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Supplier / Vendor / Client Ledger
+                </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <div class="w-100">
+                        <div class="row g-2 p-1">
+                            <div class="col-3">
+                                <div class="form-floating">
+                                    <InputDate id="DateFrom" class="form-control" @bind-Value="MyModel.DtFrom_Com"></InputDate>
+                                    <label for="DateFrom">From</label>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-floating">
+                                    <InputDate id="DateTo" class="form-control" @bind-Value="MyModel.DtTo_Com"></InputDate>
+                                    <label for="DateFrom">To</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-floating">
+
+                                    <InputSelect id="coa_nature" class="form-control"
+                                                 @bind-Value="@MyModel.CompanyID"
+                                                 @onclick:preventDefault
+                                                 @onmouseup="async (e) => await HandleClick(e)">
+                                        @foreach (var item in Companies)
+                                        {
+                                            <option value=@item.ID>@item.Title</option>
+                                        }
+                                    </InputSelect>
+                                    <label for="coa_nature">Customer, Verndor, Clients</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-2 p1-">
+                            <div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div>
+                                        <button class="btn btn-primary" @onclick="Refresh">Refresh</button>
+                                    </div>
+                                    <div style="display: flex; justify-content: flex-end;">
+                                        @if (!IsPrinting)
+                                        {
+                                            <ReportingButtons ReturnValue="Print" ID="@MyModel.CompanyID" />
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item mt-1">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    Employee Ledger
+                </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <strong>This is the third item’s accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It’s also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                </div>
+            </div>
+        </div>
+
+        <!-- Do not want to of record data as list. only show printing functions.  -->
+        @* <div class="accordion-item mt-1">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                    Result .....
+                </button>
+            </h2>
+            <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <div class="table-container">
+                        @if (MyModel.Ledger is not null)
+                        {
+                            <table class="table-list">
+                                <thead>
+                                    <tr>
+                                        <th style="width:8%">Date</th>
+                                        <th style="width:8%">Voucher</th>
+                                        <th style="width:20%">Vendor / Client</th>
+                                        <th style="width:30%">Remarks</th>
+                                        <th style="width:10%">Debit</th>
+                                        <th style="width:10%">Credit</th>
+                                        <th style="width:10%">Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (DataRow Row in (MyModel.PagingQuery.GetPageData().Result).Rows)
+                                    {
+
+                                        TotalDR += (decimal)Row["DR"];
+                                        TotalCR += (decimal)Row["CR"];
+                                        LedgerBalance += ((decimal)Row["DR"] - (decimal)Row["CR"]);
+
+                                        string Debit = ((decimal)Row["DR"]).ToString(Format.Digit);
+                                        string Credit = ((decimal)Row["CR"]).ToString(Format.Digit);
+                                        string Balance = LedgerBalance.ToString(Format.Digit);
+                                        string VouDate = ((DateTime)Row["Vou_Date"]).ToString(Format.DDMMMYY);
+
+                                        <tr>
+                                            <td>@Conversion.Row2Date(Row["Vou_Date"], Format.DDMMMYYYY)</td>
+                                            <td>@Row["Vou_no"].ToString()</td>
+
+                                            <td>@Row["CompanyName"].ToString()</td>
+                                            <td class="left">@Row["Description"].ToString()</td>
+                                            <td class="amount">@Debit</td>
+                                            <td class="amount">@Credit</td>
+                                            <td class="amount-blue">@Balance</td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="middle">
+                                                <NavPageBar Paging="MyModel.PagingQuery.Pages"></NavPageBar>
+                                            </div>
+                                        </td>
+
+                                        <td class="amount">@TotalDR</td>
+                                        <td class="amount">@TotalCR</td>
+                                        <td class="amount-blue">@LedgerBalance</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div> *@
+        #endregion
+    </div>
+}
+else
+{
+    <div class="alert alert-danger" role="alert">
+        <string>@IsPageValidMessage</string>
+    </div>
+}
+
+<!--
+    ADD THIS style for (center the pagination in Footer column.  
+    Do not Delete 13-09-25
+-->
+<style>
+    .pagination {
+        margin: 0px;
+    }
+    
+    .accordion-button {
+        height:50px;
+    }
+
+</style>
