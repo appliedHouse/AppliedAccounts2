@@ -44,7 +44,7 @@ namespace Menus
             {
                 item.Active = !item.Active;
             }
-            await Task.Delay(1000);
+            await Task.Delay(500);
         }
 
         public List<MenuItem> SelectedMenu(int MenuID)
