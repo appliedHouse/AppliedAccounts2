@@ -1,0 +1,10 @@
+
+
+Component
+
+AppliedAccounts.Components.
+
+<ShowBrowseWindow Id="ddcompany"
+                  Title="company"
+                  @bind-Value="MyModel.CompanyID"
+                  BrowseList="MyModel.CompanyList" />

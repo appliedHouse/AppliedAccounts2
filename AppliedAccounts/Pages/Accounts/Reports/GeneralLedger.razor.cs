@@ -1,14 +1,12 @@
 ﻿using AppliedAccounts.Component;
 using AppliedAccounts.Data;
+using AppliedAccounts.Libs;
 using AppliedAccounts.Models;
 using AppliedDB;
 using AppMessages;
-using BlazorJS;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System.Data;
-using System.Drawing;
 using Format = AppliedGlobals.AppValues.Format;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
 using MESSAGES = AppMessages.Enums.Messages;
@@ -20,15 +18,16 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         public DataSource Source { get; set; }
         public GLModel MyModel { get; set; }
         public MessageClass MsgClass { get; set; }
+        //public BrowseWindow BrowseClass { get; set; }
         public string DBFile { get; set; }
         public bool IsPageValid { get; set; }
         public bool IsPrinting { get; set; }
         string IsPageValidMessage { get; set; } = "Page has some error. Consult to Administrator";
         NavigationManager NavManager => AppGlobal.NavManager;
 
-        public List<CodeTitle> Accounts { get; set; }
-        public List<CodeTitle> Companies { get; set; }
-        public List<CodeTitle> Employees { get; set; }
+        //public List<CodeTitle> Accounts { get; set; }
+        //public List<CodeTitle> Companies { get; set; }
+        //public List<CodeTitle> Employees { get; set; }
 
         public GeneralLedger()
         {
@@ -39,16 +38,16 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         {
             if (_UserModel != null)
             {
-
                 MsgClass = new();
-                //UserModel = _UserModel;
                 Source = new(AppGlobal.AppPaths);
                 DBFile = AppGlobal.DBFile;
-                Accounts = Source.GetAccounts();            // Get List of Accounts
-                Companies = Source.GetCustomers();          // Get List of Costomer/Clients
-                Employees = Source.GetEmployees();        // Get List of Employees
+                MyModel.AccountList = Source.GetAccounts();
+                MyModel.CompanyList = Source.GetCustomers();
+                MyModel.EmployeeList = Source.GetEmployees();
 
-
+                //Accounts = Source.GetAccounts();            // Get List of Accounts
+                //Companies = Source.GetCustomers();          // Get List of Costomer/Clients
+                //Employees = Source.GetEmployees();        // Get List of Employees
             }
             else
             {
@@ -102,7 +101,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         public void Refresh()
         {
             SetKeys();
-            
+
 
 
             //GetReportData();
@@ -154,7 +153,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
         public async void GetReportData()
         {
-            if(MyModel.COAID == 0)
+            if (MyModel.COAID == 0)
             {
                 ReportService.IsError = true;
                 MsgClass.Add(MESSAGES.AccountIDIsZero);
@@ -173,7 +172,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
             MyModel.PagingQuery.Query = _Query;
             MyModel.PagingQuery.Source = Source;
-             
+
             MyModel.PagingQuery.Pages = MyModel.PagingQuery.Pages ?? new PageModel();
 
             DataTable _ReportTable = Source.GetTable(_Query);
@@ -186,7 +185,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 MsgClass.Add(MESSAGES.NoRecordFound);
             }
 
-            
+
             ReportService.Data.ReportTable = _ReportTable;
             ReportService.Data.DataSetName = "dsname_Ledger";
 
@@ -209,44 +208,38 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         }
         #endregion
 
-        #region Open Dialog windows
 
-        private async Task HandleClick(MouseEventArgs e)
+        public class GLModel
         {
-            // Prevent default using JS interop
-            await AppGlobal.JS.InvokeVoidAsync("eval", "event.preventDefault()");
-            opnCompanies();
+            public int BookID { get; set; }
+            public int COAID { get; set; }
+            public int CompanyID { get; set; }
+            public int ProjectID { get; set; }
+            public int EmployeeID { get; set; }
+
+            public DateTime Date_From { get; set; }
+            public DateTime Date_To { get; set; }
+            public string SortBy { get; set; }
+            public DataTable Ledger { get; set; }
+
+            public DateTime DtFrom_Com { get; set; }            // Date for (Companies/Clients)
+            public DateTime DtTo_Com { get; set; }
+
+            public DateTime DtFrom_Emp { get; set; }            // Date for (Employees)
+            public DateTime DtTo_Emp { get; set; }
+
+            public PageQuery PagingQuery { get; set; } = new();
+
+            public BrowseModel BrowseClass { get; set; } = new();
+
+            public List<CodeTitle> AccountList { get; set; } = new();
+            public List<CodeTitle> CompanyList { get; set; } = new();
+            public List<CodeTitle> EmployeeList { get; set; } = new();
+
+            public string TitleCOA { get; set; }
+            public string TitleCompany { get; set; }
+            public string TitleEmployee { get; set; }
+
         }
-
-        public void opnCompanies()
-        {
-            AppGlobal.JS.AlertAsync("Open Companies Dialog Box");
-
-        }
-        #endregion
-    }
-
-    public class GLModel
-    {
-        public int BookID { get; set; }
-        public int COAID { get; set; }
-        public int CompanyID { get; set; }
-        public int ProjectID { get; set; }
-        public int EmployeeID { get; set; }
-
-        public DateTime Date_From { get; set; }
-        public DateTime Date_To { get; set; }
-        public string SortBy { get; set; }
-        public DataTable Ledger { get; set; }
-
-        public DateTime DtFrom_Com { get; set; }            // Date for (Companies/Clients)
-        public DateTime DtTo_Com { get; set; }
-
-        public DateTime DtFrom_Emp { get; set; }            // Date for (Employees)
-        public DateTime DtTo_Emp { get; set; }
-
-        public PageQuery PagingQuery { get; set; } = new();
-
-
     }
 }

@@ -9,7 +9,7 @@
     protected override void OnInitialized()
     {
         MenusClass = new();
-        MenusClass.MyMenus = MenusClass.SelectedMenu(21);
+        MenusClass.SecondLevel(MenusClass.GetMenu(21)!);
     }
 }
 

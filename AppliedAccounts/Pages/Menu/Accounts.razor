@@ -9,7 +9,8 @@
     protected override void OnInitialized()
     {
         MenusClass = new();
-        MenusClass.MyMenus = MenusClass.SelectedMenu(22);
+        var _AccountMenu = MenusClass.GetMenu(2);
+        MenusClass.TopSelected(_AccountMenu!, true);
     }
 }
 

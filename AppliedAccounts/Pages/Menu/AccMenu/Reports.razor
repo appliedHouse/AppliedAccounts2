@@ -2,14 +2,13 @@
 @attribute [Authorize]
 @inject GlobalService AppGlobal
 
-
 @code {
     public Menus.MenusClass MenusClass { get; set; }
 
     protected override void OnInitialized()
     {
         MenusClass = new();
-        MenusClass.MyMenus = MenusClass.SelectedMenu(23);
+        MenusClass.SecondLevel(MenusClass.GetMenu(23)!);
     }
 }
 

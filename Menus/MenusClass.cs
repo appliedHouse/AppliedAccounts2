@@ -1,71 +1,103 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Menus
 {
     public interface IMenusClass
     {
-        public List<MenuItem> MyMenus { get; set; }
-        public List<MenuItem> GetTopLevel();
-        public List<MenuItem> GetSubMenu(int _Level, int _Parent);
-        public Task MenuActive(int TopMenuID);
+        List<MenuItem> MyMenus { get; set; }
+        void GetTopLevel();
+        void TopSelected(MenuItem MenuItem, bool ShowSubMenu);
+        void SecondLevel(MenuItem MenuItem);
+        MenuItem? GetMenu(int _MenuID); // Change return type to nullable
     }
 
     public class MenusClass : IMenusClass
     {
         public List<MenuItem> MyMenus { get; set; }
         private List<MenuItem> FullMenus { get; set; }
+        public bool ShowSubMenu { get; set; }
+        public int TopMenuLevel { get; set; } = 1;
 
         public MenusClass()
         {
             FullMenus = MenusFromDB.Get();
-            MyMenus = MenusFromDB.Get();
+            GetTopLevel();
         }
 
         public void Reset()
         {
-            MyMenus = FullMenus;
+            GetTopLevel();
         }
 
-
-        public List<MenuItem> GetSubMenu(int _Level, int _Parent)
-        {
-            return [.. MyMenus.Where(m => m.Level == 2 && m.ParentID == _Parent)];
-        }
-
-        public List<MenuItem> GetTopLevel()
-        {
-            return [.. MyMenus.Where(m => m.Level == 1)];
-        }
-
-        public async Task MenuActive(int TopMenuID)
-        {
-            foreach (var item in MyMenus.Where(m => m.Level == 2 && m.ParentID == TopMenuID))
-            {
-                item.Active = !item.Active;
-            }
-            await Task.Delay(500);
-        }
-
-        public List<MenuItem> SelectedMenu(int MenuID)
+        public void HomeButton(bool ShowSubMenu)
         {
             List<MenuItem> _Menus = [];
-            var menu1 = MyMenus.FirstOrDefault(m => m.ID == 1);
-            if (menu1 != null)  { _Menus.Add(menu1); }
+            TopMenuLevel = 1;
+            var _HomeBtn = FullMenus.Where(m => m.Title.ToUpper().Equals("HOME")).First();
+            _HomeBtn.Level = TopMenuLevel;
 
-            var menus2 = MyMenus.Where(m => m.ID == MenuID || m.ParentID == MenuID).ToList();
-
-            _Menus.AddRange(menus2);
-
-            foreach (var Menu in _Menus)
+            foreach (var menu in FullMenus)
             {
-                if(Menu.Level > 1)
+                if (menu.Level == 1) { _Menus.Add(menu); }
+                if(ShowSubMenu)
                 {
-                    Menu.Level = Menu.Level - 1;
+                    if (menu.ID == _HomeBtn.ID)
+                    {
+                        _Menus.AddRange(FullMenus.Where(mnu => mnu.ParentID == _HomeBtn.ID));
+                    }
                 }
             }
 
-            return _Menus;
+            MyMenus = _Menus;
+        }
+
+
+        public void GetTopLevel()   // Main menu or first menu show at start of page
+        {
+            List<MenuItem> _Menus = [];
+            TopMenuLevel = 1;
+            _Menus = [.. FullMenus.Where(m => m.Level == 1)];
+            _Menus.Where(mnu => mnu.Title.ToUpper().Equals("HOME")).First().Level = TopMenuLevel;
+            MyMenus = _Menus;
+        }
+
+        public void TopSelected(MenuItem MenuItem, bool ShowSubMenu)
+        {
+            List<MenuItem> _Menus = [];
+            TopMenuLevel = MenuItem.Level;
+            
+            foreach(var menu in FullMenus)
+            {
+                if(menu.Level==1) { _Menus.Add(menu); }
+                if (ShowSubMenu)
+                {
+                    if (menu.ID == MenuItem.ID)
+                    {
+                        _Menus.AddRange(FullMenus.Where(mnu => mnu.ParentID == MenuItem.ID));
+                    }
+                }
+            }
+            
+            MyMenus = _Menus;
+        }
+
+        public void SecondLevel(MenuItem MenuItem)
+        {
+            List<MenuItem> _Menus = [];
+            TopMenuLevel = MenuItem.Level;
+
+            _Menus.Add(FullMenus.FirstOrDefault(m => m.Title.ToUpper().Equals("HOME"))!); // Home menu always show
+            _Menus.Add(MenuItem);
+            _Menus.AddRange(FullMenus.Where(mnu=> mnu.ParentID==MenuItem.ID)); // Other top level menu
+            _Menus.Where(mnu => mnu.Title.ToUpper().Equals("HOME")).First()!.Level = TopMenuLevel;
+            
+            MyMenus = _Menus;
+
+        }
+
+        public MenuItem? GetMenu(int _MenuID)
+        {
+            return FullMenus.FirstOrDefault(mnu => mnu.ID == _MenuID);
         }
     }
 }
