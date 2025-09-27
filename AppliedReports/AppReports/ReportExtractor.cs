@@ -7,12 +7,27 @@ namespace AppReports
         public List<ReportParameterClass> MyParameters { get; set; }
 
         public string RDL_File { get; set; }
-        public string DataSetName => GetDataSetNames().FirstOrDefault() ?? "";
+        public string DataSetName => GetDataSetNames()?.FirstOrDefault() ?? "";
 
         public ReportExtractor(string _RDLFile)
         {
-            RDL_File = _RDLFile;
-            MyParameters = GetParameters(RDL_File);
+            if(File.Exists(_RDLFile))
+            {
+                RDL_File = _RDLFile;
+                MyParameters = GetParameters(RDL_File);
+            }
+
+            MyParameters ??=
+            [
+                new ReportParameterClass
+                {
+                    Name = "NotFound",
+                    DataType = "N/A",
+                    Prompt = "N/A"
+                }
+            ];
+
+
         }
         public bool IsExistParameter(string value)
         {
@@ -40,22 +55,26 @@ namespace AppReports
 
 
 
-        private List<string> GetDataSetNames()
+        private List<string>? GetDataSetNames()
         {
-            XNamespace ns = "http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition";
-            var xdoc = XDocument.Load(RDL_File);
-            var datasetNames = new List<string>();
-
-            foreach (var dataset in xdoc.Descendants(ns + "DataSet"))
+            if(!string.IsNullOrEmpty(RDL_File))
             {
-                var nameAttr = dataset.Attribute("Name");
-                if (nameAttr != null)
-                {
-                    datasetNames.Add(nameAttr.Value);
-                }
-            }
+                XNamespace ns = "http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition";
+                var xdoc = XDocument.Load(RDL_File);
+                var datasetNames = new List<string>();
 
-            return datasetNames;
+                foreach (var dataset in xdoc.Descendants(ns + "DataSet"))
+                {
+                    var nameAttr = dataset.Attribute("Name");
+                    if (nameAttr != null)
+                    {
+                        datasetNames.Add(nameAttr.Value);
+                    }
+                }
+
+                return datasetNames;
+            }
+            return null;
         }
     }
     public class ReportParameterClass

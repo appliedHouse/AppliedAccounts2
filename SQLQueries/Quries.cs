@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SQLQueries
 {
@@ -328,6 +329,73 @@ namespace SQLQueries
         public static string BatchesForGraph()
         {
             return "SELECT [Ref_No] AS [Batch] FROM [BillReceivable] GROUP BY [Ref_No] ORDER BY [Ref_No] DESC LIMIT 5;";
+        }
+
+        public static string Ledger2(string _FilterOB, string _Filter, string _Groupby, string OBDate, string _OrderBy)
+        {
+            var _Text1 = new StringBuilder();           // Opening Balance
+            var _Text2 = new StringBuilder();           // Ledger
+            var _Text3 = new StringBuilder();           // Combine Opening and Ledger
+
+            // Ledger Opening Balance One DataRow
+            _Text1.AppendLine("SELECT");
+            _Text1.AppendLine("0 AS[Vou_No],");
+            _Text1.AppendLine($"Date('{OBDate}') AS[Vou_Date],");
+            _Text1.AppendLine("IIF([BAL] > 0, [BAL], 0) AS[DR],");
+            _Text1.AppendLine("IIF([BAL] < 0, ABS([BAL]), 0) AS[CR],");
+            _Text1.AppendLine("'Opening Balance...' AS[Description],");
+            _Text1.AppendLine("0 AS[COA],");
+            _Text1.AppendLine("0 AS[Customer],");
+            _Text1.AppendLine("0 AS[Project],");
+            _Text1.AppendLine("0 AS[Employee],");
+            _Text1.AppendLine("0 AS[Inventory]");
+            _Text1.AppendLine("FROM(SELECT");
+            _Text1.AppendLine("SUM([DR]) AS[DR],");
+            _Text1.AppendLine("SUM([CR]) AS[CR],");
+            _Text1.AppendLine("SUM([DR] - [CR]) AS[BAL]");
+            _Text1.AppendLine("FROM [Ledger]");
+            _Text1.AppendLine($"WHERE {_FilterOB}) ");
+            _Text1.AppendLine($"GROUP BY {_Groupby} ");
+
+            // Ledger DataRow from Start to End Date
+            _Text2.AppendLine("SELECT");
+            _Text2.AppendLine("[Ledger].[Vou_No],");
+            _Text2.AppendLine("[Ledger].[Vou_Date],");
+            _Text2.AppendLine("[Ledger].[DR],");
+            _Text2.AppendLine("[Ledger].[CR],");
+            _Text2.AppendLine("[Ledger].[Description],");
+            _Text2.AppendLine("[Ledger].[COA],");
+            _Text2.AppendLine("[Ledger].[Customer],");
+            _Text2.AppendLine("[Ledger].[Project],");
+            _Text2.AppendLine("[Ledger].[Employee],");
+            _Text2.AppendLine("[Ledger].[Inventory]");
+            _Text2.AppendLine("FROM[Ledger]");
+            _Text2.AppendLine($"WHERE {_Filter} ");
+
+
+            _Text3.AppendLine("SELECT[L].*,");
+            _Text3.AppendLine("[A].[TITLE] AS[AccountTitle],");
+            _Text3.AppendLine("[C].[TITLE] AS[CompanyName],");
+            _Text3.AppendLine("[E].[TITLE] AS[EmployeeName],");
+            _Text3.AppendLine("[P].[TITLE] AS[ProjectTitle],");
+            _Text3.AppendLine("[I].[TITLE] AS[StockTitle]");
+            _Text3.AppendLine($"FROM(");
+
+            _Text3.AppendLine(_Text1.ToString());
+            _Text3.AppendLine("UNION ALL");
+            _Text3.AppendLine(_Text2.ToString());
+
+
+            _Text3.AppendLine(") AS[L]");
+            _Text3.AppendLine("LEFT JOIN[COA]       [A] ON[A].[ID] = [L].[COA]");
+            _Text3.AppendLine("LEFT JOIN[Customers] [C] ON[C].[ID] = [L].[CUSTOMER]");
+            _Text3.AppendLine("LEFT JOIN[Employees] [E] ON[E].[ID] = [L].[EMPLOYEE]");
+            _Text3.AppendLine("LEFT JOIN[Project]   [P] ON[P].[ID] = [L].[PROJECT]");
+            _Text3.AppendLine("LEFT JOIN[Inventory] [I] ON[I].[ID] = [L].[INVENTORY]");
+            if (_OrderBy.Length > 0) { _Text3.AppendLine($"ORDER BY {_OrderBy}"); }
+
+            return _Text3.ToString();
+
         }
         #endregion
 
