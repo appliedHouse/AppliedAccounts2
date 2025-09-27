@@ -1,11 +1,9 @@
-﻿using AppliedAccounts.Component;
-using AppliedAccounts.Data;
-using AppliedAccounts.Libs;
+﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
 using AppliedDB;
 using AppMessages;
+using AppReports;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using System.Data;
 using Format = AppliedGlobals.AppValues.Format;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
@@ -25,10 +23,6 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         string IsPageValidMessage { get; set; } = "Page has some error. Consult to Administrator";
         NavigationManager NavManager => AppGlobal.NavManager;
 
-        //public List<CodeTitle> Accounts { get; set; }
-        //public List<CodeTitle> Companies { get; set; }
-        //public List<CodeTitle> Employees { get; set; }
-
         public GeneralLedger()
         {
             MyModel = new();
@@ -45,9 +39,6 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 MyModel.CompanyList = Source.GetCustomers();
                 MyModel.EmployeeList = Source.GetEmployees();
 
-                //Accounts = Source.GetAccounts();            // Get List of Accounts
-                //Companies = Source.GetCustomers();          // Get List of Costomer/Clients
-                //Employees = Source.GetEmployees();        // Get List of Employees
             }
             else
             {
@@ -85,7 +76,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
             AppRegistry.SetKey(DBFile, "GL_Company", MyModel.CompanyID, KeyType.Number, "Company Ledger ID,From,To,Sort");
             AppRegistry.SetKey(DBFile, "GL_Company", MyModel.DtFrom_Com, KeyType.From);
-            AppRegistry.SetKey(DBFile, "GL_Company", MyModel.DtTo_Emp, KeyType.To);
+            AppRegistry.SetKey(DBFile, "GL_Company", MyModel.DtTo_Com, KeyType.To);
             AppRegistry.SetKey(DBFile, "GL_Company", MyModel.SortBy, KeyType.Text);
 
             AppRegistry.SetKey(DBFile, "GL_Employee", MyModel.EmployeeID, KeyType.Number, "Company Ledger ID,From,To,Sort");
@@ -101,14 +92,6 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         public void Refresh()
         {
             SetKeys();
-
-
-
-            //GetReportData();
-            //if (_ReportData.ReportTable != null)
-            //{
-            //    MyModel.Ledger = _ReportData.ReportTable;
-            //}
         }
 
         public void BackPage()
@@ -207,6 +190,114 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
         }
         #endregion
+
+
+        #region Print Company
+        public async void PrintCompany(ReportActionClass PrintAction)
+        {
+            MsgClass = new();           // Clear all previous messages - refresh
+            IsPrinting = true;
+            await InvokeAsync(StateHasChanged);
+            try
+            {
+                SetKeys();
+                ReportService = new(AppGlobal); ;
+                ReportService.ReportType = PrintAction.PrintType;
+                ReportService.IsError = await CreateReportModel_Company();
+                if (ReportService.IsError)
+                {
+                    ReportService.Print();
+                }
+
+            }
+            catch (Exception error)
+            {
+                MsgClass.Error(error.Message);
+            }
+            IsPrinting = false;
+            await InvokeAsync(StateHasChanged);
+
+            bool stop = true;
+        }
+
+        private async Task<bool> CreateReportModel_Company()
+        {
+            var _CompanyName = Source.SeekTitle(AppliedDB.Enums.Tables.Customers, MyModel.CompanyID);
+            var _Heading1 = $"Company Ledger " + _CompanyName;
+            var _Heading2 = $"[{MyModel.Date_From.ToString(Format.DDMMMYY)}] to [{MyModel.Date_To.ToString(Format.DDMMMYY)}] ";
+            var _ReportName = "CompanyGL2.rdl";
+            ReportService.Model.InputReport.FileName = _ReportName;
+
+            if (File.Exists(ReportService.Model.InputReport.FileFullName))
+            {
+                //ReportService.Model = new();
+                ReportService.Model.InputReport.FileName = _ReportName;
+                ReportService.Model.OutputReport.FileName = "CompanyGL_" + _CompanyName.Replace(" ", "_");
+                ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
+                ReportService.Model.AddReportParameter("Heading1", _Heading1);
+                ReportService.Model.AddReportParameter("Heading2", _Heading2);
+                ReportService.Model.ReportDataSource = await GetReportData_Company();  //ReportService.Data;  // Load Reporting Data to Report Model
+                ReportService.IsError = false;
+            }
+            else
+            {
+                ReportService.IsError = true;
+                MsgClass.Error(MESSAGES.rptRDLCNotExist + " " + ReportService.Model.InputReport.FileFullName);
+                return false;
+            }
+            return true;
+        }
+
+        private async Task<ReportData> GetReportData_Company()
+        {
+            var _Result = new ReportData();
+
+            if (MyModel.COAID == 0)
+            {
+                ReportService.IsError = true;
+                MsgClass.Add(MESSAGES.AccountIDIsZero);
+                return _Result;
+            }
+
+            var _OBDate = MyModel.DtFrom_Com.AddDays(-1).ToString(Format.YMD);
+            var _DateFrom = MyModel.DtFrom_Com.ToString(Format.YMD);
+            var _DateTo = MyModel.DtTo_Com.ToString(Format.YMD);
+
+            var _Nature = AppRegistry.GetText(AppGlobal.DBFile, "CompanyGLs");
+            var _FilterOB = $"[Customer] = {MyModel.CompanyID} AND  [COA] IN ({_Nature}) AND Date([Vou_Date]) < Date('{_DateFrom}')";
+            var _Filter = $"[Customer] = {MyModel.CompanyID} AND  [COA] IN ({_Nature}) AND (Date([Vou_Date]) BETWEEN Date('{_DateFrom}') AND Date('{_DateTo}'))";
+            var _GroupBy = "[Customer]";
+            var _SortBy = "[Vou_date], [Vou_no]";
+
+            var _Query = SQLQueries.Quries.Ledger2(_FilterOB, _Filter, _GroupBy, _OBDate, _SortBy);
+
+            MyModel.PagingQuery.Query = _Query;
+            MyModel.PagingQuery.Source = Source;
+
+            MyModel.PagingQuery.Pages = MyModel.PagingQuery.Pages ?? new PageModel();
+
+            DataTable _ReportTable = Source.GetTable(_Query);
+            MyModel.PagingQuery.Pages.TotalRecords = _ReportTable.Rows.Count;
+            DataTable _DisplayTable = await MyModel.PagingQuery.GetPageData();
+
+            if (_ReportTable.Columns.Count == 0)
+            {
+                ReportService.IsError = false;
+                MsgClass.Add(MESSAGES.NoRecordFound);
+            }
+
+            _Result.ReportTable = _ReportTable;
+            _Result.DataSetName = "dsname_CompanyGL";
+
+            ReportService.Data.ReportTable = _Result.ReportTable;
+            ReportService.Data.DataSetName = _Result.DataSetName;
+            MyModel.Ledger = _DisplayTable;
+
+            return _Result;
+            
+        }
+        #endregion
+
 
 
         public class GLModel

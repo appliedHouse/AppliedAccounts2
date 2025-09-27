@@ -103,6 +103,10 @@ namespace AppliedAccounts.Services
                     default: await Preview(); break;
                 }
             }
+            else
+            {
+                bool stop = true;
+            }
         }
 
         #endregion
