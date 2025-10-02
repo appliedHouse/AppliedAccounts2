@@ -120,13 +120,13 @@ namespace AppliedAccounts.Services
             if (!Model.IsParametersValid())
             {
                 result = true;
-                MyMessage.Add("Report Parameters are not equal with report.");
+                MyMessage.Add("The report parameters are not aligned with the report requirements.");
             }
 
             if (Data.DataSetName != Extractor.DataSetName)
             {
                 result = true;
-                MyMessage.Add("Report Dataset Name is not matched with report.");
+                MyMessage.Add("The report Dataset name is not aligned with the report requirements.");
             }
 
             return result;
