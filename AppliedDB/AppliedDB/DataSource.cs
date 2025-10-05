@@ -155,6 +155,13 @@ namespace AppliedDB
         {
             return GetTable(_SQLQuery, "", "");
         }
+
+        public async Task<DataTable> GetTableAsync(string _SQLQuery)
+        {
+            var _Table = await Task.Run(() => GetTable(_SQLQuery, "", ""));
+            return _Table;
+
+        }
         public DataTable GetTable(string _SQLQuery, string _Filter)
         {
             return GetTable(_SQLQuery, _Filter, "");
@@ -309,7 +316,7 @@ namespace AppliedDB
                     if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
                     _Adapter.Fill(_DataSet, _Table.ToString());
                     if (_Connection.State == ConnectionState.Open) { _Connection.Close(); }
-                   
+
                     if (_DataSet.Tables.Count == 1)
                     {
                         return _DataSet.Tables[0];
@@ -428,7 +435,7 @@ namespace AppliedDB
 
         public string SeekTitle(Tables _Table, int ID)
         {
-            if(_Table == 0 || ID == 0) { return string.Empty; }
+            if (_Table == 0 || ID == 0) { return string.Empty; }
 
             DataTable _DataTable = GetTable(_Table);
 
@@ -910,7 +917,7 @@ namespace AppliedDB
                 string _SQLQuery = SQLQuery.View_Book($"BookID = {BookID} ");
                 string _Sort = "Vou_Date DESC, ID DESC";
 
-                _Table = GetTable(_SQLQuery,Filter, _Sort);
+                _Table = GetTable(_SQLQuery, Filter, _Sort);
             }
             return _Table;
         }
@@ -1090,7 +1097,7 @@ namespace AppliedDB
         {
             string _Query = $"SELECT COUNT(*) FROM {_Table} WHERE {_Filter}";
             using var command = new SQLiteCommand(_Query, MyConnection);
-            if(MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
+            if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
             var result = Convert.ToInt32(command.ExecuteScalar()); MyConnection.Close();
             return result;
         }

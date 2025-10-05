@@ -1,5 +1,69 @@
-﻿@page "/Accounts/Reports/TrialBalance" 
+﻿@page "/Accounts/Reports/TrialBalance"
+
+@inject GlobalService AppGlobal
+@inject PrintService ReportService
+@using AppliedAccounts.Libs
 
 @code {
+
+	bool IsPageValidae = false;
+	bool IsPrinting = false;
+
+	
+}
+
+@if (IsPrinting)
+{
+	<div class="alert alert-primary d-flex align-items-center" role="alert">
+		<div class="spinner-border text-primary me-2" role="status" aria-hidden="true"></div>
+		<div>
+			Loading printing data, please wait...
+		</div>
+	</div>
+}
+
+
+@if (MsgClass.Count > 0)
+{
+	<PageErrors Messages="@MsgClass" />
+}
+
+@if (!IsPageValidae)
+{
+	<EditForm Model="MyModel">
+		<div class="container">
+			<div class="row flex-md-row">
+				<div class="col-md-3">
+					<div class="form-floating">
+						<InputDate id="DateFrom" class="form-control" @bind-Value="MyModel.TB_From"></InputDate>
+						<label for="DateFrom">From</label>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="form-floating">
+						<InputDate id="DateTo" class="form-control" @bind-Value="MyModel.TB_To"></InputDate>
+						<label for="DateFrom">To</label>
+					</div>
+				</div>
+				<div class="col-md-2">
+					<select @bind="MyModel.TB_Option" class="form-select">
+						@foreach (var option in MyModel.OptionTypes)
+						{
+							<option value="@option.Key">@option.Value</option>
+						}
+					</select>
+				</div>
+				<div class="col-md-4">
+					<div style="display: flex; justify-content: flex-end;">
+						@if (!IsPrinting)
+						{
+							<ReportingButtons ReturnValue="Print"/>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</EditForm>
+
 
 }
