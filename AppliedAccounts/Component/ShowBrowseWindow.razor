@@ -1,0 +1,183 @@
+﻿@using AppliedDB
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
+
+
+@code {
+    [Parameter] public string Id { get; set; } = "ddBrowse";
+    [Parameter] public int Value { get; set; }
+    [Parameter] public string Title { get; set; } = "Browse";
+    [Parameter] public EventCallback<int> ValueChanged { get; set; }
+    [Parameter] public List<CodeTitle>? BrowseList { get; set; }
+
+    private string SearchText { get; set; } = string.Empty;
+    private IEnumerable<CodeTitle>? FilteredList => string.IsNullOrWhiteSpace(SearchText)
+        ? BrowseList
+        : BrowseList?.Where(x => x.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
+                              || x.Code.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+
+    private Task OnSearchInput(ChangeEventArgs e)
+    {
+        SearchText = e.Value?.ToString() ?? string.Empty;
+        return Task.CompletedTask;
+    }
+
+    private async Task SelectItem(int id)
+    {
+        Value = id;
+        await ValueChanged.InvokeAsync(id);
+    }
+}
+
+
+
+<div class="form-floating d-flex gap-2">
+    <!-- Dropdown -->
+    <InputSelect id="@Id"
+                 class="form-control item-height flex-grow-1"
+                 TValue="int"
+                 @bind-Value="Value">
+        @if (BrowseList?.Any() == true)
+        {
+            @foreach (var item in BrowseList)
+            {
+                <option value="@item.ID">@item.Title</option>
+            }
+        }
+        else
+        {
+            <option value="0">No Records - @Title</option>
+        }
+    </InputSelect>
+
+    <!-- Open modal button -->
+    <button class="btn btn-outline-secondary"
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#@($"{Id}_browse")">
+        <i class="bi bi-search"></i>
+    </button>
+
+    <label for="@Id">@Title</label>
+</div>
+
+<!-- Browse modal -->
+<div class="modal fade" id="@($"{Id}_browse")" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title fs-5">@Title</h5>
+                <InputText @bind-Value="SearchText"
+                           @oninput="OnSearchInput"
+                           placeholder="Search..."
+                           class="form-control w-50" />
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th style="width:15%">Code</th>
+                            <th style="width:70%">Title</th>
+                            <th style="width:15%">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (FilteredList?.Any() == true)
+                        {
+                            @foreach (var item in FilteredList)
+                            {
+                                <tr>
+                                    <td>@item.Code</td>
+                                    <td>@item.Title</td>
+                                    <td>
+                                        <button class="btn btn-link"
+                                                data-bs-dismiss="modal"
+                                                @onclick="() => SelectItem(item.ID)">
+                                            <i class="bi bi-mouse"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">No records found</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+    /* Modal enhancements */
+    .modal-content {
+        background-color: #fefefe; /* Soft light background */
+        border-radius: 12px; /* Rounded corners */
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Soft shadow */
+        border: none;
+    }
+
+    /* Table enhancements */
+    .table {
+        background-color: #ffffff; /* Soft white background */
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+        .table th {
+            background-color: #f8f9fa; /* Light gray header */
+            color: #495057;
+            font-weight: 500;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .table td {
+            background-color: #ffffff;
+            color: #495057;
+        }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #fdfdfd; /* Very light striping */
+    }
+
+    /* Button enhancements */
+    .btn-link {
+        color: #0d6efd; /* Bootstrap primary blue */
+        transition: color 0.2s;
+    }
+
+        .btn-link:hover {
+            color: #0056b3;
+            text-decoration: none;
+        }
+
+    /* Input enhancements */
+    .modal-header .form-control {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    /* Footer button */
+    .modal-footer .btn-close {
+        background-color: #f8f9fa;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        border: none;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+</style>

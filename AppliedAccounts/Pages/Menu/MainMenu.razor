@@ -1,39 +1,58 @@
 ﻿@using Menus;
 @inject IJSRuntime js
 @inject NavigationManager NavManager
-@inject AuthenticationStateProvider AuthState;
+@inject AuthenticationStateProvider AuthState
 
 @code {
     [Parameter] public MenusClass MenuClass { get; set; }
 
-    private int ActiveMenu { get; set; } = 0;
+    private bool SubMenu { get; set; } = false;
     private async Task Beep() { await js.InvokeVoidAsync("playBeep"); }
-    private async Task TopLevelClick(int MenuID)
+    private async Task MenuClick(int MenuID)
     {
-        if (MenuID == (int)AppMenu.Home)
-        {
-            MenuClass.Reset();          // Refresh Main Menu 
+        await js.InvokeVoidAsync("playBeep"); await Task.Delay(100);
 
-        }
+        var _SelectedMnu = MenuClass.GetMenu(MenuID);
+        if (_SelectedMnu == null) { return; }
 
+        #region Logout User
         if (MenuID == (int)AppMenu.Logout)
         {
             var UserService = (UserAuthenticationStateProvider)AuthState;
             await UserService.UpdateAuthonticateState(null);
             NavManager.NavigateTo("/");
+            return;
+        }
+        #endregion
+        #region Home Button
+        if (_SelectedMnu.Title.ToUpper().Equals("HOME"))
+        {
+            SubMenu = !SubMenu;
+            MenuClass.HomeButton(SubMenu);
+            return;
+        }
+        #endregion
+        #region Menu button Clieck
+
+        if (_SelectedMnu.Level == 1)
+        {
+            SubMenu = !SubMenu;
+            // All top level menus and sub menu of the select
+            MenuClass.TopSelected(_SelectedMnu, SubMenu);
+        }
+        if (_SelectedMnu.Level == 2)
+        {
+            MenuClass.SecondLevel(_SelectedMnu);
+        }
+        #endregion
+
+        if(!string.IsNullOrEmpty(_SelectedMnu.NavigateTo))
+        {
+            NavManager.NavigateTo(_SelectedMnu.NavigateTo);
         }
 
-        if (ActiveMenu != MenuID) { ActiveMenu = MenuID; } else { ActiveMenu = 0; }
-
     }
-    private async Task SubMenuClick(int MenuID)
-    {
-        if (MenuID == 0) { return; }
 
-        MenuItem _Menu = MenuClass.MyMenus.FirstOrDefault(m => m.ID == MenuID) ?? new();
-        NavManager.NavigateTo(_Menu.NavigateTo, true);
-        await Task.Delay(100);
-    }
 
     protected override void OnInitialized()
     {
@@ -41,21 +60,20 @@
     }
 }
 
-
 <div class="sidebar">
     <div class="Menu mt-2">
-        @foreach (var Menu in MenuClass.GetTopLevel())
+        @foreach (var Menu in MenuClass.MyMenus)
         {
-            <button type="button" class="btn-Menu mw" id="btn-TopLevel" @onclick="async () => { await Beep(); await TopLevelClick(Menu.ID); }"><i class="@Menu.Icon"></i>  @Menu.Title</button>
-            @foreach (var SubMenu in MenuClass.GetSubMenu(2, Menu.ID))
+            if (Menu.Level == MenuClass.TopMenuLevel)
             {
-                if (Menu.ID == ActiveMenu)
-                {
-                    <button type="button" class="btn-Menu subMenu" id="btn-SubMenu" @onclick="async () => { await Beep(); await SubMenuClick(SubMenu.ID); }"><i class="@SubMenu.Icon text-success"></i>  @SubMenu.Title</button>
-                }
+                <button type="button" class="btn-Menu mw" id="btn-TopLevel" @onclick="async () => { await MenuClick(Menu.ID); }"><i class="@Menu.Icon"></i>  @Menu.Title</button>
+            }
+
+            if (Menu.Level == MenuClass.TopMenuLevel + 1)
+            {
+                <button type="button" class="btn-Menu subMenu" id="btn-SubMenu" @onclick="async () => { await MenuClick(Menu.ID); }"><i class="@Menu.Icon text-success"></i>  @Menu.Title</button>
             }
         }
+
     </div>
 </div>
-
-

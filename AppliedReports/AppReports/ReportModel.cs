@@ -180,7 +180,15 @@ namespace AppReports
         {
             if (InputReport.IsFileExist)
             {
+                #region RDL File Not found
                 Extractor ??= new(InputReport.FileFullName);
+                if (Extractor.MyParameters.First().Name == "Not Found")  // if file does not exist.....
+                {
+                    Messages.Add($"{DateTimeNow}: RDL Report file not found in.");
+                    return;
+                }
+                #endregion
+
                 var _Parameter = new ReportParameter(Key, Value);
                 if (Extractor.IsExistParameter(Key))
                 {
@@ -198,8 +206,8 @@ namespace AppReports
         {
             // Check all the variable are generated for the report, if not match send false;
 
-            if (Extractor.MyParameters.Count != ReportParameters.Count)
-                return false;
+            if (Extractor == null) { return false; }
+            if (Extractor.MyParameters.Count != ReportParameters.Count) { return false; }
 
             return Extractor.MyParameters.All(myParam => ReportParameters.Any(reportParam =>
             string.Equals(myParam.Name, reportParam.Name, StringComparison.OrdinalIgnoreCase)));

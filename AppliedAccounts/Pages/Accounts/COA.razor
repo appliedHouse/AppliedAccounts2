@@ -62,94 +62,23 @@
                         <!-- Class, Nature and Notes Dropdown-->
                         <div class="row mt-2">
                             <div class="col-md-4">
-                                @if (MyModel.ClassList != null)
-                                {
-                                    <div class="form-floating d-flex gap-2">
-                                        <InputSelect id="ddAccounts" class="form-control item-height flex-grow-1"
-                                                     TValue="int"
-                                                     Value="@MyModel.Record.Class"
-                                                     ValueChanged="@((e) => ClassChanged(e))"
-                                                     ValueExpression="@(() => MyModel.Record.Class)">
-                                            @if (MyModel.ClassList?.Any() == true)
-                                            {
-                                                @foreach (var item in MyModel.ClassList)
-                                                {
-                                                    <option value="@item.ID">@item.Title</option>
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <option value="0">No Records - Accounts</option>
-                                            }
-                                        </InputSelect>
 
-                                        <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(1)">
-                                            <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
-                                        </button>
-
-                                        <label for="ddAccounts">Account</label>
-                                    </div>
-                                }
+                                <ShowBrowseWindow Id="ddClass"
+                                                  Title="Class"
+                                                  @bind-Value="@MyModel.Record.Class"
+                                                  BrowseList="@MyModel.ClassList" />
                             </div>
                             <div class="col-md-4">
-                                @if (MyModel.NatureList != null)
-                                {
-                                    <div class="form-floating d-flex gap-2">
-                                        <InputSelect id="ddNature" class="form-control item-height flex-grow-1"
-                                                     TValue="int"
-                                                     Value="@MyModel.Record.Nature"
-                                                     ValueChanged="@((e) => NatureChanged(e))"
-                                                     ValueExpression="@(() => MyModel.Record.Nature)">
-                                            @if (MyModel.ClassList?.Any() == true)
-                                            {
-                                                @foreach (var item in MyModel.NatureList)
-                                                {
-                                                    <option value="@item.ID">@item.Title</option>
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <option value="0">No Records - Accounts Nature</option>
-                                            }
-                                        </InputSelect>
-
-                                        <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(2)">
-                                            <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
-                                        </button>
-
-                                        <label for="ddNature">Nature</label>
-                                    </div>
-                                }
+                               <ShowBrowseWindow Id="ddNature"
+                                                  Title="Nature"
+                                                  @bind-Value="@MyModel.Record.Nature"
+                                                  BrowseList="@MyModel.NatureList" />
                             </div>
                             <div class="col-md-4">
-                                @if (MyModel.NotesList != null)
-                                {
-                                    <div class="form-floating d-flex gap-2">
-                                        <InputSelect id="ddNotes" class="form-control item-height flex-grow-1"
-                                                     TValue="int"
-                                                     Value="@MyModel.Record.Notes"
-                                                     ValueChanged="@((e) => NotesChanged(e))"
-                                                     ValueExpression="@(() => MyModel.Record.Notes)">
-                                            @if (MyModel.ClassList?.Any() == true)
-                                            {
-                                                @foreach (var item in MyModel.NotesList)
-                                                {
-                                                    <option value="@item.ID">@item.Title</option>
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <option value="0">No Records - Accounts Notes</option>
-                                            }
-                                        </InputSelect>
-
-                                        <button class="btn btn-outline-secondary" @onclick="() => BrowseWindow(3)">
-                                            <i class="bi bi-search"></i> <!-- Bootstrap icon or custom -->
-                                        </button>
-
-                                        <label for="ddNotes">Notes</label>
-                                    </div>
-                                }
+                                <ShowBrowseWindow Id="ddNotes"
+                                                  Title="Notes"
+                                                  @bind-Value="@MyModel.Record.Notes"
+                                                  BrowseList="@MyModel.NotesList" />
                             </div>
                             
                         </div>
@@ -240,50 +169,7 @@ else
 }
 
 
-<div class="modal fade" id="winBrowse" tabindex="-1" aria-labelledby="browseModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fs-5" id="browseModalLabel">@MyModel.BrowseClass.Heading</h5>
-                    <InputText @bind-Value="MyModel.BrowseClass.SearchText"
-                               @oninput="MyModel.BrowseClass.InputHandler"
-                               placeholder="Search..."
-                               class="form-control" />
-                   
-                </div>
-                <div class="modal-body">
-                    <div class="container">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th style="width:15%">Code</th>
-                                    <th style="width:70%">Title</th>
-                                    <th style="width:15%">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in @MyModel.BrowseClass.GetBrowseList())
-                                {
-                                    <tr>
-                                        <td>@item.Code</td>
-                                        <td>@item.Title</td>
-                                        <td>
-                                            <button class="btn btn-link" data-bs-dismiss="modal" @onclick="(e) =>  SelectedBrowse(item.ID)">
-                                                <i class="bi bi-mouse"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
 
 <style>

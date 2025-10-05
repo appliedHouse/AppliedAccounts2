@@ -1,4 +1,6 @@
-﻿using AppReports;
+﻿using AppliedDB;
+using AppMessages;
+using AppReports;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Microsoft.Reporting.NETCore;
@@ -19,6 +21,7 @@ namespace AppliedAccounts.Services
 
         public bool IsError { get; set; } = false;
         public List<string> MyMessage { get; set; } = new();
+        public MessageClass MsgClass { get; set; }
 
 
         public PrintService(GlobalService _Config)
@@ -103,6 +106,10 @@ namespace AppliedAccounts.Services
                     default: await Preview(); break;
                 }
             }
+            else
+            {
+                bool stop = true;
+            }
         }
 
         #endregion
@@ -112,17 +119,20 @@ namespace AppliedAccounts.Services
         {
             bool result = false;
             Extractor = new(Model.InputReport.FileFullName);
+            MsgClass ??= new();
 
             if (!Model.IsParametersValid())
             {
                 result = true;
-                MyMessage.Add("Report Parameters are not equal with report.");
+                MyMessage.Add("The report parameters are not aligned with the report requirements.");
+                MsgClass.Critical("The report parameters are not aligned with the report requirements.");
             }
 
             if (Data.DataSetName != Extractor.DataSetName)
             {
                 result = true;
-                MyMessage.Add("Report Dataset Name is not matched with report.");
+                MyMessage.Add("The report Dataset name is not aligned with the report requirements.");
+                MsgClass.Critical("The report Dataset name is not aligned with the report requirements.");
             }
 
             return result;
