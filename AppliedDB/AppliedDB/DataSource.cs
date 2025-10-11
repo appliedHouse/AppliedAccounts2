@@ -675,6 +675,11 @@ namespace AppliedDB
             string TableName = _Table.ToString();
             return GetDataTable(DBFile, TableName);
         }
+        public static DataTable GetDataTable(string DBFile, Tables _Table, string _Filter)
+        {
+            string Query = $"SELECT * FROM [{_Table}] WHERE Code='{_Filter}'";
+            return GetDataTable(DBFile, Query, _Table.ToString());
+        }
         public static DataTable GetDataTable(string DBFile, string _Table)
         {
             if (DBFile == null) { return new(); }

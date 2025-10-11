@@ -11,7 +11,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 {
     public partial class TrialBalance
     {
-        public string DBFile { get; set; } 
+        public string DBFile { get; set; }
         public TBModel MyModel { get; set; }
         public DataSource Source { get; set; }
 
@@ -19,7 +19,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
         public TrialBalance()
         {
-            
+
         }
 
         protected override void OnInitialized()
@@ -27,13 +27,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             Source = new(AppGlobal.AppPaths);
             DBFile = AppGlobal.DBFile;
 
-            MyModel = new()
-            {
-                TB_From = AppRegistry.GetFrom(DBFile, "TiralBalance"),
-                TB_To = AppRegistry.GetFrom(DBFile, "TiralBalance"),
-                TB_Option = AppRegistry.GetNumber(DBFile, "TiralBalance")
-            };
-
+            MyModel = new();
             GetKeys();
         }
 
@@ -41,8 +35,8 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         public async void Print(ReportActionClass PrintAction)
         {
             MsgClass = new();           // Clear all previous messages - refresh
-            IsPrinting = true;
-            await InvokeAsync(StateHasChanged);
+            IsPrinting = true; 
+            await InvokeAsync(StateHasChanged); await Task.Delay(100);
 
             try
             {
@@ -55,10 +49,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                     ReportService.Print();
                     MsgClass = ReportService.MsgClass;
                 }
-                else
-                {
-                    
-                }
+                
             }
             catch (Exception error)
             {
@@ -93,7 +84,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         {
 
             var _Heading1 = $"Trial Balance ";
-            var _Heading2 = $"[{MyModel.TB_Option.ToString(Format.DDMMMYY)}] to [{MyModel.TB_To.ToString(Format.DDMMMYY)}] ";
+            var _Heading2 = $"[{MyModel.TB_From.ToString(Format.DDMMMYY)}] to [{MyModel.TB_To.ToString(Format.DDMMMYY)}] ";
             var _CompanyName = ReportService.Config.Client.Company.Replace(" ", "_");
 
             ReportService.Model.InputReport.FileName = "TB.rdl";
@@ -121,7 +112,9 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         public DataTable TBOB_Data()
         {
             DataTable _Table;
-            var _Filter = string.Empty;
+            DateTime OBalDate = AppRegistry.GetDate(DBFile, "OBDate");
+            var _Date = AppRegistry.YMD(OBalDate);
+            var _Filter = $"Date([Ledger].[Vou_Date]) = Date('{_Date}')";
             var _OrderBy = "Code";
             var _Query = SQLQueries.Quries.TrialBalance(_Filter, _OrderBy);
             _Table = Source.GetTable(_Query);
@@ -131,7 +124,10 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         public DataTable TB_Dates(DateTime Date1, DateTime Date2)
         {
             DataTable _Table;
-            var _Filter = string.Empty;
+            var _Date1 = AppRegistry.YMD(Date1);
+            var _Date2 = AppRegistry.YMD(Date2);
+
+            var _Filter = $"Date(Vou_Date) >= '{_Date1}' AND Date(Vou_Date) <= '{_Date2}'";
             var _OrderBy = "Code";
             var _Query = SQLQueries.Quries.TrialBalance(_Filter, _OrderBy);
             _Table = Source.GetTable(_Query);
@@ -144,16 +140,16 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Set and Get Keys
         public void SetKeys()
         {
-            AppRegistry.SetKey(DBFile,"TrialBalance", MyModel.TB_From, KeyTypes.Date,"Trial Balance");
-            AppRegistry.SetKey(DBFile, "TrialBalance", MyModel.TB_To, KeyTypes.Date);
-            AppRegistry.SetKey(DBFile,"TrialBalance", MyModel.TB_Option, KeyTypes.Number);
+            AppRegistry.SetKey(DBFile, "TrialBalance", MyModel.TB_From, KeyTypes.From, "Trial Balance");
+            AppRegistry.SetKey(DBFile, "TrialBalance", MyModel.TB_To, KeyTypes.To);
+            AppRegistry.SetKey(DBFile, "TrialBalance", MyModel.TB_Option, KeyTypes.Number);
         }
 
         public void GetKeys()
         {
-           MyModel.TB_From = AppRegistry.GetFrom(DBFile, "TrialBalance");
-           MyModel.TB_To = AppRegistry.GetTo(DBFile, "TrialBalance");
-           MyModel.TB_Option = AppRegistry.GetNumber(DBFile, "TrialBalance");
+            MyModel.TB_From = AppRegistry.GetFrom(DBFile, "TrialBalance");
+            MyModel.TB_To = AppRegistry.GetTo(DBFile, "TrialBalance");
+            MyModel.TB_Option = AppRegistry.GetNumber(DBFile, "TrialBalance");
         }
         #endregion
     }
