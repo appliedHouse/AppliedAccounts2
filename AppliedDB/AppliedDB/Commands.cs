@@ -20,6 +20,11 @@ namespace AppliedDB
                 string _TableName = CurrentRow.Table.TableName;
                 string _ParameterName;
 
+                if(_TableName == "")
+                {
+                    return null;
+                }
+
                 _CommandString.Append("INSERT INTO [");
                 _CommandString.Append(_TableName);
                 _CommandString.Append("] VALUES (");
@@ -116,6 +121,10 @@ namespace AppliedDB
             if (CurrentRow.Field<long>("ID") != 0)
             {
                 var _TableName = CurrentRow.Table.TableName;
+                if(_TableName == "")
+                {
+                    return null;
+                }
                 var _Command = new SqliteCommand("",DBConnection);
                 _Command.Parameters.AddWithValue("@ID", CurrentRow["ID"]);
                 _Command.CommandText = $"DELETE FROM [{_TableName}] WHERE ID=@ID";
@@ -131,6 +140,11 @@ namespace AppliedDB
                 var _TableName = CurrentRow.Table.TableName;
                 var _Connection = Connections.GetClientConnection(DBFile);
                 using var _Command = new SqliteCommand("", _Connection);
+
+                if(_TableName == "")
+                {
+                    return null;
+                }
 
                 _Command.Parameters.AddWithValue("@ID", CurrentRow["ID"]);
                 _Command.CommandText = $"DELETE FROM [{_TableName}] WHERE ID=@ID";

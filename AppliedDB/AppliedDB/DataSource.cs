@@ -1,6 +1,7 @@
 ﻿using AppliedGlobals;
 using Microsoft.Data.Sqlite;
 using System.Data;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using static AppliedDB.Enums;
 using static AppliedGlobals.AppErums;
@@ -182,7 +183,6 @@ namespace AppliedDB
                 if (!string.IsNullOrEmpty(_SQLQuery))
                     if (MyConnection is not null)
                     {
-                        //var _Query = SQLQuery.GetQuery(_SQLQuery);
                         if (!string.IsNullOrWhiteSpace(_SQLQuery))
                         {
                             if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
@@ -190,27 +190,11 @@ namespace AppliedDB
                             if (!string.IsNullOrEmpty(_Filter)) { _Command.CommandText += $" WHERE {_Filter}"; }
                             if (!string.IsNullOrEmpty(_Sort)) { _Command.CommandText += $" ORDER BY {_Sort}"; }
                             using var reader = _Command.ExecuteReader();
-                            var dt = new DataTable();
-                            dt.Load(reader);
 
+                            var dt = GetDataTableExtention(reader);
+                            dt.TableName = ExtractTableNameFromQuery(_SQLQuery);
                             return dt;
                         }
-
-
-
-
-                        //if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
-                        //var _Command = new SqliteCommand(_SQLQuery, MyConnection);
-                        //if (!string.IsNullOrEmpty(_Filter)) { _Command.CommandText += $" WHERE {_Filter}"; }
-                        //if (!string.IsNullOrEmpty(_Sort)) { _Command.CommandText += $" ORDER BY {_Sort}"; }
-                        //var _Adapter = new SqliteDataAdapter(_Command);
-                        //var _DataSet = new DataSet();
-                        //_Adapter.Fill(_DataSet, (Guid.NewGuid()).ToString());
-                        //if (MyConnection.State == ConnectionState.Open) { MyConnection.Close(); }
-                        //if (_DataSet.Tables.Count == 1)
-                        //{
-                        //    return _DataSet.Tables[0];
-                        //}
                     }
                 return new DataTable();
             }
@@ -241,9 +225,8 @@ namespace AppliedDB
                     string TableName = _Table.ToString();
 
                     using var reader = _Command.ExecuteReader();
-                    var dt = new DataTable();
-                    dt.Load(reader);
-                    dt.TableName = TableName;
+                    var dt = GetDataTableExtention(reader);
+                    dt.TableName = _Table.ToString();
 
                     return dt;
                 }
@@ -271,12 +254,10 @@ namespace AppliedDB
                     string TableName = _Table.ToString();
                     string CommText = $"SELECT * FROM [{_Table}]";
 
-                    
-
                     using var _Command = new SqliteCommand(CommText, _Connection);
                     using var reader = _Command.ExecuteReader();
-                    var dt = new DataTable();
-                    dt.Load(reader);
+                    var dt = GetDataTableExtention(reader); // new DataTable();
+                    //dt.Load(reader);
                     dt.TableName = _Table;
                     return dt;
 
@@ -299,14 +280,11 @@ namespace AppliedDB
                 {
                     if (!string.IsNullOrEmpty(_SQLQuery))
                     {
-
                         if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
-                        //var _Query = SQLQuery.GetQuery(_SQLQuery);
                         var _Command = new SqliteCommand(_SQLQuery, _Connection);
-                        var loader = _Command.ExecuteReader();
-                        var dt = new DataTable();
-                        dt.Load(loader);
-
+                        using var reader = _Command.ExecuteReader();
+                        var dt = GetDataTableExtention(reader);
+                        dt.TableName = ExtractTableNameFromQuery(_SQLQuery);
                         return dt;
                     }
                 }
@@ -336,9 +314,9 @@ namespace AppliedDB
                     connection.Open();
 
                 using var reader = command.ExecuteReader();
-                var dt = new DataTable();
-                dt.Load(reader);
+                var dt = GetDataTableExtention(reader);
 
+                dt.TableName = table.ToString();
                 return dt;
             }
             catch
@@ -452,14 +430,13 @@ namespace AppliedDB
             // _ID     => ID primary key for search record
             // _column => Column Name for search value
 
-            var TableList = GetTable(_Table).AsEnumerable().ToList().Where(rows => rows.Field<long>("ID") == _ID).SingleOrDefault();
+            var _DataRow = GetTable(_Table).AsEnumerable().ToList().Where(rows => rows.Field<long>("ID") == _ID).SingleOrDefault();
 
-            if (TableList != null)
+            if(_DataRow != null)
             {
-                return TableList[_column];
-
+                return _DataRow.Field<object>(_column);
             }
-
+            
             return null;
 
         }
@@ -728,23 +705,11 @@ namespace AppliedDB
                     if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
                     using var _Command = new SqliteCommand(_CommandText, _Connection);
                     using var _reader = _Command.ExecuteReader();
-                    var dt = new DataTable();
-
-                    dt.Load(_reader);
-
+                    var schemaTable = _reader.GetSchemaTable();
+                    var dt = GetDataTableExtention(_reader);
+                    dt.TableName = _Table;
                     return dt;
 
-                    //SqliteDataAdapter _Adapter = new(_Command);
-                    //DataSet _DataSet = new();
-                    //_Adapter.Fill(_DataSet, TableName);
-                    //if (_Connection.State == ConnectionState.Open) { _Connection.Close(); }
-
-                    //if (_DataSet.Tables.Count == 1)
-                    //{
-                    //    _Command.Dispose();
-                    //    _Adapter.Dispose();
-                    //    return _DataSet.Tables[0];
-                    //}
                 }
             }
             catch (Exception)
@@ -769,14 +734,9 @@ namespace AppliedDB
                 if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
                 using var _Command = new SqliteCommand(_CommandText, _Connection);
                 using var _reader = _Command.ExecuteReader();
-                var schemaTable = _reader.GetSchemaTable();
-                
-                var dt = new DataTable();
-
-                dt.Load(_reader);
+                var dt = GetDataTableExtention(_reader);
                 dt.TableName = _TableName;
                 return dt;
-
             }
             return null;
         }
@@ -798,16 +758,13 @@ namespace AppliedDB
                     if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
                     using var _Command = new SqliteCommand(_CommandText, _Connection);
                     using var _reader = _Command.ExecuteReader();
-                    var dt = new DataTable();
-                    dt.Load(_reader);
+                    var dt = GetDataTableExtention(_reader);
 
                     foreach (DataRow Row in dt.Rows)
                     {
                         Dictionary<long, string> _item = new() { { (int)Row.Field<long>("ID"), (string)Row["Title"] } };
                         _List.Add(_item);
                     }
-
-
                     return _List;
                 }
                 else
@@ -1124,7 +1081,88 @@ namespace AppliedDB
             var result = Convert.ToInt32(command.ExecuteScalar()); MyConnection.Close();
             return result;
         }
+
+        #region Data Table Extention
+        public static DataTable GetDataTableExtention(SqliteDataReader _reader)
+        {
+            var schemaTable = _reader.GetSchemaTable();
+            var dt = new DataTable();
+
+            if (schemaTable != null)
+            {
+                foreach (DataRow row in schemaTable.Rows)
+                {
+                    string _ColumnName = row["ColumnName"].ToString() ?? string.Empty;
+                    Type _DataType = (Type)row["DataType"];
+                    string _TypeName = (string)row["DataTypeName"];
+
+                    if (_TypeName.ToUpper() == "INT") { _DataType = typeof(int); }
+                    if (_TypeName.ToUpper() == "DECIMAL") { _DataType = typeof(decimal); }
+                    if (_TypeName.ToUpper() == "DATETIME") { _DataType = typeof(DateTime); }
+                    if (_TypeName.ToUpper() == "NVARCHAR") { _DataType = typeof(string); }
+                    if (_ColumnName.ToUpper() == "ID") { _DataType = typeof(long); }
+
+                    dt.Columns.Add(_ColumnName, _DataType);
+                }
+
+                var _Stop = true;
+
+                while (_reader.Read())
+                {
+                    DataRow newRow = dt.NewRow();
+
+                    for (int i = 0; i < _reader.FieldCount; i++)
+                    {
+                        string columnName = _reader.GetName(i);
+                        Type columnType = dt.Columns[columnName].DataType;
+
+                        if (_reader.IsDBNull(i)) { newRow[columnName] = DBNull.Value; }
+                        else { newRow[columnName] = _reader.GetValue(i); }
+
+
+                    }
+                    dt.Rows.Add(newRow);
+
+                }
+            }
+
+            return dt;
+        }
+
+        private static string ExtractTableNameFromQuery(string sqlQuery)
+        {
+            if (string.IsNullOrWhiteSpace(sqlQuery))
+                return "UnknownTable";
+
+            // Normalize the query
+            var query = sqlQuery.Trim();
+
+            // Check if it's a SELECT query
+            if (query.StartsWith("SELECT", StringComparison.OrdinalIgnoreCase))
+            {
+                // Find the FROM clause
+                var fromIndex = query.IndexOf(" FROM ", StringComparison.OrdinalIgnoreCase);
+                if (fromIndex > 0)
+                {
+                    var fromPart = query.Substring(fromIndex + 6); // Skip " FROM "
+
+                    // Find the next keyword (WHERE, ORDER BY, GROUP BY, etc.)
+                    var endIndex = fromPart.IndexOfAny(new[] { ' ', '\t', '\n', '\r', ';' });
+                    if (endIndex > 0)
+                    {
+                        return fromPart.Substring(0, endIndex).Trim();
+                    }
+                    return fromPart.Trim().Split(' ')[0].Trim();
+                }
+            }
+            return "QueryResult";
+        }
     }
+
+
+    #endregion
+
+
 
     public class CodeTitle
     {

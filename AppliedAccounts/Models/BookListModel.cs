@@ -47,7 +47,14 @@ namespace AppliedAccounts.Models
             {
                 if (_BookID == 0) { BookID = 1; } else { BookID = _BookID; }
                 var result = Source?.SeekValue(Enums.Tables.COA, BookID, "Nature") ?? 0;
-                BookNatureID = (long)result;
+                if (result.GetType() == typeof(DBNull)) { BookNatureID = 1; }        // Use Dafault ID
+                if (result.GetType() == typeof(long)) { BookNatureID = (long)result; }        // Use Dafault ID
+                if (result.GetType() != typeof(long))
+                {
+                    long.TryParse(result.ToString(), out long _Value);
+                    BookNatureID = _Value;
+                }       
+
                 BookID = _BookID;
 
                 NatureAccountsList =
@@ -163,7 +170,7 @@ namespace AppliedAccounts.Models
                     _List.Add(_Record);
                 }
 
-                
+
                 Pages.Refresh(TotalRecord);
 
                 return _List;

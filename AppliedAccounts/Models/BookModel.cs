@@ -88,8 +88,14 @@ namespace AppliedAccounts.Models
                     Projects = Source.GetProjects();
                     Accounts = Source.GetAccounts();
 
+                    BookNature = 1;         // Default value;
+
                     var result = Source.SeekValue(Tables.COA, BookID, "Nature") ?? 0;
-                    BookNature = (long)result;
+                    if(result.GetType() != typeof(long))
+                    {
+                        long.TryParse(result.ToString(), out long val);
+                        BookNature = val;
+                    }
                     if (BookNature > 0)
                     { BookList = Source.GetBookAccounts(BookNature); }
 
