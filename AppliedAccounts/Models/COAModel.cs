@@ -57,7 +57,7 @@ namespace AppliedAccounts.Models
             _Row = AppliedDB.Functions.RemoveNull(_Row);
             COARecord _Record = new();
             {
-                _Record.ID = (int)_Row["ID"];
+                _Record.ID = (long)_Row["ID"];
                 _Record.Code = (string)_Row["Code"];
                 _Record.Title = (string)_Row["Title"];
                 _Record.Class = (int)_Row["Class"];
@@ -175,12 +175,9 @@ namespace AppliedAccounts.Models
             if (Validate(_NewRow))
             {
                 Source!.Save(_NewRow);
-                return true;
-
-                //var _Commands = new CommandClass(_NewRow, DBFile);
-                //return _Commands.SaveChanges();
+                MsgClass = Source.MyCommands.MyMessages;
+                return Source.IsSaved;
             }
-
             return false;
         }
         #endregion
@@ -228,7 +225,7 @@ namespace AppliedAccounts.Models
             if (_Row["Class"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.AccClassZero); }
             if (_Row["Nature"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.AccNatureZero); }
             if (_Row["Notes"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.AccNotesZero); }
-            if (_Row["Code"].ToString()?.Length != 6) { _Validated = false; MsgClass.Add(MESSAGES.CodeLength6); }
+            if (_Row["Code"].ToString()?.Length < 6) { _Validated = false; MsgClass.Add(MESSAGES.CodeLength6); }
 
 
             return _Validated;

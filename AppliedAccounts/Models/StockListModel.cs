@@ -129,14 +129,9 @@ namespace AppliedAccounts.Models
         public bool Save()
         {
             var _Row = Record2Row();
-            var _Saved = Source.Save(Tables.Inventory, _Row);
-            if (!_Saved)
-            {
-                MsgClass = Source.MyCommands.MyMessages;
-            }
-            return _Saved;
-
-
+            Source.Save(_Row);
+            MsgClass = Source.MyCommands.MyMessages;
+            return Source.IsSaved;
         }
         #endregion
 

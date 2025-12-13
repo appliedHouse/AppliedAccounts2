@@ -5,9 +5,11 @@
 @using AppliedAccounts.Services
 
 @inject GlobalService AppGlobal
+@inject ToastService ToastService
 
 @code {
     private string[] BrowseList = { "Class", "Nature", "Notes" };
+    public string ToastCssClass { get; set; } = string.Empty;
 
 
     protected override void OnInitialized()
@@ -15,6 +17,9 @@
         MyModel = new(AppGlobal);
         IsPageValid = GetPageIsValid();
     }
+
+
+
 }
 
 <PageHeading Text="Chart of Accounts" />
@@ -87,7 +92,7 @@
                         <div class="container mt-2 mb-2">
                             <div class="row">
                                 <div class="col">
-                                    <button type="button" class="btn btn-Save" @onclick="()=>MyModel.Save()">Save</button>
+                                    <button type="button" class="btn btn-Save" @onclick="()=>Save()">Save</button>
                                     <button type="button" class="btn btn-New" @onclick="()=>MyModel.Add()">New</button>
                                     <button type="button" class="btn btn-Back" @onclick="Back">Back</button>
                                 </div>
@@ -157,6 +162,15 @@
             </table>
         </div>
     </EditForm>
+
+    <!-- Toast -->
+        <div class="toast-container position-fixed @ToastService.Toasters.GetPosition()">
+            @if (ToastService.Toasters.ShowToast)
+            {
+                <ShowToastMessage toastClass="@ToastService.Toasters"></ShowToastMessage>
+            }
+        </div>
+
 }
 else
 {

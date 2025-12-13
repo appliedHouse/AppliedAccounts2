@@ -17,6 +17,7 @@ namespace AppliedDB
         public CommandClass MyCommands { get; set; } = new();
         public string DBFile => GetDataFile();
         public string ErrorMessage { get; set; }
+        public bool IsSaved { get; set; } = false;
 
 
         #region Constructor
@@ -1002,10 +1003,17 @@ namespace AppliedDB
         #region Save
         public void Save(DataRow newRow)
         {
+            IsSaved = false;
             MyCommands = new(newRow, MyConnection);
-            MyCommands.SaveChanges();
+            var result = MyCommands.SaveChanges();
+            if(result)
+            {
+                IsSaved = true; 
+            }
         }
 
+
+        // Depreciated....... NOT IN USE... 14-Dec-2025.
         public bool Save(Tables _Table, DataRow newRow)
         {
             MyCommands = new(newRow, MyConnection);

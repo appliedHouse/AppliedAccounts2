@@ -41,7 +41,7 @@ namespace AppliedAccounts.Pages.Accounts
         public void Start()
         {
             MsgClass = new();
-            MyToastClass = new();
+            //MyToastClass = new();
             MyModel = new(ID, BookID, AppGlobal); ;
             //MyModel.AppGlobal = AppGlobal;
             MyModel.ReportService = ReportService;

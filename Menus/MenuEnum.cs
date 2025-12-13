@@ -4,13 +4,13 @@
     {
         public enum Menus
         {
-            Home = 0,
-            Accounts = 1,
-            Sale = 2,
-            Stock = 3,
-            HR = 4,
-            Admin = 5,
-            Logout = 6
+            Home = 1,
+            Accounts = 2,
+            Sale = 3,
+            Stock = 4,
+            HR = 5,
+            Admin = 6,
+            Logout = 7
         }
     }
 }

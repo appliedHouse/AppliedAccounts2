@@ -11,20 +11,15 @@ namespace AppliedDB
 
         public static SqliteCommand? Insert(DataRow CurrentRow, SqliteConnection DBConnection)
         {
-            if (CurrentRow.Field<long>("ID") == 0) 
+            if (CurrentRow.Field<long>("ID") == 0)
             {
                 DataColumnCollection _Columns = CurrentRow.Table.Columns;
-                
+
                 StringBuilder _CommandString = new();
                 string _LastColumn = _Columns[_Columns.Count - 1].ColumnName.ToString();
                 string _TableName = CurrentRow.Table.TableName;
                 string _ParameterName;
-
-                if(_TableName == "")
-                {
-                    return null;
-                }
-
+                if (_TableName == "") { return null; }
                 _CommandString.Append("INSERT INTO [");
                 _CommandString.Append(_TableName);
                 _CommandString.Append("] VALUES (");
@@ -67,10 +62,8 @@ namespace AppliedDB
         {
             if (CurrentRow.Field<long>("ID") != 0)
             {
-
                 var _TableName = CurrentRow.Table.TableName;
                 var _Columns = CurrentRow.Table.Columns;
-                //var _Command = new SqliteCommand(DBConnection);
                 var _CommandString = new StringBuilder();
                 var _LastColumn = _Columns[_Columns.Count - 1].ColumnName.ToString();
 
@@ -121,11 +114,8 @@ namespace AppliedDB
             if (CurrentRow.Field<long>("ID") != 0)
             {
                 var _TableName = CurrentRow.Table.TableName;
-                if(_TableName == "")
-                {
-                    return null;
-                }
-                var _Command = new SqliteCommand("",DBConnection);
+                if (_TableName == "") { return null; }
+                var _Command = new SqliteCommand("", DBConnection);
                 _Command.Parameters.AddWithValue("@ID", CurrentRow["ID"]);
                 _Command.CommandText = $"DELETE FROM [{_TableName}] WHERE ID=@ID";
                 return _Command;
@@ -141,7 +131,7 @@ namespace AppliedDB
                 var _Connection = Connections.GetClientConnection(DBFile);
                 using var _Command = new SqliteCommand("", _Connection);
 
-                if(_TableName == "")
+                if (_TableName == "")
                 {
                     return null;
                 }
@@ -232,18 +222,19 @@ namespace AppliedDB
                         Effected = CommandInsert.ExecuteNonQuery();
                         CommandInsert.Connection.Close();
                         PrimaryKeyID = (long)CommandInsert.Parameters["@ID"].Value;
-                    }
-                    catch (Exception)
-                    {
-                        MyMessages.Danger(Messages.RowNotInserted); result = false;
-                    }
 
+                        if (Effected == 0) { MyMessages.Alert(Messages.NotSave); result = false; }
+                        if (Effected > 0) { MyMessages.Add(Messages.Save); result = true; }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        MyMessages.Danger(ex.Message); result = false;
+                    }
                 }
             }
 
-            if (Effected == 0) { MyMessages.Alert(Messages.NotSave); result = false; }
-            if (Effected > 0) { MyMessages.Add(Messages.Save); result = true; }
-
+            
             return result;
         }
 

@@ -49,6 +49,19 @@ namespace AppMessages
         }
         #endregion
 
+        #region Success
+        public void Success(string _Text)
+        {
+            MessageList.Add(GetMessage(_Text, Class.Success));
+        }
+
+        public void Success(Messages _Code)
+        {
+            MessageList.Add(GetMessage(_Code, Class.Success));
+        }
+        #endregion
+
+
         #region Error
         public void Error(string _Text)
         {
