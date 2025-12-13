@@ -1,17 +1,17 @@
 ﻿using AppliedDB;
 using AppliedGlobals;
 using System.Data;
-using System.Data.SQLite;
 using System.Text;
 using static AppliedDB.Enums;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
+using Microsoft.Data.Sqlite;
 
 namespace AppliedAccounts.Data
 {
     public class CreateDatabase
     {
         public Connections ConnectionClass { get; set; }
-        public SQLiteConnection MyConnection { get; set; }
+        public SqliteConnection MyConnection { get; set; }
         public List<DataRow> TableList { get; set; }
         public AppValues.AppPath AppPaths { get; set; }
         public AppUserModel UserModel { get; set; }
@@ -27,7 +27,7 @@ namespace AppliedAccounts.Data
             MyMessages = new List<string>();
             ConnectionClass = new(AppPaths);
 
-            MyConnection = ConnectionClass.GetSQLiteUsers() ?? new();
+            MyConnection = ConnectionClass.GetSqliteUsers() ?? new();
 
             if (!string.IsNullOrEmpty(MyConnection.ConnectionString))
             {
@@ -42,7 +42,7 @@ namespace AppliedAccounts.Data
             {
                 var tableNames = new List<string>();
                 if (MyConnection.State != System.Data.ConnectionState.Open) { MyConnection.Open(); }
-                var CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';";
+                var CommandText = "SELECT name FROM Sqlite_master WHERE type='table' AND name NOT LIKE 'Sqlite_%';";
                 var _Table = AppliedDB.DataSource.GetQueryTable(CommandText, MyConnection);
                 TableList = _Table.AsEnumerable().ToList();
             }
@@ -53,7 +53,7 @@ namespace AppliedAccounts.Data
 
         public void CreateTables()
         {
-            var _SQLQuery = $"SELECT name FROM sqlite_master WHERE type in('table', 'view') ORDER BY 1";
+            var _SQLQuery = $"SELECT name FROM Sqlite_master WHERE type in('table', 'view') ORDER BY 1";
             var _TableView = DataSource.GetDataTable(DBFile, _SQLQuery).AsDataView();
             var _TablesList = Enum.GetValues(typeof(Tables)).Cast<Tables>().ToList();
 
@@ -73,14 +73,14 @@ namespace AppliedAccounts.Data
         public void CreateTable(Tables _Table)
         {
             var _TableName = _Table.ToString();
-            var _Command = new SQLiteCommand();
+            var _Command = new SqliteCommand();
             var _CommandText = string.Empty;
 
             #region return if table exist
             if (string.IsNullOrEmpty(MyConnection.ConnectionString))
             {
-                _CommandText = $"SELECT count(name) FROM sqlite_master WHERE type in('table', 'view') AND name ='{_TableName}'";
-                _Command = new SQLiteCommand(_CommandText, MyConnection);
+                _CommandText = $"SELECT count(name) FROM Sqlite_master WHERE type in('table', 'view') AND name ='{_TableName}'";
+                _Command = new SqliteCommand(_CommandText, MyConnection);
                 if (!MyConnection.State.Equals(ConnectionState.Open)) { MyConnection.Open(); }
                 long TableExist = (long)_Command.ExecuteScalar();
                 if (TableExist > 0) { return; }
@@ -430,7 +430,7 @@ namespace AppliedAccounts.Data
         public string DirectoriesINSERT()
         {
             //DataTableClass _TableClass = new DataTableClass(UserName, Tables.Directories);
-            //SQLiteCommand _Command = new(ConnectionClass.AppConnection(UserName));
+            //SqliteCommand _Command = new(ConnectionClass.AppConnection(UserName));
             //string[] Queries = new string[4];
 
             //Queries[0] = "INSERT INTO [Directories] VALUES (1, 'CompanyStatus', 1, 'Customer')";

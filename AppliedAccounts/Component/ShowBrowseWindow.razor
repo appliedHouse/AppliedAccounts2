@@ -5,9 +5,9 @@
 
 @code {
     [Parameter] public string Id { get; set; } = "ddBrowse";
-    [Parameter] public int Value { get; set; }
+    [Parameter] public long Value { get; set; }
     [Parameter] public string Title { get; set; } = "Browse";
-    [Parameter] public EventCallback<int> ValueChanged { get; set; }
+    [Parameter] public EventCallback<long> ValueChanged { get; set; }
     [Parameter] public List<CodeTitle>? BrowseList { get; set; }
 
     private string SearchText { get; set; } = string.Empty;
@@ -22,10 +22,10 @@
         return Task.CompletedTask;
     }
 
-    private async Task SelectItem(int id)
+    private async Task SelectItem(long id)
     {
         Value = id;
-        await ValueChanged.InvokeAsync(id);
+        await ValueChanged.InvokeAsync((int)id);
     }
 }
 
@@ -35,7 +35,7 @@
     <!-- Dropdown -->
     <InputSelect id="@Id"
                  class="form-control item-height flex-grow-1"
-                 TValue="int"
+                 TValue="long"
                  @bind-Value="Value">
         @if (BrowseList?.Any() == true)
         {

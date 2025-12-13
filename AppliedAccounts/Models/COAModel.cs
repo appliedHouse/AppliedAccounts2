@@ -71,7 +71,7 @@ namespace AppliedAccounts.Models
             return _Record;
         }
 
-        public COARecord GetRecord(int _ID)
+        public COARecord GetRecord(long _ID)
         {
             var _Record = new COARecord();
 
@@ -137,7 +137,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Delete
-        public bool Delete(int _ID)
+        public bool Delete(long _ID)
         {
             //MyMessages = MessageClass.Messages;
             var _DeleteRow = DataSource.GetNewRow(DBFile, Tables.COA);
@@ -193,7 +193,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Edit
-        public void Edit(int _ID)
+        public void Edit(long _ID)
         {
             Record = GetRecord(_ID);
         }
@@ -241,12 +241,12 @@ namespace AppliedAccounts.Models
 
     public class COARecord
     {
-        public int ID { get; set; } = 0;
+        public long ID { get; set; } = 0;
         public string Code { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
-        public int Class { get; set; } = 0;
-        public int Nature { get; set; } = 0;
-        public int Notes { get; set; } = 0;
+        public long Class { get; set; } = 0;
+        public long Nature { get; set; } = 0;
+        public long Notes { get; set; } = 0;
         public decimal OBal { get; set; } = 0.00M;
 
         public virtual string? TitleClass { get; set; }

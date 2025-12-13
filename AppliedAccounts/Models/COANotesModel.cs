@@ -69,7 +69,7 @@ namespace AppliedAccounts.Models
             }
             return _Record;
         }
-        public COANotesRecord GetRecord(int _ID)
+        public COANotesRecord GetRecord(long _ID)
         {
             var _Record = new COANotesRecord();
 
@@ -116,21 +116,21 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Edit
-        public void Edit(int _ID)
+        public void Edit(long _ID)
         {
             GetRecord(_ID);
         }
         #endregion
 
         #region Delete
-        public bool Delete(int _ID)
+        public bool Delete(long _ID)
         {
             GetRecord(_ID);
             IsDeleted = true;
             return true;
         }
 
-        public bool DeleteRow(int _ID)
+        public bool DeleteRow(long _ID)
         {
             GetRecord(_ID);
             IsDeleted = false;

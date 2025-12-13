@@ -67,7 +67,7 @@
             Sale_TaxRateNotMatch = 121,
 
 
-            // SQLite Commands
+            // Sqlite Commands
             cmd_InsertNull = 44,
             cmd_UpdateNull = 45,
             cmd_DeleteNull = 46,

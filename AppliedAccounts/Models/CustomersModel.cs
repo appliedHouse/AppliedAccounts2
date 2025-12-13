@@ -58,7 +58,7 @@ namespace AppliedAccounts.Models
             _Row = AppliedDB.Functions.RemoveNull(_Row);
             CustomerRecord _Record = new();
             {
-                _Record.ID = (int)_Row["ID"];
+                _Record.ID = (int)_Row.Field<long>("ID");
                 _Record.Code = (string)_Row["Code"];
                 _Record.Title = (string)_Row["Title"];
                 _Record.Address1 = (string)_Row["Address1"];
@@ -76,7 +76,7 @@ namespace AppliedAccounts.Models
             return _Record;
         }
 
-        public CustomerRecord GetRecord(int _ID)
+        public CustomerRecord GetRecord(long _ID)
         {
 
             foreach (CustomerRecord _Record in Records)
@@ -92,33 +92,40 @@ namespace AppliedAccounts.Models
 
         private DataRow GetDataRow(CustomerRecord _Record)
         {
-            DataRow _DataRow = MyDataRow!.Table.NewRow();
-            if (MyDataRow is not null)
+            try
             {
-                //_DataRow = MyDataRow.Table.NewRow();
-                _DataRow["Id"] = _Record.ID;
-                _DataRow["Code"] = _Record.Code;
-                _DataRow["Title"] = _Record.Title;
-                _DataRow["Address1"] = _Record.Address1;
-                _DataRow["Address2"] = _Record.Address2;
-                _DataRow["Address3"] = _Record.Address3;
-                _DataRow["City"] = _Record.City;
-                _DataRow["State"] = _Record.State;
-                _DataRow["Country"] = _Record.Country;
-                _DataRow["Phone"] = _Record.Phone;
-                _DataRow["Mobile"] = _Record.Mobile;
-                _DataRow["Email"] = _Record.Email;
-                _DataRow["NTN"] = _Record.NTN;
-                _DataRow["CNIC"] = _Record.CNIC;
-                _DataRow["Notes"] = _Record.Notes;
-               
-               
+                DataRow _DataRow = MyDataRow!.Table.NewRow();
+                if (MyDataRow is not null)
+                {
+                    //_DataRow = MyDataRow.Table.NewRow();
+                    _DataRow["Id"] = _Record.ID;
+                    _DataRow["Code"] = _Record.Code;
+                    _DataRow["Title"] = _Record.Title;
+                    _DataRow["Address1"] = _Record.Address1;
+                    _DataRow["Address2"] = _Record.Address2;
+                    _DataRow["Address3"] = _Record.Address3;
+                    _DataRow["City"] = _Record.City;
+                    _DataRow["State"] = _Record.State;
+                    _DataRow["Country"] = _Record.Country;
+                    _DataRow["Phone"] = _Record.Phone;
+                    _DataRow["Mobile"] = _Record.Mobile;
+                    _DataRow["Email"] = _Record.Email;
+                    _DataRow["NTN"] = _Record.NTN;
+                    _DataRow["CNIC"] = _Record.CNIC;
+                    _DataRow["Notes"] = _Record.Notes;
+                }
+                else
+                {
+                    MsgClass.Alert(AppMessages.Enums.Messages.RecordNotSaved);
+                }
+                return _DataRow;
             }
-            else
+            catch (Exception ex)
             {
-                MsgClass.Alert(AppMessages.Enums.Messages.RecordNotSaved);
+                MsgClass.Alert(ex.Message);
             }
-            return _DataRow;
+            return null;
+            
         }
         #endregion
 
@@ -151,7 +158,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Delete
-        public bool Delete(int _ID)
+        public bool Delete(long _ID)
         {
             //MyMessages = MessageClass.Messages;
             MyDataRow = Source!.Seek(Tables.Customers, _ID);
@@ -215,7 +222,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Edit
-        public void Edit(int _ID)
+        public void Edit(long _ID)
         {
             GetRecord(_ID);
         }

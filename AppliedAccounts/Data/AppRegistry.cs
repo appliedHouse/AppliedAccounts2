@@ -101,17 +101,27 @@ namespace AppliedAccounts.Data
         }
         public static int GetNumber(string DataFile, string Key)
         {
-            if (DataFile == null || DataFile == string.Empty) { return 0; }
-            DataView VW_Registry = GetRegistryView(DataFile);
-            VW_Registry.RowFilter = string.Concat("Code='", Key, "'");
-            if (VW_Registry.Count == 1)
+            try
             {
-                return (int)VW_Registry[0]["nValue"];
+                if (DataFile == null || DataFile == string.Empty) { return 0; }
+                DataView VW_Registry = GetRegistryView(DataFile);
+                VW_Registry.RowFilter = string.Concat("Code='", Key, "'");
+                if (VW_Registry.Count == 1)
+                {
+                    return (int)VW_Registry[0]["nValue"];
+                }
+                else
+                {
+                    return 0;
+                }
             }
-            else
+            catch (Exception)
             {
+
                 return 0;
             }
+
+            
         }
         public static decimal GetCurrency(string DataFile, string Key)
         {

@@ -10,13 +10,13 @@ namespace AppliedAccounts.Models
     {
 
         #region Variables
-        public int ID { get; set; }
+        public long ID { get; set; }
         public string SheetNo { get; set; } = string.Empty;
         public DateTime SheetDate { get; set; }
-        public int Company { get; set; }
-        public int Project { get; set; }
-        public int Employee { get; set; }
-        public int StockID { get; set; }
+        public long Company { get; set; }
+        public long Project { get; set; }
+        public long Employee { get; set; }
+        public long StockID { get; set; }
         public decimal Qty { get; set; } = 0;
         public decimal Rate { get; set; } = 0;
         public decimal TaxID { get; set; } = 0;
@@ -49,7 +49,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Get Row
-        private DataRow GetDataRow(int _Index)
+        private DataRow GetDataRow(long _Index)
         {
             FoundRow = false;
             DataRow _CurrentRow;
@@ -59,7 +59,7 @@ namespace AppliedAccounts.Models
                 if (TB_RevSheet.Rows.Count == 1)
                 {
                     FoundRow = true;
-                    _CurrentRow = TB_RevSheet.Rows[_Index];
+                    _CurrentRow = TB_RevSheet.Rows[(int)_Index];
                 }
                 else
                 {
@@ -104,12 +104,12 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Row -> Variables
-        public void GetVariables(int _ID)
+        public void GetVariables(long _ID)
         {
             CurrentRow = GetDataRow(_ID);
             if (FoundRow)
             {
-                ID = (int)CurrentRow["ID"];
+                ID = (long)CurrentRow["ID"];
                 SheetNo = (string)CurrentRow["SheetNo"];
                 SheetDate = (DateTime)CurrentRow["SheetDate"];
                 Company = (int)CurrentRow["Company"];
@@ -152,7 +152,7 @@ namespace AppliedAccounts.Models
             {
                 if (CurrentRow != null)
                 {
-                    if ((int)CurrentRow["ID"] == 0)
+                    if ((long)CurrentRow["ID"] == 0)
                     {
                         if (Validated(SQLType.Insert))
                         {
@@ -163,7 +163,7 @@ namespace AppliedAccounts.Models
                         }
                     }
 
-                    if ((int)CurrentRow["ID"] > 0)
+                    if ((long)CurrentRow["ID"] > 0)
                     {
                         if (Validated(SQLType.Update))
                         {

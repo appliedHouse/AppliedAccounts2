@@ -1,6 +1,6 @@
 ﻿using AppliedGlobals;
 using System.Data;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 
 namespace AppliedDB
 {
@@ -60,18 +60,13 @@ namespace AppliedDB
             var _Connection = Connections.GetUsersConnection();
             if (_Connection is not null)
             {
-
-                _Connection.Open();
-                SQLiteCommand _Command = new(_CommandText, _Connection);
-                SQLiteDataAdapter _Adapter = new(_Command);
-                DataSet _DataSet = new();
-                _Adapter.Fill(_DataSet, "Users");
-                _Connection.Close();
-
-                if (_DataSet.Tables.Count == 1)
-                {
-                    return _DataSet.Tables[0].Rows[0];
-                }
+                using var _Command = new SqliteCommand(_CommandText, _Connection);
+                using var _reader = _Command.ExecuteReader();
+                var dt = new DataTable();
+                var ds = new DataSet();
+                dt.Load(_reader);
+                
+                return dt.Rows.Count > 0 ? RemoveNulls(dt.Rows[0]) : GetEmptyRow();
             }
             return GetEmptyRow();
         }

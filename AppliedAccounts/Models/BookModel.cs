@@ -14,9 +14,9 @@ namespace AppliedAccounts.Models
     {
 
         #region Variables
-        public int VoucherID { get; set; }
-        public int BookID { get; set; }
-        public int BookNature { get; set; }
+        public long VoucherID { get; set; }
+        public long BookID { get; set; }
+        public long BookNature { get; set; }
         public string BookNatureTitle { get; set; }
 
         public Voucher MyVoucher { get; set; }
@@ -55,7 +55,7 @@ namespace AppliedAccounts.Models
         {
 
         }
-        public BookModel(int _VoucherID, int _BookID, GlobalService _AppGlobal)
+        public BookModel(long _VoucherID, long _BookID, GlobalService _AppGlobal)
         {
             AppGlobal = _AppGlobal;
             MsgClass = new();
@@ -89,7 +89,7 @@ namespace AppliedAccounts.Models
                     Accounts = Source.GetAccounts();
 
                     var result = Source.SeekValue(Tables.COA, BookID, "Nature") ?? 0;
-                    BookNature = (int)result;
+                    BookNature = (long)result;
                     if (BookNature > 0)
                     { BookList = Source.GetBookAccounts(BookNature); }
 
@@ -99,14 +99,14 @@ namespace AppliedAccounts.Models
                 }
                 else
                 {
-                    MsgClass.Add(MESSAGE.UserProfileIsNull);
+                    MsgClass.Alert(MESSAGE.UserProfileIsNull);
                 }
 
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MsgClass.Add(MESSAGE.Default);
+                MsgClass.Danger(ex.Message);
 
 
             }
@@ -184,8 +184,6 @@ namespace AppliedAccounts.Models
         #region New Voucher
         private Voucher NewVoucher()
         {
-
-
             Voucher _NewVoucher = new();
             _NewVoucher.Master.ID1 = 0;
             _NewVoucher.Master.Vou_No = "New";
@@ -198,10 +196,6 @@ namespace AppliedAccounts.Models
             _NewVoucher.Master.Status = "Submitted";
 
             _NewVoucher.Detail = NewDetail();
-
-
-
-
             return _NewVoucher;
         }
 
@@ -210,7 +204,6 @@ namespace AppliedAccounts.Models
         {
             int _MaxSrNo = 1;
             if (MyVoucher.Details.Count > 0) { _MaxSrNo = MyVoucher.Details.Max(e => e.Sr_No) + 1; }
-
 
             var _Detail = new Detail();
             {
@@ -504,6 +497,11 @@ namespace AppliedAccounts.Models
             ReportService.Model.AddReportParameter("CurrencySign", "SAR");
             ReportService.Model.AddReportParameter("ShowImages", true.ToString());
         }
+
+        public void Edit(long _ID2)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
         #region Models
@@ -527,10 +525,10 @@ namespace AppliedAccounts.Models
         public class Master
         {
             public Master() { }
-            public int ID1 { get; set; }
+            public long ID1 { get; set; }
             public string Vou_No { get; set; }
             public DateTime Vou_Date { get; set; }
-            public int BookID { get; set; }
+            public long BookID { get; set; }
             public decimal Amount { get; set; }
             public string Ref_No { get; set; }
             public string SheetNo { get; set; }
@@ -543,13 +541,13 @@ namespace AppliedAccounts.Models
         public class Detail
         {
             public Detail() { }
-            public int ID2 { get; set; }
-            public int TranID { get; set; }
+            public long ID2 { get; set; }
+            public long TranID { get; set; }
             public int Sr_No { get; set; }
-            public int COA { get; set; }
-            public int Company { get; set; }
-            public int Employee { get; set; }
-            public int Project { get; set; }
+            public long COA { get; set; }
+            public long Company { get; set; }
+            public long Employee { get; set; }
+            public long Project { get; set; }
             public decimal DR { get; set; }
             public decimal CR { get; set; }
             public string Description { get; set; }

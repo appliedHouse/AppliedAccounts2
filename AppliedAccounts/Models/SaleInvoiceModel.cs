@@ -18,7 +18,7 @@ namespace AppliedAccounts.Models
     public class SaleInvoiceModel : IVoucher
     {
         #region Variables
-        public int SaleInvoiceID { get; set; }
+        public long SaleInvoiceID { get; set; }
         public DataSource Source { get; set; }
         public Voucher MyVoucher { get; set; } = new();
         public List<Detail> Deleted { get; set; } = new();
@@ -56,7 +56,7 @@ namespace AppliedAccounts.Models
             Source = new DataSource(AppGlobal.AppPaths);
         }
 
-        public SaleInvoiceModel(GlobalService _AppGlobal, int _SaleInvoiceID)
+        public SaleInvoiceModel(GlobalService _AppGlobal, long _SaleInvoiceID)
         {
             AppGlobal = _AppGlobal;
             SaleInvoiceID = _SaleInvoiceID;
@@ -67,7 +67,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Start
-        public void Start(int _SaleInvoiceID)
+        public void Start(long _SaleInvoiceID)
         {
             try
             {
@@ -285,7 +285,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Edit and New Voucher
-        public void Edit(int _ID2)
+        public void Edit(long _ID2)
         {
             var _Detail = MyVoucher.Detail;
             MyVoucher.Detail = MyVoucher.Details.Where(e => e.ID2 == _ID2).First() ?? _Detail;
@@ -663,11 +663,11 @@ namespace AppliedAccounts.Models
         public class Master
         {
             public Master() { }
-            public int ID1 { get; set; }
+            public long ID1 { get; set; }
             public string Vou_No { get; set; } = string.Empty;
             public DateTime Vou_Date { get; set; }
-            public int Company { get; set; }
-            public int Employee { get; set; }
+            public long Company { get; set; }
+            public long Employee { get; set; }
             public string Ref_No { get; set; } = string.Empty;
             public string Inv_No { get; set; } = string.Empty;
             public DateTime Inv_Date { get; set; }
@@ -686,17 +686,17 @@ namespace AppliedAccounts.Models
         public class Detail
         {
             public Detail() { }
-            public int ID2 { get; set; }
-            public int TranID { get; set; }
+            public long ID2 { get; set; }
+            public long TranID { get; set; }
             public int Sr_No { get; set; }
-            public int Inventory { get; set; }
+            public long Inventory { get; set; }
             public string Batch { get; set; } = string.Empty;
             public decimal Qty { get; set; } = 0.00M;
             public decimal Rate { get; set; } = 0.00M;
-            public int TaxID { get; set; }
+            public long TaxID { get; set; }
             public decimal TaxRate { get; set; } = 0.00M;
             public string Description { get; set; } = string.Empty;
-            public int Project { get; set; }
+            public long Project { get; set; }
 
             // Non DataBase Variables
 
@@ -707,7 +707,7 @@ namespace AppliedAccounts.Models
             public string TitleInventory { get; set; } = string.Empty;
             public string TitleProject { get; set; } = string.Empty;
             public string TitleTaxID { get; set; } = string.Empty;
-            public int Unit { get; set; }                                       // Unit ID get from inventory
+            public long Unit { get; set; }                                       // Unit ID get from inventory
             public string TitleUnit { get; set; } = string.Empty;
             public string Action { get; set; } = string.Empty; // action like save, delete, update
 

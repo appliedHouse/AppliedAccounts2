@@ -40,7 +40,7 @@ namespace AppliedAccounts.Models.Interface
 
         #region New and Edit Record
 
-        void Edit(int _ID2);
+        void Edit(long _ID2);
         void New();
         #endregion
 

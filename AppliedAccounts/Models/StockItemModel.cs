@@ -7,25 +7,25 @@ namespace AppliedAccounts.Models
 {
     public class StockItemModel
     {
-        public int ID { get; set; }
+        public long ID { get; set; }
         public string Code { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
-        public int PackingQty { get; set; }
-        public int Packing { get; set; }
-        public int UOM { get; set; }
-        public int StockCategory { get; set; }
+        public long PackingQty { get; set; }
+        public long Packing { get; set; }
+        public long UOM { get; set; }
+        public long StockCategory { get; set; }
         public string Description { get; set; } = string.Empty;
 
         public virtual DataTable TB_Stock { get; set; } = new();
         public virtual DataRow CurrentRow { get; set; }
-        public virtual List<Dictionary<int, string>> ListPacking { get; set; } = new();
-        public virtual List<Dictionary<int, string>> ListUOM { get; set; } = new();
-        public virtual List<Dictionary<int, string>> ListCategories { get; set; } = new();
-        public virtual int SelectedPacking { get; set; } = 1;
+        public virtual List<Dictionary<long, string>> ListPacking { get; set; } = new();
+        public virtual List<Dictionary<long, string>> ListUOM { get; set; } = new();
+        public virtual List<Dictionary<long, string>> ListCategories { get; set; } = new();
+        public virtual long SelectedPacking { get; set; } = 1;
         public virtual string SelectedUOM { get; set; } = string.Empty;
         public virtual string SelectedCategory { get; set; } = string.Empty;
 
-        public virtual int StockID { get; set; }
+        public virtual long StockID { get; set; }
         public virtual string DataFile { get; set; } = string.Empty;
         public virtual AppMessages.MessageClass MsgClass { get; set; } = new();
 
@@ -58,7 +58,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Get Stock Data
-        public void GetStockData(int _StockID)
+        public void GetStockData(long _StockID)
         {
             if (TB_Stock == null) { return; }
 
@@ -67,7 +67,7 @@ namespace AppliedAccounts.Models
             if (TB_Stock.DefaultView.Count == 1)
             {
                 CurrentRow = TB_Stock.DefaultView[0].Row;
-                ID = (int)CurrentRow["ID"];
+                ID = (long)CurrentRow["ID"];
                 Code = (string)CurrentRow["Code"];
                 Title = (string)CurrentRow["Title"];
                 PackingQty = (int)CurrentRow["Qty_Packing"];

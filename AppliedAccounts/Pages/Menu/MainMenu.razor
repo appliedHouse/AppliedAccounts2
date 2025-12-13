@@ -16,7 +16,7 @@
         if (_SelectedMnu == null) { return; }
 
         #region Logout User
-        if (MenuID == (int)AppMenu.Logout)
+        if (MenuID == (int)MenuEnum.Menus.Logout)
         {
             var UserService = (UserAuthenticationStateProvider)AuthState;
             await UserService.UpdateAuthonticateState(null);

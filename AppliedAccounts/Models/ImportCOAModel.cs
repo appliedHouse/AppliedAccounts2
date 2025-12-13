@@ -4,7 +4,7 @@ using AppliedDB;
 using AppMessages;
 using System;
 using System.Data;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 
 namespace AppliedAccounts.Models
 {
@@ -42,7 +42,7 @@ namespace AppliedAccounts.Models
             string _Path = Connections.GetTempDBPath();                               // Temp DB Path
             string _File = Source.GetText(ExcelImportRegistry);                       // Imported DB File for COA
             string _ImportDBPath = Path.Combine(_Path, _File + ".db");                        // Connection string Path
-            SQLiteConnection _TempDBConnection = new($"Data Source={_ImportDBPath}");
+            SqliteConnection _TempDBConnection = new($"Data Source={_ImportDBPath}");
             ImportedData = [.. DataSource.GetDataTable(SelectedTable, _TempDBConnection).AsEnumerable()];
             //Pages = new(); Pages.Refresh(ImportedData.Count); // Refresh Page Model with Total Records
             //FilterData = [.. ImportedData.Skip(Pages.Current).Take(Pages.Size)]; // Copy Imported Data to Filter Data

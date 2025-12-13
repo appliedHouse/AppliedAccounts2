@@ -4,7 +4,7 @@
     {
         public string UserName { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
-        public string SQLiteFile { get; set; } = string.Empty;
+        public string SqliteFile { get; set; } = string.Empty;
         public string CompanyName { get; set; } = string.Empty;
         public string DisplayName { get; set; } = string.Empty;
         public string Designation { get; set; } = string.Empty;

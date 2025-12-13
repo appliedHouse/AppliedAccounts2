@@ -6,7 +6,7 @@ namespace AppliedDB
 {
     interface IGetDataRow
     {
-        DataRow? GetRow(int id);
+        DataRow? GetRow(long ID);
     }
 
 
@@ -28,7 +28,7 @@ namespace AppliedDB
             }
         }
 
-        public DataRow? GetRow(int id)
+        public DataRow? GetRow(long ID)
         {
             return _DataRow;
         }

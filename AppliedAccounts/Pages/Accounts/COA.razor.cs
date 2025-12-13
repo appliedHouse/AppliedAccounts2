@@ -33,7 +33,7 @@ namespace AppliedAccounts.Pages.Accounts
 
             //Model.Add();
         }
-        public async void Edit(int ID)
+        public async void Edit(long ID)
         {
             MyModel.Edit(ID);
             await AppGlobal.JS.InvokeVoidAsync("showAcordion", "accordionRecordDisplay");

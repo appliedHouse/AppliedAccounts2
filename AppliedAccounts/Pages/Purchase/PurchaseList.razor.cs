@@ -24,14 +24,14 @@ namespace AppliedAccounts.Pages.Purchase
         }
 
         #region Edit
-        public void Edit(int ID)
+        public void Edit(long _ID)
         {
-            AppGlobal.NavManager.NavigateTo($"/Purchase/Purchased/{ID}");
+            AppGlobal.NavManager.NavigateTo($"/Purchase/Purchased/{_ID}");
         }
         #endregion
 
         #region Delete
-        public async void Delete(int ID)
+        public async void Delete(long ID)
         {
 
             await Task.Delay(1000);
@@ -47,7 +47,7 @@ namespace AppliedAccounts.Pages.Purchase
             //StateHasChanged();
         }
 
-        public void SelectOne(int _ID)
+        public void SelectOne(long _ID)
         {
             var item = MyModel.Records.Where(a => a.ID1 == _ID).First();
             item.IsSelected = !item.IsSelected;
@@ -75,7 +75,7 @@ namespace AppliedAccounts.Pages.Purchase
             await InvokeAsync(StateHasChanged);
         }
 
-        public async Task Print(int ID)
+        public async Task Print(long ID)
         {
             //await InvokeAsync(StateHasChanged);
             MyModel.Record = MyModel.Records.Where(row => row.ID1 == ID).First();
@@ -90,7 +90,7 @@ namespace AppliedAccounts.Pages.Purchase
             await AppGlobal.JS.InvokeVoidAsync("downloadPDF", _FileName, ReportService.Model.ReportBytes);
 
         }
-        private ReportData GetReportData(int ID)
+        private ReportData GetReportData(long ID)
         {
             ReportData _Result = new();
             string _Query = ReportQuery.SaleInvoiceQuery($"[B2].[TranID]={ID}");
@@ -102,7 +102,7 @@ namespace AppliedAccounts.Pages.Purchase
             return _Result;
         }
 
-        private ReportModel CreateReportModel(int _ID)
+        private ReportModel CreateReportModel(long _ID)
         {
 
             ReportModel _Reportmodel = new();

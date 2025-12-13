@@ -19,8 +19,8 @@ namespace AppliedAccounts.Models
         public DataSource Source { get; set; }
         public List<DataRow> DataList { get; set; }
         public List<CodeTitle> PayerList { get; set; }
-        public int ReceiptID { get; set; }
-        public int PayerID { get; set; }
+        public long ReceiptID { get; set; }
+        public long PayerID { get; set; }
         public Tables Table { get; set; }
         public string SearchText { get; set; }
         public MessageClass MsgClass { get; set; }
@@ -163,7 +163,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Edit
-        public void Edit(int _ID)
+        public void Edit(long _ID)
         {
             SetKeys();
             AppGlobal.NavManager.NavigateTo($"/Accounts/Receipt/{ReceiptID}");

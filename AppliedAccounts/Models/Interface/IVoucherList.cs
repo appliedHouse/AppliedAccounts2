@@ -29,8 +29,8 @@ namespace AppliedAccounts.Models.Interface
         NavigationManager NavManager { get; set; }
 
         string GetFilterText(); //{ return string.Empty; }
-        void Print(int _ID);
-        void Edit(int _ID);
+        void Print(long _ID);
+        void Edit(long _ID);
 
         List<object> LoadData(); // { return []; }
     }

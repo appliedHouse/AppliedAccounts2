@@ -333,7 +333,7 @@ namespace AppliedDB
             return string.Empty;
         }
 
-        //public static string BookVoucher(int _ID)
+        //public static string BookVoucher(long _ID)
         //{
         //    if (_ID > 0)
         //    {

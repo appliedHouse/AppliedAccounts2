@@ -1,7 +1,8 @@
 ﻿using AppliedAccounts.Authentication;
 using AppliedDB;
+using Microsoft.Data.Sqlite;
 using System.Data;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 
 namespace AppliedAccounts.Pages.Users
 {
@@ -36,7 +37,7 @@ namespace AppliedAccounts.Pages.Users
                     _UserData.DisplayName = AppUser.Profile.DisplayName;
                     _UserData.Designation = AppUser.Profile.Designation;
                     _UserData.Email = AppUser.Profile.UserEmail;
-                    _UserData.SQLiteFile = AppUser.Profile.DataFile;
+                    _UserData.SqliteFile = AppUser.Profile.DataFile;
                     _UserData.CompanyName = AppUser.Profile.Company;
                     _UserData.PIN = "0000";
                     _UserData.SessionGuid = _newGUID;
@@ -63,73 +64,106 @@ namespace AppliedAccounts.Pages.Users
             IsLogin = true;
             return;
         }
-        private UserProfile GetUserProfile(AppliedGlobals.AppUserModel _UserModel)
+        private UserProfile GetUserProfile(AppliedGlobals.AppUserModel userModel)
         {
-            var _UserProfile = new UserProfile();
+            var userProfile = new UserProfile();
+
             try
             {
-                var _Profile = new AppliedGlobals.AppUserModel();
-                var _UserID = _UserModel.UserID;
-                if (_UserModel != null)
+                // Validate input
+                if (userModel == null)
                 {
-                    var UsersDBFile = Path.Combine(
-                        AppGlobal.AppPaths.FirstPath,
-                        AppGlobal.AppPaths.RootPath,
-                        AppGlobal.AppPaths.UsersPath, "AppliedUsers2.db");
-
-                    var _CommandText = $"SELECT * FROM [Users] WHERE [UserID] = '{_UserID}'";
-                    var _Connection = Connections.GetSQLiteConnection(UsersDBFile); _Connection?.Open();
-                    SQLiteCommand _Command = new(_CommandText, _Connection);
-                    SQLiteDataAdapter _Adapter = new(_Command);
-                    DataSet _DataSet = new();
-                    _Adapter.Fill(_DataSet, "Users");
-                    _Connection?.Close();
-
-                    if (_DataSet.Tables.Count == 1)
-                    {
-                        if (_DataSet.Tables[0].Rows.Count > 0)
-                        {
-                            var _UserData = _DataSet.Tables[0].Rows[0];
-                            if (_UserData != null)
-                            {
-                                _UserProfile.Profile = new()
-                                {
-                                    UserID = _UserData["UserID"].ToString() ?? "",
-                                    Password = _UserData["Password"].ToString() ?? "",
-                                    DisplayName = _UserData["DisplayName"].ToString() ?? "",
-                                    Designation = _UserData["Designation"].ToString() ?? "",
-                                    UserEmail = _UserData["UserEmail"].ToString() ?? "",
-                                    Role = _UserData["Role"].ToString() ?? "",
-                                    LastLogin = _UserData["LastLogin"].ToString() ?? "",
-                                    Session = Guid.NewGuid().ToString(),
-                                    DataFile = _UserData["DataFile"].ToString() ?? "",
-                                    Company = _UserData["Company"].ToString() ?? "",
-                                    Address1 = _UserData["Address1"].ToString() ?? "",
-                                    Address2 = _UserData["Address2"].ToString() ?? "",
-                                    City = _UserData["City"].ToString() ?? "",
-                                    Country = _UserData["Country"].ToString() ?? "",
-                                    Contact = _UserData["Contact"].ToString() ?? ""
-                                };
-                                IsUserFound = true;
-                            }
-                        }
-                        else
-                        {
-                            IsLogin = false;
-                            ErrorMessage = "User Not Found...";
-                            //NavManager.NavigateTo("/AppError");
-                        }
-                    }
+                    IsLogin = false;
+                    ErrorMessage = "User model cannot be null";
+                    return userProfile;
                 }
+
+                if (string.IsNullOrWhiteSpace(userModel.UserID))
+                {
+                    IsLogin = false;
+                    ErrorMessage = "User ID cannot be empty";
+                    return userProfile;
+                }
+
+                var usersDBFile = Path.Combine(
+                    AppGlobal.AppPaths.FirstPath,
+                    AppGlobal.AppPaths.RootPath,
+                    AppGlobal.AppPaths.UsersPath,
+                    "AppliedUsers2.db");
+
+                // Verify database file exists
+                if (!File.Exists(usersDBFile))
+                {
+                    IsLogin = false;
+                    ErrorMessage = "User database not found";
+                    return userProfile;
+                }
+
+                const string commandText = "SELECT * FROM [Users] WHERE [UserID] = @UserID";
+
+                using var connection = new SqliteConnection($"Data Source={usersDBFile}");
+                connection.Open();
+
+                using var command = new SqliteCommand(commandText, connection);
+                command.Parameters.AddWithValue("@UserID", userModel.UserID);
+
+                using var reader = command.ExecuteReader();
+                var dataTable = new DataTable();
+                dataTable.Load(reader);
+
+                // Check if we got any results
+                if (dataTable.Rows.Count == 0)
+                {
+                    IsLogin = false;
+                    ErrorMessage = "User not found";
+                    return userProfile;
+                }
+
+                var userData = dataTable.Rows[0];
+
+                // Create user profile with null checks
+                userProfile.Profile = new AppliedGlobals.AppUserModel
+                {
+                    UserID = GetSafeString(userData["UserID"]),
+                    Password = GetSafeString(userData["Password"]),
+                    DisplayName = GetSafeString(userData["DisplayName"]),
+                    Designation = GetSafeString(userData["Designation"]),
+                    UserEmail = GetSafeString(userData["UserEmail"]),
+                    Role = GetSafeString(userData["Role"]),
+                    LastLogin = GetSafeString(userData["LastLogin"]),
+                    Session = Guid.NewGuid().ToString(),
+                    DataFile = GetSafeString(userData["DataFile"]),
+                    Company = GetSafeString(userData["Company"]),
+                    Address1 = GetSafeString(userData["Address1"]),
+                    Address2 = GetSafeString(userData["Address2"]),
+                    City = GetSafeString(userData["City"]),
+                    Country = GetSafeString(userData["Country"]),
+                    Contact = GetSafeString(userData["Contact"])
+                };
+
+                IsUserFound = true;
+                IsLogin = true; // Assuming login should be true when user is found
             }
-            catch (Exception error)
+            catch (SqliteException sqlEx)
             {
                 IsError = true;
-                ErrorMessage = error.Message;
+                ErrorMessage = $"Database error: {sqlEx.Message}";
+                // Log the exception here if you have logging
+            }
+            catch (Exception ex)
+            {
+                IsError = true;
+                ErrorMessage = $"Unexpected error: {ex.Message}";
+                // Log the exception here if you have logging
             }
 
+            return userProfile;
+        }
 
-            return _UserProfile;
+        // Helper method for safe string conversion
+        private static string GetSafeString(object value)
+        {
+            return value?.ToString()?.Trim() ?? string.Empty;
         }
     }
 }

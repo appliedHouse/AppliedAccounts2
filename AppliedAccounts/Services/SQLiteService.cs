@@ -1,38 +1,38 @@
 ﻿using AppliedGlobals;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 
 namespace AppliedAccounts.Services
 {
-    public class SQLiteService
+    public class SqliteService
     {
         public AppliedDB.Connections MyConnections { get; set; }
-        public SQLiteService(AppValues.AppPath _AppPaths)
+        public SqliteService(AppValues.AppPath _AppPaths)
         {
             MyConnections = new(_AppPaths);
         }
 
-        public SQLiteConnection? GetSQLiteConnection(SQLiteConnectionType _ConnectionType)
+        public SqliteConnection? GetSqliteConnection(SqliteConnectionType _ConnectionType)
         {
             switch (_ConnectionType)
             {
-                case SQLiteConnectionType.Users:
-                    return MyConnections.GetSQLiteUsers();
-                case SQLiteConnectionType.Client:
-                    return MyConnections.GetSQLiteClient();
-                case SQLiteConnectionType.Language:
-                    return MyConnections.GetSQLiteLanguage();
-                case SQLiteConnectionType.Message:
-                    return MyConnections.GetSQLiteMessage();
-                case SQLiteConnectionType.System:
-                    return MyConnections.GetSQLiteSystem();
-                case SQLiteConnectionType.Session:
-                    return MyConnections.GetSQLiteSession();
+                case SqliteConnectionType.Users:
+                    return MyConnections.GetSqliteUsers();
+                case SqliteConnectionType.Client:
+                    return MyConnections.GetSqliteClient();
+                case SqliteConnectionType.Language:
+                    return MyConnections.GetSqliteLanguage();
+                case SqliteConnectionType.Message:
+                    return MyConnections.GetSqliteMessage();
+                case SqliteConnectionType.System:
+                    return MyConnections.GetSqliteSystem();
+                case SqliteConnectionType.Session:
+                    return MyConnections.GetSqliteSession();
             }
             return null;
         }
 
         // Changed the accessibility of the enum to public to fix CS0051
-        public enum SQLiteConnectionType
+        public enum SqliteConnectionType
         {
             Users,
             Client,

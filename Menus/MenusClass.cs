@@ -21,6 +21,7 @@ namespace Menus
         public MenusClass()
         {
             FullMenus = MenusFromDB.Get();
+            //FullMenus = MenusFromDB.Get2();
             GetTopLevel();
         }
 
@@ -50,7 +51,6 @@ namespace Menus
 
             MyMenus = _Menus;
         }
-
 
         public void GetTopLevel()   // Main menu or first menu show at start of page
         {
@@ -99,5 +99,12 @@ namespace Menus
         {
             return FullMenus.FirstOrDefault(mnu => mnu.ID == _MenuID);
         }
+
+        public MenuItem? GetMenu(MenuEnum.Menus _MenuID)
+        {
+            return FullMenus.FirstOrDefault(mnu => mnu.ID == (int)_MenuID);
+        }
+
+
     }
 }

@@ -119,7 +119,7 @@
                         {
                         <div class="form-floating">
                             <InputSelect id="ddAccounts" class="form-control item-height"
-                                         TValue="int"
+                                         TValue="long"
                                          Value="@MyModel.MyVoucher.Master.COA"
                                          ValueExpression="@(() => @MyModel.MyVoucher.Master.COA)"
                                          ValueChanged="@((e) => COAIDChanged(e))">
@@ -144,7 +144,7 @@
                     <div class="col-md-3">
                         <div class="form-floating">
                             <InputSelect id="ddPayer" class="form-control item-height"
-                                         TValue="int"
+                                         TValue="long"
                                          Value="@MyModel.MyVoucher.Master.Payer"
                                          ValueExpression="@(() => @MyModel.MyVoucher.Master.Payer)"
                                          ValueChanged="@((e) => PayerIDChanged(e))">
@@ -216,7 +216,7 @@
                     <div class="col-md-3">
                         <div class="form-floating">
                             <InputSelect id="ddProject" class="form-control item-height"
-                                         TValue="int"
+                                         TValue="long"
                                          Value="@MyModel.MyVoucher.Detail.Project"
                                          ValueExpression="@(() => @MyModel.MyVoucher.Detail.Project)"
                                          ValueChanged="@((e) => ProjectIDChanged(e))">
@@ -240,7 +240,7 @@
                     <div class="col-md-3">
                         <div class="form-floating">
                             <InputSelect id="ddEmployee" class="form-control item-height"
-                                         TValue="int"
+                                         TValue="long"
                                          Value="@MyModel.MyVoucher.Detail.Employee"
                                          ValueExpression="@(() => @MyModel.MyVoucher.Detail.Employee)"
                                          ValueChanged="@((e) => EmployeeIDChanged(e))">
@@ -270,7 +270,7 @@
                         <div class="form-floating">
 
                             <InputSelect id="ddAccounts" class="form-control item-height"
-                                         TValue="int"
+                                         TValue="long"
                                          Value="@MyModel.MyVoucher.Detail.Account"
                                          ValueExpression="@(() => @MyModel.MyVoucher.Detail.Account)"
                                          ValueChanged="@((e) => AccountIDChanged(e))">

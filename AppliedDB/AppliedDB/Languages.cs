@@ -1,11 +1,12 @@
 ﻿using System.Data;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
+using Windows.System.UserProfile;
 
 namespace AppliedDB
 {
     public class Languages
     {
-        //public SQLiteConnection LangConnection = Connections.GetLanguageConnection() ?? new();
+        //public SqliteConnection LangConnection = Connections.GetLanguageConnection() ?? new();
 
 
 
@@ -17,15 +18,19 @@ namespace AppliedDB
             {
                 // SELECT * FROM [LanguageList]
                 _Connection.Open();
-                var _Command = new SQLiteCommand($"SELECT * FROM [LanguageList]", _Connection);
-                var _Adapter = new SQLiteDataAdapter(_Command);
-                var _DataSet = new DataSet();
-                _Adapter.Fill(_DataSet, "LanguageList");
-                _Connection.Close();
-                if (_DataSet.Tables.Count > 0)
-                {
-                    return _DataSet.Tables[0];
-                }
+                using var _Command = new SqliteCommand($"SELECT * FROM [LanguageList]", _Connection);
+                using var _reader = _Command.ExecuteReader();
+                var dt = new DataTable();
+                dt.Load(_reader);
+                return dt;
+                //var _Adapter = new SqliteDataAdapter(_Command);
+                //var _DataSet = new DataSet();
+                //_Adapter.Fill(_DataSet, "LanguageList");
+                //_Connection.Close();
+                //if (_DataSet.Tables.Count > 0)
+                //{
+                //    return _DataSet.Tables[0];
+                //}
             }
             return null;
 
@@ -39,15 +44,19 @@ namespace AppliedDB
                 // SELECT * FROM [Language records of specific language ]
                 _Connection.Open();
                 var _Filter = $"WHERE Language={_Language} AND Section IN ('{_Section}','Common')";
-                var _Command = new SQLiteCommand($"SELECT * FROM [LanguageText] {_Filter}", _Connection);
-                var _Adapter = new SQLiteDataAdapter(_Command);
-                var _DataSet = new DataSet();
-                _Adapter.Fill(_DataSet, "LanguageText");
-                _Connection.Close();
-                if (_DataSet.Tables.Count > 0)
-                {
-                    return _DataSet.Tables[0];
-                }
+                using var _Command = new SqliteCommand($"SELECT * FROM [LanguageText] {_Filter}", _Connection);
+                using var _reader = _Command.ExecuteReader();
+                var dt = new DataTable();
+                dt.Load(_reader);
+                return dt;
+                //var _Adapter = new SqliteDataAdapter(_Command);
+                //var _DataSet = new DataSet();
+                //_Adapter.Fill(_DataSet, "LanguageList");
+                //_Connection.Close();
+                //if (_DataSet.Tables.Count > 0)
+                //{
+                //    return _DataSet.Tables[0];
+                //}
             }
             return null;
 

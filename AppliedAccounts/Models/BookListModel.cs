@@ -20,15 +20,14 @@ namespace AppliedAccounts.Models
         public PrintService ReportService { get; set; }
         public PageModel Pages { get; set; } = new();
 
-        public int BookID { get; set; }
-        public int BookNatureID { get; set; }
-        public int VoucherID { get; set; }
+        public long BookID { get; set; }
+        public long BookNatureID { get; set; }
+        public long VoucherID { get; set; }
         public int TotalRecord { get; set; } = 0;
         public DateTime DT_Start { get; set; }
         public DateTime DT_End { get; set; }
         public string SearchText { get; set; }
         public string BookNatureTitle = "Book Title";
-        //public List<BookView> BookRecords { get; set; }
         public bool PageIsValid { get; set; } = false;
         public bool IsWaiting { get; set; } = false;
 
@@ -48,7 +47,7 @@ namespace AppliedAccounts.Models
             {
                 if (_BookID == 0) { BookID = 1; } else { BookID = _BookID; }
                 var result = Source?.SeekValue(Enums.Tables.COA, BookID, "Nature") ?? 0;
-                BookNatureID = (int)result;
+                BookNatureID = (long)result;
                 BookID = _BookID;
 
                 NatureAccountsList =
@@ -81,7 +80,7 @@ namespace AppliedAccounts.Models
             }
         }
 
-        public List<BookView> LoadBookRecords(int _BookID)     // Load List of Cash / Bank Book record in Table
+        public List<BookView> LoadBookRecords(long _BookID)     // Load List of Cash / Bank Book record in Table
         {
             if (_BookID == 0) { return []; }
 
@@ -222,7 +221,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Edit Book Voucher Re-direct to Book Page
-        public void Edit(int _ID)
+        public void Edit(long _ID)
         {
             SetKeys();
             AppGlobal.NavManager.NavigateTo($"/Accounts/Books/{BookID}/{BookNatureID}");

@@ -1,5 +1,5 @@
 ﻿@page "/Sale/SaleInvoice"
-@page "/Sale/SaleInvoice/{ID:int}"
+@page "/Sale/SaleInvoice/{ID:long}"
 @layout PageLayout
 @attribute [Authorize]
 
@@ -19,7 +19,7 @@
 @inject GlobalService AppGlobal
 
 @code {
-    [Parameter] public int ID { get; set; }
+    [Parameter] public long ID { get; set; }
 
     protected override void OnInitialized()
     {
@@ -96,7 +96,7 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
-                                <InputSelect id="ddSaleman" class="form-select" TValue="int" Value="@MyModel.MyVoucher.Master.Employee" ValueExpression="@(() => MyModel.MyVoucher.Master.Employee)" ValueChanged="@((e) => EmployeeChanged(e))">
+                                <InputSelect id="ddSaleman" class="form-select" TValue="long" Value="@MyModel.MyVoucher.Master.Employee" ValueExpression="@(() => MyModel.MyVoucher.Master.Employee)" ValueChanged="@((e) => EmployeeChanged(e))">
                                     @foreach (CodeTitle _CodeTitle in MyModel.Employees)
                                     {
                                         <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
@@ -108,7 +108,7 @@
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
                                 <InputSelect id="ddSaleman" class="form-select"
-                                             TValue="int"
+                                             TValue="long"
                                              Value="@MyModel.MyVoucher.Master.Company"
                                              ValueExpression="@(() => MyModel.MyVoucher.Master.Company)"
                                              ValueChanged="@((e) => CompanyChanged(e))">
@@ -150,7 +150,7 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
-                                <InputSelect id="ddInventory" class="form-select" TValue="int" Value="@MyModel.MyVoucher.Detail.Inventory" ValueExpression="@(() => MyModel.MyVoucher.Detail.Inventory)" ValueChanged="@((e) => InventoryChanged(e))">
+                                <InputSelect id="ddInventory" class="form-select" TValue="long" Value="@MyModel.MyVoucher.Detail.Inventory" ValueExpression="@(() => MyModel.MyVoucher.Detail.Inventory)" ValueChanged="@((e) => InventoryChanged(e))">
                                     @foreach (CodeTitle _CodeTitle in MyModel.Inventory)
                                     {
                                         <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
@@ -168,7 +168,7 @@
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
                                 <InputSelect id="ddUnits" class="form-select"
-                                             TValue="int"
+                                             TValue="long"
                                              Value="@MyModel.MyVoucher.Detail.Unit"
                                              ValueExpression="@(() => MyModel.MyVoucher.Detail.Unit)"
                                              ValueChanged="@((e) => UnitChanged(e))">
@@ -208,7 +208,7 @@
                     <div class="row mt-1 g-1">
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
-                                <InputSelect id="ddTaxID" class="form-select" TValue="int" Value="@MyModel.MyVoucher.Detail.TaxID" ValueExpression="@(() => MyModel.MyVoucher.Detail.TaxID)" ValueChanged="@((e) => TaxChanged(e))">
+                                <InputSelect id="ddTaxID" class="form-select" TValue="long" Value="@MyModel.MyVoucher.Detail.TaxID" ValueExpression="@(() => MyModel.MyVoucher.Detail.TaxID)" ValueChanged="@((e) => TaxChanged(e))">
                                     @foreach (CodeTitle _CodeTitle in MyModel.Taxes)
                                     {
                                         <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>

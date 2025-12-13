@@ -1,4 +1,5 @@
-﻿using AppliedAccounts.Data;
+﻿using AppliedAccounts.Authentication;
+using AppliedAccounts.Data;
 using AppliedAccounts.Models;
 using AppliedAccounts.Services;
 using AppMessages;
@@ -10,8 +11,8 @@ namespace AppliedAccounts.Pages.Accounts
 {
     public partial class Books
     {
-        [Parameter] public int ID { get; set; }
-        [Parameter] public int BookID { get; set; }
+        [Parameter] public long ID { get; set; }
+        [Parameter] public long BookID { get; set; }
 
         public AppliedGlobals.AppUserModel UserProfile { get; set; }
         public BookModel MyModel { get; set; } = new();
@@ -21,6 +22,14 @@ namespace AppliedAccounts.Pages.Accounts
         public ToastClass MyToastClass { get; set; }
 
         public ToastClass Toast { get; set; }
+
+
+        private decimal Tot_DR = 0.0M;
+        private decimal Tot_CR = 0.0M;
+        private string ErrorMessage = string.Empty;
+
+        
+
         public Books() { }
 
         public void ShowToast(ToastClass _toast)
@@ -44,13 +53,13 @@ namespace AppliedAccounts.Pages.Accounts
         }
 
         #region Drop Down Value changed events
-        private void BookIDChanged(int _BookID)
+        private void BookIDChanged(long _BookID)
         {
             BookID = _BookID;
             MyModel.MyVoucher.Master.BookID = BookID;
         }
 
-        private void AccountIDChanged(int _ID)
+        private void AccountIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.COA = _ID;
             MyModel.MyVoucher.Detail.TitleAccount = MyModel.Accounts
@@ -59,7 +68,7 @@ namespace AppliedAccounts.Pages.Accounts
                 .First() ?? "";
         }
 
-        private void CompanyIDChanged(int _ID)
+        private void CompanyIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Company = _ID;
             MyModel.MyVoucher.Detail.TitleCompany = MyModel.Companies
@@ -67,7 +76,7 @@ namespace AppliedAccounts.Pages.Accounts
                 .Select(e => e.Title)
                 .First() ?? "";
         }
-        private void ProjectIDChanged(int _ID)
+        private void ProjectIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Project = _ID;
             MyModel.MyVoucher.Detail.TitleProject = MyModel.Projects
@@ -76,7 +85,7 @@ namespace AppliedAccounts.Pages.Accounts
                 .First() ?? "";
 
         }
-        private void EmployeeIDChanged(int _ID)
+        private void EmployeeIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Employee = _ID;
             MyModel.MyVoucher.Detail.TitleEmployee = MyModel.Employees

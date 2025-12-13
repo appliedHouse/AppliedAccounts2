@@ -21,7 +21,7 @@ namespace AppliedAccounts.Pages.Accounts
         }
 
         #region DropDown Changed
-        private void COAIDChanged(int _ID)
+        private void COAIDChanged(long _ID)
         {
             MyModel.MyVoucher.Master.COA = _ID;
             MyModel.MyVoucher.Master.TitleCOA = MyModel.PayCOA
@@ -30,7 +30,7 @@ namespace AppliedAccounts.Pages.Accounts
                 .First() ?? "";
         }
 
-        private void PayerIDChanged(int _ID)
+        private void PayerIDChanged(long _ID)
         {
             MyModel.MyVoucher.Master.Payer = _ID;
             MyModel.MyVoucher.Master.TitlePayer = MyModel.Companies
@@ -39,7 +39,7 @@ namespace AppliedAccounts.Pages.Accounts
                 .First() ?? "";
         }
 
-        private void AccountIDChanged(int _ID)
+        private void AccountIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Account = _ID;
             MyModel.MyVoucher.Detail.TitleAccount = MyModel.Accounts
@@ -48,7 +48,7 @@ namespace AppliedAccounts.Pages.Accounts
                 .First() ?? "";
         }
 
-        private void ProjectIDChanged(int _ID)
+        private void ProjectIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Project = _ID;
             MyModel.MyVoucher.Detail.TitleProject = MyModel.Projects
@@ -57,7 +57,7 @@ namespace AppliedAccounts.Pages.Accounts
                 .First() ?? "";
         }
 
-        private void EmployeeIDChanged(int _ID)
+        private void EmployeeIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Employee = _ID;
             MyModel.MyVoucher.Detail.TitleEmployee = MyModel.Employees

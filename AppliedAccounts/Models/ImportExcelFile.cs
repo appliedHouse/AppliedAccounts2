@@ -4,7 +4,7 @@ using AppliedDB;
 using ExcelDataReader;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Data;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 using System.Text;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
 
@@ -106,10 +106,10 @@ namespace AppliedAccounts.Models
 
             AppRegistry.SetKey(AppGlobal.DBFile, ExcelImportRegistry, _GUID, KeyType.Text, _Title);
 
-            string _ConnText = $"";
+            //string _ConnText = $"";
             string _ImportDBPath = Path.Combine(_Path, _GUID + ".db");
-            SQLiteConnection.CreateFile(_ImportDBPath);
-            SQLiteConnection _TempDBConnection = new($"Data Source={_ImportDBPath}");
+            //SqliteConnection.CreateFile(_ImportDBPath);
+            SqliteConnection _TempDBConnection = new($"Data Source={_ImportDBPath}");
 
             if (_TempDBConnection.State != ConnectionState.Open) { _TempDBConnection.Open(); }
 
@@ -155,7 +155,7 @@ namespace AppliedAccounts.Models
                     }
 
                     _Text.Append(')');
-                    SQLiteCommand _Command = new(_Text.ToString(), _TempDBConnection);
+                    SqliteCommand _Command = new(_Text.ToString(), _TempDBConnection);
                     _Command.ExecuteNonQuery();
 
                     foreach (DataRow _Row in _Table.Rows)

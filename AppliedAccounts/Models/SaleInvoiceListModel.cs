@@ -19,7 +19,7 @@ namespace AppliedAccounts.Models
         public MessageClass MsgClass { get; set; } = new();
         public decimal TotalAmount { get; set; } = 0.00M;
         public bool SelectAll { get; set; }
-        public int VoucherID { get; set; }
+        public long VoucherID { get; set; }
         public string SearchText { get; set; } = string.Empty;
         #region Constructor
         public SaleInvoiceListModel() { }
@@ -97,7 +97,7 @@ namespace AppliedAccounts.Models
             return _Record;
         }
 
-        public SalesRecord GetRecord(int _ID)
+        public SalesRecord GetRecord(long _ID)
         {
 
             foreach (SalesRecord _Record in Records)
@@ -120,7 +120,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Edit
-        public void Edit(int _ID)
+        public void Edit(long _ID)
         {
             GetRecord(_ID);
         }

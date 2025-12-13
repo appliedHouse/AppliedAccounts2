@@ -32,17 +32,17 @@
 
         if(Nature != null)
         {
-            BookNatureChanged((int)Nature); 
+            BookNatureChanged((long)Nature); 
         }
     }
         
-       private void BookNatureChanged(int _NatureID)
+       private void BookNatureChanged(long _NatureID)
     {
         MyModel.BookNatureID = _NatureID;
         MyModel.BookID = MyModel.Source.GetBookAccounts(MyModel.BookNatureID).First()?.ID ?? 0;
     }
 
-    private void BookListChanged(int _BookID)
+    private void BookListChanged(long _BookID)
     {
         MyModel.BookID = _BookID; //result;
     }
@@ -67,11 +67,11 @@ else
     <div class="d-flex flex-row mb-3 filter" hidden="@MyModel.IsWaiting">
         <div class="p-2">
             <InputSelect id="ddBook" class="item-height"
-                         TValue="int"
+                         TValue="long"
                          Value="@MyModel.BookNatureID"
                          ValueExpression="@(() => MyModel.BookNatureID)"
                          ValueChanged="@((e) => BookNatureChanged(e))">
-
+                
                 @foreach (var item in MyModel.NatureAccountsList)
                 {
                     <option value="@item.ID">@item.Title</option>
@@ -81,7 +81,7 @@ else
         </div>
         <div class="p-2">
             <InputSelect id="ddBook" class="item-height"
-                         TValue="int"
+                         TValue="long"
                          Value="@MyModel.BookID"
                          ValueExpression="@(()=> MyModel.BookID)"
                          ValueChanged="@((e)=>BookListChanged(e))">

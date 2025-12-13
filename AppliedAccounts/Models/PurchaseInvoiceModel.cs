@@ -92,7 +92,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Get / Set Purchases Invoice Record (Table to Variable)
-        public bool SetPurchaseInvoiceRecord(int _ID)
+        public bool SetPurchaseInvoiceRecord(long _ID)
         {
             if (View_PurchaseInvoice is not null)
             {
@@ -563,18 +563,18 @@ namespace AppliedAccounts.Models
 
     public class PurchaseInvoiceRecord
     {
-        public int ID1 { get; set; }
-        public int ID2 { get; set; }
+        public long ID1 { get; set; }
+        public long ID2 { get; set; }
         public string Vou_No { get; set; } = string.Empty;
         public string Ref_No { get; set; } = string.Empty;
         public string Inv_No { get; set; } = string.Empty;
-        public int TranID { get; set; }
+        public long TranID { get; set; }
         public int Sr_No { get; set; }
-        public int Inventory { get; set; }
-        public int Company { get; set; }
-        public int Employee { get; set; }
-        public int Project { get; set; }
-        public int TaxID { get; set; }
+        public long Inventory { get; set; }
+        public long Company { get; set; }
+        public long Employee { get; set; }
+        public long Project { get; set; }
+        public long TaxID { get; set; }
 
 
         public string TitleInventory { get; set; } = string.Empty;
@@ -594,7 +594,7 @@ namespace AppliedAccounts.Models
         public string Batch { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
 
-        public int Unit { get; set; }
+        public long Unit { get; set; }
         public decimal Qty { get; set; } = 0.00M;
         public decimal Rate { get; set; } = 0.00M;
         public decimal TaxRate { get; set; } = 0.00M;
