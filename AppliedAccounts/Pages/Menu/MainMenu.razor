@@ -36,6 +36,8 @@
 
         if (_SelectedMnu.Level == 1)
         {
+            <ClickMenus _SelectedMenu=_SelectedMnu></ClickMenus>
+
             SubMenu = !SubMenu;
             // All top level menus and sub menu of the select
             MenuClass.TopSelected(_SelectedMnu, SubMenu);
