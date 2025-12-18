@@ -65,6 +65,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Models\Posting\" />
     <Folder Include="Pages\Reporting\" />
     <Folder Include="wwwroot\ExcelFiles\" />
   </ItemGroup>

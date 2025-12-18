@@ -21,7 +21,6 @@ namespace Menus
         public MenusClass()
         {
             FullMenus = MenusFromDB.Get();
-            //FullMenus = MenusFromDB.Get2();
             GetTopLevel();
         }
 

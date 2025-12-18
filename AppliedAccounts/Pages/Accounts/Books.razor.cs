@@ -101,6 +101,7 @@ namespace AppliedAccounts.Pages.Accounts
             var IsSaved = false;
             MyModel.MyMessage = "Saving....";
             IsSaved = await MyModel.SaveAllAsync(); // Ensure save operation completes successfully
+            
 
             if (IsSaved)
             {
@@ -108,6 +109,12 @@ namespace AppliedAccounts.Pages.Accounts
                 ToastService.ShowToast(ToastClass.SaveToast, MyModel.MyVoucher.Master.Vou_No);
                 await InvokeAsync(StateHasChanged);
             }
+            else
+            {
+                MsgClass = MyModel.MsgClass;
+            }
+
+            
         }
         #endregion
 

@@ -5,10 +5,6 @@ namespace Menus
 {
     public class MenusFromDB
     {
-
-
-
-
         internal static List<MenuItem> Get()
         {
             try

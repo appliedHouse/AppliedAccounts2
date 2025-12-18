@@ -6,51 +6,50 @@
 @code {
     [Parameter] public MenusClass MenuClass { get; set; }
 
+    private string buildNum { get; set; } = "2.0.1";
     private bool SubMenu { get; set; } = false;
     private async Task Beep() { await js.InvokeVoidAsync("playBeep"); }
     private async Task MenuClick(int MenuID)
     {
         await js.InvokeVoidAsync("playBeep"); await Task.Delay(100);
 
-        var _SelectedMnu = MenuClass.GetMenu(MenuID);
-        if (_SelectedMnu == null) { return; }
+        var _SelectedMenu = MenuClass.GetMenu(MenuID);
+        if (_SelectedMenu == null) { return; }
 
         #region Logout User
         if (MenuID == (int)MenuEnum.Menus.Logout)
         {
             var UserService = (UserAuthenticationStateProvider)AuthState;
-            await UserService.UpdateAuthonticateState(null);
+            await UserService.UpdateAuthonticateState(null);                    // Logout User
             NavManager.NavigateTo("/");
             return;
         }
         #endregion
+
         #region Home Button
-        if (_SelectedMnu.Title.ToUpper().Equals("HOME"))
+        if (MenuID == (int)MenuEnum.Menus.Home)
         {
-            SubMenu = !SubMenu;
-            MenuClass.HomeButton(SubMenu);
+            NavManager.NavigateTo("/");
             return;
         }
         #endregion
+
         #region Menu button Clieck
 
-        if (_SelectedMnu.Level == 1)
+        if (_SelectedMenu.Level == 1)
         {
-            <ClickMenus _SelectedMenu=_SelectedMnu></ClickMenus>
-
             SubMenu = !SubMenu;
-            // All top level menus and sub menu of the select
-            MenuClass.TopSelected(_SelectedMnu, SubMenu);
+            MenuClass.TopSelected(_SelectedMenu, SubMenu);
         }
-        if (_SelectedMnu.Level == 2)
+        if (_SelectedMenu.Level == 2)
         {
-            MenuClass.SecondLevel(_SelectedMnu);
+            MenuClass.SecondLevel(_SelectedMenu);
         }
         #endregion
 
-        if(!string.IsNullOrEmpty(_SelectedMnu.NavigateTo))
+        if (!string.IsNullOrEmpty(_SelectedMenu.NavigateTo))
         {
-            NavManager.NavigateTo(_SelectedMnu.NavigateTo);
+            NavManager.NavigateTo(_SelectedMenu.NavigateTo);
         }
 
     }
@@ -77,4 +76,17 @@
         }
 
     </div>
+    <div class="build">Build: @buildNum</div>
 </div>
+
+
+
+<style>
+    .build {
+        position: absolute;
+        bottom: 0;
+        left: 3; 
+        font-size: 12px;
+        color: #888; 
+    }
+</style>
