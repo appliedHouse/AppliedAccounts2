@@ -1,5 +1,4 @@
-﻿using AppliedAccounts.Authentication;
-using AppliedAccounts.Data;
+﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
 using AppliedAccounts.Services;
 using AppMessages;
@@ -40,10 +39,7 @@ namespace AppliedAccounts.Pages.Accounts
 
         public void Start()
         {
-            MsgClass = new();
-            //MyToastClass = new();
             MyModel = new(ID, BookID, AppGlobal); ;
-            //MyModel.AppGlobal = AppGlobal;
             MyModel.ReportService = ReportService;
 
             if (MyModel == null) { IsPageValid = false; MsgClass.Add("Model is null"); return; }
@@ -101,11 +97,19 @@ namespace AppliedAccounts.Pages.Accounts
             var IsSaved = false;
             MyModel.MyMessage = "Saving....";
             IsSaved = await MyModel.SaveAllAsync(); // Ensure save operation completes successfully
-            
 
             if (IsSaved)
             {
                 MyModel.IsWaiting = false;
+                MyModel.LoadData();
+
+                if(MyModel.MyVoucher.Details.Count == 0)
+                {
+                    // Delete Master record if (details are all deleted / empty)  20-DEC-2025
+                }
+
+
+
                 ToastService.ShowToast(ToastClass.SaveToast, MyModel.MyVoucher.Master.Vou_No);
                 await InvokeAsync(StateHasChanged);
             }

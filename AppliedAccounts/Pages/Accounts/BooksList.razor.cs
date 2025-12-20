@@ -73,7 +73,7 @@ namespace AppliedAccounts.Pages.Accounts
 
     public class BookView
     {
-        public int ID { get; set; }
+        public long ID { get; set; }
         public string Vou_No { get; set; }
         public DateTime Vou_Date { get; set; }
         public string Description { get; set; }

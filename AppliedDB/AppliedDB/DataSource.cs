@@ -1105,10 +1105,15 @@ namespace AppliedDB
                     string _TypeName = (string)row["DataTypeName"];
 
                     if (_TypeName.ToUpper() == "INT") { _DataType = typeof(int); }
+                    if (_TypeName.ToUpper() == "INT64") { _DataType = typeof(long); }
                     if (_TypeName.ToUpper() == "DECIMAL") { _DataType = typeof(decimal); }
                     if (_TypeName.ToUpper() == "DATETIME") { _DataType = typeof(DateTime); }
                     if (_TypeName.ToUpper() == "NVARCHAR") { _DataType = typeof(string); }
                     if (_ColumnName.ToUpper() == "ID") { _DataType = typeof(long); }
+                    if (_ColumnName.ToUpper() == "ID1") { _DataType = typeof(long); }
+                    if (_ColumnName.ToUpper() == "ID2") { _DataType = typeof(long); }
+                    if (_ColumnName.ToUpper() == "TranID") { _DataType = typeof(long); }
+                    if (_ColumnName.ToUpper() == "SR_NO") { _DataType = typeof(int); }
 
                     dt.Columns.Add(_ColumnName, _DataType);
                 }

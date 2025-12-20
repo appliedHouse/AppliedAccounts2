@@ -3,7 +3,7 @@
 
 @code {
     [Parameter] public EventCallback<ReportActionClass> ReturnValue { get; set; }
-    [Parameter] public int VoucherID { get; set; }
+    [Parameter] public long VoucherID { get; set; }
 
     private void NotifyParent(ReportType reportType)
     {

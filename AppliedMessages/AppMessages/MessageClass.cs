@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using static AppMessages.Enums;
-//using Messages = AppMessages.Message ;
 
 namespace AppMessages
 {
@@ -9,20 +8,25 @@ namespace AppMessages
         #region Variables
         public Message MyMessage { get; set; }
         public List<Message> MessageList { get; set; } = [];
+        public List<Message> Errors { get; set; } = [];
         public DataTable MessagesTable { get; set; } = new();
         public Message Empty { get; set; } = new();
-        public int Count => MessageList.Count;
+        public int Count => MessageList.Count + Errors.Count;
+        public int CountError => Errors.Count;
+        public int CountMessages => MessageList.Count;
+
+        public object AppliedDB { get; }
         #endregion
 
         #region Constructor
         public MessageClass()
         {
-
-
+            
         }
         public MessageClass(DataTable _Table)
         {
             MessagesTable = _Table;
+            
         }
         #endregion
 
@@ -61,16 +65,15 @@ namespace AppMessages
         }
         #endregion
 
-
         #region Error
         public void Error(string _Text)
         {
-            MessageList.Add(GetMessage(_Text, Class.Error));
+            Errors.Add(GetMessage(_Text, Class.Error));
         }
 
         public void Error(Messages _Code)
         {
-            MessageList.Add(GetMessage(_Code, Class.Error));
+            Errors.Add(GetMessage(_Code, Class.Error));
         }
         #endregion
 
@@ -100,11 +103,11 @@ namespace AppMessages
         #region Danger
         public void Danger(string _Text)
         {
-            MessageList.Add(GetMessage(_Text, Class.Danger));
+            Errors.Add(GetMessage(_Text, Class.Danger));
         }
         public void Danger(Messages _Code)
         {
-            MessageList.Add(GetMessage(_Code, Class.Danger));
+            Errors.Add(GetMessage(_Code, Class.Danger));
 
         }
         #endregion
@@ -113,12 +116,12 @@ namespace AppMessages
 
         public void Critical(string _Text)
         {
-            MessageList.Add(GetMessage(_Text, Class.Critical));
+            Errors.Add(GetMessage(_Text, Class.Critical));
         }
 
         public void Critical(Messages _Code)
         {
-            MessageList.Add(GetMessage(_Code, Class.Critical));
+            Errors.Add(GetMessage(_Code, Class.Critical));
         }
         #endregion
 

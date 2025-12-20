@@ -259,7 +259,7 @@
                     @if (MyModel.Count > 0)
                     {
                        
-                        <button @onclick="MyModel.Remove" class="btn ctrl ctrl-del"><i class="bi bi-trash"></i></button>
+                        //<button @onclick="MyModel.Remove" class="btn ctrl ctrl-del"><i class="bi bi-trash"></i></button>
 
                         
                         <div class="btn-group" role="group" aria-label="Navigation Buttons" id="navigationBtns">
@@ -358,7 +358,7 @@
                                         <button type="button" id="si_btn_edit" class="btn btn-link btn-edit" title="Edit" @onclick="()=>MyModel.Edit(SaleRecord.ID2)">
                                             <i class="bi bi-pencil-fill"></i>
                                         </button>
-
+                                        <button class="btn btn-Del" @onclick="(() => MyModel.Remove(SaleRecord.Sr_No))"><i class="fa fa-trash-can"></i></button>
 
                                         @*  <button type="button" id="si_btn_delete" class="btn btn-link btn-del" title="Delete" @onclick="()=>MyModel.Delete(SaleRecord.Sr_No)">
                                         <i class="bi bi-trash-fill btn-trash"></i>

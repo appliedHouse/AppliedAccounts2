@@ -105,7 +105,7 @@
             RowNotUpdated = 143,
             SQLQueryIsNull = 215,
             UserProfileIsNull = 145,
-            VouNoNotDefine = 103,
+           
             BookIDIsZero = 147,
             BookNatureIsZero = 149,
             BookNatureIsNull = 209,
@@ -136,11 +136,10 @@
             EmployeeIDIsZero = 37,
             AccountIDIsZero = 191,
             CustomerIDIsZero = 999901,
-            VouNoIsNull = 1033,
+            
             NoRecordFound = 193,
             PageIsNotValid = 195,
-            VouDateLess = 999902,
-            VouDateMore = 999903,
+           
             Row_NoStatus = 197,
             VouNoNotDefineProperly = 103000,
             SerialNoIsZero = 199,
@@ -148,8 +147,13 @@
             DetailRecordsisNull = 203,
             DetailRecordsAreZero = 205,
             AmountNotEqual = 218,
-            GlobalValueIsNull = 999909
+            GlobalValueIsNull = 999909,
 
+            VouNoIsNull = 1033,
+            VouNoNotDefine = 103,
+            VouDateLess = 401,
+            VouDateMore = 402,
+            VouTransNotDeleted = 403
         }
 
         public enum Class
