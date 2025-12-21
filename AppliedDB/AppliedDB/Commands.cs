@@ -8,7 +8,6 @@ namespace AppliedDB
 {
     public class Commands
     {
-
         public static SqliteCommand? Insert(DataRow CurrentRow, SqliteConnection DBConnection)
         {
             if (CurrentRow.Field<long>("ID") == 0)
