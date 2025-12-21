@@ -1,12 +1,12 @@
 ﻿using System.Data;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 using static AppliedGlobals.AppErums;
 
 namespace AppliedDB
 {
-    public class Registry(SQLiteConnection _Connection, string _UserName)
+    public class Registry(SqliteConnection _Connection, string _UserName)
     {
-        public SQLiteConnection MyConnection { get; set; } = _Connection;
+        public SqliteConnection MyConnection { get; set; } = _Connection;
         public List<string> Messages { get; set; } = new();
         public bool IsConnected { get; set; }
         public string UserName { get; set; } = _UserName;

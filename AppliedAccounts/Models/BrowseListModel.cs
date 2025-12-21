@@ -21,8 +21,8 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> BrowseList { get; set; }
         public List<CodeTitle> FilteredList { get; set; }
         public string BrowseListName { get; set; }
-        public int InputValue { get; set; }
-        public int OutputValue { get; set; }
+        public long InputValue { get; set; }
+        public long OutputValue { get; set; }
         public bool Enable { get; set; } = false;
         public string SearchText { get; set; }
 
@@ -56,7 +56,7 @@ namespace AppliedAccounts.Models
             FilteredList = GetFilterList(SearchText);
         }
 
-        public void SelectValue(int _ID)
+        public void SelectValue(long _ID)
         {
             OutputValue = _ID;
         }

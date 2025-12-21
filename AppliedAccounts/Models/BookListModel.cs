@@ -20,15 +20,14 @@ namespace AppliedAccounts.Models
         public PrintService ReportService { get; set; }
         public PageModel Pages { get; set; } = new();
 
-        public int BookID { get; set; }
-        public int BookNatureID { get; set; }
-        public int VoucherID { get; set; }
+        public long BookID { get; set; }
+        public long BookNatureID { get; set; }
+        public long VoucherID { get; set; }
         public int TotalRecord { get; set; } = 0;
         public DateTime DT_Start { get; set; }
         public DateTime DT_End { get; set; }
         public string SearchText { get; set; }
         public string BookNatureTitle = "Book Title";
-        //public List<BookView> BookRecords { get; set; }
         public bool PageIsValid { get; set; } = false;
         public bool IsWaiting { get; set; } = false;
 
@@ -48,7 +47,14 @@ namespace AppliedAccounts.Models
             {
                 if (_BookID == 0) { BookID = 1; } else { BookID = _BookID; }
                 var result = Source?.SeekValue(Enums.Tables.COA, BookID, "Nature") ?? 0;
-                BookNatureID = (int)result;
+                if (result.GetType() == typeof(DBNull)) { BookNatureID = 1; }        // Use Dafault ID
+                if (result.GetType() == typeof(long)) { BookNatureID = (long)result; }        // Use Dafault ID
+                if (result.GetType() != typeof(long))
+                {
+                    long.TryParse(result.ToString(), out long _Value);
+                    BookNatureID = _Value;
+                }       
+
                 BookID = _BookID;
 
                 NatureAccountsList =
@@ -81,7 +87,7 @@ namespace AppliedAccounts.Models
             }
         }
 
-        public List<BookView> LoadBookRecords(int _BookID)     // Load List of Cash / Bank Book record in Table
+        public List<BookView> LoadBookRecords(long _BookID)     // Load List of Cash / Bank Book record in Table
         {
             if (_BookID == 0) { return []; }
 
@@ -146,25 +152,26 @@ namespace AppliedAccounts.Models
                     _CR = Row.Field<decimal>("CR");
                     _Bal += _CR - _DR;
 
-                    var _Record = new BookView()
+                    var _Record = new BookView();
                     {
-                        ID = Row.Field<int>("ID1"),
-                        Vou_No = Row.Field<string>("Vou_No") ?? "---",
-                        Vou_Date = Row.Field<DateTime>("Vou_Date"),
-                        Recevied = _CR,
-                        Paid = _DR,
-                        Balance = _Bal,
-                        Description = Row.Field<string>("Description") ?? "",
-
-                        TReceived = _CR.ToString(Format.Digit),
-                        TPaid = _DR.ToString(Format.Digit),
-                        TBalance = _Bal.ToString(Format.Digit)
+                        _Record.ID = Row.Field<long>("ID1");
+                        _Record.Vou_No = Row.Field<string>("Vou_No") ?? "---";
+                        _Record.Sr_No = Row.Field<int>("Sr_No");
+                        _Record.Vou_Date = Row.Field<DateTime>("Vou_Date");
+                        _Record.Recevied = _CR;
+                        _Record.Paid = _DR;
+                        _Record.Balance = _Bal;
+                        _Record.Description = Row.Field<string>("Description") ?? "";
+                        
+                        _Record.TReceived = _CR.ToString(Format.Digit);
+                        _Record.TPaid = _DR.ToString(Format.Digit);
+                        _Record.TBalance = _Bal.ToString(Format.Digit);
                     };
 
                     _List.Add(_Record);
                 }
 
-                
+
                 Pages.Refresh(TotalRecord);
 
                 return _List;
@@ -222,7 +229,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Edit Book Voucher Re-direct to Book Page
-        public void Edit(int _ID)
+        public void Edit(long _ID)
         {
             SetKeys();
             AppGlobal.NavManager.NavigateTo($"/Accounts/Books/{BookID}/{BookNatureID}");
@@ -246,11 +253,11 @@ namespace AppliedAccounts.Models
         {
             if (!string.IsNullOrEmpty(Source.DBFile))
             {
-                BookNatureID = AppRegistry.GetNumber(Source.DBFile, "BKNatureID");
-                BookID = AppRegistry.GetNumber(Source.DBFile, "BKbook");
-                DT_Start = AppRegistry.GetFrom(Source.DBFile, "BKbook");
-                DT_End = AppRegistry.GetTo(Source.DBFile, "BKbook");
-                SearchText = AppRegistry.GetText(Source.DBFile, "BKBook");
+                BookNatureID = AppRegistry.GetNumber(Source.DBFile, "BkNatureID");
+                BookID = AppRegistry.GetNumber(Source.DBFile, "BkBook");
+                DT_Start = AppRegistry.GetFrom(Source.DBFile, "BkBook");
+                DT_End = AppRegistry.GetTo(Source.DBFile, "BkBook");
+                SearchText = AppRegistry.GetText(Source.DBFile, "BkBook");
             }
         }
         #endregion

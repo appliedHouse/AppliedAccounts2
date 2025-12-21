@@ -27,28 +27,28 @@ namespace AppliedAccounts.Pages.Sale
         #endregion
 
         #region DropDown List change
-        public void CompanyChanged(int _NewValue)
+        public void CompanyChanged(long _NewValue)
         {
             MyModel.MyVoucher.Master.Company = _NewValue;
             MyModel.MyVoucher.Master.TitleCompany = MyModel.Companies.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
         }
-        public void EmployeeChanged(int _NewValue)
+        public void EmployeeChanged(long _NewValue)
         {
             MyModel.MyVoucher.Master.Employee = _NewValue;
             MyModel.MyVoucher.Master.TitleEmployee = MyModel.Employees.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
         }
-        public void InventoryChanged(int _NewValue)
+        public void InventoryChanged(long _NewValue)
         {
             MyModel.MyVoucher.Detail.Inventory = _NewValue;
             MyModel.MyVoucher.Detail.TitleInventory = MyModel.Inventory.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
         }
-        public void TaxChanged(int _NewValue)
+        public void TaxChanged(long _NewValue)
         {
             MyModel.MyVoucher.Detail.TaxID = _NewValue;
             MyModel.MyVoucher.Detail.TitleTaxID = MyModel.Taxes.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
             MyModel.MyVoucher.Detail.TaxRate = MyModel.Source.SeekTaxRate(MyModel.MyVoucher.Detail.TaxID);
         }
-        public void UnitChanged(int _NewValue)
+        public void UnitChanged(long _NewValue)
         {
             MyModel.MyVoucher.Detail.Unit = _NewValue;
             MyModel.MyVoucher.Detail.TitleUnit = MyModel.Units.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";

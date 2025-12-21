@@ -24,7 +24,7 @@ namespace AppliedAccounts.Pages.Sale
 
 
         #region Delete
-        public async void Delete(int ID)
+        public async void Delete(long ID)
         {
 
             await Task.Delay(1000);
@@ -32,7 +32,7 @@ namespace AppliedAccounts.Pages.Sale
         }
         #endregion
         #region Edit
-        public void Edit(int ID)
+        public void Edit(long ID)
         {
             NavManager.NavigateTo($"/Sale/SaleInvoice/{ID}");
         }
@@ -45,7 +45,7 @@ namespace AppliedAccounts.Pages.Sale
             //StateHasChanged();
         }
 
-        public void SelectOne(int _ID)
+        public void SelectOne(long _ID)
         {
             var item = MyModel.Records.Where(a => a.Id == _ID).First();
             item.IsSelected = !item.IsSelected;

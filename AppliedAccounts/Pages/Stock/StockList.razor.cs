@@ -25,14 +25,14 @@ namespace AppliedAccounts.Pages.Stock
             ShowForm = true;
             MyModel.Add();
         }
-        public void Edit(int ID)
+        public void Edit(long ID)
         {
             ShowList = false;
             ShowForm = true;
             MyModel.Edit(ID);
 
         }
-        public async void Delete(int? ID)
+        public async void Delete(long? ID)
         {
             if (MyModel.Delete())
             {
@@ -54,7 +54,7 @@ namespace AppliedAccounts.Pages.Stock
         #endregion
 
         #region Dropdown Changed
-        public void CategoryChanged(int _ID)
+        public void CategoryChanged(long _ID)
         {
             MyModel.Record.Category = _ID;
             MyModel.Record.TitleCategory = MyModel.Category
@@ -63,7 +63,7 @@ namespace AppliedAccounts.Pages.Stock
                 .First() ?? "";
         }
 
-        public void SubCategoryChanged(int _ID)
+        public void SubCategoryChanged(long _ID)
         {
             MyModel.Record.SubCategory = _ID;
             MyModel.Record.TitleSubCategory = MyModel.SubCategory
@@ -72,7 +72,7 @@ namespace AppliedAccounts.Pages.Stock
                 .First() ?? "";
         }
 
-        public void PackingChanged(int _ID)
+        public void PackingChanged(long _ID)
         {
             MyModel.Record.Packing = _ID;
             MyModel.Record.TitlePacking = MyModel.Packing
@@ -81,7 +81,7 @@ namespace AppliedAccounts.Pages.Stock
                 .First() ?? "";
         }
 
-        public void SizeChanged(int _ID)
+        public void SizeChanged(long _ID)
         {
             MyModel.Record.Size = _ID;
             MyModel.Record.TitleSize = MyModel.Size
@@ -95,14 +95,14 @@ namespace AppliedAccounts.Pages.Stock
         #endregion
 
         #region Browse Window
-        private void SelectedBrowse(int selectedId)
+        private void SelectedBrowse(long selectedId)
         {
             if (MyModel.BrowseClass.Type == 1) { CategoryChanged(selectedId); }
             else if (MyModel.BrowseClass.Type == 2) { SubCategoryChanged(selectedId); }
             else if (MyModel.BrowseClass.Type == 3) { PackingChanged(selectedId); }
             else if (MyModel.BrowseClass.Type == 4) { SizeChanged(selectedId); }
         }
-        public async void BrowseWindow(int _ListType)
+        public async void BrowseWindow(long _ListType)
         {
             switch (_ListType)
             {

@@ -9,7 +9,7 @@ namespace AppliedAccounts.Models
         public string Heading { get; set; }
         public List<CodeTitle> BrowseList { get; set; }
         public List<CodeTitle> FilterList { get; set; }
-        public int Selected { get; set; }
+        public long Selected { get; set; }
         public string SearchText { get; set; } = string.Empty;
 
         public BrowseModel()

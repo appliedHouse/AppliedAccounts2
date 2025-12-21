@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Models;
+using AppliedAccounts.Services;
 using Microsoft.JSInterop;
 
 namespace AppliedAccounts.Pages.Accounts
@@ -9,7 +10,7 @@ namespace AppliedAccounts.Pages.Accounts
     {
         public COAModel MyModel { get; set; } = new();
         public bool IsPageValid { get; set; }
-
+        
         public COA()
         {
 
@@ -33,10 +34,24 @@ namespace AppliedAccounts.Pages.Accounts
 
             //Model.Add();
         }
-        public async void Edit(int ID)
+        public async void Edit(long ID)
         {
             MyModel.Edit(ID);
             await AppGlobal.JS.InvokeVoidAsync("showAcordion", "accordionRecordDisplay");
+        }
+
+        public async void Save()
+        {
+            var IsSaved = await Task.Run(()=> MyModel.Save());
+            if(IsSaved)
+            {
+                MyModel.MsgClass.Success(AppMessages.Enums.Messages.Save);
+                ToastService.ShowToast(ToastClass.SaveToast);
+            }
+            else
+            {
+                ToastService.ShowToast(ToastClass.NotSaveToast);
+            }
         }
 
     }

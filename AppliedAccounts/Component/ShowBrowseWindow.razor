@@ -4,10 +4,10 @@
 
 
 @code {
-    [Parameter] public string Id { get; set; } = "ddBrowse";
-    [Parameter] public int Value { get; set; }
+    [Parameter] public string Id { get; set; } = "ddBrowse";            // Id id of the html tag
+    [Parameter] public long Value { get; set; }
     [Parameter] public string Title { get; set; } = "Browse";
-    [Parameter] public EventCallback<int> ValueChanged { get; set; }
+    [Parameter] public EventCallback<long> ValueChanged { get; set; }
     [Parameter] public List<CodeTitle>? BrowseList { get; set; }
 
     private string SearchText { get; set; } = string.Empty;
@@ -22,9 +22,11 @@
         return Task.CompletedTask;
     }
 
-    private async Task SelectItem(int id)
+    private async Task SelectItem(long id)
     {
+        Console.WriteLine($"SelectItem called with id: {id}, Type: {id.GetType()}");
         Value = id;
+        Console.WriteLine($"Setting Value to: {Value}, Type: {Value.GetType()}");
         await ValueChanged.InvokeAsync(id);
     }
 }
@@ -35,8 +37,10 @@
     <!-- Dropdown -->
     <InputSelect id="@Id"
                  class="form-control item-height flex-grow-1"
-                 TValue="int"
-                 @bind-Value="Value">
+                 TValue="long"
+                 Value="@Value"
+                 ValueChanged="@((long value) => ValueChanged.InvokeAsync(value))"
+                 ValueExpression="@(() => Value)">
         @if (BrowseList?.Any() == true)
         {
             @foreach (var item in BrowseList)
@@ -49,6 +53,24 @@
             <option value="0">No Records - @Title</option>
         }
     </InputSelect>
+
+
+    @* <InputSelect id="@Id"
+                 class="form-control item-height flex-grow-1"
+                 TValue="long"
+                 @bind-Value="Value">
+        @if (BrowseList?.Any() == true)
+        {
+            @foreach (var item in BrowseList)
+            {
+                <option value="@item.ID">@item.Title</option>
+            }
+        }
+        else
+        {
+            <option value="0">No Records - @Title</option>
+        }
+    </InputSelect> *@
 
     <!-- Open modal button -->
     <button class="btn btn-outline-secondary"

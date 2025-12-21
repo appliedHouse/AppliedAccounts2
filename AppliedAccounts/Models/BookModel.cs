@@ -14,9 +14,9 @@ namespace AppliedAccounts.Models
     {
 
         #region Variables
-        public int VoucherID { get; set; }
-        public int BookID { get; set; }
-        public int BookNature { get; set; }
+        public long VoucherID { get; set; }
+        public long BookID { get; set; }
+        public long BookNature { get; set; }
         public string BookNatureTitle { get; set; }
 
         public Voucher MyVoucher { get; set; }
@@ -44,8 +44,10 @@ namespace AppliedAccounts.Models
         public NavigationManager NavManager => AppGlobal.NavManager;
         public PrintService ReportService { get; set; }
 
-        private int CashNatureID = 0;
-        private int BankNatureID = 0;
+        private int CashNatureID = 1;           // Default Nature Id = 1 for cash
+        private int BankNatureID = 2;           // Default Nature Id = 2 for cash
+
+        public string _Deleted = "deleted";
 
 
         #endregion
@@ -55,7 +57,7 @@ namespace AppliedAccounts.Models
         {
 
         }
-        public BookModel(int _VoucherID, int _BookID, GlobalService _AppGlobal)
+        public BookModel(long _VoucherID, long _BookID, GlobalService _AppGlobal)
         {
             AppGlobal = _AppGlobal;
             MsgClass = new();
@@ -65,7 +67,6 @@ namespace AppliedAccounts.Models
             {
                 BookID = _BookID;
                 VoucherID = _VoucherID;
-                //UserProfile = _AppUserProfile;
                 DataFile = AppGlobal.DBFile;
 
                 CashNatureID = AppRegistry.GetNumber(DataFile, "CashBKNature");
@@ -88,8 +89,14 @@ namespace AppliedAccounts.Models
                     Projects = Source.GetProjects();
                     Accounts = Source.GetAccounts();
 
+                    BookNature = 1;         // Default value;
+
                     var result = Source.SeekValue(Tables.COA, BookID, "Nature") ?? 0;
-                    BookNature = (int)result;
+                    if (result.GetType() != typeof(long))
+                    {
+                        long.TryParse(result.ToString(), out long val);
+                        BookNature = val;
+                    }
                     if (BookNature > 0)
                     { BookList = Source.GetBookAccounts(BookNature); }
 
@@ -99,14 +106,14 @@ namespace AppliedAccounts.Models
                 }
                 else
                 {
-                    MsgClass.Add(MESSAGE.UserProfileIsNull);
+                    MsgClass.Alert(MESSAGE.UserProfileIsNull);
                 }
 
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MsgClass.Add(MESSAGE.Default);
+                MsgClass.Danger(ex.Message);
 
 
             }
@@ -128,45 +135,45 @@ namespace AppliedAccounts.Models
                     {
                         if (VoucherData.Count > 0)
                         {
-                            BookID = VoucherData.Select(row => row.Field<int>("BookID")).First();
+                            BookID = VoucherData.Select(row => row.Field<long>("BookID")).First();
 
                             MyVoucher.Master = VoucherData!.Select(first => new Master()
                             {
-                                ID1 = first.Field<int>("ID1"),
-                                Vou_No = first.Field<string>("Vou_No") ?? "",
+                                ID1 = first.Field<long>("ID1"),
+                                Vou_No = first.Field<string?>("Vou_No") ?? "",
                                 Vou_Date = first.Field<DateTime>("Vou_Date"),
-                                BookID = first.Field<int>("BookID"),
+                                BookID = first.Field<long>("BookID"),
                                 Amount = first.Field<decimal>("Amount"),
-                                Ref_No = first.Field<string>("Ref_No") ?? "",
-                                SheetNo = first.Field<string>("SheetNo") ?? "",
-                                Remarks = first.Field<string>("Remarks") ?? "",
-                                Status = first.Field<string>("Status") ?? ""
+                                Ref_No = first.Field<string?>("Ref_No") ?? "",
+                                SheetNo = first.Field<string?>("SheetNo") ?? "",
+                                Remarks = first.Field<string?>("Remarks") ?? "",
+                                Status = first.Field<string?>("Status") ?? "Submitted"
                             }).First() ?? new();
 
                             MyVoucher.Details = [.. VoucherData.Select(row => new Detail()
                             {
-                                ID2 = row.Field<int>("ID2"),
-                                TranID = row.Field<int>("TranID"),
+                                ID2 = row.Field<long>("ID2"),
+                                TranID = row.Field<long>("TranID"),
                                 Sr_No = row.Field<int>("SR_NO"),
-                                COA = row.Field<int>("COA"),
-                                Company = row.Field<int>("Company"),
-                                Employee = row.Field<int>("Employee"),
-                                Project = row.Field<int>("Project"),
+                                COA = row.Field < long?>("COA") ?? 0,
+                                Company = row.Field<long?>("Company") ?? 0,
+                                Employee = row.Field<long?>("Employee") ?? 0,
+                                Project = row.Field<long?>("Project") ?? 0,
                                 DR = row.Field<decimal>("DR"),
                                 CR = row.Field<decimal>("CR"),
-                                Description = row.Field<string>("Description") ?? "",
-                                Comments = row.Field<string>("Comments") ?? "",
+                                Description = row.Field<string?>("Description") ?? "",
+                                Comments = row.Field<string?>("Comments") ?? "",
                                 action = "get",
+                                DetailGuid = Guid.NewGuid(),            // Record unique ID for delete records.
 
-                                TitleAccount = row.Field<string>("TitleCOA") ?? "",
-                                TitleCompany = row.Field<string>("TitleCompany") ?? "",
-                                TitleEmployee = row.Field<string>("TitleEmployee") ?? "",
-                                TitleProject = row.Field<string>("TitleProject") ?? ""
+                                TitleAccount = row.Field<string?>("TitleCOA") ?? "",
+                                TitleCompany = row.Field<string?>("TitleCompany") ?? "",
+                                TitleEmployee = row.Field<string?>("TitleEmployee") ?? "",
+                                TitleProject = row.Field<string?>("TitleProject") ?? ""
 
                             })];
 
-
-                            if(MyVoucher.Details.Count > 0) { MyVoucher.Detail = MyVoucher.Details.First(); }
+                            if (MyVoucher.Details.Count > 0) { MyVoucher.Detail = MyVoucher.Details.First(); }
 
                             return true;
                         }
@@ -184,8 +191,6 @@ namespace AppliedAccounts.Models
         #region New Voucher
         private Voucher NewVoucher()
         {
-
-
             Voucher _NewVoucher = new();
             _NewVoucher.Master.ID1 = 0;
             _NewVoucher.Master.Vou_No = "New";
@@ -198,10 +203,6 @@ namespace AppliedAccounts.Models
             _NewVoucher.Master.Status = "Submitted";
 
             _NewVoucher.Detail = NewDetail();
-
-
-
-
             return _NewVoucher;
         }
 
@@ -210,7 +211,6 @@ namespace AppliedAccounts.Models
         {
             int _MaxSrNo = 1;
             if (MyVoucher.Details.Count > 0) { _MaxSrNo = MyVoucher.Details.Max(e => e.Sr_No) + 1; }
-
 
             var _Detail = new Detail();
             {
@@ -226,6 +226,7 @@ namespace AppliedAccounts.Models
                 _Detail.Description = "";
                 _Detail.Comments = "";
                 _Detail.action = "new";
+                _Detail.DetailGuid = Guid.NewGuid();
 
                 _Detail.TitleAccount = string.Empty;
                 _Detail.TitleCompany = string.Empty;
@@ -255,7 +256,7 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-        #region Add, Save, Delete buttons
+        #region New, Add / Edit 
         public void New()
         {
             MyVoucher.Detail = NewDetail();
@@ -267,22 +268,28 @@ namespace AppliedAccounts.Models
             MyVoucher.Detail = MyVoucher.Details.Where(e => e.Sr_No == _SrNo).First() ?? _Detail;
 
         }
+
+
+
+        #endregion
+
+        #region Save
         public void Save()
         {
-            if (IsVoucherValidated())
+            if (IsTransValidated())
             {
                 var IsSrNo = MyVoucher.Details.Where(e => e.Sr_No == MyVoucher.Detail.Sr_No).Any();
                 if (!IsSrNo)
                 {
                     MyVoucher.Detail.action = "save";
                     MyVoucher.Details.Add(MyVoucher.Detail);
-
                 }
             }
         }
 
         public async Task<bool> SaveAllAsync()
         {
+
             IsSaved = true;
 
             if (!IsWaiting)
@@ -290,87 +297,177 @@ namespace AppliedAccounts.Models
                 IsWaiting = true;
                 await Task.Run(() =>
                 {
-                    try
+
+                    if (IsVoucherValidated())
                     {
-                        if (MyVoucher.Master.Vou_No.ToUpper().Equals("NEW"))
+                        try
                         {
-                            if (BookNature == CashNatureID)         // Cash Book Nature
+                            var IsVoucherNumValid = true;
+                            if (MyVoucher.Master.Vou_No.ToUpper().Equals("NEW"))
                             {
-                                MyVoucher.Master.Vou_No = NewVoucherNo.GetCashVoucher(AppGlobal.DBFile, MyVoucher.Master.Vou_Date);
+                                IsVoucherNumValid = false;
+                                if (BookNature == CashNatureID)         // Cash Book Nature
+                                {
+                                    MyVoucher.Master.Vou_No = NewVoucherNo.GetCashVoucher(AppGlobal.DBFile, MyVoucher.Master.Vou_Date);
+                                    IsVoucherNumValid = true;
+                                }
+
+                                else if (BookNature == BankNatureID)         // Bank Book Nature
+                                {
+                                    MyVoucher.Master.Vou_No = NewVoucherNo.GetBankVoucher(AppGlobal.DBFile, MyVoucher.Master.Vou_Date);
+                                    IsVoucherNumValid = true;
+                                }
                             }
 
-                            if (BookNature == BankNatureID)         // Bank Book Nature
+                            if (IsVoucherNumValid)
                             {
-                                MyVoucher.Master.Vou_No = NewVoucherNo.GetBankVoucher(AppGlobal.DBFile, MyVoucher.Master.Vou_Date);
+                                var Row1 = Source.GetNewRow(Tables.Book);
+
+                                Row1["ID"] = MyVoucher.Master.ID1;
+                                Row1["Vou_No"] = MyVoucher.Master.Vou_No;
+                                Row1["Vou_Date"] = MyVoucher.Master.Vou_Date;
+                                Row1["BookID"] = MyVoucher.Master.BookID;
+                                Row1["Ref_No"] = MyVoucher.Master.Vou_Date;
+                                Row1["SheetNo"] = string.IsNullOrWhiteSpace(MyVoucher.Master.SheetNo) ? DBNull.Value : MyVoucher.Master.SheetNo;
+                                Row1["Remarks"] = MyVoucher.Master.Remarks;
+                                Row1["Status"] = MyVoucher.Master.Status;
+                                Row1["Amount"] = MyVoucher.Details.Sum(e => e.DR) - MyVoucher.Details.Sum(e => e.CR);
+
+                                CommandClass cmdClass1 = new(Row1, Source.MyConnection);
+                                var saved1 = cmdClass1.SaveChanges();
+
+                                if (saved1)             // if (voucher master record save successfully)
+                                {
+                                    VoucherID = cmdClass1.PrimaryKeyID;
+                                    Row1["ID"] = VoucherID;                // Get a new Id of record after save / insert.
+
+                                    var Row2 = Source.GetNewRow(Tables.Book2);
+                                    var _NewSrNo = 1;
+
+                                    foreach (var item in MyVoucher.Details)
+                                    {
+                                        if(item.action == _Deleted)
+                                        {
+                                            Row2["ID"] = item.ID2;
+                                            CommandClass cmdClassDel = new(Row2, Source.MyConnection);
+                                            var deleted = cmdClassDel.DeleteRow();
+                                            if(!deleted)
+                                            {
+                                                MsgClass.Danger(MESSAGE.VouTransNotDeleted);
+                                                // Roll Back master record
+                                                IsSaved = false;
+                                                break;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Row2["ID"] = item.ID2;
+                                            Row2["TranID"] = VoucherID;
+                                            Row2["SR_NO"] = _NewSrNo; _NewSrNo++;
+                                            Row2["COA"] = item.COA;
+                                            Row2["Company"] = item.Company == 0 ? DBNull.Value : item.Company;
+                                            Row2["Employee"] = item.Employee == 0 ? DBNull.Value : item.Employee;
+                                            Row2["Project"] = item.Project == 0 ? DBNull.Value : item.Project;
+                                            Row2["DR"] = item.DR;
+                                            Row2["CR"] = item.CR;
+                                            Row2["Description"] = string.IsNullOrWhiteSpace(item.Description) ? DBNull.Value : item.Description;
+                                            Row2["Comments"] = string.IsNullOrWhiteSpace(item.Comments) ? DBNull.Value : item.Comments;
+
+                                            CommandClass cmdClass2 = new(Row2, Source.MyConnection);
+                                            var save2 = cmdClass2.SaveChanges();
+                                            if (!save2)
+                                            {
+                                                MsgClass.Error(MESSAGE.NotSave);
+                                                var stop = true;
+                                                // roll Bank master record from Data Table
+                                            }
+                                        }
+
+                                        
+                                    }
+
+                                    IsWaiting = false;
+                                }
+                                else
+                                {
+                                    MsgClass.Error(MESSAGE.NotSave);
+                                }
+                            }
+                            else
+                            {
+                                MsgClass.Alert(MESSAGE.VouNoNotDefineProperly);
                             }
                         }
 
-
-                        var Row1 = Source.GetNewRow(Tables.Book);
-
-                        Row1["ID"] = MyVoucher.Master.ID1;
-                        Row1["Vou_No"] = MyVoucher.Master.Vou_No;
-                        Row1["Vou_Date"] = MyVoucher.Master.Vou_Date;
-                        Row1["BookID"] = MyVoucher.Master.BookID;
-                        Row1["Ref_No"] = MyVoucher.Master.Vou_Date;
-                        Row1["SheetNo"] = MyVoucher.Master.SheetNo;
-                        Row1["Remarks"] = MyVoucher.Master.Remarks;
-                        Row1["Status"] = MyVoucher.Master.Status;
-                        Row1["Amount"] = MyVoucher.Details.Sum(e => e.DR) - MyVoucher.Details.Sum(e => e.CR);
-
-                        CommandClass cmdClass1 = new(Row1, Source.MyConnection);
-                        cmdClass1.SaveChanges();
-
-                        VoucherID = cmdClass1.PrimaryKeyID;
-                        Row1["ID"] = VoucherID;                // Get a new Id of record after save / insert.
-
-                        var Row2 = Source.GetNewRow(Tables.Book2);
-
-                        foreach (var item in MyVoucher.Details)
+                        catch (Exception ex)
                         {
-                            Row2["ID"] = item.ID2;
-                            Row2["TranID"] = VoucherID;
-                            Row2["SR_NO"] = item.Sr_No;
-                            Row2["COA"] = item.COA;
-                            Row2["Company"] = item.Company;
-                            Row2["Employee"] = item.Employee;
-                            Row2["Project"] = item.Project;
-                            Row2["DR"] = item.DR;
-                            Row2["CR"] = item.CR;
-                            Row2["Description"] = item.Description;
-                            Row2["Comments"] = item.Comments;
-
-                            CommandClass cmdClass2 = new(Row2, Source.MyConnection);
-                            cmdClass2.SaveChanges();
+                            IsSaved = false;
+                            MsgClass.Danger(ex.Message);
                         }
-
-                        IsWaiting = false;
-
                     }
-                    catch (Exception)
-                    {
-                        IsSaved = false;
-
-                    }
-
                 });
                 IsWaiting = false;
-
             }
-
             return IsSaved;
         }
+
+
         #endregion
 
         #region Remove
-        public void Remove()
+        public void Remove(int _SrNo)
         {
-            if (MyVoucher.Detail != null)
+            if (_SrNo > 0 && _SrNo <= MyVoucher.Details.Max(sr => sr.Sr_No))
             {
-                MyVoucher.Detail.action = "delete";                     // Marked record as deleted.
-                Deleted.Add(MyVoucher.Detail);                          // Add a record to delete while saving.
-                MyVoucher.Details.Remove(MyVoucher.Detail);             // Remove record from current list.
+                var _Trans = MyVoucher.Details.FirstOrDefault(sr => sr.Sr_No == _SrNo);
+                if (_Trans != null)
+                {
+                    if (MyVoucher.Master.Vou_No == "NEW")
+                    {
+                        //_Trans.Sr_No = _Trans.Sr_No * -1;
+                        //_Trans.action = "delete";
+                        //Deleted.Add(_Trans);                     // Marked record as deleted.
+
+                        MyVoucher.Details.Remove(_Trans);
+
+                        if (MyVoucher.Details.Count > 0)
+                        {
+                            var _NewSrNo = 1;
+                            foreach (var trans in MyVoucher.Details)
+                            {
+                                trans.Sr_No = _NewSrNo; _SrNo++;
+                            }
+                        }
+                    }
+                    else
+                    {   // if (voucher is exist in database.
+                        // Save a record as deleted marks to Deleted at save all function.
+                        _Trans.Sr_No = _Trans.Sr_No * -1;
+                        _Trans.action = _Deleted;
+                        Deleted.Add(_Trans);                     // Marked record as deleted.
+                    }
+                }
             }
+            if( _SrNo < 0)
+            {
+                var _Trans = MyVoucher.Details.FirstOrDefault(sr => sr.Sr_No == _SrNo);
+                if(_Trans != null)
+                {
+                    _Trans.Sr_No = _Trans.Sr_No * -1;            // Undo Removed transaction
+                    _Trans.action = "get";
+                }
+            }
+
+        }
+
+        internal void DeleteMaster()
+        {
+            var MasterDataRow = Source.GetNewRow(Tables.Book);
+            MasterDataRow["ID"] = MyVoucher.Master.ID1;
+            CommandClass cmdMasterDelete = new(MasterDataRow, Source.MyConnection);
+            var IsDeleted = cmdMasterDelete.DeleteRow();
+            MsgClass.Add(IsDeleted ? MESSAGE.VouMasterDeleted : MESSAGE.VouMasterNotDeleted);
+
         }
 
         #endregion
@@ -378,25 +475,46 @@ namespace AppliedAccounts.Models
         #region Validation
         public bool IsVoucherValidated()
         {
+            MsgClass.ClearMessages();
             bool IsValid = true;
 
-
-            MsgClass = new();
             if (MyVoucher.Master.BookID == 0) { MsgClass.Add(MESSAGE.BookIDIsZero); }
             if (MyVoucher.Master.Vou_No.Length == 0) { MsgClass.Add(MESSAGE.VouNoNotDefine); }
-            //if (!MyVoucher.Master.Vou_No.ToLower().Equals("new"))
-            //{
-            //    if (MyVoucher.Master.Vou_No.Length != 11) { MsgClass.Add(MESSAGE.VouNoNotDefineProperly); }
-            //}
             if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgClass.Add(MESSAGE.VouDateLess); }
             if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgClass.Add(MESSAGE.VouDateMore); }
             if (MyVoucher.Master.Remarks.Length == 0) { MsgClass.Add(MESSAGE.Row_NoRemarks); }
             if (MyVoucher.Master.Status.Length == 0) { MsgClass.Add(MESSAGE.Row_NoStatus); }
-            if (MyVoucher.Detail.Sr_No == 0) { MsgClass.Add(MESSAGE.SerialNoIsZero); }
-            if (MyVoucher.Detail.COA == 0) { MsgClass.Add(MESSAGE.Row_COAIsZero); }
-            if (MyVoucher.Detail.DR > 0 && MyVoucher.Detail.CR > 0) { MsgClass.Add(MESSAGE.DRnCRHaveValue); }
-            if (MyVoucher.Detail.DR == 0 && MyVoucher.Detail.CR == 0) { MsgClass.Add(MESSAGE.DRnCRAreZero); }
-            if (string.IsNullOrEmpty(MyVoucher.Detail.Description)) { MsgClass.Add(MESSAGE.DescriptionIsNothing); }
+
+            foreach (var Trans in MyVoucher.Details)
+            {
+                if (Trans.Sr_No == 0) { MsgClass.Add(MESSAGE.SerialNoIsZero); }
+                if (Trans.COA == 0) { MsgClass.Add(MESSAGE.Row_COAIsZero); }
+                if (Trans.DR > 0 && Trans.CR > 0) { MsgClass.Add(MESSAGE.DRnCRHaveValue); }
+                if (Trans.DR == 0 && Trans.CR == 0) { MsgClass.Add(MESSAGE.DRnCRAreZero); }
+                if (string.IsNullOrEmpty(Trans.Description)) { MsgClass.Add(MESSAGE.DescriptionIsNothing); }
+
+            }
+            return IsValid;
+
+        }
+
+        public bool IsTransValidated()
+        {
+            bool IsValid = true;
+
+
+            MsgClass = new();
+            if (MyVoucher.Master.BookID == 0) { MsgClass.Alert(MESSAGE.BookIDIsZero); }
+            if (MyVoucher.Master.Vou_No.Length == 0) { MsgClass.Alert(MESSAGE.VouNoNotDefine); }
+            if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgClass.Alert(MESSAGE.VouDateLess); }
+            if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgClass.Alert(MESSAGE.VouDateMore); }
+            if (MyVoucher.Master.Remarks.Length == 0) { MsgClass.Alert(MESSAGE.Row_NoRemarks); }
+            if (MyVoucher.Master.Status.Length == 0) { MsgClass.Alert(MESSAGE.Row_NoStatus); }
+            if (MyVoucher.Detail.Sr_No == 0) { MsgClass.Alert(MESSAGE.SerialNoIsZero); }
+            if (MyVoucher.Detail.COA == 0) { MsgClass.Alert(MESSAGE.Row_COAIsZero); }
+            if (MyVoucher.Detail.DR > 0 && MyVoucher.Detail.CR > 0) { MsgClass.Alert(MESSAGE.DRnCRHaveValue); }
+            if (MyVoucher.Detail.DR == 0 && MyVoucher.Detail.CR == 0) { MsgClass.Alert(MESSAGE.DRnCRAreZero); }
+            if (string.IsNullOrEmpty(MyVoucher.Detail.Description)) { MsgClass.Alert(MESSAGE.DescriptionIsNothing); }
             if (MsgClass.Count > 0) { IsValid = false; }
 
             return IsValid;
@@ -504,10 +622,16 @@ namespace AppliedAccounts.Models
             ReportService.Model.AddReportParameter("CurrencySign", "SAR");
             ReportService.Model.AddReportParameter("ShowImages", true.ToString());
         }
+
+        public void Edit(long _ID2)
+        {
+            throw new NotImplementedException();
+        }
+
+       
         #endregion
 
         #region Models
-
         public class Voucher
         {
 
@@ -522,15 +646,13 @@ namespace AppliedAccounts.Models
             public Detail Detail { get; set; }
             public List<Detail> Details { get; set; }
         }
-
-
         public class Master
         {
             public Master() { }
-            public int ID1 { get; set; }
+            public long ID1 { get; set; }
             public string Vou_No { get; set; }
             public DateTime Vou_Date { get; set; }
-            public int BookID { get; set; }
+            public long BookID { get; set; }
             public decimal Amount { get; set; }
             public string Ref_No { get; set; }
             public string SheetNo { get; set; }
@@ -539,17 +661,16 @@ namespace AppliedAccounts.Models
 
 
         }
-
         public class Detail
         {
             public Detail() { }
-            public int ID2 { get; set; }
-            public int TranID { get; set; }
+            public long ID2 { get; set; }
+            public long TranID { get; set; }
             public int Sr_No { get; set; }
-            public int COA { get; set; }
-            public int Company { get; set; }
-            public int Employee { get; set; }
-            public int Project { get; set; }
+            public long COA { get; set; }
+            public long Company { get; set; }
+            public long Employee { get; set; }
+            public long Project { get; set; }
             public decimal DR { get; set; }
             public decimal CR { get; set; }
             public string Description { get; set; }
@@ -560,6 +681,8 @@ namespace AppliedAccounts.Models
             public string TitleCompany { get; set; }
             public string TitleProject { get; set; }
             public string TitleEmployee { get; set; }
+
+            public Guid DetailGuid { get; set; }
 
         }
         #endregion

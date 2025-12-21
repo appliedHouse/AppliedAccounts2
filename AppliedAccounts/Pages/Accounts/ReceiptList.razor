@@ -29,7 +29,7 @@
         if (MyModel.Source is null) { MyModel.PageIsValid = false; return; }
     }
 
-    private void PayerListChanged(int _PayerID)
+    private void PayerListChanged(long _PayerID)
     {
         MyModel.PayerID = _PayerID; //result;
 
@@ -76,7 +76,7 @@
                 </div>
                 <div class="p-2">
                     <InputSelect id="ddBook" class="item-height"
-                                 TValue="int"
+                                 TValue="long"
                                  Value="@MyModel.PayerID"
                                  ValueExpression="@(()=> MyModel.PayerID)"
                                  ValueChanged="@((e)=>PayerListChanged(e))">

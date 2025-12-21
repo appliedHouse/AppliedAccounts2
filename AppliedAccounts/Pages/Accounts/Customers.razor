@@ -15,21 +15,7 @@
     public int ID { get; set; }
     public bool IsDelete { get; set; } = false;
 
-    protected override void OnInitialized()
-    {
-        var AppUserProfile = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
 
-        if (ID < 0) { IsDelete = true; ID = Math.Abs(ID); }
-
-        if (AppUserProfile != null) { MyModel = new(AppGlobal, ID); }
-        else { MyModel = new(); }
-    }
-
-    
-    public void Delete(int ID)
-    {
-        if (MyModel.Delete(ID)) { AppGlobal.NavManager.NavigateTo("/CustomerList"); }
-    }
 }
 
 <style>

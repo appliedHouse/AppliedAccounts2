@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 using System.Threading.Tasks;
 
 namespace AppliedAccounts.Middleware
@@ -27,8 +27,8 @@ namespace AppliedAccounts.Middleware
     {
         public static IApplicationBuilder UseDatabasePatches(this IApplicationBuilder builder)
         {
-            var _UserFile = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SQLiteDB", "AppliedUser2.db");
-            var _Connection = new SQLiteConnection($"Data Source={_UserFile}");
+            var _UserFile = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqliteDB", "AppliedUser2.db");
+            var _Connection = new SqliteConnection($"Data Source={_UserFile}");
             {
                 // Set the connection string properties if needed
                 // e.g., Password = "your_password"

@@ -51,7 +51,6 @@ namespace Menus
             MyMenus = _Menus;
         }
 
-
         public void GetTopLevel()   // Main menu or first menu show at start of page
         {
             List<MenuItem> _Menus = [];
@@ -99,5 +98,12 @@ namespace Menus
         {
             return FullMenus.FirstOrDefault(mnu => mnu.ID == _MenuID);
         }
+
+        public MenuItem? GetMenu(MenuEnum.Menus _MenuID)
+        {
+            return FullMenus.FirstOrDefault(mnu => mnu.ID == (int)_MenuID);
+        }
+
+
     }
 }

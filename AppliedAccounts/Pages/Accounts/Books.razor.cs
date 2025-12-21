@@ -1,7 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
 using AppliedAccounts.Services;
-using AppMessages;
 using Microsoft.AspNetCore.Components;
 using System.Data;
 
@@ -10,18 +9,27 @@ namespace AppliedAccounts.Pages.Accounts
 {
     public partial class Books
     {
-        [Parameter] public int ID { get; set; }
-        [Parameter] public int BookID { get; set; }
+        [Parameter] public long ID { get; set; }
+        [Parameter] public long BookID { get; set; }
 
         public AppliedGlobals.AppUserModel UserProfile { get; set; }
         public BookModel MyModel { get; set; } = new();
-        public MessageClass MsgClass { get; set; }
 
         public bool IsPageValid { get; set; } = true;
         public ToastClass MyToastClass { get; set; }
 
         public ToastClass Toast { get; set; }
-        public Books() { }
+
+
+        private decimal Tot_DR = 0.0M;
+        private decimal Tot_CR = 0.0M;
+        private string ErrorMessage = string.Empty;
+
+        
+
+        public Books() 
+        {
+        }
 
         public void ShowToast(ToastClass _toast)
         {
@@ -31,26 +39,23 @@ namespace AppliedAccounts.Pages.Accounts
 
         public void Start()
         {
-            MsgClass = new();
-            MyToastClass = new();
             MyModel = new(ID, BookID, AppGlobal); ;
-            //MyModel.AppGlobal = AppGlobal;
             MyModel.ReportService = ReportService;
 
-            if (MyModel == null) { IsPageValid = false; MsgClass.Add("Model is null"); return; }
-            if (MyModel?.MyVoucher == null) { IsPageValid = false; MsgClass.Add("Voucher is null"); return; }
-            if (MyModel?.MyVoucher.Master == null) { IsPageValid = false; MsgClass.Add("Voucher master data is null"); return; }
-            if (MyModel?.MyVoucher.Detail == null) { IsPageValid = false; MsgClass.Add("Voucher detail data is null"); return; }
+            if (MyModel == null) { IsPageValid = false; MsgService.Warning("Model is null"); return; }
+            if (MyModel?.MyVoucher == null) { IsPageValid = false; MsgService.Warning("Voucher is null"); return; }
+            if (MyModel?.MyVoucher.Master == null) { IsPageValid = false; MsgService.Warning("Voucher master data is null"); return; }
+            if (MyModel?.MyVoucher.Detail == null) { IsPageValid = false; MsgService.Warning("Voucher detail data is null"); return; }
         }
 
         #region Drop Down Value changed events
-        private void BookIDChanged(int _BookID)
+        private void BookIDChanged(long _BookID)
         {
             BookID = _BookID;
             MyModel.MyVoucher.Master.BookID = BookID;
         }
 
-        private void AccountIDChanged(int _ID)
+        private void AccountIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.COA = _ID;
             MyModel.MyVoucher.Detail.TitleAccount = MyModel.Accounts
@@ -59,7 +64,7 @@ namespace AppliedAccounts.Pages.Accounts
                 .First() ?? "";
         }
 
-        private void CompanyIDChanged(int _ID)
+        private void CompanyIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Company = _ID;
             MyModel.MyVoucher.Detail.TitleCompany = MyModel.Companies
@@ -67,7 +72,7 @@ namespace AppliedAccounts.Pages.Accounts
                 .Select(e => e.Title)
                 .First() ?? "";
         }
-        private void ProjectIDChanged(int _ID)
+        private void ProjectIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Project = _ID;
             MyModel.MyVoucher.Detail.TitleProject = MyModel.Projects
@@ -76,7 +81,7 @@ namespace AppliedAccounts.Pages.Accounts
                 .First() ?? "";
 
         }
-        private void EmployeeIDChanged(int _ID)
+        private void EmployeeIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Employee = _ID;
             MyModel.MyVoucher.Detail.TitleEmployee = MyModel.Employees
@@ -96,9 +101,26 @@ namespace AppliedAccounts.Pages.Accounts
             if (IsSaved)
             {
                 MyModel.IsWaiting = false;
+                MyModel.LoadData();
+
+                if(MyModel.MyVoucher.Details.Count == 0)
+                {
+                    MyModel.DeleteMaster();
+
+                    // Delete Master record if (details are all deleted / empty)  20-DEC-2025
+                }
+
+
+
                 ToastService.ShowToast(ToastClass.SaveToast, MyModel.MyVoucher.Master.Vou_No);
                 await InvokeAsync(StateHasChanged);
             }
+            else
+            {
+                MsgService.AddRange(MyModel.MsgClass);
+            }
+
+            
         }
         #endregion
 
@@ -115,5 +137,7 @@ namespace AppliedAccounts.Pages.Accounts
             MyModel.IsWaiting = false; await InvokeAsync(StateHasChanged);
         }
         #endregion
+
+        
     }
 }

@@ -18,7 +18,7 @@ namespace AppliedAccounts.Models
     public class SaleInvoiceModel : IVoucher
     {
         #region Variables
-        public int SaleInvoiceID { get; set; }
+        public long SaleInvoiceID { get; set; }
         public DataSource Source { get; set; }
         public Voucher MyVoucher { get; set; } = new();
         public List<Detail> Deleted { get; set; } = new();
@@ -56,7 +56,7 @@ namespace AppliedAccounts.Models
             Source = new DataSource(AppGlobal.AppPaths);
         }
 
-        public SaleInvoiceModel(GlobalService _AppGlobal, int _SaleInvoiceID)
+        public SaleInvoiceModel(GlobalService _AppGlobal, long _SaleInvoiceID)
         {
             AppGlobal = _AppGlobal;
             SaleInvoiceID = _SaleInvoiceID;
@@ -67,7 +67,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Start
-        public void Start(int _SaleInvoiceID)
+        public void Start(long _SaleInvoiceID)
         {
             try
             {
@@ -249,7 +249,18 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Is Voucher is valided 
-        public bool IsVoucherValidated()
+        public bool IsVoucherValidated()            // Validate Master and Detail both of all record
+        {
+            bool IsValid = true;                
+            MsgClass.ClearMessages();
+            if (!IsTransValidated())                // Temp code. update in future 20-DEC-2025
+            {
+                IsValid = false;
+            }
+            return IsValid;
+        }
+
+        public bool IsTransValidated()
         {
             bool IsValid = true;
             MsgClass ??= new(Msg.GetMessages());
@@ -285,7 +296,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Edit and New Voucher
-        public void Edit(int _ID2)
+        public void Edit(long _ID2)
         {
             var _Detail = MyVoucher.Detail;
             MyVoucher.Detail = MyVoucher.Details.Where(e => e.ID2 == _ID2).First() ?? _Detail;
@@ -372,43 +383,69 @@ namespace AppliedAccounts.Models
         }
 
         #region Remove
-        public void Remove()
+
+        public void Remove(int _SrNo)
         {
-            if (MyVoucher.Detail is not null)
+            if (_SrNo > 0 && _SrNo <= MyVoucher.Details.Max(sr => sr.Sr_No))
             {
-                // Delete from List and do not save in deleted list if voucher is NEW
-                if (MyVoucher.Master.Vou_No.ToUpper().Equals("NEW"))
+                var _Trans = MyVoucher.Details.FirstOrDefault(sr => sr.Sr_No == _SrNo);
+                if (_Trans != null)
                 {
-                    MyVoucher.Details.Remove(MyVoucher.Detail);
-                    MyVoucher.Detail = NewDetail();
-                }
-                else
-                {
-                    Deleted ??= [];
-                    // Delete from List and save in deleted list, if Voucher is already in DB , would be deleted from DB when Save All.
-                    if (Deleted.Count > 0)
-                    {
-                        var IsAlreadyDeleted = Deleted.Where(e => e.Sr_No == MyVoucher.Detail.Sr_No).Any();
-                        if (!IsAlreadyDeleted)
-                        {
-                            // show Message already deleted. not can npot be deleted.
-                        }
-                    }
-                    Deleted.Add(MyVoucher.Detail);
-                    MyVoucher.Details.Remove(MyVoucher.Detail);
+                    // Save a deleted record to Deleted list
+                    _Trans.Sr_No = _Trans.Sr_No * -1;
+                    Deleted.Add(_Trans);                     // Marked record as deleted.
+
+                    MyVoucher.Details.Remove(_Trans);
+
                     if (MyVoucher.Details.Count > 0)
                     {
-                        MyVoucher.Detail = MyVoucher.Details.First();
+                        var _NewSrNo = 1;
+                        foreach (var trans in MyVoucher.Details)
+                        {
+                            trans.Sr_No = _NewSrNo; _SrNo++;
+                        }
                     }
-                    else
-                    {
-                        MyVoucher.Detail = NewDetail();
-                    }
-
                 }
-                CalculateTotal();
             }
         }
+
+        //public void Remove()
+        //{
+        //    if (MyVoucher.Detail is not null)
+        //    {
+        //        // Delete from List and do not save in deleted list if voucher is NEW
+        //        if (MyVoucher.Master.Vou_No.ToUpper().Equals("NEW"))
+        //        {
+        //            MyVoucher.Details.Remove(MyVoucher.Detail);
+        //            MyVoucher.Detail = NewDetail();
+        //        }
+        //        else
+        //        {
+        //            Deleted ??= [];
+        //            // Delete from List and save in deleted list, if Voucher is already in DB , would be deleted from DB when Save All.
+        //            if (Deleted.Count > 0)
+        //            {
+        //                var IsAlreadyDeleted = Deleted.Where(e => e.Sr_No == MyVoucher.Detail.Sr_No).Any();
+        //                if (!IsAlreadyDeleted)
+        //                {
+        //                    // show Message already deleted. not can npot be deleted.
+        //                }
+        //            }
+        //            Deleted.Add(MyVoucher.Detail);
+        //            MyVoucher.Details.Remove(MyVoucher.Detail);
+        //            if (MyVoucher.Details.Count > 0)
+        //            {
+        //                MyVoucher.Detail = MyVoucher.Details.First();
+        //            }
+        //            else
+        //            {
+        //                MyVoucher.Detail = NewDetail();
+        //            }
+
+        //        }
+        //        CalculateTotal();
+        //    }
+        //}
         #endregion
 
         #region Save & Save All
@@ -568,7 +605,6 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-
         #region Calculations
 
         private decimal CalculateNetAmount()
@@ -641,9 +677,6 @@ namespace AppliedAccounts.Models
             return rptModel;
         }
 
-
-
-
         #endregion
 
         #region Model
@@ -663,11 +696,11 @@ namespace AppliedAccounts.Models
         public class Master
         {
             public Master() { }
-            public int ID1 { get; set; }
+            public long ID1 { get; set; }
             public string Vou_No { get; set; } = string.Empty;
             public DateTime Vou_Date { get; set; }
-            public int Company { get; set; }
-            public int Employee { get; set; }
+            public long Company { get; set; }
+            public long Employee { get; set; }
             public string Ref_No { get; set; } = string.Empty;
             public string Inv_No { get; set; } = string.Empty;
             public DateTime Inv_Date { get; set; }
@@ -686,17 +719,17 @@ namespace AppliedAccounts.Models
         public class Detail
         {
             public Detail() { }
-            public int ID2 { get; set; }
-            public int TranID { get; set; }
+            public long ID2 { get; set; }
+            public long TranID { get; set; }
             public int Sr_No { get; set; }
-            public int Inventory { get; set; }
+            public long Inventory { get; set; }
             public string Batch { get; set; } = string.Empty;
             public decimal Qty { get; set; } = 0.00M;
             public decimal Rate { get; set; } = 0.00M;
-            public int TaxID { get; set; }
+            public long TaxID { get; set; }
             public decimal TaxRate { get; set; } = 0.00M;
             public string Description { get; set; } = string.Empty;
-            public int Project { get; set; }
+            public long Project { get; set; }
 
             // Non DataBase Variables
 
@@ -707,7 +740,7 @@ namespace AppliedAccounts.Models
             public string TitleInventory { get; set; } = string.Empty;
             public string TitleProject { get; set; } = string.Empty;
             public string TitleTaxID { get; set; } = string.Empty;
-            public int Unit { get; set; }                                       // Unit ID get from inventory
+            public long Unit { get; set; }                                       // Unit ID get from inventory
             public string TitleUnit { get; set; } = string.Empty;
             public string Action { get; set; } = string.Empty; // action like save, delete, update
 

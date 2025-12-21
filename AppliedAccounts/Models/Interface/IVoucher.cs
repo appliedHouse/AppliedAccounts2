@@ -35,12 +35,13 @@ namespace AppliedAccounts.Models.Interface
         #endregion
 
         #region Voucher Validation
+        bool IsTransValidated();
         bool IsVoucherValidated();
         #endregion
 
         #region New and Edit Record
 
-        void Edit(int _ID2);
+        void Edit(long _ID2);
         void New();
         #endregion
 
@@ -52,7 +53,8 @@ namespace AppliedAccounts.Models.Interface
         #endregion
 
         #region Remove record from list
-        void Remove();
+        //void Remove();
+        void Remove(int _SrNo);
         #endregion
 
         #region Add and Save Voucher
@@ -60,11 +62,5 @@ namespace AppliedAccounts.Models.Interface
         Task<bool> SaveAllAsync();
         #endregion
 
-        //#region Print
-        //void Print(ReportType _rptType);
-        //ReportData GetReportData();
-        //ReportModel CreateReportModel();
-
-        //#endregion
     }
 }

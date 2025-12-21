@@ -5,7 +5,6 @@ using AppMessages;
 using AppReports;
 using Microsoft.AspNetCore.Components;
 using System.Data;
-using System.Security.Cryptography.X509Certificates;
 using Format = AppliedGlobals.AppValues.Format;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
 using MESSAGES = AppMessages.Enums.Messages;
@@ -514,11 +513,11 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
         public class GLModel
         {
-            public int BookID { get; set; }
-            public int COAID { get; set; }
-            public int CompanyID { get; set; }
-            public int ProjectID { get; set; }
-            public int EmployeeID { get; set; }
+            public long BookID { get; set; }
+            public long COAID { get; set; }
+            public long CompanyID { get; set; }
+            public long ProjectID { get; set; }
+            public long EmployeeID { get; set; }
 
             public DateTime Date_From { get; set; }
             public DateTime Date_To { get; set; }

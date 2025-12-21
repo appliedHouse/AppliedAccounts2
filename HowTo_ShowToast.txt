@@ -1,0 +1,28 @@
+
+How to Inject Toast and show...
+
+1. Inject Toast class in .razor page
+    @inject ToastClass Toast
+
+
+1. In Razor Page Construct toast
+	public ToastClass Toast { get; set; }
+
+2. Create a HTML Tag Helper in .razor page
+	    <div class="toast-container position-fixed @Toast.GetPosition()">
+            @if (Toast.ShowToast)
+            {
+                <ShowToastMessage toastClass="@Toast"></ShowToastMessage>
+            }
+        </div>
+
+3. Create a C# Method in .razor Page at @code Section
+        public void ShowToast(ToastClass _toast)
+        {
+            Toast = _toast;
+            ToastService.ShowToast(Toast);
+        }
+
+
+Note : Toast Service in Dependency Injected in program.cs 
+        and Service class is in /Services/ToastService.cs

@@ -32,17 +32,17 @@
 
         if(Nature != null)
         {
-            BookNatureChanged((int)Nature); 
+            BookNatureChanged((long)Nature); 
         }
     }
         
-       private void BookNatureChanged(int _NatureID)
+       private void BookNatureChanged(long _NatureID)
     {
         MyModel.BookNatureID = _NatureID;
         MyModel.BookID = MyModel.Source.GetBookAccounts(MyModel.BookNatureID).First()?.ID ?? 0;
     }
 
-    private void BookListChanged(int _BookID)
+    private void BookListChanged(long _BookID)
     {
         MyModel.BookID = _BookID; //result;
     }
@@ -67,11 +67,11 @@ else
     <div class="d-flex flex-row mb-3 filter" hidden="@MyModel.IsWaiting">
         <div class="p-2">
             <InputSelect id="ddBook" class="item-height"
-                         TValue="int"
+                         TValue="long"
                          Value="@MyModel.BookNatureID"
                          ValueExpression="@(() => MyModel.BookNatureID)"
                          ValueChanged="@((e) => BookNatureChanged(e))">
-
+                
                 @foreach (var item in MyModel.NatureAccountsList)
                 {
                     <option value="@item.ID">@item.Title</option>
@@ -81,7 +81,7 @@ else
         </div>
         <div class="p-2">
             <InputSelect id="ddBook" class="item-height"
-                         TValue="int"
+                         TValue="long"
                          Value="@MyModel.BookID"
                          ValueExpression="@(()=> MyModel.BookID)"
                          ValueChanged="@((e)=>BookListChanged(e))">
@@ -126,7 +126,8 @@ else
                     <tr>
                         <th style="width:10%">Voucher</th>
                         <th style="width:10%">Date</th>
-                        <th style="width:40%">Description</th>
+                        <th style="width:5%">Sr.No</th>
+                        <th style="width:35%">Description</th>
                         <th style="width:10%">Received</th>
                         <th style="width:10%">Paid</th>
                         <th style="width:10%">Balance</th>
@@ -142,6 +143,7 @@ else
                         <tr>
                             <td>@Record.Vou_No</td>
                             <td>@Record.Vou_Date.ToString(Format.DDMMMYY)</td>
+                            <td class="center">@Record.Sr_No</td>
                             <td class="left">@Record.Description</td>
                             <td class="amount">@Record.TReceived</td>
                             <td class="amount">@Record.TPaid</td>

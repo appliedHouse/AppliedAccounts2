@@ -30,24 +30,28 @@ namespace AppliedDB
         }
         public static DataRow RemoveNull(DataRow CurrentRow)
         {
-            foreach (DataColumn Column in CurrentRow.Table.Columns)
+            if (CurrentRow != null)
             {
-                if (CurrentRow[Column] == DBNull.Value)
+                foreach (DataColumn Column in CurrentRow.Table.Columns)
                 {
-                    var _Type = CurrentRow.Table.Columns[Column.ColumnName]?.DataType;
-
-                    if (_Type is not null)
+                    if (CurrentRow[Column] == DBNull.Value)
                     {
-                        if (_Type == typeof(string)) { CurrentRow[Column] = ""; }
-                        if (_Type == typeof(int)) { CurrentRow[Column] = 0; }
-                        if (_Type == typeof(long)) { CurrentRow[Column] = 0; }
-                        if (_Type == typeof(short)) { CurrentRow[Column] = 0; }
-                        if (_Type == typeof(decimal)) { CurrentRow[Column] = 0.00M; }
-                        if (_Type == typeof(DateTime)) { CurrentRow[Column] = DateTime.Now; }
+                        var _Type = CurrentRow.Table.Columns[Column.ColumnName]?.DataType;
+
+                        if (_Type is not null)
+                        {
+                            if (_Type == typeof(string)) { CurrentRow[Column] = ""; }
+                            if (_Type == typeof(int)) { CurrentRow[Column] = 0; }
+                            if (_Type == typeof(long)) { CurrentRow[Column] = 0; }
+                            if (_Type == typeof(short)) { CurrentRow[Column] = 0; }
+                            if (_Type == typeof(decimal)) { CurrentRow[Column] = 0.00M; }
+                            if (_Type == typeof(DateTime)) { CurrentRow[Column] = DateTime.Now; }
+                        }
                     }
                 }
+                return CurrentRow;
             }
-            return CurrentRow;
+            return null;
         }
         public static DataTable ToDataTable<T>(this IList<T> data)
         {

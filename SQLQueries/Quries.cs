@@ -6,7 +6,7 @@ namespace SQLQueries
     public class Quries
     {
         #region Receipt
-        public static string Receipt(int _ReceiptID)
+        public static string Receipt(long _ReceiptID)
         {
             var _Text = new StringBuilder();
             _Text.AppendLine("SELECT [R].*,[R2].*,");
@@ -52,7 +52,7 @@ namespace SQLQueries
         #endregion
 
         #region Sale Invoice / Bill Receivable
-        public static string SaleInvoice(int _ID)
+        public static string SaleInvoice(long _ID)
         {
             var _Text = new StringBuilder();
             _Text.AppendLine("SELECT * FROM (");
@@ -145,7 +145,7 @@ namespace SQLQueries
         #endregion
 
         #region General Ledger
-        public static string GeneralLedger(int COAID, string OBDate, string FilterOB, string GroupBy, string Filter, string OrderBy)
+        public static string GeneralLedger(long COAID, string OBDate, string FilterOB, string GroupBy, string Filter, string OrderBy)
         {
             var _Text = new StringBuilder();
             var _Text1 = new StringBuilder();           // Opening Balance

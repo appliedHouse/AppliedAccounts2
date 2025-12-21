@@ -101,17 +101,27 @@ namespace AppliedAccounts.Data
         }
         public static int GetNumber(string DataFile, string Key)
         {
-            if (DataFile == null || DataFile == string.Empty) { return 0; }
-            DataView VW_Registry = GetRegistryView(DataFile);
-            VW_Registry.RowFilter = string.Concat("Code='", Key, "'");
-            if (VW_Registry.Count == 1)
+            try
             {
-                return (int)VW_Registry[0]["nValue"];
+                if (DataFile == null || DataFile == string.Empty) { return 0; }
+                DataView VW_Registry = GetRegistryView(DataFile);
+                VW_Registry.RowFilter = string.Concat("Code='", Key, "'");
+                if (VW_Registry.Count == 1)
+                {
+                    return (int)VW_Registry[0]["nValue"];
+                }
+                else
+                {
+                    return 0;
+                }
             }
-            else
+            catch (Exception)
             {
+
                 return 0;
             }
+
+            
         }
         public static decimal GetCurrency(string DataFile, string Key)
         {
@@ -175,12 +185,13 @@ namespace AppliedAccounts.Data
 
         public static DateTime GetFrom(string DataFile, string Key)
         {
-            if (DataFile == null || DataFile == string.Empty) { return DateTime.Now; }
+            if (DataFile == null || DataFile == string.Empty) { return MinDate; }
 
-            DataView VW_Registry = GetRegistryView(DataFile);
-            VW_Registry.RowFilter = string.Concat($"Code='{Key}'");
+            DataView VW_Registry = GetRegistryView(DataFile,Key);
             if (VW_Registry.Count == 1)
             {
+                var _Value = VW_Registry[0]["From"];
+                if(_Value == DBNull.Value) { return MinDate; }
                 return (DateTime)VW_Registry[0]["From"];
             }
             return DateTime.Now;
@@ -188,12 +199,13 @@ namespace AppliedAccounts.Data
 
         public static DateTime GetTo(string DataFile, string Key)
         {
-            if (DataFile == null || DataFile == string.Empty) { return DateTime.Now; }
+            if (DataFile == null || DataFile == string.Empty) { return MinDate; }
 
-            DataView VW_Registry = GetRegistryView(DataFile);
-            VW_Registry.RowFilter = string.Concat($"Code='{Key}'");
+            DataView VW_Registry = GetRegistryView(DataFile, Key);
             if (VW_Registry.Count == 1)
             {
+                var _Value = VW_Registry[0]["To"];
+                if (_Value == DBNull.Value) { return MinDate; }
                 return (DateTime)VW_Registry[0]["To"];
             }
             return DateTime.Now;
@@ -208,7 +220,7 @@ namespace AppliedAccounts.Data
         {
 
             if (DataFile == null || DataFile == string.Empty) { return false; }
-            DataTable TB_Registry = GetRegistryTable(DataFile);
+            DataTable TB_Registry = GetRegistryTable(DataFile,Key);
             DataRow CurrentRow;
             string SQLAction;
 
@@ -279,9 +291,17 @@ namespace AppliedAccounts.Data
         {
             return AppliedDB.DataSource.GetDataTable(DataFile, Tables.Registry).AsDataView();
         }
+        private static DataView GetRegistryView(string DataFile, string Key)
+        {
+            return AppliedDB.DataSource.GetDataTable(DataFile, Tables.Registry, Key).AsDataView();
+        }
         private static DataTable GetRegistryTable(string DataFile)
         {
             return AppliedDB.DataSource.GetDataTable(DataFile, Tables.Registry);
+        }
+        private static DataTable GetRegistryTable(string DataFile, string Key)
+        {
+            return AppliedDB.DataSource.GetDataTable(DataFile, Tables.Registry, Key);
         }
     }
 

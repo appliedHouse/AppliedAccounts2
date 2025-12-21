@@ -16,8 +16,8 @@ namespace AppliedAccounts.Models.Interface
         MessageClass MsgClass { get; set; }
         AppliedDB.Enums.Tables Table { get; set; }
         List<T> LoadData();
-        void Print(int ID);
-        void Edit(int ID);
+        void Print(long ID);
+        void Edit(long ID);
 
 
     }

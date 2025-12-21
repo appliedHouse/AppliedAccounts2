@@ -103,7 +103,7 @@ namespace AppliedAccounts.Models
             return _Record;
         }
 
-        public PurchaseRecord GetRecord(int _ID)
+        public PurchaseRecord GetRecord(long _ID)
         {
             var _Record = new PurchaseRecord();
 
@@ -132,7 +132,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Edit
-        public void Edit(int _ID)
+        public void Edit(long _ID)
         {
             GetRecord(_ID);
         }

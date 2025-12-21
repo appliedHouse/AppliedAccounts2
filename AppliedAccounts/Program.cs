@@ -22,6 +22,7 @@ builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
 builder.Services.AddScoped<ToastService>();
 builder.Services.AddScoped<PrintService>();
+builder.Services.AddScoped<MessagesService>();
 builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<GlobalService>(sp =>

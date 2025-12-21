@@ -18,7 +18,7 @@ namespace AppliedAccounts.Models
     public class ReceiptModel : IVoucher
     {
         #region Variables
-        public int ReceiptID { get; set; }
+        public long ReceiptID { get; set; }
         public int[] NatureIDs { get; set; }
         public DateTime LastVoucherDate { get; set; }
         public DateTime MaxVouDate { get; set; }
@@ -69,7 +69,7 @@ namespace AppliedAccounts.Models
 
 
         }
-        public void Start(int _ReceiptID)
+        public void Start(long _ReceiptID)
         {
             //if (UserProfile is null) { return; }
             Source ??= new(AppGlobal.AppPaths);
@@ -145,7 +145,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Edit Record
-        public void Edit(int _ID2)
+        public void Edit(long _ID2)
         {
             var _Detail = MyVoucher.Detail;
             MyVoucher.Detail = MyVoucher.Details.Where(e => e.ID2 == _ID2).First() ?? _Detail;
@@ -154,6 +154,15 @@ namespace AppliedAccounts.Models
 
         #region Validation
         public bool IsVoucherValidated()
+        {
+            bool IsValid = true;
+            MsgClass = new();
+            // update for (voucher master and detail before save to data base)
+            return IsValid;
+        }
+
+
+        public bool IsTransValidated()
         {
             bool IsValid = true;
             MsgClass = new();
@@ -216,11 +225,11 @@ namespace AppliedAccounts.Models
 
                             MyVoucher.Master = VoucherData!.Select(first => new Master()
                             {
-                                ID1 = first.Field<int>("ID1"),
+                                ID1 = first.Field<long>("ID1"),
                                 Vou_No = first.Field<string>("Vou_No") ?? "",
                                 Vou_Date = first.Field<DateTime>("Vou_Date"),
-                                Payer = first.Field<int>("Payer"),
-                                COA = first.Field<int>("COA"),
+                                Payer = first.Field<long>("Payer"),
+                                COA = first.Field<long>("COA"),
                                 Amount = first.Field<decimal>("Amount"),
                                 Ref_No = first.Field<string>("Ref_No") ?? "",
                                 Remarks = first.Field<string>("Remarks") ?? "",
@@ -726,11 +735,11 @@ namespace AppliedAccounts.Models
         public class Master
         {
             public Master() { }
-            public int ID1 { get; set; }
+            public long ID1 { get; set; }
             public string Vou_No { get; set; }
             public DateTime Vou_Date { get; set; }
-            public int COA { get; set; }               // Amount received in this account i.e. cash or bank acc.
-            public int Payer { get; set; }             // Customer, client, donner etc.
+            public long COA { get; set; }               // Amount received in this account i.e. cash or bank acc.
+            public long Payer { get; set; }             // Customer, client, donner etc.
             public string Ref_No { get; set; }          // Cheque No. c
             public string? Doc_No { get; set; }          // Cheque No. or on-line transaction no.
             public DateTime? Doc_Date { get; set; }      // Cheque No. or on-line transaction no.
@@ -747,16 +756,16 @@ namespace AppliedAccounts.Models
 
         public class Detail
         {
-            public int ID2 { get; set; }
+            public long ID2 { get; set; }
             public int Sr_No { get; set; }
-            public int TranID { get; set; }
+            public long TranID { get; set; }
             public string Ref_No { get; set; }
-            public int Inv_No { get; set; }
-            public int Account { get; set; }                // Settle account against receipt amount
+            public long Inv_No { get; set; }
+            public long Account { get; set; }                // Settle account against receipt amount
             public decimal DR { get; set; }
             public decimal CR { get; set; }
-            public int Employee { get; set; }
-            public int Project { get; set; }
+            public long Employee { get; set; }
+            public long Project { get; set; }
             public string Description { get; set; }
 
             public string TitleAccount { get; set; }

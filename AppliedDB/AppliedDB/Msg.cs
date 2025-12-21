@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
+using Microsoft.Data.Sqlite;
 
 namespace AppliedDB
 {
@@ -11,21 +7,28 @@ namespace AppliedDB
     {
         public static DataTable GetMessages()
         {
-            var _Connection = Connections.GetMessagesConnection();
-            if (_Connection is not null)
+            try
             {
-                // SELECT * FROM [Messages]
-                _Connection.Open();
-                var _Command = new System.Data.SQLite.SQLiteCommand($"SELECT * FROM [Messages]", _Connection);
-                var _Adapter = new System.Data.SQLite.SQLiteDataAdapter(_Command);
-                var _DataSet = new DataSet();
-                _Adapter.Fill(_DataSet, "Messages");
-                _Connection.Close();
-                if (_DataSet.Tables.Count > 0)
+                var _Connection = Connections.GetMessagesConnection();
+                if (_Connection is not null)
                 {
-                    return _DataSet.Tables[0];
+                    // SELECT * FROM [Messages]
+                    _Connection.Open();
+                    using var _Command = new SqliteCommand($"SELECT * FROM [Messages]", _Connection);
+                    using var _reader = _Command.ExecuteReader();
+
+                    var _DataSet = new DataSet();
+                    var _DataTable = new DataTable();
+
+                    _DataTable.Load(_reader);
+                    return _DataTable;
                 }
             }
+            catch (Exception)
+            {
+                return null;
+            }
+
             return null;
         }
 

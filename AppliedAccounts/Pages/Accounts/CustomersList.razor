@@ -21,8 +21,8 @@
 
     public void Back() { NavManager.NavigateTo("/Menu/Accounts"); }
     public void Add1() { NavManager.NavigateTo("/Customer/0"); }
-    public void Edit(int ID) { NavManager.NavigateTo($"/Customer/{ID}"); }
-    public void Delete(int ID) { NavManager.NavigateTo($"/Customer/{ID}"); }
+    public void Edit(long ID) { NavManager.NavigateTo($"/Customer/{ID}"); }
+    public void Delete(long ID) { NavManager.NavigateTo($"/Customer/{ID}"); }
     public void Submit() { }
 }
 
@@ -66,20 +66,14 @@
                         <td rowspan="2">@_Record.Code</td>
                         <td rowspan="2" style="font-size:larger">@_Record.Title</td>
 
-                        <td>@_Record.Address1</td>
-                        <td>@_Record.City</td>
+                        <td class="no-border-bottom">@_Record.Address1</td>
+                        <td class="no-border-bottom">@_Record.City</td>
 
                         <td rowspan="2">
                             <div>
                                 <!-- Edit Button -->
                                 <Btn_Edit @onclick="() => Edit(_Record.ID)"/>
                                 <Btn_Delete @onclick="() => Delete(_Record.ID * -1)"/>
-                                @*<button id="btnEdit" type="button" class="btn-Edit" aria-label="Edit Record" @onclick="() => Edit(_Record.ID)">
-                                    <i class="bi bi-pencil-fill"></i>
-                                </button>
-                                <button id="btnDel" type="button" class="btn-Del" aria-label="Delete Record" @onclick="() => Delete(_Record.ID * -1)">
-                                    <i class="bi bi-trash-fill"></i>
-                                </button>*@
                             </div>
                         </td>
                     </tr>
@@ -93,5 +87,10 @@
         </table>
     </div>
 
+    <style>
+        .no-border-bottom {
+    border-bottom: none !important;
+}
+    </style>
 
 </EditForm>

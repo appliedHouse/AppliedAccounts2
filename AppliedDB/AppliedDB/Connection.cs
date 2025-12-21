@@ -1,5 +1,5 @@
 ﻿using AppliedGlobals;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 
 namespace AppliedDB
 {
@@ -53,39 +53,39 @@ namespace AppliedDB
         }
 
         #region Connection non static
-        public SQLiteConnection? GetSQLiteUsers()
+        public SqliteConnection? GetSqliteUsers()
         {
-            return GetSQLiteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Client));
+            return GetSqliteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Client));
         }
 
-        public SQLiteConnection? GetSQLiteClient()
+        public SqliteConnection? GetSqliteClient()
         {
-            return GetSQLiteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Client));
+            return GetSqliteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Client));
         }
 
-        public SQLiteConnection? GetSQLiteLanguage()
+        public SqliteConnection? GetSqliteLanguage()
         {
-            return GetSQLiteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Language));
+            return GetSqliteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Language));
         }
 
-        public SQLiteConnection? GetSQLiteMessage()
+        public SqliteConnection? GetSqliteMessage()
         {
-            return GetSQLiteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Message));
+            return GetSqliteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Message));
         }
 
-        public SQLiteConnection? GetSQLiteSystem()
+        public SqliteConnection? GetSqliteSystem()
         {
-            return GetSQLiteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_System));
+            return GetSqliteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_System));
         }
 
-        public SQLiteConnection? GetSQLiteSession()
+        public SqliteConnection? GetSqliteSession()
         {
-            return GetSQLiteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Session));
+            return GetSqliteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Session));
         }
 
         public static string GetTempDBPath()
         {
-            return Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SQLiteTemp");
+            return Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqliteTemp");
         }
 
         public static string GetExcelPath()
@@ -96,53 +96,49 @@ namespace AppliedDB
         #endregion
 
         #region Static Connection by default values.
-        public static SQLiteConnection? GetUsersConnection()
+        public static SqliteConnection? GetUsersConnection()
         {
-            var DBFile = Path.Combine(AppPath, "wwwroot", "SQLiteDB", DB_Users);
-            return GetSQLiteConnection(DBFile);
+            var DBFile = Path.Combine(AppPath, "wwwroot", "SqliteDB", DB_Users);
+            return GetSqliteConnection(DBFile);
             //if (File.Exists(DBFile))
             //{
             //    return GetClientConnection(DBFile);
             //}
             //return null;
         }
-        public static SQLiteConnection? GetMessagesConnection()
+        public static SqliteConnection? GetMessagesConnection()
         {
             var DBFile = Path.Combine(AppPath, "wwwroot", "Messages", DB_Message);
-            return GetSQLiteConnection(DBFile);
+            return GetSqliteConnection(DBFile);
             //if (File.Exists(DBFile))
             //{
             //    return GetClientConnection(DBFile);
             //}
             //return null;
         }
-        public static SQLiteConnection? GetLanguageConnection()
+        public static SqliteConnection? GetLanguageConnection()
         {
             var DBFile = Path.Combine(AppPath, "wwwroot", "Languages", DB_Language);
-            return GetSQLiteConnection(DBFile);
-            //if (File.Exists(DBFile))
-            //{
-            //    return GetClientConnection(DBFile);
-            //}
-            //return null;
+            return GetSqliteConnection(DBFile);
+      
         }
-        public static SQLiteConnection? GetClientConnection(string _DBFile)
+        public static SqliteConnection? GetClientConnection(string _DBFile)
         {
-            var DBFile = Path.Combine(AppPath, "wwwroot", "SQLiteDB", _DBFile);
-            return GetSQLiteConnection(DBFile);
+            var DBFile = Path.Combine(AppPath, "wwwroot", "SqliteDB", _DBFile);
+            return GetSqliteConnection(DBFile);
         }
-        public static SQLiteConnection? GetSQLiteConnection(string _UsersDBFile)
+        public static SqliteConnection? GetSqliteConnection(string _UsersDBFile)
         {
 
             if (File.Exists(_UsersDBFile))
             {
                 try
                 {
-                    SQLiteConnection _Connection = new(); ;
+                    SqliteConnection _Connection = new(); ;
                     _Connection.ConnectionString = $"Data Source={_UsersDBFile}";
                     return _Connection;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     // Error handling code type here....
                 }
@@ -160,6 +156,8 @@ namespace AppliedDB
             //SystemConnection?.Dispose();
             //SessionConnection?.Dispose();
         }
+
+        
     }
 
 }

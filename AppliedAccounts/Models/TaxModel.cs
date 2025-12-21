@@ -37,7 +37,7 @@ namespace AppliedAccounts.Models
             }
         }
 
-        public DataRow GetDataRow(int _ID)
+        public DataRow GetDataRow(long _ID)
         {
             FoundRow = false;
             DataRow _CurrentRow;
@@ -110,7 +110,7 @@ namespace AppliedAccounts.Models
             }
         }
 
-        public void GetVariables(int _ID)
+        public void GetVariables(long _ID)
         {
             CurrentRow = GetDataRow(_ID);
             if (FoundRow)

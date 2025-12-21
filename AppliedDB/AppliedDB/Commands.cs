@@ -1,6 +1,6 @@
 ﻿using AppMessages;
+using Microsoft.Data.Sqlite;
 using System.Data;
-using System.Data.SQLite;
 using System.Text;
 using Messages = AppMessages.Enums.Messages;
 
@@ -8,19 +8,17 @@ namespace AppliedDB
 {
     public class Commands
     {
-
-        public static SQLiteCommand? Insert(DataRow CurrentRow, SQLiteConnection DBConnection)
+        public static SqliteCommand? Insert(DataRow CurrentRow, SqliteConnection DBConnection)
         {
-            if ((int)CurrentRow["ID"] == 0)
+            if (CurrentRow.Field<long>("ID") == 0)
             {
                 DataColumnCollection _Columns = CurrentRow.Table.Columns;
-                SQLiteCommand _Command = new(DBConnection);
 
                 StringBuilder _CommandString = new();
                 string _LastColumn = _Columns[_Columns.Count - 1].ColumnName.ToString();
                 string _TableName = CurrentRow.Table.TableName;
                 string _ParameterName;
-
+                if (_TableName == "") { return null; }
                 _CommandString.Append("INSERT INTO [");
                 _CommandString.Append(_TableName);
                 _CommandString.Append("] VALUES (");
@@ -35,7 +33,7 @@ namespace AppliedDB
                     { _CommandString.Append(") "); }
                 }
 
-                _Command.CommandText = _CommandString.ToString();
+                SqliteCommand _Command = new SqliteCommand(_CommandString.ToString(), DBConnection);
 
                 foreach (DataColumn _Column in _Columns)
                 {
@@ -50,7 +48,7 @@ namespace AppliedDB
             }
             return null;
         }
-        public static SQLiteCommand? Insert(DataRow CurrentRow, string DBFile)
+        public static SqliteCommand? Insert(DataRow CurrentRow, string DBFile)
         {
             var _Connection = Connections.GetClientConnection(DBFile);
             if (_Connection is not null)
@@ -59,14 +57,12 @@ namespace AppliedDB
             }
             return null;
         }
-        public static SQLiteCommand? UpDate(DataRow CurrentRow, SQLiteConnection DBConnection)
+        public static SqliteCommand? UpDate(DataRow CurrentRow, SqliteConnection DBConnection)
         {
-            if ((int)CurrentRow["ID"] != 0)
+            if (CurrentRow.Field<long>("ID") != 0)
             {
-
                 var _TableName = CurrentRow.Table.TableName;
                 var _Columns = CurrentRow.Table.Columns;
-                var _Command = new SQLiteCommand(DBConnection);
                 var _CommandString = new StringBuilder();
                 var _LastColumn = _Columns[_Columns.Count - 1].ColumnName.ToString();
 
@@ -89,7 +85,7 @@ namespace AppliedDB
                     }
                 }
 
-                _Command.CommandText = _CommandString.ToString();
+                SqliteCommand _Command = new SqliteCommand(_CommandString.ToString(), DBConnection);
 
                 foreach (DataColumn _Column in _Columns)
                 {
@@ -103,7 +99,7 @@ namespace AppliedDB
             return null;
 
         }
-        public static SQLiteCommand? UpDate(DataRow CurrentRow, string DBFile)
+        public static SqliteCommand? UpDate(DataRow CurrentRow, string DBFile)
         {
             var _Connection = Connections.GetClientConnection(DBFile);
             if (_Connection is not null)
@@ -112,12 +108,13 @@ namespace AppliedDB
             }
             return null;
         }
-        public static SQLiteCommand? Delete(DataRow CurrentRow, SQLiteConnection DBConnection)
+        public static SqliteCommand? Delete(DataRow CurrentRow, SqliteConnection DBConnection)
         {
-            if ((int)CurrentRow["ID"] != 0)
+            if (CurrentRow.Field<long>("ID") != 0)
             {
                 var _TableName = CurrentRow.Table.TableName;
-                var _Command = new SQLiteCommand(DBConnection);
+                if (_TableName == "") { return null; }
+                var _Command = new SqliteCommand("", DBConnection);
                 _Command.Parameters.AddWithValue("@ID", CurrentRow["ID"]);
                 _Command.CommandText = $"DELETE FROM [{_TableName}] WHERE ID=@ID";
                 return _Command;
@@ -125,12 +122,19 @@ namespace AppliedDB
             return null;
 
         }
-        public static SQLiteCommand? Delete(DataRow CurrentRow, string DBFile)
+        public static SqliteCommand? Delete(DataRow CurrentRow, string DBFile)
         {
-            if ((int)CurrentRow["ID"] != 0)
+            if (CurrentRow.Field<long>("ID") != 0)
             {
                 var _TableName = CurrentRow.Table.TableName;
-                var _Command = new SQLiteCommand(Connections.GetClientConnection(DBFile));
+                var _Connection = Connections.GetClientConnection(DBFile);
+                using var _Command = new SqliteCommand("", _Connection);
+
+                if (_TableName == "")
+                {
+                    return null;
+                }
+
                 _Command.Parameters.AddWithValue("@ID", CurrentRow["ID"]);
                 _Command.CommandText = $"DELETE FROM [{_TableName}] WHERE ID=@ID";
                 return _Command;
@@ -141,14 +145,14 @@ namespace AppliedDB
     }
     public class CommandClass
     {
-        public SQLiteCommand CommandInsert { get; set; }
-        public SQLiteCommand CommandUpdate { get; set; }
-        public SQLiteCommand CommandDelete { get; set; }
+        public SqliteCommand CommandInsert { get; set; } = new();
+        public SqliteCommand CommandUpdate { get; set; } = new();
+        public SqliteCommand CommandDelete { get; set; } = new();
         public DataRow Row { get; set; }
         public string Action { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
         public int Effected { get; set; } = 0;
-        public int PrimaryKeyID { get; set; } = 0;
+        public long PrimaryKeyID { get; set; } = 0;
         public MessageClass MyMessages { get; set; } = new();
 
         #region Constructors
@@ -161,7 +165,7 @@ namespace AppliedDB
         {
             Row = _Row;
 
-            if ((int)Row["ID"] == 0) { Action = "Insert"; } else { Action = "Update"; }
+            if ((int)Row.Field<long>("ID") == 0) { Action = "Insert"; } else { Action = "Update"; }
 
             CommandInsert = Commands.Insert(Row, DBFile);
             CommandUpdate = Commands.UpDate(Row, DBFile);
@@ -169,11 +173,11 @@ namespace AppliedDB
 
         }
 
-        public CommandClass(DataRow _Row, SQLiteConnection DBConnection)
+        public CommandClass(DataRow _Row, SqliteConnection DBConnection)
         {
             Row = _Row;
 
-            if ((int)Row["ID"] == 0) { Action = "Insert"; } else { Action = "Update"; }
+            if ((int)Row.Field<long>("ID") == 0) { Action = "Insert"; } else { Action = "Update"; }
 
             CommandInsert = Commands.Insert(Row, DBConnection);
             CommandUpdate = Commands.UpDate(Row, DBConnection);
@@ -198,7 +202,10 @@ namespace AppliedDB
                         CommandUpdate.Connection.Open();
                         Effected = CommandUpdate.ExecuteNonQuery();
                         CommandUpdate.Connection.Close();
-                        PrimaryKeyID = (int)CommandUpdate.Parameters["@ID"].Value;
+                        PrimaryKeyID = (long)CommandUpdate.Parameters["@ID"].Value;
+
+                        if (Effected == 0) { MyMessages.Alert(Messages.NotSave); result = false; }
+                        if (Effected > 0) { MyMessages.Add(Messages.Save); result = true; }
                     }
                     catch (Exception)
                     {
@@ -216,19 +223,20 @@ namespace AppliedDB
                         CommandInsert.Connection.Open();
                         Effected = CommandInsert.ExecuteNonQuery();
                         CommandInsert.Connection.Close();
-                        PrimaryKeyID = (int)CommandInsert.Parameters["@ID"].Value;
-                    }
-                    catch (Exception)
-                    {
-                        MyMessages.Danger(Messages.RowNotInserted); result = false;
-                    }
+                        PrimaryKeyID = (long)CommandInsert.Parameters["@ID"].Value;
 
+                        if (Effected == 0) { MyMessages.Alert(Messages.NotSave); result = false; }
+                        if (Effected > 0) { MyMessages.Add(Messages.Save); result = true; }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        MyMessages.Danger(ex.Message); result = false;
+                    }
                 }
             }
 
-            if (Effected == 0) { MyMessages.Alert(Messages.NotSave); result = false; }
-            if (Effected > 0) { MyMessages.Add(Messages.Save); result = true; }
-
+            
             return result;
         }
 
@@ -237,7 +245,7 @@ namespace AppliedDB
         {
             if (Row is not null)
             {
-                Row.Table.DefaultView.RowFilter = $"ID={(int)Row["ID"]}";
+                Row.Table.DefaultView.RowFilter = $"ID={Row.Field<long>("ID")}";
                 if (Row.Table.DefaultView.Count == 1)
                 {
                     if (CommandDelete is not null)

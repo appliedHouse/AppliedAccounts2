@@ -57,7 +57,7 @@ namespace AppliedAccounts.Models
             _Row = AppliedDB.Functions.RemoveNull(_Row);
             COARecord _Record = new();
             {
-                _Record.ID = (int)_Row["ID"];
+                _Record.ID = (long)_Row["ID"];
                 _Record.Code = (string)_Row["Code"];
                 _Record.Title = (string)_Row["Title"];
                 _Record.Class = (int)_Row["Class"];
@@ -71,7 +71,7 @@ namespace AppliedAccounts.Models
             return _Record;
         }
 
-        public COARecord GetRecord(int _ID)
+        public COARecord GetRecord(long _ID)
         {
             var _Record = new COARecord();
 
@@ -137,7 +137,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Delete
-        public bool Delete(int _ID)
+        public bool Delete(long _ID)
         {
             //MyMessages = MessageClass.Messages;
             var _DeleteRow = DataSource.GetNewRow(DBFile, Tables.COA);
@@ -175,12 +175,9 @@ namespace AppliedAccounts.Models
             if (Validate(_NewRow))
             {
                 Source!.Save(_NewRow);
-                return true;
-
-                //var _Commands = new CommandClass(_NewRow, DBFile);
-                //return _Commands.SaveChanges();
+                MsgClass = Source.MyCommands.MyMessages;
+                return Source.IsSaved;
             }
-
             return false;
         }
         #endregion
@@ -193,7 +190,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Edit
-        public void Edit(int _ID)
+        public void Edit(long _ID)
         {
             Record = GetRecord(_ID);
         }
@@ -228,7 +225,7 @@ namespace AppliedAccounts.Models
             if (_Row["Class"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.AccClassZero); }
             if (_Row["Nature"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.AccNatureZero); }
             if (_Row["Notes"].ToString()?.Length == 0) { _Validated = false; MsgClass.Add(MESSAGES.AccNotesZero); }
-            if (_Row["Code"].ToString()?.Length != 6) { _Validated = false; MsgClass.Add(MESSAGES.CodeLength6); }
+            if (_Row["Code"].ToString()?.Length < 6) { _Validated = false; MsgClass.Add(MESSAGES.CodeLength6); }
 
 
             return _Validated;
@@ -241,12 +238,12 @@ namespace AppliedAccounts.Models
 
     public class COARecord
     {
-        public int ID { get; set; } = 0;
+        public long ID { get; set; } = 0;
         public string Code { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
-        public int Class { get; set; } = 0;
-        public int Nature { get; set; } = 0;
-        public int Notes { get; set; } = 0;
+        public long Class { get; set; } = 0;
+        public long Nature { get; set; } = 0;
+        public long Notes { get; set; } = 0;
         public decimal OBal { get; set; } = 0.00M;
 
         public virtual string? TitleClass { get; set; }

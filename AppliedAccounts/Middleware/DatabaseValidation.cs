@@ -23,7 +23,7 @@
 
                 string dbPath = Path.Combine(Directory.GetCurrentDirectory(),
                     "wwwroot",
-                    "SQLiteDB",
+                    "SqliteDB",
                     "AppliedUsers2.db");
 
                 // Check if the database file exists

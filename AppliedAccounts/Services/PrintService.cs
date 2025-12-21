@@ -1,5 +1,4 @@
-﻿using AppliedDB;
-using AppMessages;
+﻿using AppMessages;
 using AppReports;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -139,9 +138,6 @@ namespace AppliedAccounts.Services
 
         }
         #endregion
-
-
-
 
         #region Option (Type) of Printing Of reports. Print,Preview,PDF, Excel.... 
         public async Task Printer()

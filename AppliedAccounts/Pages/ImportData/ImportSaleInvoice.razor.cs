@@ -72,7 +72,7 @@ namespace AppliedAccounts.Pages.ImportData
         // Sep 1
         // The Excel File save on server and
         // Open from Server
-        // Create a Temp Database Table and move all data to this temp SQLite Database File.
+        // Create a Temp Database Table and move all data to this temp Sqlite Database File.
         public async Task GetExcelFile(InputFileChangeEventArgs e)
         {
             try
@@ -522,7 +522,7 @@ namespace AppliedAccounts.Pages.ImportData
         #endregion
 
         #region Dispaly invocie in Model...  Pending.  through View button in <Table> Tag.
-        private async Task ShowInvoiceModal(int ID)
+        private async Task ShowInvoiceModal(long ID)
         {
 
             MyModel.GetSelectedSale(ID);
@@ -616,7 +616,7 @@ namespace AppliedAccounts.Pages.ImportData
                     CommandClass _Commands = new(master, AppGlobal.DBFile);
                     var IsSaved = _Commands.SaveChanges();
                     MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} saved ---> {IsSaved} ");
-                    var _TranID = (int)master["ID"];        // Get ID after save row in SQLite Data Table.
+                    var _TranID = (int)master["ID"];        // Get ID after save row in Sqlite Data Table.
                     foreach (var Row in details)
                     {
                         Row["ID"] = 0;
@@ -695,12 +695,12 @@ namespace AppliedAccounts.Pages.ImportData
             SaleDetails = _SaleTable2.NewRow();
         }
 
-        public List<DataRow> GetDetail(int _ID)
+        public List<DataRow> GetDetail(long _ID)
         {
             return SaleDetailsList.Where(a => (int)a["ID"] == _ID).ToList();
         }
 
-        public void GetSelectedSale(int TranID)
+        public void GetSelectedSale(long TranID)
         {
             var _master = SaleInvoiceList.Where(Row => (int)Row["ID"] == TranID).First();
             var _detail = SaleDetailsList.Where(Row => (int)Row["TranID"] == TranID).ToList();

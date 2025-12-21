@@ -48,9 +48,9 @@ namespace AppliedAccounts.Services
             AppPaths.LanguagesPath = Config.GetValue<string>("Paths:LanguagesPath") ?? "Languages";
             AppPaths.MessagesPath = Config.GetValue<string>("Paths:MessagesPath") ?? "Messages";
             AppPaths.PDFPath = Config.GetValue<string>("Paths:PDFPath") ?? "PDFReports";
-            AppPaths.ClientPath = Config.GetValue<string>("Paths:ClientPath") ?? "SQLiteDB";
-            AppPaths.UsersPath = Config.GetValue<string>("Paths:UsersPath") ?? "SQLiteDB";
-            AppPaths.DBTempPath = Config.GetValue<string>("Paths:DBTempPath") ?? "SQLiteTemp";
+            AppPaths.ClientPath = Config.GetValue<string>("Paths:ClientPath") ?? "SqliteDB";
+            AppPaths.UsersPath = Config.GetValue<string>("Paths:UsersPath") ?? "SqliteDB";
+            AppPaths.DBTempPath = Config.GetValue<string>("Paths:DBTempPath") ?? "SqliteTemp";
             AppPaths.SessionPath = Config.GetValue<string>("Paths:SessionPath") ?? "Sessions";
             AppPaths.ExcelFilesPath = Config.GetValue<string>("Paths:ExcelFilesPath") ?? "ExcelFiles";
 

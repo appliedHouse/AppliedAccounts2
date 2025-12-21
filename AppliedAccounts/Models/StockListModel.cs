@@ -11,7 +11,7 @@ namespace AppliedAccounts.Models
         public GlobalService AppGlobal { get; set; }
         public DataSource Source { get; set; }
         public MessageClass MsgClass { get; set; }
-        public int RecordID { get; set; } = 0; // Current record ID
+        public long RecordID { get; set; } = 0; // Current record ID
         public RecordModel Record { get; set; } = new(); // List of stock records
         public List<RecordModel> Records { get; set; } = new(); // List of stock records
         public List<RecordModel> FilterRecords { get; set; } = new(); // List of stock records
@@ -64,7 +64,7 @@ namespace AppliedAccounts.Models
 
         }
 
-        public void Edit(int ID)
+        public void Edit(long ID)
         {
             try
             {
@@ -129,14 +129,9 @@ namespace AppliedAccounts.Models
         public bool Save()
         {
             var _Row = Record2Row();
-            var _Saved = Source.Save(Tables.Inventory, _Row);
-            if (!_Saved)
-            {
-                MsgClass = Source.MyCommands.MyMessages;
-            }
-            return _Saved;
-
-
+            Source.Save(_Row);
+            MsgClass = Source.MyCommands.MyMessages;
+            return Source.IsSaved;
         }
         #endregion
 
@@ -155,15 +150,15 @@ namespace AppliedAccounts.Models
         #region RecordModel
         public class RecordModel
         {
-            public int ID { get; set; }
+            public long ID { get; set; }
             public string Code { get; set; } = string.Empty;
             public string Title { get; set; } = string.Empty;
             public int Qty_Packing { get; set; }
-            public int Packing { get; set; }
-            public int UOM { get; set; }
-            public int Size { get; set; }
-            public int SubCategory { get; set; }
-            public int Category { get; set; }
+            public long Packing { get; set; }
+            public long UOM { get; set; }
+            public long Size { get; set; }
+            public long SubCategory { get; set; }
+            public long Category { get; set; }
             public string Notes { get; set; }
 
             public virtual string TitlePacking { get; set; }
