@@ -100,12 +100,12 @@
             TitleIsNull = 13,
             CityIsZero = 24,
             CodeIsZero = 12,
-            TitleIsZero = 999906,
+            TitleIsZero = 14,
             CommendError = 141,
             RowNotUpdated = 143,
             SQLQueryIsNull = 215,
             UserProfileIsNull = 145,
-            VouNoNotDefine = 103,
+           
             BookIDIsZero = 147,
             BookNatureIsZero = 149,
             BookNatureIsNull = 209,
@@ -131,25 +131,32 @@
             DRnCRAreZero = 183,
             DRIsNegative = 185,
             CRIsNegative = 187,
-            DescriptionIsNothing = 999905,
+            DescriptionIsNothing = 193,
             ProjectIDIsZero = 36,
             EmployeeIDIsZero = 37,
             AccountIDIsZero = 191,
-            CustomerIDIsZero = 999901,
-            VouNoIsNull = 1033,
+            CustomerIDIsZero = 192,
+            
             NoRecordFound = 193,
             PageIsNotValid = 195,
-            VouDateLess = 999902,
-            VouDateMore = 999903,
+           
             Row_NoStatus = 197,
-            VouNoNotDefineProperly = 103000,
+            
             SerialNoIsZero = 199,
             MasterRecordisNull = 201,
             DetailRecordsisNull = 203,
             DetailRecordsAreZero = 205,
             AmountNotEqual = 218,
-            GlobalValueIsNull = 999909
+            GlobalValueIsNull = 219,
 
+            VouNoIsNull = 401,
+            VouNoNotDefine = 402,
+            VouNoNotDefineProperly = 403,
+            VouDateLess = 404,
+            VouDateMore = 405,
+            VouTransNotDeleted = 406,
+            VouMasterDeleted = 407,
+            VouMasterNotDeleted = 408
         }
 
         public enum Class

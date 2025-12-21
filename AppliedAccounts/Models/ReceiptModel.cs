@@ -157,6 +157,15 @@ namespace AppliedAccounts.Models
         {
             bool IsValid = true;
             MsgClass = new();
+            // update for (voucher master and detail before save to data base)
+            return IsValid;
+        }
+
+
+        public bool IsTransValidated()
+        {
+            bool IsValid = true;
+            MsgClass = new();
 
             if (MyVoucher.Master == null) { MsgClass.Add(MESSAGE.MasterRecordisNull); return false; }
             if (MyVoucher.Details == null) { MsgClass.Add(MESSAGE.DetailRecordsisNull); return false; }

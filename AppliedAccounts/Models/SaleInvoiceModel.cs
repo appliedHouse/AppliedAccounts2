@@ -249,7 +249,18 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Is Voucher is valided 
-        public bool IsVoucherValidated()
+        public bool IsVoucherValidated()            // Validate Master and Detail both of all record
+        {
+            bool IsValid = true;                
+            MsgClass.ClearMessages();
+            if (!IsTransValidated())                // Temp code. update in future 20-DEC-2025
+            {
+                IsValid = false;
+            }
+            return IsValid;
+        }
+
+        public bool IsTransValidated()
         {
             bool IsValid = true;
             MsgClass ??= new(Msg.GetMessages());
@@ -372,43 +383,69 @@ namespace AppliedAccounts.Models
         }
 
         #region Remove
-        public void Remove()
+
+        public void Remove(int _SrNo)
         {
-            if (MyVoucher.Detail is not null)
+            if (_SrNo > 0 && _SrNo <= MyVoucher.Details.Max(sr => sr.Sr_No))
             {
-                // Delete from List and do not save in deleted list if voucher is NEW
-                if (MyVoucher.Master.Vou_No.ToUpper().Equals("NEW"))
+                var _Trans = MyVoucher.Details.FirstOrDefault(sr => sr.Sr_No == _SrNo);
+                if (_Trans != null)
                 {
-                    MyVoucher.Details.Remove(MyVoucher.Detail);
-                    MyVoucher.Detail = NewDetail();
-                }
-                else
-                {
-                    Deleted ??= [];
-                    // Delete from List and save in deleted list, if Voucher is already in DB , would be deleted from DB when Save All.
-                    if (Deleted.Count > 0)
-                    {
-                        var IsAlreadyDeleted = Deleted.Where(e => e.Sr_No == MyVoucher.Detail.Sr_No).Any();
-                        if (!IsAlreadyDeleted)
-                        {
-                            // show Message already deleted. not can npot be deleted.
-                        }
-                    }
-                    Deleted.Add(MyVoucher.Detail);
-                    MyVoucher.Details.Remove(MyVoucher.Detail);
+                    // Save a deleted record to Deleted list
+                    _Trans.Sr_No = _Trans.Sr_No * -1;
+                    Deleted.Add(_Trans);                     // Marked record as deleted.
+
+                    MyVoucher.Details.Remove(_Trans);
+
                     if (MyVoucher.Details.Count > 0)
                     {
-                        MyVoucher.Detail = MyVoucher.Details.First();
+                        var _NewSrNo = 1;
+                        foreach (var trans in MyVoucher.Details)
+                        {
+                            trans.Sr_No = _NewSrNo; _SrNo++;
+                        }
                     }
-                    else
-                    {
-                        MyVoucher.Detail = NewDetail();
-                    }
-
                 }
-                CalculateTotal();
             }
         }
+
+        //public void Remove()
+        //{
+        //    if (MyVoucher.Detail is not null)
+        //    {
+        //        // Delete from List and do not save in deleted list if voucher is NEW
+        //        if (MyVoucher.Master.Vou_No.ToUpper().Equals("NEW"))
+        //        {
+        //            MyVoucher.Details.Remove(MyVoucher.Detail);
+        //            MyVoucher.Detail = NewDetail();
+        //        }
+        //        else
+        //        {
+        //            Deleted ??= [];
+        //            // Delete from List and save in deleted list, if Voucher is already in DB , would be deleted from DB when Save All.
+        //            if (Deleted.Count > 0)
+        //            {
+        //                var IsAlreadyDeleted = Deleted.Where(e => e.Sr_No == MyVoucher.Detail.Sr_No).Any();
+        //                if (!IsAlreadyDeleted)
+        //                {
+        //                    // show Message already deleted. not can npot be deleted.
+        //                }
+        //            }
+        //            Deleted.Add(MyVoucher.Detail);
+        //            MyVoucher.Details.Remove(MyVoucher.Detail);
+        //            if (MyVoucher.Details.Count > 0)
+        //            {
+        //                MyVoucher.Detail = MyVoucher.Details.First();
+        //            }
+        //            else
+        //            {
+        //                MyVoucher.Detail = NewDetail();
+        //            }
+
+        //        }
+        //        CalculateTotal();
+        //    }
+        //}
         #endregion
 
         #region Save & Save All
@@ -568,7 +605,6 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-
         #region Calculations
 
         private decimal CalculateNetAmount()
@@ -640,9 +676,6 @@ namespace AppliedAccounts.Models
 
             return rptModel;
         }
-
-
-
 
         #endregion
 

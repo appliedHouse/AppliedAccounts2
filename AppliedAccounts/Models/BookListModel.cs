@@ -152,19 +152,20 @@ namespace AppliedAccounts.Models
                     _CR = Row.Field<decimal>("CR");
                     _Bal += _CR - _DR;
 
-                    var _Record = new BookView()
+                    var _Record = new BookView();
                     {
-                        ID = Row.Field<int>("ID1"),
-                        Vou_No = Row.Field<string>("Vou_No") ?? "---",
-                        Vou_Date = Row.Field<DateTime>("Vou_Date"),
-                        Recevied = _CR,
-                        Paid = _DR,
-                        Balance = _Bal,
-                        Description = Row.Field<string>("Description") ?? "",
-
-                        TReceived = _CR.ToString(Format.Digit),
-                        TPaid = _DR.ToString(Format.Digit),
-                        TBalance = _Bal.ToString(Format.Digit)
+                        _Record.ID = Row.Field<long>("ID1");
+                        _Record.Vou_No = Row.Field<string>("Vou_No") ?? "---";
+                        _Record.Sr_No = Row.Field<int>("Sr_No");
+                        _Record.Vou_Date = Row.Field<DateTime>("Vou_Date");
+                        _Record.Recevied = _CR;
+                        _Record.Paid = _DR;
+                        _Record.Balance = _Bal;
+                        _Record.Description = Row.Field<string>("Description") ?? "";
+                        
+                        _Record.TReceived = _CR.ToString(Format.Digit);
+                        _Record.TPaid = _DR.ToString(Format.Digit);
+                        _Record.TBalance = _Bal.ToString(Format.Digit);
                     };
 
                     _List.Add(_Record);
@@ -252,11 +253,11 @@ namespace AppliedAccounts.Models
         {
             if (!string.IsNullOrEmpty(Source.DBFile))
             {
-                BookNatureID = AppRegistry.GetNumber(Source.DBFile, "BKNatureID");
-                BookID = AppRegistry.GetNumber(Source.DBFile, "BKbook");
-                DT_Start = AppRegistry.GetFrom(Source.DBFile, "BKbook");
-                DT_End = AppRegistry.GetTo(Source.DBFile, "BKbook");
-                SearchText = AppRegistry.GetText(Source.DBFile, "BKBook");
+                BookNatureID = AppRegistry.GetNumber(Source.DBFile, "BkNatureID");
+                BookID = AppRegistry.GetNumber(Source.DBFile, "BkBook");
+                DT_Start = AppRegistry.GetFrom(Source.DBFile, "BkBook");
+                DT_End = AppRegistry.GetTo(Source.DBFile, "BkBook");
+                SearchText = AppRegistry.GetText(Source.DBFile, "BkBook");
             }
         }
         #endregion

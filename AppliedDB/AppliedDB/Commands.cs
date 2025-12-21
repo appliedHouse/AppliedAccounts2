@@ -145,9 +145,9 @@ namespace AppliedDB
     }
     public class CommandClass
     {
-        public SqliteCommand CommandInsert { get; set; }
-        public SqliteCommand CommandUpdate { get; set; }
-        public SqliteCommand CommandDelete { get; set; }
+        public SqliteCommand CommandInsert { get; set; } = new();
+        public SqliteCommand CommandUpdate { get; set; } = new();
+        public SqliteCommand CommandDelete { get; set; } = new();
         public DataRow Row { get; set; }
         public string Action { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
@@ -203,6 +203,9 @@ namespace AppliedDB
                         Effected = CommandUpdate.ExecuteNonQuery();
                         CommandUpdate.Connection.Close();
                         PrimaryKeyID = (long)CommandUpdate.Parameters["@ID"].Value;
+
+                        if (Effected == 0) { MyMessages.Alert(Messages.NotSave); result = false; }
+                        if (Effected > 0) { MyMessages.Add(Messages.Save); result = true; }
                     }
                     catch (Exception)
                     {

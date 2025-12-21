@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using static AppMessages.Enums;
-//using Messages = AppMessages.Message ;
 
 namespace AppMessages
 {
@@ -9,22 +8,28 @@ namespace AppMessages
         #region Variables
         public Message MyMessage { get; set; }
         public List<Message> MessageList { get; set; } = [];
-        public DataTable MessagesTable { get; set; } = new();
+        public List<Message> Errors { get; set; } = [];
+        public DataTable MessagesTable { get; set; }
         public Message Empty { get; set; } = new();
-        public int Count => MessageList.Count;
+        public int Count => MessageList.Count + Errors.Count;
+        public int CountError => Errors.Count;
+        public int CountMessages => MessageList.Count;
+
+        public object AppliedDB { get; }
         #endregion
 
         #region Constructor
         public MessageClass()
         {
-
-
+            
         }
         public MessageClass(DataTable _Table)
         {
             MessagesTable = _Table;
+            
         }
         #endregion
+
 
         #region Clear Message / Error List
         public void ClearMessages() { MessageList.Clear(); }
@@ -49,6 +54,8 @@ namespace AppMessages
         }
         #endregion
 
+        // Messages
+
         #region Success
         public void Success(string _Text)
         {
@@ -58,19 +65,6 @@ namespace AppMessages
         public void Success(Messages _Code)
         {
             MessageList.Add(GetMessage(_Code, Class.Success));
-        }
-        #endregion
-
-
-        #region Error
-        public void Error(string _Text)
-        {
-            MessageList.Add(GetMessage(_Text, Class.Error));
-        }
-
-        public void Error(Messages _Code)
-        {
-            MessageList.Add(GetMessage(_Code, Class.Error));
         }
         #endregion
 
@@ -97,14 +91,28 @@ namespace AppMessages
         }
         #endregion
 
+        // Errors
+
+        #region Error
+        public void Error(string _Text)
+        {
+            Errors.Add(GetMessage(_Text, Class.Error));
+        }
+
+        public void Error(Messages _Code)
+        {
+            Errors.Add(GetMessage(_Code, Class.Error));
+        }
+        #endregion
+        
         #region Danger
         public void Danger(string _Text)
         {
-            MessageList.Add(GetMessage(_Text, Class.Danger));
+            Errors.Add(GetMessage(_Text, Class.Danger));
         }
         public void Danger(Messages _Code)
         {
-            MessageList.Add(GetMessage(_Code, Class.Danger));
+            Errors.Add(GetMessage(_Code, Class.Danger));
 
         }
         #endregion
@@ -113,12 +121,12 @@ namespace AppMessages
 
         public void Critical(string _Text)
         {
-            MessageList.Add(GetMessage(_Text, Class.Critical));
+            Errors.Add(GetMessage(_Text, Class.Critical));
         }
 
         public void Critical(Messages _Code)
         {
-            MessageList.Add(GetMessage(_Code, Class.Critical));
+            Errors.Add(GetMessage(_Code, Class.Critical));
         }
         #endregion
 
@@ -171,7 +179,7 @@ namespace AppMessages
             return _Message; ;
         }
 
-        public static Message GetMessage(string _Text)
+        public Message GetMessage(string _Text)
         {
             return new Message()
             {
@@ -182,7 +190,7 @@ namespace AppMessages
             };
         }
 
-        public static Message GetMessage(string _Text, Class _Class)
+        public Message GetMessage(string _Text, Class _Class)
         {
             return new Message()
             {
@@ -193,10 +201,7 @@ namespace AppMessages
             };
         }
 
-        public void Add(object classIsNull)
-        {
-            throw new NotImplementedException();
-        }
+       
         #endregion
     }
 }

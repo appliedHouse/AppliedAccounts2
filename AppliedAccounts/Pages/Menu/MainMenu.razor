@@ -6,7 +6,7 @@
 @code {
     [Parameter] public MenusClass MenuClass { get; set; }
 
-    private string buildNum { get; set; } = "2.0.1";
+    private string buildNum { get; set; } = "2.0.4";
     private bool SubMenu { get; set; } = false;
     private async Task Beep() { await js.InvokeVoidAsync("playBeep"); }
     private async Task MenuClick(int MenuID)
@@ -84,8 +84,8 @@
 <style>
     .build {
         position: absolute;
-        bottom: 0;
-        left: 3; 
+        bottom: 1px;
+        left: 3px; 
         font-size: 12px;
         color: #888; 
     }
