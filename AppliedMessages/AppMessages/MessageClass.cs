@@ -9,7 +9,7 @@ namespace AppMessages
         public Message MyMessage { get; set; }
         public List<Message> MessageList { get; set; } = [];
         public List<Message> Errors { get; set; } = [];
-        public DataTable MessagesTable { get; set; } = new();
+        public DataTable MessagesTable { get; set; }
         public Message Empty { get; set; } = new();
         public int Count => MessageList.Count + Errors.Count;
         public int CountError => Errors.Count;
@@ -29,6 +29,7 @@ namespace AppMessages
             
         }
         #endregion
+
 
         #region Clear Message / Error List
         public void ClearMessages() { MessageList.Clear(); }
@@ -53,6 +54,8 @@ namespace AppMessages
         }
         #endregion
 
+        // Messages
+
         #region Success
         public void Success(string _Text)
         {
@@ -62,18 +65,6 @@ namespace AppMessages
         public void Success(Messages _Code)
         {
             MessageList.Add(GetMessage(_Code, Class.Success));
-        }
-        #endregion
-
-        #region Error
-        public void Error(string _Text)
-        {
-            Errors.Add(GetMessage(_Text, Class.Error));
-        }
-
-        public void Error(Messages _Code)
-        {
-            Errors.Add(GetMessage(_Code, Class.Error));
         }
         #endregion
 
@@ -100,6 +91,20 @@ namespace AppMessages
         }
         #endregion
 
+        // Errors
+
+        #region Error
+        public void Error(string _Text)
+        {
+            Errors.Add(GetMessage(_Text, Class.Error));
+        }
+
+        public void Error(Messages _Code)
+        {
+            Errors.Add(GetMessage(_Code, Class.Error));
+        }
+        #endregion
+        
         #region Danger
         public void Danger(string _Text)
         {
@@ -174,7 +179,7 @@ namespace AppMessages
             return _Message; ;
         }
 
-        public static Message GetMessage(string _Text)
+        public Message GetMessage(string _Text)
         {
             return new Message()
             {
@@ -185,7 +190,7 @@ namespace AppMessages
             };
         }
 
-        public static Message GetMessage(string _Text, Class _Class)
+        public Message GetMessage(string _Text, Class _Class)
         {
             return new Message()
             {
@@ -196,10 +201,7 @@ namespace AppMessages
             };
         }
 
-        public void Add(object classIsNull)
-        {
-            throw new NotImplementedException();
-        }
+       
         #endregion
     }
 }

@@ -1,7 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
 using AppliedAccounts.Services;
-using AppMessages;
 using Microsoft.AspNetCore.Components;
 using System.Data;
 
@@ -15,7 +14,6 @@ namespace AppliedAccounts.Pages.Accounts
 
         public AppliedGlobals.AppUserModel UserProfile { get; set; }
         public BookModel MyModel { get; set; } = new();
-        public MessageClass MsgClass { get; set; }
 
         public bool IsPageValid { get; set; } = true;
         public ToastClass MyToastClass { get; set; }
@@ -29,7 +27,9 @@ namespace AppliedAccounts.Pages.Accounts
 
         
 
-        public Books() { }
+        public Books() 
+        {
+        }
 
         public void ShowToast(ToastClass _toast)
         {
@@ -42,10 +42,10 @@ namespace AppliedAccounts.Pages.Accounts
             MyModel = new(ID, BookID, AppGlobal); ;
             MyModel.ReportService = ReportService;
 
-            if (MyModel == null) { IsPageValid = false; MsgClass.Add("Model is null"); return; }
-            if (MyModel?.MyVoucher == null) { IsPageValid = false; MsgClass.Add("Voucher is null"); return; }
-            if (MyModel?.MyVoucher.Master == null) { IsPageValid = false; MsgClass.Add("Voucher master data is null"); return; }
-            if (MyModel?.MyVoucher.Detail == null) { IsPageValid = false; MsgClass.Add("Voucher detail data is null"); return; }
+            if (MyModel == null) { IsPageValid = false; MsgService.Warning("Model is null"); return; }
+            if (MyModel?.MyVoucher == null) { IsPageValid = false; MsgService.Warning("Voucher is null"); return; }
+            if (MyModel?.MyVoucher.Master == null) { IsPageValid = false; MsgService.Warning("Voucher master data is null"); return; }
+            if (MyModel?.MyVoucher.Detail == null) { IsPageValid = false; MsgService.Warning("Voucher detail data is null"); return; }
         }
 
         #region Drop Down Value changed events
@@ -105,6 +105,8 @@ namespace AppliedAccounts.Pages.Accounts
 
                 if(MyModel.MyVoucher.Details.Count == 0)
                 {
+                    MyModel.DeleteMaster();
+
                     // Delete Master record if (details are all deleted / empty)  20-DEC-2025
                 }
 
@@ -115,7 +117,7 @@ namespace AppliedAccounts.Pages.Accounts
             }
             else
             {
-                MsgClass = MyModel.MsgClass;
+                MsgService.AddRange(MyModel.MsgClass);
             }
 
             
@@ -135,5 +137,7 @@ namespace AppliedAccounts.Pages.Accounts
             MyModel.IsWaiting = false; await InvokeAsync(StateHasChanged);
         }
         #endregion
+
+        
     }
 }

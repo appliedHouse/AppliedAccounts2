@@ -5,7 +5,6 @@ using AppliedDB;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
 using System.Data;
-using Windows.System.RemoteSystems;
 using MESSAGE = AppMessages.Enums.Messages;
 using Tables = AppliedDB.Enums.Tables;
 
@@ -290,6 +289,7 @@ namespace AppliedAccounts.Models
 
         public async Task<bool> SaveAllAsync()
         {
+
             IsSaved = true;
 
             if (!IsWaiting)
@@ -297,23 +297,6 @@ namespace AppliedAccounts.Models
                 IsWaiting = true;
                 await Task.Run(() =>
                 {
-                    #region Delete transaction marked as delete
-                    
-                    try
-                    {
-                        if(MyVoucher.Details.Any(e=> e.action == _Deleted))
-                        {
-
-                        }
-
-
-                    }
-                    catch (Exception error)
-                    {
-                        MsgClass.Danger(error.Message);
-                    }
-                    #endregion
-
 
                     if (IsVoucherValidated())
                     {
@@ -477,6 +460,16 @@ namespace AppliedAccounts.Models
 
         }
 
+        internal void DeleteMaster()
+        {
+            var MasterDataRow = Source.GetNewRow(Tables.Book);
+            MasterDataRow["ID"] = MyVoucher.Master.ID1;
+            CommandClass cmdMasterDelete = new(MasterDataRow, Source.MyConnection);
+            var IsDeleted = cmdMasterDelete.DeleteRow();
+            MsgClass.Add(IsDeleted ? MESSAGE.VouMasterDeleted : MESSAGE.VouMasterNotDeleted);
+
+        }
+
         #endregion
 
         #region Validation
@@ -511,17 +504,17 @@ namespace AppliedAccounts.Models
 
 
             MsgClass = new();
-            if (MyVoucher.Master.BookID == 0) { MsgClass.Add(MESSAGE.BookIDIsZero); }
-            if (MyVoucher.Master.Vou_No.Length == 0) { MsgClass.Add(MESSAGE.VouNoNotDefine); }
-            if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgClass.Add(MESSAGE.VouDateLess); }
-            if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgClass.Add(MESSAGE.VouDateMore); }
-            if (MyVoucher.Master.Remarks.Length == 0) { MsgClass.Add(MESSAGE.Row_NoRemarks); }
-            if (MyVoucher.Master.Status.Length == 0) { MsgClass.Add(MESSAGE.Row_NoStatus); }
-            if (MyVoucher.Detail.Sr_No == 0) { MsgClass.Add(MESSAGE.SerialNoIsZero); }
-            if (MyVoucher.Detail.COA == 0) { MsgClass.Add(MESSAGE.Row_COAIsZero); }
-            if (MyVoucher.Detail.DR > 0 && MyVoucher.Detail.CR > 0) { MsgClass.Add(MESSAGE.DRnCRHaveValue); }
-            if (MyVoucher.Detail.DR == 0 && MyVoucher.Detail.CR == 0) { MsgClass.Add(MESSAGE.DRnCRAreZero); }
-            if (string.IsNullOrEmpty(MyVoucher.Detail.Description)) { MsgClass.Add(MESSAGE.DescriptionIsNothing); }
+            if (MyVoucher.Master.BookID == 0) { MsgClass.Alert(MESSAGE.BookIDIsZero); }
+            if (MyVoucher.Master.Vou_No.Length == 0) { MsgClass.Alert(MESSAGE.VouNoNotDefine); }
+            if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgClass.Alert(MESSAGE.VouDateLess); }
+            if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgClass.Alert(MESSAGE.VouDateMore); }
+            if (MyVoucher.Master.Remarks.Length == 0) { MsgClass.Alert(MESSAGE.Row_NoRemarks); }
+            if (MyVoucher.Master.Status.Length == 0) { MsgClass.Alert(MESSAGE.Row_NoStatus); }
+            if (MyVoucher.Detail.Sr_No == 0) { MsgClass.Alert(MESSAGE.SerialNoIsZero); }
+            if (MyVoucher.Detail.COA == 0) { MsgClass.Alert(MESSAGE.Row_COAIsZero); }
+            if (MyVoucher.Detail.DR > 0 && MyVoucher.Detail.CR > 0) { MsgClass.Alert(MESSAGE.DRnCRHaveValue); }
+            if (MyVoucher.Detail.DR == 0 && MyVoucher.Detail.CR == 0) { MsgClass.Alert(MESSAGE.DRnCRAreZero); }
+            if (string.IsNullOrEmpty(MyVoucher.Detail.Description)) { MsgClass.Alert(MESSAGE.DescriptionIsNothing); }
             if (MsgClass.Count > 0) { IsValid = false; }
 
             return IsValid;
@@ -634,6 +627,8 @@ namespace AppliedAccounts.Models
         {
             throw new NotImplementedException();
         }
+
+       
         #endregion
 
         #region Models

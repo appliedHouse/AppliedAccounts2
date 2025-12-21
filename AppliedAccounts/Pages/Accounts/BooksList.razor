@@ -126,7 +126,8 @@ else
                     <tr>
                         <th style="width:10%">Voucher</th>
                         <th style="width:10%">Date</th>
-                        <th style="width:40%">Description</th>
+                        <th style="width:5%">Sr.No</th>
+                        <th style="width:35%">Description</th>
                         <th style="width:10%">Received</th>
                         <th style="width:10%">Paid</th>
                         <th style="width:10%">Balance</th>
@@ -142,6 +143,7 @@ else
                         <tr>
                             <td>@Record.Vou_No</td>
                             <td>@Record.Vou_Date.ToString(Format.DDMMMYY)</td>
+                            <td class="center">@Record.Sr_No</td>
                             <td class="left">@Record.Description</td>
                             <td class="amount">@Record.TReceived</td>
                             <td class="amount">@Record.TPaid</td>

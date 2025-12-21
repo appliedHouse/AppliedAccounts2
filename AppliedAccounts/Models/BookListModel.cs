@@ -156,6 +156,7 @@ namespace AppliedAccounts.Models
                     {
                         _Record.ID = Row.Field<long>("ID1");
                         _Record.Vou_No = Row.Field<string>("Vou_No") ?? "---";
+                        _Record.Sr_No = Row.Field<int>("Sr_No");
                         _Record.Vou_Date = Row.Field<DateTime>("Vou_Date");
                         _Record.Recevied = _CR;
                         _Record.Paid = _DR;
@@ -252,11 +253,11 @@ namespace AppliedAccounts.Models
         {
             if (!string.IsNullOrEmpty(Source.DBFile))
             {
-                BookNatureID = AppRegistry.GetNumber(Source.DBFile, "BKNatureID");
-                BookID = AppRegistry.GetNumber(Source.DBFile, "BKbook");
-                DT_Start = AppRegistry.GetFrom(Source.DBFile, "BKbook");
-                DT_End = AppRegistry.GetTo(Source.DBFile, "BKbook");
-                SearchText = AppRegistry.GetText(Source.DBFile, "BKBook");
+                BookNatureID = AppRegistry.GetNumber(Source.DBFile, "BkNatureID");
+                BookID = AppRegistry.GetNumber(Source.DBFile, "BkBook");
+                DT_Start = AppRegistry.GetFrom(Source.DBFile, "BkBook");
+                DT_End = AppRegistry.GetTo(Source.DBFile, "BkBook");
+                SearchText = AppRegistry.GetText(Source.DBFile, "BkBook");
             }
         }
         #endregion

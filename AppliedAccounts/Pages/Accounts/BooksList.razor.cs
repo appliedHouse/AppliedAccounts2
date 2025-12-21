@@ -3,6 +3,7 @@ using AppliedAccounts.Models;
 using AppliedAccounts.Services;
 using AppliedDB;
 using Microsoft.AspNetCore.Components;
+using System.Net;
 
 namespace AppliedAccounts.Pages.Accounts
 {
@@ -68,13 +69,14 @@ namespace AppliedAccounts.Pages.Accounts
             await Task.Delay(100);                  // Delay for show the message and 
         }
         #endregion
+
+
     }
-
-
     public class BookView
     {
         public long ID { get; set; }
         public string Vou_No { get; set; }
+        public int Sr_No { get; set; }
         public DateTime Vou_Date { get; set; }
         public string Description { get; set; }
         public decimal Recevied { get; set; }

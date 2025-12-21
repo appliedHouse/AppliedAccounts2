@@ -67,6 +67,7 @@
             </div>
         }
     }
+    
     @foreach (var Message in Messages.Errors)
     {
         @if (Message.MessageClass.Equals(Enums.Class.Error))
@@ -77,7 +78,6 @@
                 <div>@Message.MessageText</div>
             </div>
         }
-        
         @if (Message.MessageClass.Equals(Enums.Class.Danger))
         {
             <div class="alert alert-danger d-flex align-items-center" role="alert">
