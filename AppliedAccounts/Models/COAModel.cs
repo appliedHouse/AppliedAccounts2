@@ -60,9 +60,9 @@ namespace AppliedAccounts.Models
                 _Record.ID = (long)_Row["ID"];
                 _Record.Code = (string)_Row["Code"];
                 _Record.Title = (string)_Row["Title"];
-                _Record.Class = (int)_Row["Class"];
-                _Record.Nature = (int)_Row["Nature"];
-                _Record.Notes = (int)_Row["Notes"];
+                _Record.Class = (long)_Row["Class"];
+                _Record.Nature = (long)_Row["Nature"];
+                _Record.Notes = (long)_Row["Notes"];
 
                 _Record.TitleClass = (string)_Row["TitleClass"];
                 _Record.TitleNature = (string)_Row["TitleNature"];
@@ -119,7 +119,6 @@ namespace AppliedAccounts.Models
         private List<COARecord> GetFilterRecords()
         {
             var OIC = StringComparison.OrdinalIgnoreCase;
-
             var filteredData = Data.AsEnumerable()
                 .Where(row =>
                     (row.Field<string>("Code")?.Contains(SearchText, OIC) ?? false)
@@ -131,8 +130,6 @@ namespace AppliedAccounts.Models
                 .ToList();
 
             return filteredData;
-
-
         }
         #endregion
 

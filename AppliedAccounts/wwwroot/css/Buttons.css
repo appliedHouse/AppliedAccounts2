@@ -71,17 +71,29 @@
 
 
 .btn-New {
-    color: white;
     background-color: royalblue;
+    color: white;
     width: 45px;
-    height: 16px;
+    height: 28px;
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
 .btn-Save {
-    color: white;
     background-color: forestgreen;
+    color: white;
     width: 45px;
-    height: 16px;
+    height: 28px;
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
 

@@ -2,7 +2,6 @@
 using AppliedDB;
 using Microsoft.Data.Sqlite;
 using System.Data;
-using Microsoft.Data.Sqlite;
 
 namespace AppliedAccounts.Pages.Users
 {
