@@ -78,7 +78,7 @@ namespace AppliedAccounts.Models
             try
             {
                 LoadBookRecords(BookID);
-                return false;
+                return true;
             }
             catch (Exception)
             {
@@ -93,13 +93,13 @@ namespace AppliedAccounts.Models
 
             string _Date1 = DT_Start.ToString(Format.YMD);
             string _Date2 = DT_End.ToString(Format.YMD);
-            string _Query = $"SELECT * FROM [view_Book]";
+            string _Query = $"SELECT * FROM [view_Book] ";
             decimal _OBal = 0.00M; // Opening Balance
             List<BookView> _List = [];
 
             // Get Opening Balance
             #region Opening Balance
-            string _QueryOB = $"{_Query} WHERE Date([Vou_Date]) < '{_Date1}' AND [BookID] = {_BookID}";
+            string _QueryOB = $"{_Query} [BookID] = {_BookID} AND (Date([Vou_Date]) BETWEEN '{_Date1}' AND '{_Date2})'";
             DataTable _OBalTable = Source.GetTable(_QueryOB);
             if (_OBalTable != null && _OBalTable.Rows.Count > 0)
             {
@@ -128,8 +128,15 @@ namespace AppliedAccounts.Models
             #endregion
 
             // Fatch Book Records between Date Range
+            //SELECT COUNT(*)
+            //FROM view_Book
+            //WHERE BookID = 31
+            //AND Vou_Date >= '2025-12-08 00:00:00'
+            //AND Vou_Date<  '2025-12-09 00:00:00';
 
-            string _Filter = $"Date([Vou_Date]) BETWEEN '{_Date1}' AND '{_Date2}'";
+
+
+            string _Filter = $"[BookID] = {_BookID} AND [Vou_Date] >= '{_Date1}' AND [Vou_Date] <= '{_Date2})'";
             if (SearchText.Length > 0)
             {
                 _Filter += $" AND ([Vou_No] LIKE '%{SearchText}%' OR [Description] LIKE '%{SearchText}%')";
