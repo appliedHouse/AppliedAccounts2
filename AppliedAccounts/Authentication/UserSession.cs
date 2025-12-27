@@ -25,6 +25,7 @@
         public string SessionFolder { get; set; } = string.Empty;
         public string TempDBFolder { get; set; } = string.Empty;
 
+
         public UserSession()
         {
 
