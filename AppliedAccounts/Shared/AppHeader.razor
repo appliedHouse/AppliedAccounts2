@@ -30,6 +30,7 @@
     public string GetCompanyName() { return AppUser.Company ?? ""; }
     public string GetAppUserName() => AppUser.DisplayName ?? "";
     public void GoHome() { NavManager.NavigateTo("/"); }
+    public void GoSetup() { NavManager.NavigateTo("/Setup"); }
 }
 
 <header class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow sticky-top" data-bs-theme="dark">
@@ -50,7 +51,7 @@
                 </div>
                 <div class="p-1">
                     <span class="p-2 rounded-circle"
-                          type="button"
+                          type="button" 
                           data-bs-toggle="offcanvas"
                           data-bs-target="#offcanvasRight"
                           aria-controls="offcanvasRight">
@@ -61,6 +62,8 @@
         </AuthorizeView>
     </div>
 </header>
+
+<SettingsOffcanvas />
 
 
 <style>

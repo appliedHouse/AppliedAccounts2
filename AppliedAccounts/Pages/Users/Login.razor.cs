@@ -42,7 +42,7 @@ namespace AppliedAccounts.Pages.Users
                     _UserData.SessionGuid = _newGUID;
                     _UserData.LanguageID = LanguageID;
 
-                    await userAuthStateProvider.UpdateAuthonticateState(_UserData);
+                    await userAuthStateProvider.UpdateAuthenticateState(_UserData);
 
                     NavManager.NavigateTo("/", true);
 
