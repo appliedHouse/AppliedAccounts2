@@ -1,7 +1,6 @@
 ﻿using AppliedGlobals;
 using Microsoft.Data.Sqlite;
 using System.Data;
-using System.Reflection.PortableExecutable;
 using System.Text;
 using static AppliedDB.Enums;
 using static AppliedGlobals.AppErums;
@@ -13,11 +12,14 @@ namespace AppliedDB
     {
         public AppValues.AppPath AppPaths { get; set; }
         public SqliteConnection MyConnection { get; set; }
+        public SqliteConnection MyConnection2 { get; set; }
         public SqliteCommand MyCommand { get; set; }
         public CommandClass MyCommands { get; set; } = new();
         public string DBFile => GetDataFile();
         public string ErrorMessage { get; set; }
         public bool IsSaved { get; set; } = false;
+
+        private SqliteTransaction? _transaction;
 
 
         #region Constructor
@@ -27,6 +29,7 @@ namespace AppliedDB
             AppPaths = _AppPaths;
             var _Connection = new Connections(AppPaths);
             MyConnection = _Connection.GetSqliteClient()!;               // Get a connection of Client
+            MyConnection2 = _Connection.GetSqliteClient()!;              // Get a connection of Client
 
             if (MyConnection is not null)
             {
@@ -216,6 +219,7 @@ namespace AppliedDB
 
         #region Get Table Static
 
+       
         public static DataTable GetDataTable(Tables _Table, SqliteCommand _Command)
         {
             try
@@ -297,8 +301,6 @@ namespace AppliedDB
                 return new DataTable();
             }
         }
-
-
         public static DataTable GetDataTable(Tables table, SqliteConnection connection, string filter)
         {
             try
@@ -399,6 +401,15 @@ namespace AppliedDB
 
         #endregion
 
+        #region Get Data Row
+        public DataRow? GetDataRow(Tables _Table, long ID)
+        {
+            return  GetTable(_Table).AsEnumerable().ToList()
+                .FirstOrDefault(r => r.Field<long>("ID") == ID);
+        }
+
+        #endregion
+
         #region Seek
         public DataRow Seek(Tables _Table, long ID)
         {
@@ -433,11 +444,11 @@ namespace AppliedDB
 
             var _DataRow = GetTable(_Table).AsEnumerable().ToList().Where(rows => rows.Field<long>("ID") == _ID).SingleOrDefault();
 
-            if(_DataRow != null)
+            if (_DataRow != null)
             {
                 return _DataRow.Field<object>(_column);
             }
-            
+
             return null;
 
         }
@@ -804,6 +815,26 @@ namespace AppliedDB
             return _MaxID;
 
         }
+
+        public static long GetMaxID(Tables _Table, SqliteConnection DBConnection)
+        {
+            DataTable _DataTable = GetDataTable(_Table, DBConnection);
+            if (_DataTable.Rows.Count == 0) { return 1; }
+            long _MaxID = (long)_DataTable.Compute("MAX(ID)", "") + 1;
+            _DataTable.Dispose();
+            return _MaxID;
+
+        }
+
+        public long GetMaxID(Tables _Table)
+        {
+            var _Text = $"SELECT Max(ID) AS MaxID FROM[{_Table}]";
+            var _DataTable = GetTable(_Text);
+            if (_DataTable.Rows.Count == 0) { return 1; }
+            long _MaxID = _DataTable.Rows[0].Field<long>("MaxID") ;
+            _DataTable.Dispose();
+            return _MaxID + 1;
+        }
         #endregion
 
         #region Delete Row
@@ -818,6 +849,21 @@ namespace AppliedDB
             MyCommands = new(_NewRow, MyConnection);
             return MyCommands.DeleteRow();
         }
+
+        public bool Delete(DataRow _Row)
+        {
+
+            var IsDeleted = false;
+            MyCommands = new(_Row, MyConnection);
+            var result = MyCommands.DeleteRow();
+            if (result)
+            {
+                IsDeleted = true;
+            }
+            return IsDeleted;
+        }
+
+
         #endregion
 
         #region Get NewRow of Table
@@ -1004,14 +1050,30 @@ namespace AppliedDB
         public void Save(DataRow newRow)
         {
             IsSaved = false;
+            if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
+
             MyCommands = new(newRow, MyConnection);
-            var result = MyCommands.SaveChanges();
-            if(result)
+            if (_transaction != null)
             {
-                IsSaved = true; 
+                if(MyCommands.CommandInsert != null) { MyCommands.CommandInsert.Transaction = _transaction; }
+                if (MyCommands.CommandUpdate != null) { MyCommands.CommandUpdate.Transaction = _transaction; }
+                if (MyCommands.CommandDelete != null) { MyCommands.CommandDelete.Transaction = _transaction; }
+            }
+
+            // Add the code due to SQL transaction is makeing error to get Max ID in insert command creation. 
+            //if(MyCommands.Action=="Insert")
+            //{
+            //    var _MaxID = GetMaxID(Tables.Ledger, MyConnection2);
+            //    MyCommands.CommandInsert.Parameters["@ID"].Value = _MaxID;
+            //}
+
+
+            var result = MyCommands.SaveChanges();
+            if (result)
+            {
+                IsSaved = true;
             }
         }
-
 
         // Depreciated....... NOT IN USE... 14-Dec-2025.
         public bool Save(Tables _Table, DataRow newRow)
@@ -1081,6 +1143,7 @@ namespace AppliedDB
 
         #endregion
 
+        #region Count Record
         public int RecordCound(Tables _Table, string _Filter)
         {
             string _Query = $"SELECT COUNT(*) FROM {_Table} WHERE {_Filter}";
@@ -1089,6 +1152,7 @@ namespace AppliedDB
             var result = Convert.ToInt32(command.ExecuteScalar()); MyConnection.Close();
             return result;
         }
+        #endregion
 
         #region Data Table Extention
         public static DataTable GetDataTableExtention(SqliteDataReader _reader)
@@ -1170,10 +1234,36 @@ namespace AppliedDB
             }
             return "QueryResult";
         }
+
+        #endregion
+
+        #region SQL Transaction Methods
+        public void BeginTransaction()
+        {
+            if (MyConnection.State != ConnectionState.Open)
+                MyConnection.Open();
+
+            _transaction = MyConnection.BeginTransaction();
+        }
+
+        public void CommitTransaction()
+        {
+            _transaction?.Commit();
+            _transaction = null;
+        }
+
+        public void RollbackTransaction()
+        {
+            _transaction?.Rollback();
+            _transaction = null;
+        }
+
+        
+        #endregion
     }
 
 
-    #endregion
+
 
 
 

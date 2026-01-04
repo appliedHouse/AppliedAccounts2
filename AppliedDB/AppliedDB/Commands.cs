@@ -10,7 +10,12 @@ namespace AppliedDB
     {
         public static SqliteCommand? Insert(DataRow CurrentRow, SqliteConnection DBConnection)
         {
-            if (CurrentRow.Field<long>("ID") == 0)
+            if(CurrentRow.RowState == DataRowState.Added || CurrentRow.RowState == DataRowState.Detached)
+            //{
+            //    CurrentRow["ID"] = 0;
+            //}
+
+            //if (CurrentRow.Field<long>("ID") == 0)
             {
                 DataColumnCollection _Columns = CurrentRow.Table.Columns;
 
@@ -170,7 +175,6 @@ namespace AppliedDB
             CommandInsert = Commands.Insert(Row, DBFile);
             CommandUpdate = Commands.UpDate(Row, DBFile);
             CommandDelete = Commands.Delete(Row, DBFile);
-
         }
 
         public CommandClass(DataRow _Row, SqliteConnection DBConnection)
@@ -182,7 +186,6 @@ namespace AppliedDB
             CommandInsert = Commands.Insert(Row, DBConnection);
             CommandUpdate = Commands.UpDate(Row, DBConnection);
             CommandDelete = Commands.Delete(Row, DBConnection);
-
         }
 
         #endregion
@@ -199,9 +202,8 @@ namespace AppliedDB
                 {
                     try
                     {
-                        CommandUpdate.Connection.Open();
+                        
                         Effected = CommandUpdate.ExecuteNonQuery();
-                        CommandUpdate.Connection.Close();
                         PrimaryKeyID = (long)CommandUpdate.Parameters["@ID"].Value;
 
                         if (Effected == 0) { MyMessages.Alert(Messages.NotSave); result = false; }
@@ -220,9 +222,7 @@ namespace AppliedDB
                 {
                     try
                     {
-                        CommandInsert.Connection.Open();
                         Effected = CommandInsert.ExecuteNonQuery();
-                        CommandInsert.Connection.Close();
                         PrimaryKeyID = (long)CommandInsert.Parameters["@ID"].Value;
 
                         if (Effected == 0) { MyMessages.Alert(Messages.NotSave); result = false; }
@@ -250,9 +250,9 @@ namespace AppliedDB
                 {
                     if (CommandDelete is not null)
                     {
-                        CommandDelete.Connection.Open();
+                        
                         Effected = CommandDelete.ExecuteNonQuery();
-                        CommandDelete.Connection.Close();
+                        
                         if (Effected > 0)
                         {
                             MyMessages.Add(Messages.RowDeleted);

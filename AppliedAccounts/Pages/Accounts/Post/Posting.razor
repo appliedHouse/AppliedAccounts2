@@ -1,0 +1,218 @@
+﻿@page "/Posting"
+@using System.Data
+
+@inject GlobalService AppGlobal
+
+
+<ShowPageHeading PageTitle="VOUCHER POSTING" />
+<PageErrors Messages="@MyModel.MsgClass" />
+
+
+<!-- HEADING MENU -->
+<EditForm Model="MyViewModel" OnValidSubmit="Refresh">
+    <div class="container mb-2">
+        <div class="row d-flex align-items-baseline">
+
+            <!-- Posting Type Dropdown -->
+            <div class="col-md-4">
+                <InputSelect class="form-select"
+                             @bind-Value="MyViewModel.PostingType"
+                             @onchange="OnPostingTypeChanged">
+                    <option value="0">Select......</option>
+                    <option value="1">Cash Books</option>
+                    <option value="2">Bank Books</option>
+                    <option value="3">Write Cheques</option>
+                    <option value="4">Bill Payable</option>
+                    <option value="5">Bill Receivable</option>
+                    <option value="6">Payment</option>
+                    <option value="7">Receipt</option>
+                    <option value="8">Journal Voucher</option>
+                    <option value="9">Sale Return</option>
+                    <option value="10">Production</option>
+                </InputSelect>
+            </div>
+
+            <!-- From Date -->
+            <div class="col-md-3 d-grid">
+                <div class="input-group">
+                    <label class="input-group-text" style="width:30%">From</label>
+                    <InputDate class="form-control TextCenter"
+                               style="width:70%"
+                               @bind-Value="MyViewModel.Dt_From" />
+                </div>
+            </div>
+
+            <!-- To Date -->
+            <div class="col-md-3 d-grid">
+                <div class="input-group">
+                    <label class="input-group-text" style="width:30%">To</label>
+                    <InputDate class="form-control TextCenter"
+                               style="width:70%"
+                               @bind-Value="MyViewModel.Dt_To" />
+                </div>
+            </div>
+
+            <!-- Refresh Button -->
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary">
+                    Refresh
+                </button>
+            </div>
+
+        </div>
+    </div>
+</EditForm>
+
+
+<!-- LIST OF LEDGER -->
+@if (MyModel.PostTable != null)
+{
+    <div class="container overflow-scroll" style="height: calc(100vh - 220px)">
+        <table class="table-list">
+            <thead>
+                <tr>
+                    <th style="width:10%">Vou No</th>
+                    <th style="width:10%">Vou Date</th>
+                    <th style="width:40%">Account Title</th>
+                    <th style="width:10%">Debit</th>
+                    <th style="width:10%">Credit</th>
+                    <th style="width:10%">Status</th>
+                    <th style="width:5%">Post</th>
+                    <th style="width:5%">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (DataRow row in MyModel.PostTable.Rows)
+                {
+                    var rowDate = ((DateTime)row["Vou_Date"]).ToString(Format.DDMMMYY);
+                    var _RowID = row.Field<long>("ID");
+                    var _DR = ((decimal)row["DR"]).ToString(Format.Currency);
+                    var _CR = ((decimal)row["CR"]).ToString(Format.Currency);
+                   
+
+                    <tr>
+                        <td class="TextCenter">@row["Vou_No"]</td>
+                        <td class="TextCenter">@rowDate</td>
+                        <td>@row["Title"]</td>
+                        <td class="text-danger align-right">
+                            @_DR
+                        </td>
+                        <td class="text-danger align-right">
+                            @_CR
+                        </td>
+                        <td class="TextCenter">@row["Status"]</td>
+                        <td class="text-center">
+                            <input type="checkbox"
+                                   checked="@Convert.ToBoolean(row["Post"])"
+                                    />
+                        </td>
+
+                        <td>
+                            <button class="btn btn-link"
+                                    disabled="@(PostingVoucherID == _RowID)"
+                                    @onclick="() => PostVoucher(_RowID)">
+
+                                @if (PostingVoucherID == _RowID)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-1"
+                                          role="status"
+                                          aria-hidden="true"></span>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-upload"></i>
+                                }
+                            </button>
+                        </td>
+                        
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (MyModel.IsPosting)
+    {
+        <div class="fade-overlay">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Posting...</span>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-danger">
+        <h5>No Record Found</h5>
+    </div>
+}
+
+
+<!-- Modal -->
+<div class="modal fade" id="PostVoucher" tabindex="-1" aria-labelledby="PostVoucherLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="PostVoucherLabel">Post Voucher</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if (PostingVoucherID > 0)
+                {
+                    <p>Save Voucher No @PostingVoucher</p>
+                }
+                else
+                {
+                    <p>No voucher found to post</p>
+                }
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                @if (PostingVoucherID > 0)
+                {
+                    <button type="submit" class="btn btn-success btn-sm" data-bs-dismiss="modal" aria-label="Close" title="Post All" @onclick="() => PostVoucher(PostingVoucherID)"> Save</button>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.showModal = (id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+
+        let modal = bootstrap.Modal.getInstance(el);
+        if (!modal) {
+            modal = new bootstrap.Modal(el);
+        }
+        modal.show();
+    };
+
+    window.hideModal = (id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+
+        const modal = bootstrap.Modal.getInstance(el);
+        modal?.hide();
+    };
+</script>
+
+<style>
+    .fade-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.4); /* semi-transparent black */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999; /* top-most */
+    }
+</style>
