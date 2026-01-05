@@ -163,6 +163,11 @@
             PostingMasterIsNull = 6003,
             PostingDataIsNull = 6004,
             VoucherAlreadyPosted = 6005,
+            
+            
+            TransactionRollback = 7001,
+            TransactionCommited = 7002,
+
         }
 
         public enum Class

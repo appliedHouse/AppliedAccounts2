@@ -54,12 +54,12 @@ namespace VoucherPosting
                 Source.BeginTransaction();
                 DataRow _MasterRow = PostingData.MasterTable.Rows[0];
                 int SrNo = 1;
-                long MaxID = DataSource.GetMaxID(AppliedDB.Enums.Tables.Ledger, Source.MyConnection2);
+                long MaxID = DataSource.GetMaxID("Ledger", Source.MyConnection.DataSource);
 
                 #region Master Record
                 var LedgerRow = LedgerData.LedgerTable.NewRow();
 
-                LedgerRow["ID"] = 0;    //MaxID; MaxID++;
+                LedgerRow["ID"] = MaxID; MaxID++;
                 LedgerRow["TranID"] = _MasterRow.Field<long>("ID");
                 LedgerRow["Vou_Type"] = VoucherType.Cash.ToString();
                 LedgerRow["Vou_Date"] = _MasterRow.Field<DateTime>("Vou_Date");
@@ -82,6 +82,7 @@ namespace VoucherPosting
                 Source.Save(LedgerRow);
                 if (!Source.IsSaved)
                 {
+                    MsgClass = Source.MsgClass;
                     Source.RollbackTransaction();
                     return;
                 }
@@ -93,7 +94,7 @@ namespace VoucherPosting
                 {
                     LedgerRow = LedgerData.LedgerTable.NewRow();
 
-                    LedgerRow["ID"] = 0; //MaxID; MaxID++;
+                    LedgerRow["ID"] = MaxID; MaxID++;
                     LedgerRow["TranID"] = _MasterRow.Field<long>("ID");
                     LedgerRow["Vou_Type"] = VoucherType.Cash.ToString();
                     LedgerRow["Vou_Date"] = _MasterRow.Field<DateTime>("Vou_Date");
@@ -117,10 +118,12 @@ namespace VoucherPosting
                     Source.Save(LedgerRow);
                     if (!Source.IsSaved)
                     {
+                        MsgClass = Source.MsgClass;
                         Source.RollbackTransaction();
                         break;
                     }
 
+                    MsgClass = Source.MsgClass;
                 }
                 #endregion
 
@@ -129,12 +132,15 @@ namespace VoucherPosting
                 DataRow _PostedRow = Source.GetDataRow(AppliedDB.Enums.Tables.Book, Vou_ID);
                 if (_PostedRow != null)
                 {
+                    _PostedRow.RowState = DataRowState.Modified;
                     _PostedRow["Status"] = "Posted";
                     Source.Save(_PostedRow);
                     Source.CommitTransaction();                 // At the end commit the transaction
+                    MsgClass.Success(Messages.TransactionCommited);
                 }
                 else
                 {
+                    MsgClass.Success(Messages.TransactionRollback);
                     Source.RollbackTransaction();               // Otherwsie rollback
                 }
 

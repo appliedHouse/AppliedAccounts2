@@ -10,12 +10,9 @@ namespace AppliedDB
     {
         public static SqliteCommand? Insert(DataRow CurrentRow, SqliteConnection DBConnection)
         {
-            if(CurrentRow.RowState == DataRowState.Added || CurrentRow.RowState == DataRowState.Detached)
-            //{
-            //    CurrentRow["ID"] = 0;
-            //}
-
-            //if (CurrentRow.Field<long>("ID") == 0)
+            if (CurrentRow.RowState == DataRowState.Added
+                || CurrentRow.RowState == DataRowState.Detached
+                || CurrentRow.Field<long>("ID") == 0)
             {
                 DataColumnCollection _Columns = CurrentRow.Table.Columns;
 
@@ -47,8 +44,12 @@ namespace AppliedDB
                     _Command.Parameters.AddWithValue(_ParameterName, CurrentRow[_Column.ColumnName]);
                 }
 
-                CurrentRow["ID"] = DataSource.GetMaxID(_TableName, DBConnection);
-                _Command.Parameters["@ID"].Value = CurrentRow["ID"];
+                if(CurrentRow.Field<long>("ID") == 0)
+                {
+                    CurrentRow["ID"] = DataSource.GetMaxID(_TableName, DBConnection.ConnectionString);
+                    _Command.Parameters["@ID"].Value = CurrentRow["ID"];
+                }
+
                 return _Command;
             }
             return null;
@@ -64,7 +65,8 @@ namespace AppliedDB
         }
         public static SqliteCommand? UpDate(DataRow CurrentRow, SqliteConnection DBConnection)
         {
-            if (CurrentRow.Field<long>("ID") != 0)
+            if (CurrentRow.RowState == DataRowState.Modified)
+            //if (CurrentRow.Field<long>("ID") != 0)
             {
                 var _TableName = CurrentRow.Table.TableName;
                 var _Columns = CurrentRow.Table.Columns;
@@ -159,6 +161,7 @@ namespace AppliedDB
         public int Effected { get; set; } = 0;
         public long PrimaryKeyID { get; set; } = 0;
         public MessageClass MyMessages { get; set; } = new();
+        public AppliedGlobals.AppValues.AppPath AppPath { get; set; }
 
         #region Constructors
         public CommandClass()
@@ -170,7 +173,12 @@ namespace AppliedDB
         {
             Row = _Row;
 
-            if ((int)Row.Field<long>("ID") == 0) { Action = "Insert"; } else { Action = "Update"; }
+
+            if (_Row.RowState == DataRowState.Added
+                || _Row.RowState == DataRowState.Detached
+                || _Row.Field<long>("ID") == 0)
+            { Action = "Insert"; }
+            else { Action = "Update"; }
 
             CommandInsert = Commands.Insert(Row, DBFile);
             CommandUpdate = Commands.UpDate(Row, DBFile);
@@ -181,7 +189,11 @@ namespace AppliedDB
         {
             Row = _Row;
 
-            if ((int)Row.Field<long>("ID") == 0) { Action = "Insert"; } else { Action = "Update"; }
+            if (_Row.RowState == DataRowState.Added
+                || _Row.RowState == DataRowState.Detached
+                || _Row.Field<long>("ID") == 0) 
+            { Action = "Insert"; } 
+            else { Action = "Update"; }
 
             CommandInsert = Commands.Insert(Row, DBConnection);
             CommandUpdate = Commands.UpDate(Row, DBConnection);
@@ -202,7 +214,7 @@ namespace AppliedDB
                 {
                     try
                     {
-                        
+
                         Effected = CommandUpdate.ExecuteNonQuery();
                         PrimaryKeyID = (long)CommandUpdate.Parameters["@ID"].Value;
 
@@ -236,7 +248,7 @@ namespace AppliedDB
                 }
             }
 
-            
+
             return result;
         }
 
@@ -250,9 +262,9 @@ namespace AppliedDB
                 {
                     if (CommandDelete is not null)
                     {
-                        
+
                         Effected = CommandDelete.ExecuteNonQuery();
-                        
+
                         if (Effected > 0)
                         {
                             MyMessages.Add(Messages.RowDeleted);

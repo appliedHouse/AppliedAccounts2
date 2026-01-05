@@ -53,6 +53,7 @@ namespace AppliedDB
         }
 
         #region Connection non static
+
         public SqliteConnection? GetSqliteUsers()
         {
             return GetSqliteConnection(Path.Combine(AppPath, RootPath, ClientPath, DB_Client));

@@ -1,4 +1,5 @@
 ﻿using AppliedGlobals;
+using AppMessages;
 using Microsoft.Data.Sqlite;
 using System.Data;
 using System.Text;
@@ -18,6 +19,7 @@ namespace AppliedDB
         public string DBFile => GetDataFile();
         public string ErrorMessage { get; set; }
         public bool IsSaved { get; set; } = false;
+        public MessageClass MsgClass { get; set; } = new();
 
         private SqliteTransaction? _transaction;
 
@@ -333,6 +335,7 @@ namespace AppliedDB
             }
         }
 
+
         #endregion
         #endregion
 
@@ -404,8 +407,17 @@ namespace AppliedDB
         #region Get Data Row
         public DataRow? GetDataRow(Tables _Table, long ID)
         {
-            return  GetTable(_Table).AsEnumerable().ToList()
-                .FirstOrDefault(r => r.Field<long>("ID") == ID);
+            var _Connection = Connections.GetSqliteConnection(MyConnection.DataSource)!;
+            var _DataTable =  GetDataTable(_Table, _Connection,$"ID={ID}");
+            if(_DataTable.Rows.Count > 0)
+            {
+                return _DataTable.Rows[0];
+            }
+            return null;
+
+
+            //return  GetDataTable(_Table, _Connection).AsEnumerable().ToList()
+            //    .FirstOrDefault(r => r.Field<long>("ID") == ID);
         }
 
         #endregion
@@ -796,9 +808,13 @@ namespace AppliedDB
         #region Maximum ID of the Table
 
 
-        public static long GetMaxID(string DBFile, string _Table)
+
+
+
+        public static long GetMaxID(string _Table, string ConnectionString)
         {
-            DataTable _DataTable = GetDataTable(DBFile, _Table);
+            var _Connection = Connections.GetSqliteConnection(ConnectionString);
+            DataTable _DataTable = GetDataTable(_Table,_Connection!);
             if (_DataTable.Rows.Count == 0) { return 1; }
             long _MaxID = (long)_DataTable.Compute("MAX(ID)", "") + 1;
             _DataTable.Dispose();
@@ -1060,18 +1076,15 @@ namespace AppliedDB
                 if (MyCommands.CommandDelete != null) { MyCommands.CommandDelete.Transaction = _transaction; }
             }
 
-            // Add the code due to SQL transaction is makeing error to get Max ID in insert command creation. 
-            //if(MyCommands.Action=="Insert")
-            //{
-            //    var _MaxID = GetMaxID(Tables.Ledger, MyConnection2);
-            //    MyCommands.CommandInsert.Parameters["@ID"].Value = _MaxID;
-            //}
-
-
             var result = MyCommands.SaveChanges();
             if (result)
             {
+                MsgClass.Success(AppMessages.Enums.Messages.Save);
                 IsSaved = true;
+            }
+            else
+            {
+                MsgClass.Error(AppMessages.Enums.Messages.RecordNotSaved);
             }
         }
 
