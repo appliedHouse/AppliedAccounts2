@@ -132,7 +132,6 @@ namespace VoucherPosting
                 DataRow _PostedRow = Source.GetDataRow(AppliedDB.Enums.Tables.Book, Vou_ID);
                 if (_PostedRow != null)
                 {
-                    _PostedRow.RowState = DataRowState.Modified;
                     _PostedRow["Status"] = "Posted";
                     Source.Save(_PostedRow);
                     Source.CommitTransaction();                 // At the end commit the transaction

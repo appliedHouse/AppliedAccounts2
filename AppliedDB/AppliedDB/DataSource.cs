@@ -411,13 +411,11 @@ namespace AppliedDB
             var _DataTable =  GetDataTable(_Table, _Connection,$"ID={ID}");
             if(_DataTable.Rows.Count > 0)
             {
-                return _DataTable.Rows[0];
+                DataRow row = _DataTable.Rows[0];
+                row.AcceptChanges();                    // Add here to Rowstate must be unchanged
+                return row;
             }
             return null;
-
-
-            //return  GetDataTable(_Table, _Connection).AsEnumerable().ToList()
-            //    .FirstOrDefault(r => r.Field<long>("ID") == ID);
         }
 
         #endregion
