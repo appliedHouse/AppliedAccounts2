@@ -40,7 +40,7 @@ namespace AppliedAccounts.Models
         {
 
             string _Path = Connections.GetTempDBPath();                               // Temp DB Path
-            string _File = Source.GetText(ExcelImportRegistry);                       // Imported DB File for COA
+            string _File = Source.GetRegistryText(ExcelImportRegistry);                       // Imported DB File for COA
             string _ImportDBPath = Path.Combine(_Path, _File + ".db");                        // Connection string Path
             SqliteConnection _TempDBConnection = new($"Data Source={_ImportDBPath}");
             ImportedData = [.. DataSource.GetDataTable(SelectedTable, _TempDBConnection).AsEnumerable()];

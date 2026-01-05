@@ -14,28 +14,28 @@ namespace AppliedAccounts.Models
         public MessageClass MsgClass { get; set; } = new();
         public DataTable PostTable { get; set; }
         public bool IsPosting { get; set; } = false;
-        public DataSource Source { get; set; } 
+        public DataSource Source { get; set; }
         public string Filter { get; set; } = string.Empty;
         public int PostType { get; set; } = 0;
 
         public PostingModel()
         {
-            if(AppGlobal != null) { Source = new (AppGlobal.AppPaths); }
+            if (AppGlobal != null) { Source = new(AppGlobal.AppPaths); }
 
         }
 
         #region Load Data
         public async Task LoadData(int PostingType)
         {
-            Source ??= new (AppGlobal.AppPaths);
+            Source ??= new(AppGlobal.AppPaths);
 
             if (PostingType == 0) { return; }
 
             switch (PostingType)
             {
                 case 1:
-                    var _DataTable = Source.GetTable(AppliedDB.Enums.Tables.view_Book, Filter);
-                    PostTable = GetPostingTable(_DataTable);
+                    var _DataTable = Source.GetTable(AppliedDB.Enums.Tables.Book, Filter);
+                    PostTable = GetPostingTable(_DataTable, false);          // show posted voucehr only  true
 
                     break;
 
@@ -76,25 +76,28 @@ namespace AppliedAccounts.Models
             await Task.Delay(100);
         }
 
-        private DataTable GetPostingTable(DataTable dataTable)
+        private DataTable GetPostingTable(DataTable dataTable, bool IsSubmittedOnly)
         {
-            if(dataTable.TableName == AppliedDB.Enums.Tables.view_Book.ToString())
+            if (dataTable.TableName == AppliedDB.Enums.Tables.Book.ToString())
             {
                 PostTable = CreatePostingTable(PostType);
 
-                foreach(DataRow Row in dataTable.Rows)
+                foreach (DataRow Row in dataTable.Rows)
                 {
-                    var ptRow = PostTable.NewRow();
-                    ptRow["ID"] = Row.Field<long>("ID1") ;
-                    ptRow["Vou_Date"] = Row.Field<DateTime>("Vou_Date") ;
-                    ptRow["Vou_No"] = Row.Field<string>("Vou_No") ;
-                    ptRow["Title"] =  Row.Field<string>("TitleBook")?.Trim() + ":" +Row.Field<string>("TitleCOA")?.Trim();
-                    ptRow["DR"] = Row.Field<decimal>("DR");
-                    ptRow["CR"] = Row.Field<decimal>("CR");
-                    ptRow["Status"] = Row.Field<string>("Status") ?? "Submitted";
-                    ptRow["Post"] = false;
-
-                    PostTable.Rows.Add(ptRow);
+                    if (!IsSubmittedOnly)
+                    {
+                        if (Row.Field<string>("Status") != "Submitted") { continue; }
+                        var ptRow = PostTable.NewRow();
+                        ptRow["ID"] = Row.Field<long>("ID");
+                        ptRow["Vou_Date"] = Row.Field<DateTime>("Vou_Date");
+                        ptRow["Vou_No"] = Row.Field<string>("Vou_No");
+                        ptRow["Title"] = Source.SeekTitle(AppliedDB.Enums.Tables.COA, Row.Field<long>("ID"));
+                        ptRow["DR"] = Row.Field<decimal>("Amount") > 0 ? Row.Field<decimal>("Amount") : 0;
+                        ptRow["CR"] = Row.Field<decimal>("Amount") < 0 ? Row.Field<decimal>("Amount") : 0;
+                        ptRow["Status"] = Row.Field<string>("Status") ?? "Submitted";
+                        ptRow["Post"] = false;
+                        PostTable.Rows.Add(ptRow);
+                    }
                 }
             }
 
@@ -104,13 +107,13 @@ namespace AppliedAccounts.Models
         private DataTable CreatePostingTable(int postType)
         {
             var _Table = new DataTable();
-            if (postType==0) { _Table.Columns.Add("BookTitle"); }
+            if (postType == 0) { _Table.Columns.Add("BookTitle"); }
             _Table.Columns.Add("ID", typeof(long));
             _Table.Columns.Add("Vou_Date", typeof(DateTime));
-            _Table.Columns.Add("Vou_No",typeof(string));
+            _Table.Columns.Add("Vou_No", typeof(string));
             _Table.Columns.Add("Title", typeof(string));
             _Table.Columns.Add("DR", typeof(decimal));
-            _Table.Columns.Add("CR",typeof(decimal));
+            _Table.Columns.Add("CR", typeof(decimal));
             _Table.Columns.Add("Status", typeof(string));
             _Table.Columns.Add("Post", typeof(bool));
             return _Table;
@@ -124,15 +127,15 @@ namespace AppliedAccounts.Models
         {
             VoucherPostingModel postingModel = new();
 
-            postingModel.MasterTable = Source.GetTable(AppliedDB.Enums.Tables.Book,$"ID={_VouID}");
-            postingModel.DetailTable = Source.GetTable(AppliedDB.Enums.Tables.Book2,$"TranID={_VouID}");
+            postingModel.MasterTable = Source.GetTable(AppliedDB.Enums.Tables.Book, $"ID={_VouID}");
+            postingModel.DetailTable = Source.GetTable(AppliedDB.Enums.Tables.Book2, $"TranID={_VouID}");
 
-            if (_PostType == 0) { return ; }
-            if(_PostType == 1)
+            if (_PostType == 0) { return; }
+            if (_PostType == 1)
             {
-                CashBook postCashBook = new (Source,postingModel);
+                CashBook postCashBook = new(Source, postingModel);
                 await postCashBook.PostCashBook();
-                if(postCashBook.PostSuccessful)
+                if (postCashBook.PostSuccessful)
                 {
                     MsgClass.Success(Messages.Save);
                 }

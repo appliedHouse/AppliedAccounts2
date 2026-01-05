@@ -92,6 +92,12 @@ namespace VoucherPosting
                 #region Details
                 foreach (DataRow Row in PostingData.DetailTable.Rows)
                 {
+                    if(_MasterRow["Ref_No"]==DBNull.Value) { _MasterRow["Ref_No"] = 0; }
+                    if(Row["Company"]==DBNull.Value) { Row["Company"] = 0; }
+                    if(Row["Project"]==DBNull.Value) { Row["Project"] = 0; }
+                    if(Row["Employee"]==DBNull.Value) { Row["Employee"] = 0; }
+
+
                     LedgerRow = LedgerData.LedgerTable.NewRow();
 
                     LedgerRow["ID"] = MaxID; MaxID++;
@@ -181,9 +187,18 @@ namespace VoucherPosting
 
                     if (VouAmount != (SumDR - SumCR)) { MsgClass.Alert(Messages.AmountNotEqual); }
                 }
-                if (LedgerData.GetVouID() > 0) { MsgClass.Error(Messages.VoucherAlreadyPosted); }
+
+                var _Filter = $"Vou_No = '{Vou_No}'";
+                var _AlreadyPosted = Source?.GetTable(AppliedDB.Enums.Tables.Ledger, _Filter).AsEnumerable().Any() ?? false;
+                if(_AlreadyPosted) { MsgClass.Alert(Messages.VoucherAlreadyPosted); }
 
 
+                
+
+
+
+
+                //---------------------------------------------------- Validation Result True or False
                 if (MsgClass.Count > 0)
                 {
                     return false;

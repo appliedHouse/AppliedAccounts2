@@ -1096,13 +1096,13 @@ namespace AppliedDB
 
         #region Get Registry Keys
 
-        public void SetKey(string Key, object KeyValue, KeyTypes keytype, string _Title)
+        public void SetRegistryKey(string Key, object KeyValue, KeyTypes keytype, string _Title)
         {
             Registry _Registry = new(MyConnection, DBFile);
             _Registry.SetKey(Key, KeyValue, keytype, _Title);
         }
 
-        public async Task SetKeyAsync(string Key, object KeyValue, KeyTypes keytype, string _Title)
+        public async Task SetRegistryKeyAsync(string Key, object KeyValue, KeyTypes keytype, string _Title)
         {
             await Task.Run(() =>
             {
@@ -1111,44 +1111,44 @@ namespace AppliedDB
             });
         }
 
-        public string GetText(string Key)
+        public string GetRegistryText(string Key)
         {
             Registry _Registry = new(MyConnection, DBFile);
             return (string)_Registry.GetKey(Key, KeyTypes.Text);
         }
-        public int GetNumber(string Key)
+        public int GetRegistryNumber(string Key)
         {
             Registry _Registry = new(MyConnection, DBFile);
             return (int)_Registry.GetKey(Key, KeyTypes.Number);
         }
 
-        public DateTime GetDate(string Key)
+        public DateTime GetRegistryDate(string Key)
         {
             Registry _Registry = new(MyConnection, DBFile);
             return (DateTime)_Registry.GetKey(Key, KeyTypes.Date);
         }
 
-        public bool GetBoolean(string Key)
+        public bool GetRegistryBoolean(string Key)
         {
             Registry _Registry = new(MyConnection, DBFile);
             return (bool)_Registry.GetKey(Key, KeyTypes.Boolean);
         }
 
-        public DateTime GetFrom(string Key)
+        public DateTime GetRegistryFrom(string Key)
         {
             Registry _Registry = new(MyConnection, DBFile);
             return (DateTime)_Registry.GetKey(Key, KeyTypes.From);
         }
 
-        public DateTime GetTo(string Key)
+        public DateTime GetRegistryTo(string Key)
         {
             Registry _Registry = new(MyConnection, DBFile);
             return (DateTime)_Registry.GetKey(Key, KeyTypes.To);
         }
 
-        public DateTime[] GetFromTo(string Key)
+        public DateTime[] GetRegistryFromTo(string Key)
         {
-            DateTime[] _Dates = [GetFrom(Key), GetTo(Key)];
+            DateTime[] _Dates = [GetRegistryFrom(Key), GetRegistryTo(Key)];
             return _Dates;
         }
 
@@ -1166,19 +1166,29 @@ namespace AppliedDB
         #endregion
 
         #region Data Table Extention
+
         public static DataTable GetDataTableExtention(SqliteDataReader _reader)
         {
+            Console.WriteLine("=== Starting GetDataTableExtention ===");
+
             var schemaTable = _reader.GetSchemaTable();
             var dt = new DataTable();
 
+            // Debug schemaTable
+            Console.WriteLine($"SchemaTable is null: {schemaTable == null}");
             if (schemaTable != null)
             {
+                Console.WriteLine($"SchemaTable rows count: {schemaTable.Rows.Count}");
+
                 foreach (DataRow row in schemaTable.Rows)
                 {
                     string _ColumnName = row["ColumnName"].ToString() ?? string.Empty;
                     Type _DataType = (Type)row["DataType"];
                     string _TypeName = (string)row["DataTypeName"];
 
+                    Console.WriteLine($"Column: {_ColumnName}, Type: {_DataType}, TypeName: {_TypeName}");
+
+                    // Your existing type mapping logic
                     if (_TypeName.ToUpper() == "INT") { _DataType = typeof(int); }
                     if (_TypeName.ToUpper() == "INT64") { _DataType = typeof(long); }
                     if (_TypeName.ToUpper() == "DECIMAL") { _DataType = typeof(decimal); }
@@ -1193,29 +1203,111 @@ namespace AppliedDB
                     dt.Columns.Add(_ColumnName, _DataType);
                 }
 
-                var _Stop = true;
-
-                while (_reader.Read())
+                Console.WriteLine($"DataTable columns created: {dt.Columns.Count}");
+            }
+            else
+            {
+                Console.WriteLine("Creating columns from FieldCount");
+                for (int i = 0; i < _reader.FieldCount; i++)
                 {
-                    DataRow newRow = dt.NewRow();
-
-                    for (int i = 0; i < _reader.FieldCount; i++)
-                    {
-                        string columnName = _reader.GetName(i);
-                        Type columnType = dt.Columns[columnName].DataType;
-
-                        if (_reader.IsDBNull(i)) { newRow[columnName] = DBNull.Value; }
-                        else { newRow[columnName] = _reader.GetValue(i); }
-
-
-                    }
-                    dt.Rows.Add(newRow);
-
+                    string columnName = _reader.GetName(i);
+                    dt.Columns.Add(columnName, typeof(object));
+                    Console.WriteLine($"Added column: {columnName}");
                 }
             }
 
+            // Check if reader has rows BEFORE reading
+            Console.WriteLine($"Reader.HasRows: {_reader.HasRows}");
+            Console.WriteLine($"Reader.FieldCount: {_reader.FieldCount}");
+
+            int rowCount = 0;
+            while (_reader.Read())
+            {
+                DataRow newRow = dt.NewRow();
+
+                for (int i = 0; i < _reader.FieldCount; i++)
+                {
+                    string columnName = _reader.GetName(i);
+
+                    if (_reader.IsDBNull(i))
+                    {
+                        newRow[columnName] = DBNull.Value;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            object value = _reader.GetValue(i);
+                            Console.WriteLine($"Row {rowCount}, Col {i} ({columnName}): {value} (Type: {value.GetType().Name})");
+                            newRow[columnName] = value;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error reading Row {rowCount}, Col {i} ({columnName}): {ex.Message}");
+                            newRow[columnName] = DBNull.Value;
+                        }
+                    }
+                }
+                dt.Rows.Add(newRow);
+                rowCount++;
+                Console.WriteLine($"Added row {rowCount}");
+            }
+
+            Console.WriteLine($"Total rows read: {rowCount}");
+            Console.WriteLine($"Final DataTable rows: {dt.Rows.Count}");
+            Console.WriteLine("=== End GetDataTableExtention ===");
+
             return dt;
         }
+        //public static DataTable GetDataTableExtention(SqliteDataReader _reader)
+        //{
+        //    var schemaTable = _reader.GetSchemaTable();
+        //    var dt = new DataTable();
+
+        //    if (schemaTable != null)
+        //    {
+        //        foreach (DataRow row in schemaTable.Rows)
+        //        {
+        //            string _ColumnName = row["ColumnName"].ToString() ?? string.Empty;
+        //            Type _DataType = (Type)row["DataType"];
+        //            string _TypeName = (string)row["DataTypeName"];
+
+        //            if (_TypeName.ToUpper() == "INT") { _DataType = typeof(int); }
+        //            if (_TypeName.ToUpper() == "INT64") { _DataType = typeof(long); }
+        //            if (_TypeName.ToUpper() == "DECIMAL") { _DataType = typeof(decimal); }
+        //            if (_TypeName.ToUpper() == "DATETIME") { _DataType = typeof(DateTime); }
+        //            if (_TypeName.ToUpper() == "NVARCHAR") { _DataType = typeof(string); }
+        //            if (_ColumnName.ToUpper() == "ID") { _DataType = typeof(long); }
+        //            if (_ColumnName.ToUpper() == "ID1") { _DataType = typeof(long); }
+        //            if (_ColumnName.ToUpper() == "ID2") { _DataType = typeof(long); }
+        //            if (_ColumnName.ToUpper() == "TranID") { _DataType = typeof(long); }
+        //            if (_ColumnName.ToUpper() == "SR_NO") { _DataType = typeof(int); }
+
+        //            dt.Columns.Add(_ColumnName, _DataType);
+        //        }
+
+        //        var _Stop = true;
+
+        //        while (_reader.Read())
+        //        {
+        //            DataRow newRow = dt.NewRow();
+
+        //            for (int i = 0; i < _reader.FieldCount; i++)
+        //            {
+        //                string columnName = _reader.GetName(i);
+        //                Type columnType = dt.Columns[columnName].DataType;
+
+        //                if (_reader.IsDBNull(i)) { newRow[columnName] = DBNull.Value; }
+        //                else { newRow[columnName] = _reader.GetValue(i); }
+
+
+        //            }
+        //            dt.Rows.Add(newRow);
+        //        }
+        //    }
+
+        //    return dt;
+        //}
 
         private static string ExtractTableNameFromQuery(string sqlQuery)
         {

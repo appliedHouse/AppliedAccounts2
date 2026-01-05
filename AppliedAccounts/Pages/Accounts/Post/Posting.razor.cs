@@ -14,7 +14,6 @@ namespace AppliedAccounts.Pages.Accounts.Post
         public PostingViewModel MyViewModel { get; set; }
         public PostingModel MyModel { get; set; } = new();
         public string DBFile => AppGlobal.DBFile;
-
         public long PostingVoucherID { get; set; } = 0;
         public string PostingVoucher { get; set; } =string.Empty;
 
@@ -22,11 +21,12 @@ namespace AppliedAccounts.Pages.Accounts.Post
         protected override async Task OnInitializedAsync()
         {
             MyModel.Source = new(AppGlobal.AppPaths);
+            
             AppRegistry.SetKey(DBFile, "IsPosting", false, KeyTypes.Boolean);
             MyViewModel = new();
-            MyViewModel.Dt_From = AppRegistry.GetDate(DBFile, "Post_dt_From");
-            MyViewModel.Dt_To = AppRegistry.GetDate(DBFile, "Post_dt_To");
-            MyViewModel.PostingType = AppRegistry.GetNumber(DBFile, "Post_Type");
+            MyViewModel.Dt_From = MyModel.Source.GetRegistryDate("Post_dt_From");
+            MyViewModel.Dt_To = MyModel.Source.GetRegistryDate("Post_dt_To");
+            MyViewModel.PostingType = MyModel.Source.GetRegistryNumber("Post_Type");
             
             await MyModel.LoadData(MyViewModel.PostingType);
         }
@@ -80,6 +80,7 @@ namespace AppliedAccounts.Pages.Accounts.Post
             await AppGlobal.JS.InvokeVoidAsync("showModal", "SaveVoucher");
 
             await MyModel.DoVoucherPosting(id, MyViewModel.PostingType);
+            await MyModel.LoadData(MyViewModel.PostingType);
 
             await AppGlobal.JS.InvokeVoidAsync("hideModal", "SaveVoucher");
             MyModel.IsPosting = false;

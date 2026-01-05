@@ -12,7 +12,6 @@ namespace AppliedDB
                 var _Connection = Connections.GetMessagesConnection();
                 if (_Connection is not null)
                 {
-                    // SELECT * FROM [Messages]
                     _Connection.Open();
                     using var _Command = new SqliteCommand($"SELECT * FROM [Messages]", _Connection);
                     using var _reader = _Command.ExecuteReader();
@@ -20,6 +19,7 @@ namespace AppliedDB
                     var _DataSet = new DataSet();
                     var _DataTable = new DataTable();
 
+                    _DataTable.TableName = "Messages";
                     _DataTable.Load(_reader);
                     return _DataTable;
                 }

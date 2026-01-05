@@ -1,12 +1,11 @@
-﻿
-
-using System.Collections.Specialized;
-using System.Data;
+﻿using System.Data;
 using System.Text;
 using static AppliedDB.Enums;
 
 namespace AppliedDB
 {
+    // Data table Page query for paging bootstrap.
+
     public class PageQuery
     {
         public Tables Table { get; set; } = Tables.Nothing;
