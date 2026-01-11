@@ -229,6 +229,7 @@ namespace AppliedAccounts.Data
             {
                 SQLAction = "Update";
                 CurrentRow = TB_Registry.DefaultView[0].Row;
+                CurrentRow.AcceptChanges();
             }
             else
             {

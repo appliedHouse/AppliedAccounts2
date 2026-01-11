@@ -204,8 +204,9 @@ namespace AppliedDB
                     }
                 return new DataTable();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MsgClass.Critical(ex.Message);
                 return new DataTable();
             }
         }
@@ -1269,7 +1270,29 @@ namespace AppliedDB
             _transaction = null;
         }
 
-        
+        public DataRow RemoveNullValues(DataRow row)
+        {
+            foreach(DataColumn item in row.Table.Columns)
+            {
+                if(row[item] == DBNull.Value)
+                {
+                    if(item.GetType() == typeof(int)) { row[item] = 0; }
+                    if(item.GetType() == typeof(Int16)) { row[item] = 0; }
+                    if(item.GetType() == typeof(Int32)) { row[item] = 0; }
+                    if(item.GetType() == typeof(Int64)) { row[item] = 0; }
+                    if(item.GetType() == typeof(string)) { row[item] = string.Empty; }
+                    if(item.GetType() == typeof(decimal)) { row[item] = 0.0M; }
+                    if(item.GetType() == typeof(float)) { row[item] = 0.0; }
+                    if(item.GetType() == typeof(bool)) { row[item] = false; }
+                    if(item.GetType() == typeof(double)) { row[item] = 0.00; }
+                }
+
+            }
+
+            return row;
+        }
+
+
         #endregion
     }
 

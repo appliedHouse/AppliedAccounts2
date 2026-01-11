@@ -84,7 +84,12 @@ else
                     <div class="col-md-4">
 
                         <div class="form-floating">
-                            <InputSelect id="ddBook" class="form-control item-height" TValue="long" Value="@MyModel.MyVoucher.Master.BookID" ValueExpression="@(() => @MyModel.MyVoucher.Master.BookID)" ValueChanged="@((e) => BookIDChanged(e))">
+                            <InputSelect id="ddBook" 
+                                         class="form-control item-height" 
+                                         TValue="long" 
+                                         Value="@MyModel.MyVoucher.Master.BookID" 
+                                         ValueExpression="@(() => @MyModel.MyVoucher.Master.BookID)" 
+                                         ValueChanged="@((e) => BookIDChanged(e))">
                                 @if (MyModel.BookList.Any())
                                 {
                                     @foreach (var item in MyModel.BookList)

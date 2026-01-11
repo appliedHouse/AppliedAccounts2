@@ -1,72 +1,101 @@
 ﻿using AppliedAccounts.Services;
 using AppliedDB;
+using AppliedGlobals;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
 using System.Data;
 using VoucherPosting;
 using static AppMessages.Enums;
 
+
 namespace AppliedAccounts.Models
 {
     public class PostingModel
     {
-        [Inject] GlobalService AppGlobal { get; set; } = default!;
+        [Inject] public GlobalService AppGlobal { get; set; } = default!;
         public MessageClass MsgClass { get; set; } = new();
-        public DataTable PostTable { get; set; }
+        public List<DataListModel> DataListModelList { get; set; }
         public bool IsPosting { get; set; } = false;
-        public DataSource Source { get; set; } 
+        public DataSource Source { get; set; }
         public string Filter { get; set; } = string.Empty;
         public int PostType { get; set; } = 0;
 
         public PostingModel()
         {
-            if(AppGlobal != null) { Source = new (AppGlobal.AppPaths); }
+            if (AppGlobal != null) { Source = new(AppGlobal.AppPaths); }
 
         }
 
         #region Load Data
         public async Task LoadData(int PostingType)
         {
-            Source ??= new (AppGlobal.AppPaths);
+            Source ??= new(AppGlobal.AppPaths);
 
             if (PostingType == 0) { return; }
 
             switch (PostingType)
             {
+                // Cash Books
                 case 1:
-                    var _DataTable = Source.GetTable(AppliedDB.Enums.Tables.view_Book, Filter);
-                    PostTable = GetPostingTable(_DataTable);
+                    Filter = "";
+                    var _CashAccList = Source.GetTable(SQLQueries.Quries.GetCashAccounts());
+                    if (_CashAccList.Rows.Count > 0)
+                    {
+                        var CashAccIDs = string.Join(",", _CashAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
+                        Filter = $"BookID IN ({CashAccIDs}) ";
+                    }
+                    var _DataTableCash = Source.GetTable(AppliedDB.Enums.Tables.Book, Filter);
+                    DataListModelList = GetPostingTable(_DataTableCash);
 
                     break;
 
+                // Bank Books
                 case 2:
+                    Filter = "";
+                    var _BankAccList = Source.GetTable(SQLQueries.Quries.GetBankAccounts());
+                    if (_BankAccList.Rows.Count > 0)
+                    {
+                        var BankAccIDs = string.Join(",", _BankAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
+                        Filter = $"BookID IN ({BankAccIDs}) ";
+                    }
+                    var _DataTableBank = Source.GetTable(AppliedDB.Enums.Tables.Book, Filter);
+                    DataListModelList = GetPostingTable(_DataTableBank);
                     break;
                 case 3:
+                    DataListModelList.Clear();
                     break;
 
                 case 4:
+                    DataListModelList.Clear();
                     break;
 
                 case 5:
+                    DataListModelList.Clear();
                     break;
 
                 case 6:
+                    DataListModelList.Clear();
                     break;
 
                 case 7:
+                    DataListModelList.Clear();
                     break;
 
                 case 8:
+                    DataListModelList.Clear();
                     break;
 
                 case 9:
+                    DataListModelList.Clear();
                     break;
 
                 case 10:
+                    DataListModelList.Clear();
                     break;
 
 
                 default:
+                    DataListModelList.Clear();
                     break;
             }
 
@@ -76,45 +105,38 @@ namespace AppliedAccounts.Models
             await Task.Delay(100);
         }
 
-        private DataTable GetPostingTable(DataTable dataTable)
+        private List<DataListModel> GetPostingTable(DataTable dataTable)
         {
-            if(dataTable.TableName == AppliedDB.Enums.Tables.view_Book.ToString())
+            var _List = new List<DataListModel>();
+
+            // Cash book
+            if (dataTable.TableName == AppliedDB.Enums.Tables.Book.ToString())
             {
-                PostTable = CreatePostingTable(PostType);
+                //DataListModelList = CreatePostingTable(PostType);
 
-                foreach(DataRow Row in dataTable.Rows)
+                foreach (DataRow Row in dataTable.Rows)
                 {
-                    var ptRow = PostTable.NewRow();
-                    ptRow["ID"] = Row.Field<long>("ID1") ;
-                    ptRow["Vou_Date"] = Row.Field<DateTime>("Vou_Date") ;
-                    ptRow["Vou_No"] = Row.Field<string>("Vou_No") ;
-                    ptRow["Title"] =  Row.Field<string>("TitleBook")?.Trim() + ":" +Row.Field<string>("TitleCOA")?.Trim();
-                    ptRow["DR"] = Row.Field<decimal>("DR");
-                    ptRow["CR"] = Row.Field<decimal>("CR");
-                    ptRow["Status"] = Row.Field<string>("Status") ?? "Submitted";
-                    ptRow["Post"] = false;
+                    long ID = Row.Field<long>("ID");
 
-                    PostTable.Rows.Add(ptRow);
+                    var _DataList = new DataListModel();
+                    _DataList.ID = ID;
+                    _DataList.Vou_No = Row.Field<string>("Vou_No") ?? string.Empty;
+                    _DataList.Vou_Date = Row.Field<DateTime>("Vou_Date");
+                    _DataList.Title = Source.SeekTitle(AppliedDB.Enums.Tables.COA, ID);
+                    _DataList.DR = Row.Field<decimal>("Amount") <= 0 ? Row.Field<decimal>("Amount") : 0.0M;
+                    _DataList.CR = Row.Field<decimal>("Amount") > 0 ? Row.Field<decimal>("Amount") : 0.0M;
+                    _DataList.Status = Row.Field<string>("Status") ?? "Submitted";
+                    _DataList.Selected = false;
+
+                    _List.Add(_DataList);
+
                 }
             }
 
-            return PostTable;
+            return _List;
         }
 
-        private DataTable CreatePostingTable(int postType)
-        {
-            var _Table = new DataTable();
-            if (postType==0) { _Table.Columns.Add("BookTitle"); }
-            _Table.Columns.Add("ID", typeof(long));
-            _Table.Columns.Add("Vou_Date", typeof(DateTime));
-            _Table.Columns.Add("Vou_No",typeof(string));
-            _Table.Columns.Add("Title", typeof(string));
-            _Table.Columns.Add("DR", typeof(decimal));
-            _Table.Columns.Add("CR",typeof(decimal));
-            _Table.Columns.Add("Status", typeof(string));
-            _Table.Columns.Add("Post", typeof(bool));
-            return _Table;
-        }
+
         #endregion
 
 
@@ -124,17 +146,19 @@ namespace AppliedAccounts.Models
         {
             VoucherPostingModel postingModel = new();
 
-            postingModel.MasterTable = Source.GetTable(AppliedDB.Enums.Tables.Book,$"ID={_VouID}");
-            postingModel.DetailTable = Source.GetTable(AppliedDB.Enums.Tables.Book2,$"TranID={_VouID}");
+            postingModel.MasterTable = Source.GetTable(AppliedDB.Enums.Tables.Book, $"ID={_VouID}");
+            postingModel.DetailTable = Source.GetTable(AppliedDB.Enums.Tables.Book2, $"TranID={_VouID}");
 
-            if (_PostType == 0) { return ; }
-            if(_PostType == 1)
+            if (_PostType == 0) { return; }
+            if (_PostType == 1)
             {
-                CashBook postCashBook = new (Source,postingModel);
-                await postCashBook.PostCashBook();
-                if(postCashBook.PostSuccessful)
+                MsgClass.ClearMessages();                           // Clear all previous messages. 
+                CashBook postCashBook = new(Source, postingModel);
+                await postCashBook.PostCashBook();                  // Cash Posting main method.
+                if (postCashBook.PostSuccessful)
                 {
-                    MsgClass.Success(Messages.Save);
+                    MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
+                    await LoadData(_PostType);              // Refresh display Data afger save voucher.
                 }
                 else
                 {
@@ -144,6 +168,29 @@ namespace AppliedAccounts.Models
 
             return;
         }
+
+        #endregion
+
+
+        #region Model  razor page view in Table Tax
+
+        public class DataListModel
+        {
+            public long ID { get; set; }
+            public string Vou_No { get; set; }
+            public DateTime Vou_Date { get; set; }
+
+            public string Title { get; set; }
+            public decimal DR { get; set; }
+            public decimal CR { get; set; }
+            public decimal Amount { get; set; }
+
+            public string Status { get; set; }
+            public bool Active { get; set; }
+            public bool Selected { get; set; }
+
+        }
+
 
         #endregion
     }

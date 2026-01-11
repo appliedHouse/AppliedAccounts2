@@ -15,9 +15,13 @@
 
             <!-- Posting Type Dropdown -->
             <div class="col-md-4">
-                <InputSelect class="form-select"
-                             @bind-Value="MyViewModel.PostingType"
-                             @onchange="OnPostingTypeChanged">
+                <InputSelect id="ddPostingType"
+                             class="form-select"
+                             TValue="int"
+                             Value="@MyViewModel.PostingType"
+                             ValueExpression="@(() => MyViewModel.PostingType)"
+                             ValueChanged="@((e)=>OnPostingTypeChanged(e))">
+
                     <option value="0">Select......</option>
                     <option value="1">Cash Books</option>
                     <option value="2">Bank Books</option>
@@ -33,7 +37,7 @@
             </div>
 
             <!-- From Date -->
-            <div class="col-md-3 d-grid">
+            <div class="col-md-2 d-grid">
                 <div class="input-group">
                     <label class="input-group-text" style="width:30%">From</label>
                     <InputDate class="form-control TextCenter"
@@ -43,13 +47,25 @@
             </div>
 
             <!-- To Date -->
-            <div class="col-md-3 d-grid">
+            <div class="col-md-2 d-grid">
                 <div class="input-group">
                     <label class="input-group-text" style="width:30%">To</label>
                     <InputDate class="form-control TextCenter"
                                style="width:70%"
                                @bind-Value="MyViewModel.Dt_To" />
                 </div>
+            </div>
+
+            <div class="col-md-2">
+                <InputSelect class="form-select" id="ddPostingStatus"
+                             TValue="int"
+                             ValueExpression="@(()=> MyViewModel.PostingStatus)"
+                             Value="@MyViewModel.PostingStatus"
+                             ValueChanged="@((e)=>OnStatusChanged(e))">
+                    <option value="0">All</option>
+                    <option value="1">Posted</option>
+                    <option value="2">Submitted</option>
+                </InputSelect>
             </div>
 
             <!-- Refresh Button -->
@@ -65,7 +81,7 @@
 
 
 <!-- LIST OF LEDGER -->
-@if (MyModel.PostTable != null)
+@if (MyModel.DataListModelList != null && MyModel.DataListModelList.Count > 0)
 {
     <div class="container overflow-scroll" style="height: calc(100vh - 220px)">
         <table class="table-list">
@@ -83,35 +99,30 @@
             </thead>
 
             <tbody>
-                @foreach (DataRow row in MyModel.PostTable.Rows)
+                @foreach (var item in MyModel.DataListModelList)
                 {
-                    var rowDate = ((DateTime)row["Vou_Date"]).ToString(Format.DDMMMYY);
-                    var _RowID = row.Field<long>("ID");
-                    var _DR = ((decimal)row["DR"]).ToString(Format.Currency);
-                    var _CR = ((decimal)row["CR"]).ToString(Format.Currency);
-                   
+                    var rowDate = item.Vou_Date.ToString(Format.DDMMMYY);
+                    var _RowID = item.ID;
+                    var _DR = item.DR.ToString(Format.Digit);
+                    var _CR = item.CR.ToString(Format.Digit);
+                    var _Posted = item.Status == "Posted" ? true : false;
 
                     <tr>
-                        <td class="TextCenter">@row["Vou_No"]</td>
-                        <td class="TextCenter">@rowDate</td>
-                        <td>@row["Title"]</td>
-                        <td class="text-danger align-right">
-                            @_DR
-                        </td>
-                        <td class="text-danger align-right">
-                            @_CR
-                        </td>
-                        <td class="TextCenter">@row["Status"]</td>
+                        <td class="TextCenter">@item.Vou_No</td>
+                        <td class="TextCenter">@item.Vou_Date.ToString(Format.DDMMMYYYY)</td>
+                        <td>@item.Title</td>
+                        <td class="text-danger amount1">@_DR</td>
+                        <td class="text-danger amount1">@_CR</td>
+                        <td class="TextCenter">@item.Status</td>
                         <td class="text-center">
-                            <input type="checkbox"
-                                   checked="@Convert.ToBoolean(row["Post"])"
-                                    />
+                            <input type="checkbox" disabled="@_Posted"
+                                   checked="@item.Selected)" />
                         </td>
 
                         <td>
                             <button class="btn btn-link"
-                                    disabled="@(PostingVoucherID == _RowID)"
-                                    @onclick="() => PostVoucher(_RowID)">
+                                    disabled="@_Posted"
+                                    @onclick="() => PostVoucher(item.ID)">
 
                                 @if (PostingVoucherID == _RowID)
                                 {
@@ -125,7 +136,7 @@
                                 }
                             </button>
                         </td>
-                        
+
                     </tr>
                 }
             </tbody>

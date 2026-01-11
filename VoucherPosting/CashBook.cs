@@ -46,6 +46,7 @@ namespace VoucherPosting
 
         public async Task PostCashBook()
         {
+            MsgClass.ClearMessages();
             // Validation of Voucher
             if (!PostValidate()) { return; }
 
@@ -92,6 +93,8 @@ namespace VoucherPosting
                 #region Details
                 foreach (DataRow Row in PostingData.DetailTable.Rows)
                 {
+                    //var Row1 = Source.RemoveNullValues(Row);
+
                     LedgerRow = LedgerData.LedgerTable.NewRow();
 
                     LedgerRow["ID"] = MaxID; MaxID++;
@@ -100,21 +103,19 @@ namespace VoucherPosting
                     LedgerRow["Vou_Date"] = _MasterRow.Field<DateTime>("Vou_Date");
                     LedgerRow["Vou_No"] = _MasterRow.Field<string>("Vou_No");
                     LedgerRow["SR_No"] = SrNo++;
-                    LedgerRow["Ref_No"] = string.IsNullOrEmpty(_MasterRow.Field<string>("Ref_No"))
-                                            ? DBNull.Value
-                                            : _MasterRow["Ref_No"];
+                    LedgerRow["Ref_No"] = _MasterRow.Field<string>("Ref_No");
+                                            
                     LedgerRow["BookID"] = _MasterRow.Field<long>("BookID");
 
                     LedgerRow["COA"] = Row["COA"];
                     LedgerRow["DR"] = Row["DR"];
                     LedgerRow["CR"] = Row["CR"];
-                    LedgerRow["Customer"] = (long)Row["Company"] > 0 ? Row["Company"] : DBNull.Value;
-                    LedgerRow["Project"] = (long)Row["Project"] > 0 ? Row["Project"] : DBNull.Value;
-                    LedgerRow["Employee"] = (long)Row["Employee"] > 0 ? Row["Employee"] : DBNull.Value;
+                    LedgerRow["Customer"] = Row["Company"];
+                    LedgerRow["Project"] = Row["Project"];
+                    LedgerRow["Employee"] = Row["Employee"];
                     LedgerRow["Description"] = Row["Description"];
-                    LedgerRow["Comments"] = string.IsNullOrEmpty(Row.Field<string>("Comments"))
-                                        ? DBNull.Value
-                                        : Row.Field<string>("Comments");
+                    LedgerRow["Comments"] = Row.Field<string>("Comments");
+
                     Source.Save(LedgerRow);
                     if (!Source.IsSaved)
                     {
@@ -135,18 +136,17 @@ namespace VoucherPosting
                     _PostedRow["Status"] = "Posted";
                     Source.Save(_PostedRow);
                     Source.CommitTransaction();                 // At the end commit the transaction
+                    PostSuccessful = true;
                     MsgClass.Success(Messages.TransactionCommited);
                 }
                 else
                 {
+                    PostSuccessful = false;
                     MsgClass.Success(Messages.TransactionRollback);
                     Source.RollbackTransaction();               // Otherwsie rollback
                 }
 
                 #endregion
-
-
-
             }
             catch (Exception ex)
             {
@@ -166,10 +166,12 @@ namespace VoucherPosting
             {
                 MsgClass.ClearMessages();
 
-
                 if (Source == null) { MsgClass.Error(Messages.DataSourceIsNull); }
                 if (Vou_ID == 0) { MsgClass.Error(Messages.VouNoNotDefineProperly); }
                 if (string.IsNullOrEmpty(Vou_No)) { MsgClass.Error(Messages.VouNoIsNull); }
+                if (Source!.GetTable(AppliedDB.Enums.Tables.Ledger, $"Vou_No='{Vou_No}'").Rows.Count > 0)
+                { MsgClass.Alert(Messages.VoucherAlreadyPosted); }
+
                 if (PostingData == null) { MsgClass.Error(Messages.PostingDataIsNull); }
                 {
                     if (PostingData?.MasterTable.Rows.Count == 0) { MsgClass.Alert(Messages.PostingMasterRecordNotFound); }

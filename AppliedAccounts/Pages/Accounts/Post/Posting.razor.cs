@@ -1,7 +1,9 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
+using AppliedAccounts.Pages.Menu;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Runtime.CompilerServices;
 using static AppliedGlobals.AppErums;
 
 
@@ -22,31 +24,32 @@ namespace AppliedAccounts.Pages.Accounts.Post
         protected override async Task OnInitializedAsync()
         {
             MyModel.Source = new(AppGlobal.AppPaths);
-            AppRegistry.SetKey(DBFile, "IsPosting", false, KeyTypes.Boolean);
+           
+            MyModel.Source.SetKey("IsPosting", false, KeyTypes.Boolean, "Is posting is in progress..");
             MyViewModel = new();
             MyViewModel.Dt_From = AppRegistry.GetDate(DBFile, "Post_dt_From");
             MyViewModel.Dt_To = AppRegistry.GetDate(DBFile, "Post_dt_To");
             MyViewModel.PostingType = AppRegistry.GetNumber(DBFile, "Post_Type");
             
+            
             await MyModel.LoadData(MyViewModel.PostingType);
         }
 
-        private async Task OnPostingTypeChanged(ChangeEventArgs e)
+        #region Change Event
+        private async void OnPostingTypeChanged(int value)
         {
-            // Update the bound value
-            int.TryParse(e.Value?.ToString(), out int _Value);
+            MyViewModel.PostingType = value;
 
-            MyViewModel.PostingType = _Value;
-
-            // Call the refresh method
             await MyModel.LoadData(MyViewModel.PostingType);
         }
 
-        public Task DoPosting(int id, int postingType)
+        private void OnStatusChanged(int value)
         {
-            // Your existing posting logic
-            return Task.CompletedTask;
+
+            MyViewModel.PostingStatus = value;
         }
+
+        #endregion
 
         public void Refresh()
         {
@@ -86,15 +89,20 @@ namespace AppliedAccounts.Pages.Accounts.Post
             StateHasChanged();
         }
 
-
+       
 
 
 
         public class PostingViewModel
         {
             public int PostingType { get; set; }
+            public int PostingStatus { get; set; }
             public DateTime Dt_From { get; set; }
             public DateTime Dt_To { get; set; }
         }
+
+       
+        
+
     }
 }
