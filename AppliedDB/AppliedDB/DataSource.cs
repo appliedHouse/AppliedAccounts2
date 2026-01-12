@@ -322,6 +322,9 @@ namespace AppliedDB
                 using var reader = command.ExecuteReader();
                 var dt = GetDataTableExtention(reader);
 
+                if(dt.Rows.Count == 0) { dt.Load(reader); }             // try again to load data directly. if not found...
+
+
                 dt.TableName = table.ToString();
                 return dt;
             }
@@ -1099,6 +1102,7 @@ namespace AppliedDB
 
         public void SetKey(string Key, object KeyValue, KeyTypes keytype, string _Title)
         {
+
             Registry _Registry = new(MyConnection, DBFile);
             _Registry.SetKey(Key, KeyValue, keytype, _Title);
         }
@@ -1181,20 +1185,30 @@ namespace AppliedDB
                     string _TypeName = (string)row["DataTypeName"];
 
                     if (_TypeName.ToUpper() == "INT") { _DataType = typeof(int); }
-                    if (_TypeName.ToUpper() == "INT64") { _DataType = typeof(long); }
-                    if (_TypeName.ToUpper() == "DECIMAL") { _DataType = typeof(decimal); }
-                    if (_TypeName.ToUpper() == "DATETIME") { _DataType = typeof(DateTime); }
-                    if (_TypeName.ToUpper() == "NVARCHAR") { _DataType = typeof(string); }
-                    if (_ColumnName.ToUpper() == "ID") { _DataType = typeof(long); }
-                    if (_ColumnName.ToUpper() == "ID1") { _DataType = typeof(long); }
-                    if (_ColumnName.ToUpper() == "ID2") { _DataType = typeof(long); }
-                    if (_ColumnName.ToUpper() == "TranID") { _DataType = typeof(long); }
-                    if (_ColumnName.ToUpper() == "SR_NO") { _DataType = typeof(int); }
+                    else if (_TypeName.ToUpper() == "INT64") { _DataType = typeof(long); }
+                    else if (_TypeName.ToUpper() == "DECIMAL") { _DataType = typeof(decimal); }
+                    else if (_TypeName.ToUpper() == "DATETIME") { _DataType = typeof(DateTime); }
+                    else if (_TypeName.ToUpper() == "NVARCHAR") { _DataType = typeof(string); }
+                    else if (_TypeName.ToUpper() == "BOOLEAN") { _DataType = typeof(bool); }
+
+                    string upperColumnName = _ColumnName.ToUpper();
+                    if (upperColumnName == "ID" ||
+                        upperColumnName == "ID1" ||
+                        upperColumnName == "ID2" ||
+                        upperColumnName == "TRANID")
+                    {
+                        _DataType = typeof(long);
+                    }
+                    else if (upperColumnName == "SR_NO")
+                    {
+                        _DataType = typeof(int);
+                    }
 
                     dt.Columns.Add(_ColumnName, _DataType);
                 }
 
                 var _Stop = true;
+
 
                 while (_reader.Read())
                 {
@@ -1203,19 +1217,76 @@ namespace AppliedDB
                     for (int i = 0; i < _reader.FieldCount; i++)
                     {
                         string columnName = _reader.GetName(i);
-                        Type columnType = dt.Columns[columnName].DataType;
 
-                        if (_reader.IsDBNull(i)) { newRow[columnName] = DBNull.Value; }
-                        else { newRow[columnName] = _reader.GetValue(i); }
+                        if (_reader.IsDBNull(i))
+                        {
+                            newRow[columnName] = DBNull.Value;
+                        }
+                        else
+                        {
+                            // Get the value and handle type conversions
+                            object value = _reader.GetValue(i);
+                            Type columnType = dt.Columns[columnName].DataType;
 
+                            // Convert if needed
+                            if (value.GetType() != columnType)
+                            {
+                                try
+                                {
+                                    if (columnType == typeof(DateTime) && value is string)
+                                    {
+                                        if (DateTime.TryParse(value.ToString(), out DateTime dtValue))
+                                            value = dtValue;
+                                    }
+                                    else if (columnType == typeof(decimal) && value is double)
+                                    {
+                                        value = Convert.ToDecimal(value);
+                                    }
+                                    else if (columnType == typeof(long) && value is long)
+                                    {
+                                        // Already correct type
+                                    }
+                                    else
+                                    {
+                                        value = Convert.ChangeType(value, columnType);
+                                    }
+                                }
+                                catch
+                                {
+                                    // Keep original value if conversion fails
+                                }
+                            }
 
+                            newRow[columnName] = value;
+                        }
                     }
-                    dt.Rows.Add(newRow);
 
+                    dt.Rows.Add(newRow);
                 }
             }
 
             return dt;
+
+            //while (_reader.Read())
+            //    {
+            //        DataRow newRow = dt.NewRow();
+
+            //        for (int i = 0; i < _reader.FieldCount; i++)
+            //        {
+            //            string columnName = _reader.GetName(i);
+            //            Type columnType = dt.Columns[columnName].DataType;
+
+            //            if (_reader.IsDBNull(i)) { newRow[columnName] = DBNull.Value; }
+            //            else { newRow[columnName] = _reader.GetValue(i); }
+
+
+            //        }
+            //        dt.Rows.Add(newRow);
+
+            //    }
+            //}
+
+            //return dt;
         }
 
         private static string ExtractTableNameFromQuery(string sqlQuery)
@@ -1272,26 +1343,35 @@ namespace AppliedDB
 
         public DataRow RemoveNullValues(DataRow row)
         {
-            foreach(DataColumn item in row.Table.Columns)
+            
+            foreach (DataColumn column in row.Table.Columns)
             {
-                if(row[item] == DBNull.Value)
+                if (row.IsNull(column))
                 {
-                    if(item.GetType() == typeof(int)) { row[item] = 0; }
-                    if(item.GetType() == typeof(Int16)) { row[item] = 0; }
-                    if(item.GetType() == typeof(Int32)) { row[item] = 0; }
-                    if(item.GetType() == typeof(Int64)) { row[item] = 0; }
-                    if(item.GetType() == typeof(string)) { row[item] = string.Empty; }
-                    if(item.GetType() == typeof(decimal)) { row[item] = 0.0M; }
-                    if(item.GetType() == typeof(float)) { row[item] = 0.0; }
-                    if(item.GetType() == typeof(bool)) { row[item] = false; }
-                    if(item.GetType() == typeof(double)) { row[item] = 0.00; }
-                }
+                    Type columnType = column.DataType;
 
+                    row[column] = columnType switch
+                    {
+                        Type t when t == typeof(int) => 0,
+                        Type t when t == typeof(short) => (short)0,      // Int16
+                        Type t when t == typeof(long) => 0L,              // Int64
+                        Type t when t == typeof(string) => string.Empty,
+                        Type t when t == typeof(decimal) => 0.0M,
+                        Type t when t == typeof(float) => 0.0f,
+                        Type t when t == typeof(bool) => false,
+                        Type t when t == typeof(double) => 0.0,
+                        Type t when t == typeof(byte) => (byte)0,
+                        Type t when t == typeof(char) => '\0',
+                        Type t when t == typeof(DateTime) => DateTime.MinValue,
+                        Type t when t == typeof(Guid) => Guid.Empty,
+                        Type t when t.IsValueType => Activator.CreateInstance(t), // Default value for other value types
+                        _ => null // For reference types that aren't strings
+                    };
+                }
             }
 
             return row;
         }
-
 
         #endregion
     }

@@ -80,7 +80,7 @@ namespace AppliedAccounts.Models
             _Row = AppliedDB.Functions.RemoveNull(_Row);
             SalesRecord _Record = new();
             {
-                _Record.Id = (int)_Row["ID"];
+                _Record.Id = (long)_Row["ID"];
                 _Record.Vou_No = (string)_Row["Vou_No"];
                 _Record.Ref_No = (string)_Row["Ref_No"];
                 //_Record.Batch = (string)_Row["Batch"];
@@ -144,7 +144,7 @@ namespace AppliedAccounts.Models
 
     public class SalesRecord
     {
-        public int Id { get; set; } = 0;
+        public long Id { get; set; } = 0;
         public string Vou_No { get; set; } = string.Empty;
         public string Ref_No { get; set; } = string.Empty;
         public DateTime Vou_Date { get; set; } = DateTime.Now;

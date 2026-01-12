@@ -107,33 +107,46 @@ namespace AppliedAccounts.Models
 
         private List<DataListModel> GetPostingTable(DataTable dataTable)
         {
+
             var _List = new List<DataListModel>();
 
-            // Cash book
-            if (dataTable.TableName == AppliedDB.Enums.Tables.Book.ToString())
+            try
             {
-                //DataListModelList = CreatePostingTable(PostType);
-
-                foreach (DataRow Row in dataTable.Rows)
+                // Cash book
+                if (dataTable.TableName == AppliedDB.Enums.Tables.Book.ToString())
                 {
-                    long ID = Row.Field<long>("ID");
+                    //DataListModelList = CreatePostingTable(PostType);
 
-                    var _DataList = new DataListModel();
-                    _DataList.ID = ID;
-                    _DataList.Vou_No = Row.Field<string>("Vou_No") ?? string.Empty;
-                    _DataList.Vou_Date = Row.Field<DateTime>("Vou_Date");
-                    _DataList.Title = Source.SeekTitle(AppliedDB.Enums.Tables.COA, ID);
-                    _DataList.DR = Row.Field<decimal>("Amount") <= 0 ? Row.Field<decimal>("Amount") : 0.0M;
-                    _DataList.CR = Row.Field<decimal>("Amount") > 0 ? Row.Field<decimal>("Amount") : 0.0M;
-                    _DataList.Status = Row.Field<string>("Status") ?? "Submitted";
-                    _DataList.Selected = false;
+                    foreach (DataRow Row in dataTable.Rows)
+                    {
+                        var Row1 = Source.RemoveNullValues(Row);
 
-                    _List.Add(_DataList);
+                        long ID = Row1.Field<long>("ID");
+                        long BookID = Row1.Field<long>("BookID");
 
+                        var _DataList = new DataListModel();
+                        _DataList.ID = ID;
+                        _DataList.Vou_No = Row1.Field<string>("Vou_No") ?? string.Empty;
+                        _DataList.Vou_Date = Row1.Field<DateTime>("Vou_Date");
+                        _DataList.Title = Source.SeekTitle(AppliedDB.Enums.Tables.COA, BookID);
+                        _DataList.DR = Row1.Field<decimal>("Amount") <= 0 ? Row1.Field<decimal>("Amount") : 0.0M;
+                        _DataList.CR = Row1.Field<decimal>("Amount") > 0 ? Row1.Field<decimal>("Amount") : 0.0M;
+                        _DataList.Status = Row1.Field<string>("Status") ?? "Submitted";
+                        _DataList.Selected = false;
+
+                        _List.Add(_DataList);
+
+                    }
                 }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                MsgClass.Critical(ex.Message);
+                throw;
+            }
             return _List;
+
         }
 
 

@@ -484,7 +484,7 @@ namespace AppliedAccounts.Pages.ImportData
 
                             long _Inventory = AppliedDB.Functions.Code2long(AppGlobal.DBFile, Tables.Inventory, (string)Scheme["Code"]);
                             _Row2["Inventory"] = _Inventory;
-                            _Row2["Batch"] = Batch;
+                            //_Row2["Batch"] = Batch;
 
                             if ((string)Scheme["Entry ID"] == "A")          // Amount only
                             {
@@ -499,7 +499,7 @@ namespace AppliedAccounts.Pages.ImportData
 
                             decimal _TaxID = AppliedDB.Functions.Code2long(AppGlobal.DBFile, Tables.Taxes, (string)Scheme["STax"]);
                             _Row2["Tax"] = _TaxID;
-                            _Row2["Tax_Rate"] = AppliedDB.Functions.Code2Rate(AppGlobal.DBFile, (int)_Row2["Tax"]);
+                            _Row2["Tax_Rate"] = AppliedDB.Functions.Code2Rate(AppGlobal.DBFile, (long)_Row2["Tax"]);
                             _Row2["Description"] = Row[(string)Scheme["Remarks Code"]];
                             long.TryParse(Row["Project"].ToString(), out long _projectID);
                             _Row2["Project"] = _projectID;
@@ -558,6 +558,10 @@ namespace AppliedAccounts.Pages.ImportData
                 Source = new(AppGlobal.AppPaths);
                 var BillRec1 = Source.GetTable(Tables.BillReceivable);
                 var BillRec2 = Source.GetTable(Tables.BillReceivable2);
+                
+                var MaxID1 = Source.GetMaxID(Tables.BillReceivable);
+                var MaxID2 = Source.GetMaxID(Tables.BillReceivable2);
+
                 var master = BillRec1.NewRow();
                 var details = new List<DataRow>();
                 var Validated = true;
@@ -572,6 +576,7 @@ namespace AppliedAccounts.Pages.ImportData
 
                     MsgClass.Add($"{DateTime.Now} Invoice {master["Vou_No"]} is processing...");
                     master = Invoice;
+                    //master["ID"] = MaxID1; MaxID1++;
                     details = MyModel.SaleDetailsList.Where(row => (long)row["TranID"] == (long)master["ID"]).ToList();
 
                     MsgClass.Add($"{DateTime.Now} {details.Count} records found in invoice {master["Vou_No"]}");
@@ -580,7 +585,7 @@ namespace AppliedAccounts.Pages.ImportData
 
                     foreach (var Row in details)
                     {
-
+                        //Row["ID"] = MaxID2; MaxID2++;
                         Validated = Validation(Row); ;
                         if (!Validated)
                         {
@@ -592,14 +597,14 @@ namespace AppliedAccounts.Pages.ImportData
                     if (Validated)
                     {
                         MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} validated for post / save... ");
-                        master["ID"] = 0;           // Set a DataRow for insert command
+                        master["ID"] = MaxID1; MaxID1++;           // Set a DataRow for insert command
                         CommandClass _Commands = new(master, AppGlobal.DBFile);
                         var IsSaved = _Commands.SaveChanges();
                         MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} saved ---> {IsSaved} ");
                         var _TranID = (long)master["ID"];        // Get ID after save row in Sqlite Data Table.
                         foreach (var Row in details)
                         {
-                            Row["ID"] = 0;
+                            Row["ID"] = MaxID2; MaxID2++;
                             Row["TranID"] = _TranID;
                             _Commands = new(Row, AppGlobal.DBFile);
                             await Task.Run(() =>

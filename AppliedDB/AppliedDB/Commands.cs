@@ -180,9 +180,9 @@ namespace AppliedDB
             { Action = "Insert"; }
             else { Action = "Update"; }
 
-            CommandInsert = Commands.Insert(Row, DBFile);
-            CommandUpdate = Commands.UpDate(Row, DBFile);
-            CommandDelete = Commands.Delete(Row, DBFile);
+            CommandInsert = Commands.Insert(Row, DBFile)!;
+            CommandUpdate = Commands.UpDate(Row, DBFile)!;
+            CommandDelete = Commands.Delete(Row, DBFile)!;
         }
 
         public CommandClass(DataRow _Row, SqliteConnection DBConnection)
@@ -195,9 +195,9 @@ namespace AppliedDB
             { Action = "Insert"; } 
             else { Action = "Update"; }
 
-            CommandInsert = Commands.Insert(Row, DBConnection);
-            CommandUpdate = Commands.UpDate(Row, DBConnection);
-            CommandDelete = Commands.Delete(Row, DBConnection);
+            CommandInsert = Commands.Insert(Row, DBConnection)!;
+            CommandUpdate = Commands.UpDate(Row, DBConnection)!;
+            CommandDelete = Commands.Delete(Row, DBConnection)!;
         }
 
         #endregion
@@ -214,9 +214,10 @@ namespace AppliedDB
                 {
                     try
                     {
+                        if (CommandUpdate.Connection!.State != ConnectionState.Open) { CommandUpdate.Connection.Open(); }
 
                         Effected = CommandUpdate.ExecuteNonQuery();
-                        PrimaryKeyID = (long)CommandUpdate.Parameters["@ID"].Value;
+                        PrimaryKeyID = (long)CommandUpdate.Parameters["@ID"].Value!;
 
                         if (Effected == 0) { MyMessages.Alert(Messages.NotSave); result = false; }
                         if (Effected > 0) { MyMessages.Add(Messages.Save); result = true; }
@@ -234,8 +235,10 @@ namespace AppliedDB
                 {
                     try
                     {
+                        if(CommandInsert.Connection!.State != ConnectionState.Open) { CommandInsert.Connection.Open(); }
+
                         Effected = CommandInsert.ExecuteNonQuery();
-                        PrimaryKeyID = (long)CommandInsert.Parameters["@ID"].Value;
+                        PrimaryKeyID = (long)CommandInsert.Parameters["@ID"].Value!;
 
                         if (Effected == 0) { MyMessages.Alert(Messages.NotSave); result = false; }
                         if (Effected > 0) { MyMessages.Add(Messages.Save); result = true; }
