@@ -237,6 +237,11 @@ namespace AppliedDB
                     {
                         if(CommandInsert.Connection!.State != ConnectionState.Open) { CommandInsert.Connection.Open(); }
 
+                        if((long)CommandInsert.Parameters["@ID"].Value==0 && CommandInsert.Transaction == null)
+                        {
+                            CommandInsert.Parameters["@ID"].Value = DataSource.GetMaxID(Row.Table.TableName!, CommandInsert.Connection!.ConnectionString);
+                        }
+
                         Effected = CommandInsert.ExecuteNonQuery();
                         PrimaryKeyID = (long)CommandInsert.Parameters["@ID"].Value!;
 

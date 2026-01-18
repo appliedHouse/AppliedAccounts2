@@ -145,7 +145,25 @@ namespace AppliedDB
                 }
             }
             return null;
+        }
 
+        public static SqliteConnection? GetSqliteConnectionbyString(string _ConnectionString)
+        {
+
+            if (!string.IsNullOrEmpty(_ConnectionString))
+            {
+                try
+                {
+                    SqliteConnection _Connection = new(); ;
+                    _Connection.ConnectionString = _ConnectionString;
+                    return _Connection;
+                }
+                catch (Exception ex)
+                {
+                    // Error handling code type here....
+                }
+            }
+            return null;
         }
         #endregion
         public void Dispose()

@@ -815,7 +815,9 @@ namespace AppliedDB
 
         public static long GetMaxID(string _Table, string ConnectionString)
         {
-            var _Connection = Connections.GetSqliteConnection(ConnectionString);
+            // Create this function due to command.transaction issue.
+            // Create a new connection without transaction to avoid error in transaction mode.
+            var _Connection = Connections.GetSqliteConnectionbyString(ConnectionString);
             DataTable _DataTable = GetDataTable(_Table,_Connection!);
             if (_DataTable.Rows.Count == 0) { return 1; }
             long _MaxID = (long)_DataTable.Compute("MAX(ID)", "") + 1;

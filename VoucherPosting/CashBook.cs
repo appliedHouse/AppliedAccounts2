@@ -46,7 +46,8 @@ namespace VoucherPosting
 
         public async Task PostCashBook()
         {
-            MsgClass.ClearMessages();
+            MsgClass.ClearMessages();           // Clear all previous messages.
+
             // Validation of Voucher
             if (!PostValidate()) { return; }
 
@@ -55,7 +56,7 @@ namespace VoucherPosting
                 Source.BeginTransaction();
                 DataRow _MasterRow = PostingData.MasterTable.Rows[0];
                 int SrNo = 1;
-                long MaxID = DataSource.GetMaxID("Ledger", Source.MyConnection.DataSource);
+                long MaxID = DataSource.GetMaxID("Ledger", Source.MyConnection.ConnectionString);
 
                 #region Master Record
                 var LedgerRow = LedgerData.LedgerTable.NewRow();

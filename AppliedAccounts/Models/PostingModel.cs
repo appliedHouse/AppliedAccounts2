@@ -1,6 +1,5 @@
 ﻿using AppliedAccounts.Services;
 using AppliedDB;
-using AppliedGlobals;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
 using System.Data;
@@ -93,15 +92,10 @@ namespace AppliedAccounts.Models
                     DataListModelList.Clear();
                     break;
 
-
                 default:
                     DataListModelList.Clear();
                     break;
             }
-
-
-
-
             await Task.Delay(100);
         }
 
