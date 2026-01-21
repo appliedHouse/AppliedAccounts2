@@ -84,7 +84,12 @@ else
                     <div class="col-md-4">
 
                         <div class="form-floating">
-                            <InputSelect id="ddBook" class="form-control item-height" TValue="long" Value="@MyModel.MyVoucher.Master.BookID" ValueExpression="@(() => @MyModel.MyVoucher.Master.BookID)" ValueChanged="@((e) => BookIDChanged(e))">
+                            <InputSelect id="ddBook" 
+                                         class="form-control item-height" 
+                                         TValue="long" 
+                                         Value="@MyModel.MyVoucher.Master.BookID" 
+                                         ValueExpression="@(() => @MyModel.MyVoucher.Master.BookID)" 
+                                         ValueChanged="@((e) => BookIDChanged(e))">
                                 @if (MyModel.BookList.Any())
                                 {
                                     @foreach (var item in MyModel.BookList)
@@ -266,25 +271,44 @@ else
             <div class="container">
                 <div class="d-flex flex-row mb-3 filter position-relative">
                     <div class="p-2">
-                        <button type="button" class="btn btn-sm w1 btn-info" title="New" @onclick="MyModel.New"><i class="far fa-plus-square"></i></button>
+                        <button type="button" class="btn btn-sm w1 btn-info" title="New" @onclick="MyModel.New">
+                            <i class="bi bi-plus-square"></i>
+                        </button>
+                    </div>
+
+                    <div class="p-2">
+                        <button type="button" class="btn btn-sm w1 btn-primary" title="Add" @onclick="MyModel.Save">
+                            <i class="bi bi-arrow-bar-down"></i>
+                        </button>
                     </div>
                     <div class="p-2">
-                        <button type="button" class="btn btn-sm w1 btn-primary" title="Add" @onclick="MyModel.Save"><i class="fa-solid fa-arrow-down"></i></button>
-                    </div>
-                    <div class="p-2">
-                        <button type="button" class="btn btn-sm w1 btn-success" title="Save" data-bs-toggle="modal" data-bs-target="#SaveVoucher"><i class="fas fa-save"></i></button>
+                        <button type="button" class="btn btn-sm w1 btn-success" title="Save" data-bs-toggle="modal" data-bs-target="#SaveVoucher">
+                            <i class="bi bi-floppy2-fill"></i>
+                            </button>
                     </div>
 
                     @if (MyModel.MyVoucher != null && MyModel.MyVoucher.Details.Count > 1)
                     {
                         <div class="btn-group p-2" role="group" aria-label="Navigation">
-                            <button type="button" class="btn btn-sm w1 btn-light" title="Top" @onclick="MyModel.Top"><i class="fa fa-angles-left"></i></button>
-                            <button type="button" class="btn btn-sm w1 btn-light" title="Next" @onclick="MyModel.Next"><i class="fa fa-angle-right"></i></button>
-                            <button type="button" class="btn btn-sm w1 btn-light" title="Back" @onclick="MyModel.Back"><i class="fa fa-angle-left"></i></button>
-                            <button type="button" class="btn btn-sm w1 btn-light" title="Last" @onclick="MyModel.Last"><i class="fa fa-angles-right"></i></button>
+                            <button type="button" class="btn btn-sm w1 btn-light" title="Top" @onclick="MyModel.Top">
+                                <i class="bi bi-chevron-double-left"></i>
+                            </button>
+
+                            <button type="button" class="btn btn-sm w1 btn-light" title="Next" @onclick="MyModel.Next">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+
+                            <button type="button" class="btn btn-sm w1 btn-light" title="Back" @onclick="MyModel.Back">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+
+                            <button type="button" class="btn btn-sm w1 btn-light" title="Last" @onclick="MyModel.Last">
+                                <i class="bi bi-chevron-double-right"></i>
+                            </button>
                         </div>
+                        <div><ReportingButtons ReturnValue="Print" ID="@MyModel.MyVoucher!.Master.ID1" /></div>
                     }
-                    <div><ReportingButtons ReturnValue="Print" ID="@MyModel.MyVoucher!.Master.ID1" /></div>
+                    
                     <!-- Float Back Button to the Right -->
                     <div class="p-2 ms-auto">
                         <button type="button" class="btn btn-sm w1 btn-warning" title="Back" @onclick="BackPage"><i class="bi bi-arrow-left-circle"></i></button>
@@ -292,7 +316,7 @@ else
                 </div>
             </div>
 
-           @* Voucher Detail List *@
+            @* Voucher Detail List *@
 
             @if (MyModel.MyVoucher != null)
             {
@@ -318,7 +342,7 @@ else
                                 @ClearTotal()
                                 @foreach (var item in MyModel.MyVoucher.Details)
                                 {
-                                    @if(item.action != MyModel._Deleted)
+                                    @if (item.action != MyModel._Deleted)
                                     {
                                         Tot_DR += item.DR;
                                         Tot_CR += item.CR;
@@ -343,7 +367,7 @@ else
                                     else
                                     {
                                         <tr>
-                                            
+
 
                                             <td style="width:5%">@item.Sr_No</td>
                                             <td style="width:15%">@item.TitleAccount</td>
@@ -359,7 +383,7 @@ else
 
                                     }
 
-                                   
+
                                 }
                             </tbody>
                             <tfoot>
@@ -379,7 +403,7 @@ else
                     </div>
                 }
 
-               
+
             }
 
 

@@ -156,7 +156,18 @@
             VouDateMore = 405,
             VouTransNotDeleted = 406,
             VouMasterDeleted = 407,
-            VouMasterNotDeleted = 408
+            VouMasterNotDeleted = 408,
+            
+            PostingMasterRecordNotFound = 6001,
+            PostingDetailRecordNotFound = 6002,
+            PostingMasterIsNull = 6003,
+            PostingDataIsNull = 6004,
+            VoucherAlreadyPosted = 6005,
+            
+            
+            TransactionRollback = 7001,
+            TransactionCommited = 7002,
+
         }
 
         public enum Class

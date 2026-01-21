@@ -67,8 +67,8 @@ namespace Menus
             _Menus.Add(new MenuItem { ID = 22, Title = "Transaction", Active = true, Icon = "bi bi-stack-overflow", Level = 2, ParentID = 2, NavigateTo = "/Menu/Accounts" });
             _Menus.Add(new MenuItem { ID = 23, Title = "Reports", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 2, NavigateTo = "/Menu/Reports" });
             _Menus.Add(new MenuItem { ID = 24, Title = "Balances", Active = true, Icon = "bi bi-wallet2", Level = 2, ParentID = 2, NavigateTo = "" });
-            _Menus.Add(new MenuItem { ID = 25, Title = "Post", Active = true, Icon = "bi bi-send", Level = 2, ParentID = 2, NavigateTo = "" });
-            _Menus.Add(new MenuItem { ID = 26, Title = "Unpost", Active = true, Icon = "bi bi-send-dash", Level = 2, ParentID = 2, NavigateTo = "" });
+            _Menus.Add(new MenuItem { ID = 25, Title = "Post", Active = true, Icon = "bi bi-send", Level = 2, ParentID = 2, NavigateTo = "/Posting" });
+            _Menus.Add(new MenuItem { ID = 26, Title = "Unpost", Active = true, Icon = "bi bi-send-dash", Level = 2, ParentID = 2, NavigateTo = "/Unpost" });
 
             // Sub Menu Sale CDC
             _Menus.Add(new MenuItem { ID = 31, Title = "Dictionery", Active = true, Icon = "bi bi-journal-code", Level = 2, ParentID = 3, NavigateTo = "/Menu/Sale/Dictionery" });

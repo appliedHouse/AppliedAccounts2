@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SQLQueries
 {
@@ -419,5 +418,43 @@ namespace SQLQueries
         }
         #endregion
 
+        #region Cash and Bank Account in List
+        
+        public static string  GetCashAccounts()
+        {
+            var _Text = new StringBuilder();
+
+            _Text.AppendLine("SELECT ");
+            _Text.AppendLine("[A].[ID],");
+            _Text.AppendLine("[A].[Code],");
+            _Text.AppendLine("[A].[Title]");
+            _Text.AppendLine("FROM [COA] [A] ");
+            _Text.AppendLine("LEFT JOIN [COA_NATURE] [N] ");
+            _Text.AppendLine("ON [N].[ID] = [A].[NATURE] ");
+            _Text.AppendLine("WHERE [N].[ID] = 1");
+
+            // here 1 is nature id for cash accounts 
+            return _Text.ToString(); 
+
+        }
+
+        public static string GetBankAccounts()
+        {
+            var _Text = new StringBuilder();
+
+            _Text.AppendLine("SELECT ");
+            _Text.AppendLine("[A].[ID],");
+            _Text.AppendLine("[A].[Code],");
+            _Text.AppendLine("[A].[Title]");
+            _Text.AppendLine("FROM [COA] [A] ");
+            _Text.AppendLine("LEFT JOIN [COA_NATURE] [N] ");
+            _Text.AppendLine("ON [N].[ID] = [A].[NATURE] ");
+            _Text.AppendLine("WHERE [N].[ID] = 2");
+
+            // here 2 is nature id for bank balances
+            return _Text.ToString();
+
+        }
+        #endregion
     }
 }

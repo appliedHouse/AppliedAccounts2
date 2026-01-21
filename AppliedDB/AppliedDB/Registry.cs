@@ -7,6 +7,7 @@ namespace AppliedDB
     public class Registry(SqliteConnection _Connection, string _UserName)
     {
         public SqliteConnection MyConnection { get; set; } = _Connection;
+        //public CommandClass CmdClass { get; set; } 
         public List<string> Messages { get; set; } = new();
         public bool IsConnected { get; set; }
         public string UserName { get; set; } = _UserName;
@@ -17,19 +18,22 @@ namespace AppliedDB
             if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
 
             DataTable TB_Registry = DataSource.GetDataTable(Enums.Tables.Registry, MyConnection, $"Code = '{Key}'");
-            DataRow CurrentRow ;
+            DataRow CurrentRow ; 
             string SQLAction;
+
+
 
             if (TB_Registry.Rows.Count == 1)
             {
                 SQLAction = "Update";
                 CurrentRow = TB_Registry.DefaultView[0].Row;
+                CurrentRow.AcceptChanges();
             }
             else
             {
                 SQLAction = "Insert";
                 CurrentRow = TB_Registry.NewRow();
-                CurrentRow["ID"] = 0;
+                CurrentRow["ID"] = DataSource.GetMaxID(Enums.Tables.Registry, MyConnection);
             }
 
             CurrentRow["Code"] = Key;
@@ -62,8 +66,11 @@ namespace AppliedDB
                     break;
             }
 
-            if (SQLAction == "Insert") { var cmd = Commands.Insert(CurrentRow, MyConnection); cmd?.Connection.Open(); cmd?.ExecuteNonQuery(); cmd?.Connection.Close(); return true; }
-            if (SQLAction == "Update") { var cmd = Commands.UpDate(CurrentRow, MyConnection); cmd?.Connection.Open(); cmd?.ExecuteNonQuery(); cmd?.Connection.Close(); return true; }
+            var cmd = new CommandClass(CurrentRow, MyConnection);
+            cmd.SaveChanges();
+
+            //if (SQLAction == "Insert") { var cmd = Commands.Insert(CurrentRow, MyConnection); cmd?.Connection.Open(); cmd?.ExecuteNonQuery(); cmd?.Connection.Close(); return true; }
+            //if (SQLAction == "Update") { var cmd = Commands.UpDate(CurrentRow, MyConnection); cmd?.Connection.Open(); cmd?.ExecuteNonQuery(); cmd?.Connection.Close(); return true; }
 
             MyConnection.Close();
             return false;

@@ -62,7 +62,7 @@ namespace AppliedAccounts.Models
         {
             COANotesRecord _Record = new();
             {
-                _Record.ID = (int)_Row["ID"];
+                _Record.ID = (long)_Row["ID"];
                 _Record.Code = (string)_Row["Code"];
                 _Record.Title = (string)_Row["Title"];
 
@@ -204,7 +204,7 @@ namespace AppliedAccounts.Models
 
     public class COANotesRecord
     {
-        public int ID { get; set; }
+        public long ID { get; set; }
         public string Code { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
 

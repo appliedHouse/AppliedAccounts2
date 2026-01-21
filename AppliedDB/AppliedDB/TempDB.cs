@@ -9,6 +9,7 @@ namespace AppliedDB
         public string TempDBFile { get; set; }
         public string TableName { get; set; }
         public DataTable TempTable { get; set; }
+        public string ErrorMessage { get; set; }
 
         public TempDB(string _TempDBFile)
         {
@@ -19,7 +20,9 @@ namespace AppliedDB
 
         public async Task<DataTable> GetTempTableAsync(string tableName)
         {
+            ErrorMessage = string.Empty;
             var dt = new DataTable();
+
 
             try
             {
@@ -33,8 +36,9 @@ namespace AppliedDB
 
                 dt.Load(reader);
             }
-            catch
+            catch (Exception ex)
             {
+                ErrorMessage = ex.Message;
                 return new DataTable(); // return empty on error
             }
             finally

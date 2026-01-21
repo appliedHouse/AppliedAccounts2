@@ -172,7 +172,7 @@ else
                                 var _IDate = ((DateTime)item["Vou_Date"]).ToString(Format.DDMMMYY);
                                 var _PDate = ((DateTime)item["Pay_Date"]).ToString(Format.DDMMMYY);
                                 var _Amount = ((decimal)item["Amount"]).ToString(Format.Digit);
-                                int _ID = (int)item["ID"];
+                                long _ID = (long)item["ID"];
 
                                 <tr class="tb-body-row">
                                     <td class="tb-col-Center">@item["Vou_No"]</td>

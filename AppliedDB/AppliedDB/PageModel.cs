@@ -86,8 +86,6 @@ namespace AppliedDB
 
         public void GetPageList()
         {
-            
-
             PageList = [];
 
             if(Size <= Count)
@@ -100,8 +98,6 @@ namespace AppliedDB
                 // Select full length of Count if Size is greater than Count
                 PageList.AddRange(Enumerable.Range(1, Count));
             }
-
-               
         }
     }
 }
