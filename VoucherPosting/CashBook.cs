@@ -31,7 +31,6 @@ namespace VoucherPosting
             {
                 LedgerData = new LedgerModel(Source, Vou_No);
             }
-
         }
 
         private void GetVouNumber()
@@ -40,11 +39,22 @@ namespace VoucherPosting
             if (PostingData == null) { return; }
             if (PostingData.MasterTable == null) { return; }
             if (PostingData.MasterTable.Rows.Count == 0) { return; }
-            Vou_No = PostingData?.MasterTable.Rows[0]["Vou_No"].ToString();
-            Vou_ID = (long)PostingData?.MasterTable.Rows[0]["ID"];
+            Vou_No = PostingData?.MasterTable.Rows[0]["Vou_No"].ToString()!;
+            Vou_ID = (long)PostingData?.MasterTable.Rows[0]["ID"]!;
         }
 
-        public async Task PostCashBook()
+        public async Task DoCashPosting()
+        {
+            await PostBook();
+        }
+
+        public async Task DoBankPosting()
+        {
+            await PostBook();
+        }
+
+
+        public async Task PostBook()
         {
             MsgClass.ClearMessages();           // Clear all previous messages.
 
@@ -56,15 +66,14 @@ namespace VoucherPosting
                 Source.BeginTransaction();
                 DataRow _MasterRow = PostingData.MasterTable.Rows[0];
                 int SrNo = 1;
-                long MaxID = DataSource.GetMaxID("Ledger", Source.MyConnection.ConnectionString);
 
                 #region Master Record
                 var LedgerRow = LedgerData.LedgerTable.NewRow();
 
-                LedgerRow["ID"] = MaxID; MaxID++;
+                LedgerRow["ID"] = 0;
                 LedgerRow["TranID"] = _MasterRow.Field<long>("ID");
                 LedgerRow["Vou_Type"] = VoucherType.Cash.ToString();
-                LedgerRow["Vou_Date"] = _MasterRow.Field<DateTime>("Vou_Date");
+                LedgerRow["Vou_Date"] = _MasterRow.Field<DateTime>("Vou_Date").Date;
                 LedgerRow["Vou_No"] = _MasterRow.Field<string>("Vou_No");
                 LedgerRow["SR_No"] = SrNo++;
                 LedgerRow["Ref_No"] = string.IsNullOrEmpty(_MasterRow.Field<string>("Ref_No"))
@@ -94,20 +103,16 @@ namespace VoucherPosting
                 #region Details
                 foreach (DataRow Row in PostingData.DetailTable.Rows)
                 {
-                    //var Row1 = Source.RemoveNullValues(Row);
-
                     LedgerRow = LedgerData.LedgerTable.NewRow();
 
-                    LedgerRow["ID"] = MaxID; MaxID++;
+                    LedgerRow["ID"] = 0; 
                     LedgerRow["TranID"] = _MasterRow.Field<long>("ID");
                     LedgerRow["Vou_Type"] = VoucherType.Cash.ToString();
-                    LedgerRow["Vou_Date"] = _MasterRow.Field<DateTime>("Vou_Date");
+                    LedgerRow["Vou_Date"] = _MasterRow.Field<DateTime>("Vou_Date").Date;
                     LedgerRow["Vou_No"] = _MasterRow.Field<string>("Vou_No");
                     LedgerRow["SR_No"] = SrNo++;
                     LedgerRow["Ref_No"] = _MasterRow.Field<string>("Ref_No");
-                                            
                     LedgerRow["BookID"] = _MasterRow.Field<long>("BookID");
-
                     LedgerRow["COA"] = Row["COA"];
                     LedgerRow["DR"] = Row["DR"];
                     LedgerRow["CR"] = Row["CR"];
@@ -154,11 +159,7 @@ namespace VoucherPosting
                 Source.RollbackTransaction();
                 MsgClass.Critical(ex.Message);
             }
-
-
-
             await Task.FromResult(true);
-
         }
 
         public bool PostValidate()
@@ -196,7 +197,6 @@ namespace VoucherPosting
             {
                 MsgClass.Critical(error.Message);
                 return false;
-
             }
 
             return true;

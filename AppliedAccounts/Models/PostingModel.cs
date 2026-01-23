@@ -13,7 +13,7 @@ namespace AppliedAccounts.Models
     {
         [Inject] public GlobalService AppGlobal { get; set; } = default!;
         public MessageClass MsgClass { get; set; } = new();
-        public List<DataListModel> DataListModelList { get; set; }
+        public List<DataListModel> DataListModelList { get; set; } = new();
         public bool IsPosting { get; set; } = false;
         public DataSource Source { get; set; }
         public string Filter { get; set; } = string.Empty;
@@ -151,17 +151,19 @@ namespace AppliedAccounts.Models
 
         public async Task DoVoucherPosting(long _VouID, int _PostType)
         {
-            VoucherPostingModel postingModel = new();
-
-            postingModel.MasterTable = Source.GetTable(AppliedDB.Enums.Tables.Book, $"ID={_VouID}");
-            postingModel.DetailTable = Source.GetTable(AppliedDB.Enums.Tables.Book2, $"TranID={_VouID}");
-
-            if (_PostType == 0) { return; }
+            if (_PostType == 0) { return; }         // Return if type not assigned.
+            
+            // Cash Book Posting
             if (_PostType == 1)
             {
-                MsgClass.ClearMessages();                           // Clear all previous messages. 
+                VoucherPostingModel postingModel = new();
+
+                postingModel.MasterTable = Source.GetTable(AppliedDB.Enums.Tables.Book, $"ID={_VouID}");
+                postingModel.DetailTable = Source.GetTable(AppliedDB.Enums.Tables.Book2, $"TranID={_VouID}");
+
+                MsgClass.ClearMessages();                            // Clear all previous messages. 
                 CashBook postCashBook = new(Source, postingModel);
-                await postCashBook.PostCashBook();                  // Cash Posting main method.
+                await postCashBook.DoCashPosting();                  // Cash Posting main method.
                 if (postCashBook.PostSuccessful)
                 {
                     MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
@@ -170,6 +172,28 @@ namespace AppliedAccounts.Models
                 else
                 {
                     MsgClass = postCashBook.MsgClass;
+                }
+            }
+
+            // Bank Book Posting
+            if (_PostType == 2)
+            {
+                VoucherPostingModel postingModel = new();
+
+                postingModel.MasterTable = Source.GetTable(AppliedDB.Enums.Tables.Book, $"ID={_VouID}");
+                postingModel.DetailTable = Source.GetTable(AppliedDB.Enums.Tables.Book2, $"TranID={_VouID}");
+
+                MsgClass.ClearMessages();                           // Clear all previous messages. 
+                CashBook postBankBook = new(Source, postingModel);
+                await postBankBook.DoBankPosting();                  // Bank Posting main method.
+                if (postBankBook.PostSuccessful)
+                {
+                    MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
+                    await LoadData(_PostType);              // Refresh display Data afger save voucher.
+                }
+                else
+                {
+                    MsgClass = postBankBook.MsgClass;
                 }
             }
 

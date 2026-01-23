@@ -10,9 +10,7 @@ namespace AppliedDB
     {
         public static SqliteCommand? Insert(DataRow CurrentRow, SqliteConnection DBConnection)
         {
-            if (CurrentRow.RowState == DataRowState.Added
-                || CurrentRow.RowState == DataRowState.Detached
-                || CurrentRow.Field<long>("ID") == 0)
+            if (CurrentRow.Field<long>("ID") == 0)
             {
                 DataColumnCollection _Columns = CurrentRow.Table.Columns;
 
@@ -44,7 +42,7 @@ namespace AppliedDB
                     _Command.Parameters.AddWithValue(_ParameterName, CurrentRow[_Column.ColumnName]);
                 }
 
-                if(CurrentRow.Field<long>("ID") == 0)
+                if (CurrentRow.Field<long>("ID") == 0)
                 {
                     CurrentRow["ID"] = DataSource.GetMaxID(_TableName, DBConnection.ConnectionString);
                     _Command.Parameters["@ID"].Value = CurrentRow["ID"];
@@ -65,8 +63,8 @@ namespace AppliedDB
         }
         public static SqliteCommand? UpDate(DataRow CurrentRow, SqliteConnection DBConnection)
         {
-            if (CurrentRow.RowState == DataRowState.Modified)
-            //if (CurrentRow.Field<long>("ID") != 0)
+            //if (CurrentRow.RowState == DataRowState.Modified)
+            if (CurrentRow.Field<long>("ID") != 0)
             {
                 var _TableName = CurrentRow.Table.TableName;
                 var _Columns = CurrentRow.Table.Columns;
@@ -173,11 +171,7 @@ namespace AppliedDB
         {
             Row = _Row;
 
-
-            if (_Row.RowState == DataRowState.Added
-                || _Row.RowState == DataRowState.Detached
-                || _Row.Field<long>("ID") == 0)
-            { Action = "Insert"; }
+            if (_Row.Field<long>("ID") == 0) { Action = "Insert"; }
             else { Action = "Update"; }
 
             CommandInsert = Commands.Insert(Row, DBFile)!;
@@ -189,10 +183,7 @@ namespace AppliedDB
         {
             Row = _Row;
 
-            if (_Row.RowState == DataRowState.Added
-                || _Row.RowState == DataRowState.Detached
-                || _Row.Field<long>("ID") == 0) 
-            { Action = "Insert"; } 
+            if (_Row.Field<long>("ID") == 0) { Action = "Insert"; }
             else { Action = "Update"; }
 
             CommandInsert = Commands.Insert(Row, DBConnection)!;
@@ -205,84 +196,130 @@ namespace AppliedDB
         // Insert and Update the Row
         public bool SaveChanges()
         {
-            bool result = false;
-            if (Row is null) { MyMessages.Add(Messages.RowValueNull); return false; }
-
-            if (Action == "Update")
+            if (Row is null)
             {
-                if (CommandUpdate is not null)
+                MyMessages.Add(Messages.RowValueNull);
+                return false;
+            }
+
+            // UPDATE
+            if (Action == "Update" && CommandUpdate is not null)
+            {
+                try
                 {
-                    try
-                    {
-                        if (CommandUpdate.Connection!.State != ConnectionState.Open) { CommandUpdate.Connection.Open(); }
+                    if (CommandUpdate.Connection!.State != ConnectionState.Open)
+                        CommandUpdate.Connection.Open();
 
-                        Effected = CommandUpdate.ExecuteNonQuery();
-                        PrimaryKeyID = (long)CommandUpdate.Parameters["@ID"].Value!;
+                    Effected = CommandUpdate.ExecuteNonQuery();
+                    PrimaryKeyID = (long)CommandUpdate.Parameters["@ID"].Value!;
 
-                        if (Effected == 0) { MyMessages.Alert(Messages.NotSave); result = false; }
-                        if (Effected > 0) { MyMessages.Add(Messages.Save); result = true; }
-                    }
-                    catch (Exception)
+                    if (Effected > 0)
                     {
-                        MyMessages.Add(Messages.RowNotUpdated); return false;
+                        MyMessages.Add(Messages.Save);
+                        return true;
                     }
+
+                    MyMessages.Alert(Messages.NotSave);
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    MyMessages.Critical(ex.Message);
+                    return false;
                 }
             }
 
-            if (Action == "Insert")
+            // INSERT
+            if (Action == "Insert" && CommandInsert is not null)
             {
-                if (CommandInsert is not null)
+                try
                 {
-                    try
+                    if (CommandInsert.Connection!.State != ConnectionState.Open)
+                        CommandInsert.Connection.Open();
+
+                    // Only create savepoint if transaction exists
+                    string savePoint = null!;
+                    if (CommandInsert.Transaction != null)
                     {
-                        if(CommandInsert.Connection!.State != ConnectionState.Open) { CommandInsert.Connection.Open(); }
-
-                        if((long)CommandInsert.Parameters["@ID"].Value==0 && CommandInsert.Transaction == null)
-                        {
-                            CommandInsert.Parameters["@ID"].Value = DataSource.GetMaxID(Row.Table.TableName!, CommandInsert.Connection!.ConnectionString);
-                        }
-
-                        Effected = CommandInsert.ExecuteNonQuery();
-                        PrimaryKeyID = (long)CommandInsert.Parameters["@ID"].Value!;
-
-                        if (Effected == 0) { MyMessages.Alert(Messages.NotSave); result = false; }
-                        if (Effected > 0) { MyMessages.Add(Messages.Save); result = true; }
-
+                        savePoint = $"SP_Insert_{Guid.NewGuid():N}";
+                        CommandInsert.Transaction.Save(savePoint);
                     }
-                    catch (Exception ex)
+
+                    // Get next ID
+                    using var cmdMaxID = CommandInsert.Connection.CreateCommand();
+                    cmdMaxID.Transaction = CommandInsert.Transaction;
+                    cmdMaxID.CommandText = $"SELECT IFNULL(MAX(ID),0) + 1 FROM [{Row.Table.TableName}]";
+
+                    var nextId = (long)cmdMaxID.ExecuteScalar()!;
+                    CommandInsert.Parameters["@ID"].Value = nextId;
+
+                    Effected = CommandInsert.ExecuteNonQuery();
+                    PrimaryKeyID = nextId;
+
+                    // Release savepoint if used
+                    if (savePoint != null) { CommandInsert.Transaction!.Release(savePoint); }
+                        
+
+                    MyMessages.Add(Messages.Save);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    if (CommandInsert.Transaction != null)
                     {
-                        MyMessages.Danger(ex.Message); result = false;
+                        try { CommandInsert.Transaction.Rollback(); } catch { }
                     }
+                    MyMessages.Danger(ex.Message);
+                    return false;
                 }
             }
 
-
-            return result;
+            return false;
         }
+
+
 
         // Delete the row
         public bool DeleteRow()
         {
-            if (Row is not null)
+            if (Row == null)
             {
-                Row.Table.DefaultView.RowFilter = $"ID={Row.Field<long>("ID")}";
-                if (Row.Table.DefaultView.Count == 1)
-                {
-                    if (CommandDelete is not null)
-                    {
-
-                        Effected = CommandDelete.ExecuteNonQuery();
-
-                        if (Effected > 0)
-                        {
-                            MyMessages.Add(Messages.RowDeleted);
-                            return true;
-                        }
-                    }
-                }
+                MyMessages.Add(Messages.RowNotDeleted);
+                return false;
             }
-            MyMessages.Add(Messages.RowNotDeleted);
-            return false;
+
+            if (CommandDelete is null)
+            {
+                MyMessages.Add(Messages.RowNotDeleted);
+                return false;
+            }
+
+            try
+            {
+                long rowId = Row.Field<long>("ID");
+
+                if (CommandDelete.Connection!.State != ConnectionState.Open)
+                    CommandDelete.Connection.Open();
+
+                if (CommandDelete.Parameters.Contains("@ID"))
+                    CommandDelete.Parameters["@ID"].Value = rowId;
+
+                Effected = CommandDelete.ExecuteNonQuery();
+
+                if (Effected > 0)
+                {
+                    MyMessages.Add(Messages.RowDeleted);
+                    return true;
+                }
+
+                MyMessages.Add(Messages.RowNotDeleted);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                MyMessages.Danger(ex.Message);
+                return false;
+            }
         }
     }
 }
