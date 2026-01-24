@@ -1,7 +1,7 @@
 ﻿using AppliedGlobals;
+using AppMessages;
 using Microsoft.Data.Sqlite;
 using System.Data;
-using System.Reflection.PortableExecutable;
 using System.Text;
 using static AppliedDB.Enums;
 using static AppliedGlobals.AppErums;
@@ -13,11 +13,15 @@ namespace AppliedDB
     {
         public AppValues.AppPath AppPaths { get; set; }
         public SqliteConnection MyConnection { get; set; }
+        public SqliteConnection MyConnection2 { get; set; }
         public SqliteCommand MyCommand { get; set; }
         public CommandClass MyCommands { get; set; } = new();
         public string DBFile => GetDataFile();
         public string ErrorMessage { get; set; }
         public bool IsSaved { get; set; } = false;
+        public MessageClass MsgClass { get; set; } = new();
+
+        private SqliteTransaction? _transaction;
 
 
         #region Constructor
@@ -27,6 +31,7 @@ namespace AppliedDB
             AppPaths = _AppPaths;
             var _Connection = new Connections(AppPaths);
             MyConnection = _Connection.GetSqliteClient()!;               // Get a connection of Client
+            MyConnection2 = _Connection.GetSqliteClient()!;              // Get a connection of Client
 
             if (MyConnection is not null)
             {
@@ -199,8 +204,9 @@ namespace AppliedDB
                     }
                 return new DataTable();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MsgClass.Critical(ex.Message);
                 return new DataTable();
             }
         }
@@ -216,6 +222,7 @@ namespace AppliedDB
 
         #region Get Table Static
 
+       
         public static DataTable GetDataTable(Tables _Table, SqliteCommand _Command)
         {
             try
@@ -297,8 +304,6 @@ namespace AppliedDB
                 return new DataTable();
             }
         }
-
-
         public static DataTable GetDataTable(Tables table, SqliteConnection connection, string filter)
         {
             try
@@ -317,6 +322,9 @@ namespace AppliedDB
                 using var reader = command.ExecuteReader();
                 var dt = GetDataTableExtention(reader);
 
+                if(dt.Rows.Count == 0) { dt.Load(reader); }             // try again to load data directly. if not found...
+
+
                 dt.TableName = table.ToString();
                 return dt;
             }
@@ -330,6 +338,7 @@ namespace AppliedDB
                     connection.Close();
             }
         }
+
 
         #endregion
         #endregion
@@ -399,6 +408,22 @@ namespace AppliedDB
 
         #endregion
 
+        #region Get Data Row
+        public DataRow? GetDataRow(Tables _Table, long ID)
+        {
+            var _Connection = Connections.GetSqliteConnection(MyConnection.DataSource)!;
+            var _DataTable =  GetDataTable(_Table, _Connection,$"ID={ID}");
+            if(_DataTable.Rows.Count > 0)
+            {
+                DataRow row = _DataTable.Rows[0];
+                row.AcceptChanges();                    // Add here to Rowstate must be unchanged
+                return row;
+            }
+            return null;
+        }
+
+        #endregion
+
         #region Seek
         public DataRow Seek(Tables _Table, long ID)
         {
@@ -433,11 +458,11 @@ namespace AppliedDB
 
             var _DataRow = GetTable(_Table).AsEnumerable().ToList().Where(rows => rows.Field<long>("ID") == _ID).SingleOrDefault();
 
-            if(_DataRow != null)
+            if (_DataRow != null)
             {
                 return _DataRow.Field<object>(_column);
             }
-            
+
             return null;
 
         }
@@ -785,9 +810,15 @@ namespace AppliedDB
         #region Maximum ID of the Table
 
 
-        public static long GetMaxID(string DBFile, string _Table)
+
+
+
+        public static long GetMaxID(string _Table, string ConnectionString)
         {
-            DataTable _DataTable = GetDataTable(DBFile, _Table);
+            // Create this function due to command.transaction issue.
+            // Create a new connection without transaction to avoid error in transaction mode.
+            var _Connection = Connections.GetSqliteConnectionbyString(ConnectionString);
+            DataTable _DataTable = GetDataTable(_Table,_Connection!);
             if (_DataTable.Rows.Count == 0) { return 1; }
             long _MaxID = (long)_DataTable.Compute("MAX(ID)", "") + 1;
             _DataTable.Dispose();
@@ -804,6 +835,26 @@ namespace AppliedDB
             return _MaxID;
 
         }
+
+        public static long GetMaxID(Tables _Table, SqliteConnection DBConnection)
+        {
+            DataTable _DataTable = GetDataTable(_Table, DBConnection);
+            if (_DataTable.Rows.Count == 0) { return 1; }
+            long _MaxID = (long)_DataTable.Compute("MAX(ID)", "") + 1;
+            _DataTable.Dispose();
+            return _MaxID;
+
+        }
+
+        public long GetMaxID(Tables _Table)
+        {
+            var _Text = $"SELECT Max(ID) AS MaxID FROM[{_Table}]";
+            var _DataTable = GetTable(_Text);
+            if (_DataTable.Rows.Count == 0) { return 1; }
+            long _MaxID = _DataTable.Rows[0].Field<long>("MaxID") ;
+            _DataTable.Dispose();
+            return _MaxID + 1;
+        }
         #endregion
 
         #region Delete Row
@@ -818,6 +869,21 @@ namespace AppliedDB
             MyCommands = new(_NewRow, MyConnection);
             return MyCommands.DeleteRow();
         }
+
+        public bool Delete(DataRow _Row)
+        {
+
+            var IsDeleted = false;
+            MyCommands = new(_Row, MyConnection);
+            var result = MyCommands.DeleteRow();
+            if (result)
+            {
+                IsDeleted = true;
+            }
+            return IsDeleted;
+        }
+
+
         #endregion
 
         #region Get NewRow of Table
@@ -1004,14 +1070,27 @@ namespace AppliedDB
         public void Save(DataRow newRow)
         {
             IsSaved = false;
+            if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
+
             MyCommands = new(newRow, MyConnection);
-            var result = MyCommands.SaveChanges();
-            if(result)
+            if (_transaction != null)
             {
-                IsSaved = true; 
+                if(MyCommands.CommandInsert != null) { MyCommands.CommandInsert.Transaction = _transaction; }
+                if (MyCommands.CommandUpdate != null) { MyCommands.CommandUpdate.Transaction = _transaction; }
+                if (MyCommands.CommandDelete != null) { MyCommands.CommandDelete.Transaction = _transaction; }
+            }
+
+            var result = MyCommands.SaveChanges();
+            if (result)
+            {
+                MsgClass.Success(AppMessages.Enums.Messages.Save);
+                IsSaved = true;
+            }
+            else
+            {
+                MsgClass.Error(AppMessages.Enums.Messages.RecordNotSaved);
             }
         }
-
 
         // Depreciated....... NOT IN USE... 14-Dec-2025.
         public bool Save(Tables _Table, DataRow newRow)
@@ -1025,6 +1104,7 @@ namespace AppliedDB
 
         public void SetKey(string Key, object KeyValue, KeyTypes keytype, string _Title)
         {
+
             Registry _Registry = new(MyConnection, DBFile);
             _Registry.SetKey(Key, KeyValue, keytype, _Title);
         }
@@ -1081,6 +1161,7 @@ namespace AppliedDB
 
         #endregion
 
+        #region Count Record
         public int RecordCound(Tables _Table, string _Filter)
         {
             string _Query = $"SELECT COUNT(*) FROM {_Table} WHERE {_Filter}";
@@ -1089,6 +1170,7 @@ namespace AppliedDB
             var result = Convert.ToInt32(command.ExecuteScalar()); MyConnection.Close();
             return result;
         }
+        #endregion
 
         #region Data Table Extention
         public static DataTable GetDataTableExtention(SqliteDataReader _reader)
@@ -1105,20 +1187,30 @@ namespace AppliedDB
                     string _TypeName = (string)row["DataTypeName"];
 
                     if (_TypeName.ToUpper() == "INT") { _DataType = typeof(int); }
-                    if (_TypeName.ToUpper() == "INT64") { _DataType = typeof(long); }
-                    if (_TypeName.ToUpper() == "DECIMAL") { _DataType = typeof(decimal); }
-                    if (_TypeName.ToUpper() == "DATETIME") { _DataType = typeof(DateTime); }
-                    if (_TypeName.ToUpper() == "NVARCHAR") { _DataType = typeof(string); }
-                    if (_ColumnName.ToUpper() == "ID") { _DataType = typeof(long); }
-                    if (_ColumnName.ToUpper() == "ID1") { _DataType = typeof(long); }
-                    if (_ColumnName.ToUpper() == "ID2") { _DataType = typeof(long); }
-                    if (_ColumnName.ToUpper() == "TranID") { _DataType = typeof(long); }
-                    if (_ColumnName.ToUpper() == "SR_NO") { _DataType = typeof(int); }
+                    else if (_TypeName.ToUpper() == "INT64") { _DataType = typeof(long); }
+                    else if (_TypeName.ToUpper() == "DECIMAL") { _DataType = typeof(decimal); }
+                    else if (_TypeName.ToUpper() == "DATETIME") { _DataType = typeof(DateTime); }
+                    else if (_TypeName.ToUpper() == "NVARCHAR") { _DataType = typeof(string); }
+                    else if (_TypeName.ToUpper() == "BOOLEAN") { _DataType = typeof(bool); }
+
+                    string upperColumnName = _ColumnName.ToUpper();
+                    if (upperColumnName == "ID" ||
+                        upperColumnName == "ID1" ||
+                        upperColumnName == "ID2" ||
+                        upperColumnName == "TRANID")
+                    {
+                        _DataType = typeof(long);
+                    }
+                    else if (upperColumnName == "SR_NO")
+                    {
+                        _DataType = typeof(int);
+                    }
 
                     dt.Columns.Add(_ColumnName, _DataType);
                 }
 
                 var _Stop = true;
+
 
                 while (_reader.Read())
                 {
@@ -1127,19 +1219,76 @@ namespace AppliedDB
                     for (int i = 0; i < _reader.FieldCount; i++)
                     {
                         string columnName = _reader.GetName(i);
-                        Type columnType = dt.Columns[columnName].DataType;
 
-                        if (_reader.IsDBNull(i)) { newRow[columnName] = DBNull.Value; }
-                        else { newRow[columnName] = _reader.GetValue(i); }
+                        if (_reader.IsDBNull(i))
+                        {
+                            newRow[columnName] = DBNull.Value;
+                        }
+                        else
+                        {
+                            // Get the value and handle type conversions
+                            object value = _reader.GetValue(i);
+                            Type columnType = dt.Columns[columnName].DataType;
 
+                            // Convert if needed
+                            if (value.GetType() != columnType)
+                            {
+                                try
+                                {
+                                    if (columnType == typeof(DateTime) && value is string)
+                                    {
+                                        if (DateTime.TryParse(value.ToString(), out DateTime dtValue))
+                                            value = dtValue;
+                                    }
+                                    else if (columnType == typeof(decimal) && value is double)
+                                    {
+                                        value = Convert.ToDecimal(value);
+                                    }
+                                    else if (columnType == typeof(long) && value is long)
+                                    {
+                                        // Already correct type
+                                    }
+                                    else
+                                    {
+                                        value = Convert.ChangeType(value, columnType);
+                                    }
+                                }
+                                catch
+                                {
+                                    // Keep original value if conversion fails
+                                }
+                            }
 
+                            newRow[columnName] = value;
+                        }
                     }
-                    dt.Rows.Add(newRow);
 
+                    dt.Rows.Add(newRow);
                 }
             }
 
             return dt;
+
+            //while (_reader.Read())
+            //    {
+            //        DataRow newRow = dt.NewRow();
+
+            //        for (int i = 0; i < _reader.FieldCount; i++)
+            //        {
+            //            string columnName = _reader.GetName(i);
+            //            Type columnType = dt.Columns[columnName].DataType;
+
+            //            if (_reader.IsDBNull(i)) { newRow[columnName] = DBNull.Value; }
+            //            else { newRow[columnName] = _reader.GetValue(i); }
+
+
+            //        }
+            //        dt.Rows.Add(newRow);
+
+            //    }
+            //}
+
+            //return dt;
         }
 
         private static string ExtractTableNameFromQuery(string sqlQuery)
@@ -1170,10 +1319,67 @@ namespace AppliedDB
             }
             return "QueryResult";
         }
+
+        #endregion
+
+        #region SQL Transaction Methods
+        public void BeginTransaction()
+        {
+            if (MyConnection.State != ConnectionState.Open)
+                MyConnection.Open();
+
+            _transaction = MyConnection.BeginTransaction();
+        }
+
+        public void CommitTransaction()
+        {
+            _transaction?.Commit();
+            _transaction = null;
+        }
+
+        public void RollbackTransaction()
+        {
+            _transaction?.Rollback();
+            _transaction = null;
+        }
+
+        public DataRow RemoveNullValues(DataRow row)
+        {
+            
+            foreach (DataColumn column in row.Table.Columns)
+            {
+                if (row.IsNull(column))
+                {
+                    Type columnType = column.DataType;
+
+                    row[column] = columnType switch
+                    {
+                        Type t when t == typeof(int) => 0,
+                        Type t when t == typeof(short) => (short)0,      // Int16
+                        Type t when t == typeof(long) => 0L,              // Int64
+                        Type t when t == typeof(string) => string.Empty,
+                        Type t when t == typeof(decimal) => 0.0M,
+                        Type t when t == typeof(float) => 0.0f,
+                        Type t when t == typeof(bool) => false,
+                        Type t when t == typeof(double) => 0.0,
+                        Type t when t == typeof(byte) => (byte)0,
+                        Type t when t == typeof(char) => '\0',
+                        Type t when t == typeof(DateTime) => DateTime.MinValue,
+                        Type t when t == typeof(Guid) => Guid.Empty,
+                        Type t when t.IsValueType => Activator.CreateInstance(t), // Default value for other value types
+                        _ => null // For reference types that aren't strings
+                    };
+                }
+            }
+
+            return row;
+        }
+
+        #endregion
     }
 
 
-    #endregion
+
 
 
 

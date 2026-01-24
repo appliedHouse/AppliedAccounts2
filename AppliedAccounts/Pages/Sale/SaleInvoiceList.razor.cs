@@ -68,7 +68,7 @@ namespace AppliedAccounts.Pages.Sale
             await InvokeAsync(StateHasChanged);
             await Task.Delay(500);
 
-            List<int> SaleInvoiceIDList = new List<int>();
+            List<long> SaleInvoiceIDList = new List<long>();
 
 
             foreach (var item in MyModel.Records)
@@ -198,7 +198,7 @@ namespace AppliedAccounts.Pages.Sale
 
         }
 
-        private ReportData GetReportDataOnePDF(List<int> _SaleInvoiceIDList)
+        private ReportData GetReportDataOnePDF(List<long> _SaleInvoiceIDList)
         {
             ReportData _Result = new();
             var _Filter = string.Join(",", _SaleInvoiceIDList);

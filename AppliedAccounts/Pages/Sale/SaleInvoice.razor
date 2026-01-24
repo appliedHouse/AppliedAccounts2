@@ -203,6 +203,21 @@
                                 <label for="txtAmount">Amount</label>
                             </div>
                         </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <InputSelect id="ddProject" class="form-select"
+                                             TValue="long"
+                                             Value="@MyModel.MyVoucher.Detail.Project"
+                                             ValueExpression="@(() => MyModel.MyVoucher.Detail.Project)"
+                                             ValueChanged="@((e) => ProjectChanged(e))">
+                                    @foreach (CodeTitle _CodeTitle in MyModel.Projects)
+                                    {
+                                        <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                    }
+                                </InputSelect>
+                                <label for="ddProject">Projects</label>
+                            </div>
+                        </div>
 
                     </div>
                     <div class="row mt-1 g-1">
