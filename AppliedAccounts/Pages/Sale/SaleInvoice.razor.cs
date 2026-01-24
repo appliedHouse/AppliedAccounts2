@@ -53,6 +53,11 @@ namespace AppliedAccounts.Pages.Sale
             MyModel.MyVoucher.Detail.Unit = _NewValue;
             MyModel.MyVoucher.Detail.TitleUnit = MyModel.Units.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
         }
+        public void ProjectChanged(long _NewValue)
+        {
+            MyModel.MyVoucher.Detail.Project = _NewValue;
+            MyModel.MyVoucher.Detail.TitleProject = MyModel.Projects.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
+        }
         #endregion
 
 

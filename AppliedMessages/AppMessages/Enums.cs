@@ -167,7 +167,14 @@
             
             TransactionRollback = 7001,
             TransactionCommited = 7002,
-
+            
+            SalesInvoiceIDIsNull = 8001,
+            SalesInvoiceRowCountZero = 8002,
+            SalesInvoiceIsAlreadyPosted = 8003,
+            SalesInvoiceVoucherAlreadyPosted = 8004,
+            SalesInvoiceVoucherNotMatched = 8005,
+            SalesInvoicePostingFailed = 8006,
+            SalesInvoiceAccountNotValid = 8007,
         }
 
         public enum Class

@@ -16,28 +16,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Models\Posting\**" />
     <Compile Remove="wwwroot\ExcelFiles\**" />
     <Compile Remove="wwwroot\OutputPath\**" />
     <Compile Remove="wwwroot\PDFReports\**" />
     <Compile Remove="wwwroot\Sessions\**" />
     <Compile Remove="wwwroot\SqliteDB\**" />
     <Compile Remove="wwwroot\SqliteTemp\**" />
-    <Content Remove="Models\Posting\**" />
     <Content Remove="wwwroot\ExcelFiles\**" />
     <Content Remove="wwwroot\OutputPath\**" />
     <Content Remove="wwwroot\PDFReports\**" />
     <Content Remove="wwwroot\Sessions\**" />
     <Content Remove="wwwroot\SqliteDB\**" />
     <Content Remove="wwwroot\SqliteTemp\**" />
-    <EmbeddedResource Remove="Models\Posting\**" />
     <EmbeddedResource Remove="wwwroot\ExcelFiles\**" />
     <EmbeddedResource Remove="wwwroot\OutputPath\**" />
     <EmbeddedResource Remove="wwwroot\PDFReports\**" />
     <EmbeddedResource Remove="wwwroot\Sessions\**" />
     <EmbeddedResource Remove="wwwroot\SqliteDB\**" />
     <EmbeddedResource Remove="wwwroot\SqliteTemp\**" />
-    <None Remove="Models\Posting\**" />
     <None Remove="wwwroot\ExcelFiles\**" />
     <None Remove="wwwroot\OutputPath\**" />
     <None Remove="wwwroot\PDFReports\**" />

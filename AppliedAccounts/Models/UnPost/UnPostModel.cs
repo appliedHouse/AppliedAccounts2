@@ -6,10 +6,9 @@ using System.Data;
 using VoucherPosting;
 using static AppMessages.Enums;
 
-
-namespace AppliedAccounts.Models
+namespace AppliedAccounts.Models.UnPost
 {
-    public class PostingModel
+    public class UnPostModel
     {
         [Inject] public GlobalService AppGlobal { get; set; } = default!;
         public MessageClass MsgClass { get; set; } = new();
@@ -19,7 +18,7 @@ namespace AppliedAccounts.Models
         public string Filter { get; set; } = string.Empty;
         public int PostType { get; set; } = 0;
 
-        public PostingModel()
+        public UnPostModel()
         {
             if (AppGlobal != null) { Source = new(AppGlobal.AppPaths); }
 
@@ -41,7 +40,7 @@ namespace AppliedAccounts.Models
                     if (_CashAccList.Rows.Count > 0)
                     {
                         var CashAccIDs = string.Join(",", _CashAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
-                        Filter = $"BookID IN ({CashAccIDs}) ";
+                        Filter = $"BookID IN ({CashAccIDs}) AND [Status] = 'Posted' ";
                     }
                     var _DataTableCash = Source.GetTable(AppliedDB.Enums.Tables.Book, Filter);
                     DataListModelList = GetPostingTable(_DataTableCash);
@@ -55,7 +54,7 @@ namespace AppliedAccounts.Models
                     if (_BankAccList.Rows.Count > 0)
                     {
                         var BankAccIDs = string.Join(",", _BankAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
-                        Filter = $"BookID IN ({BankAccIDs}) ";
+                        Filter = $"BookID IN ({BankAccIDs}) AND [Status] = 'Posted' ";
                     }
                     var _DataTableBank = Source.GetTable(AppliedDB.Enums.Tables.Book, Filter);
                     DataListModelList = GetPostingTable(_DataTableBank);
@@ -147,14 +146,15 @@ namespace AppliedAccounts.Models
         #endregion
 
 
+
         #region Voucher Posting
 
-        public async Task DoVoucherPosting(long _VouID, int _PostType)
+        public async Task DoVoucherUnPost(long _VouID, int _PostType)
         {
             if (_PostType == 0) { return; }         // Return if type not assigned.
-            
+
             // Cash Book Posting
-            if (_PostType == 1)
+            if (_PostType == (int)PostingTypes.CashBook)
             {
                 VoucherPostingModel postingModel = new();
 
@@ -163,7 +163,7 @@ namespace AppliedAccounts.Models
 
                 MsgClass.ClearMessages();                            // Clear all previous messages. 
                 CashBook postCashBook = new(Source, postingModel);
-                await postCashBook.DoCashPosting();                  // Cash Posting main method.
+                await postCashBook.DoCashUnPost();                  // Cash Posting main method.
                 if (postCashBook.PostSuccessful)
                 {
                     MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
@@ -176,7 +176,7 @@ namespace AppliedAccounts.Models
             }
 
             // Bank Book Posting
-            if (_PostType == 2)
+            if (_PostType == (int)PostingTypes.BankBook)
             {
                 VoucherPostingModel postingModel = new();
 
@@ -185,7 +185,7 @@ namespace AppliedAccounts.Models
 
                 MsgClass.ClearMessages();                           // Clear all previous messages. 
                 CashBook postBankBook = new(Source, postingModel);
-                await postBankBook.DoBankPosting();                  // Bank Posting main method.
+                await postBankBook.DoBankUnPost();                  // Bank Posting main method.
                 if (postBankBook.PostSuccessful)
                 {
                     MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
@@ -197,6 +197,11 @@ namespace AppliedAccounts.Models
                 }
             }
 
+            // Bill Receivable Posting  
+            if (_PostType == (int)PostingTypes.BillReceivable)
+            {
+                return;
+            }
             return;
         }
 
@@ -222,7 +227,20 @@ namespace AppliedAccounts.Models
 
         }
 
-
+        public enum PostingTypes
+        {
+            None = 0,
+            CashBook = 1,
+            BankBook = 2,
+            WriteCheques = 3,
+            BillPayable = 4,
+            BillReceivable = 5,
+            Payment = 6,
+            Receipt = 7,
+            JournalVoucher = 8,
+            SalesReturn = 9,
+            Production = 10,
+        }
         #endregion
     }
 }

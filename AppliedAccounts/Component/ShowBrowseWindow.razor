@@ -54,24 +54,6 @@
         }
     </InputSelect>
 
-
-    @* <InputSelect id="@Id"
-                 class="form-control item-height flex-grow-1"
-                 TValue="long"
-                 @bind-Value="Value">
-        @if (BrowseList?.Any() == true)
-        {
-            @foreach (var item in BrowseList)
-            {
-                <option value="@item.ID">@item.Title</option>
-            }
-        }
-        else
-        {
-            <option value="0">No Records - @Title</option>
-        }
-    </InputSelect> *@
-
     <!-- Open modal button -->
     <button class="btn btn-outline-secondary"
             type="button"

@@ -1,11 +1,9 @@
-﻿@page "/Posting"
+﻿@page "/Unpost"
 @using System.Data
 @using AppliedAccounts.Models
 @using AppliedAccounts.Models.Posting
-@using static AppliedAccounts.Models.Posting.PostingModel
 
 @inject GlobalService AppGlobal
-
 
 <ShowPageHeading PageTitle="VOUCHER POSTING" />
 <PageErrors Messages="@MyModel.MsgClass" />
@@ -18,22 +16,9 @@
 
             <!-- Posting Type Dropdown -->
             <div class="col-md-4">
-
-                <InputSelect class="form-select"
-                             TValue="PostingTypes"
-                             Value="MyViewModel.PostingType"
-                             ValueChanged="OnPostingTypeChanged"
-                             ValueExpression="@(() => MyViewModel.PostingType)">
-
-                    @foreach (PostingTypes type in Enum.GetValues<PostingTypes>())
-                    {
-                        <option value="@type">@type</option>
-                    }
-                </InputSelect>
-
-@*                 <InputSelect id="ddPostingType"
+                <InputSelect id="ddPostingType"
                              class="form-select"
-                             TValue="PostingTypes"
+                             TValue="int"
                              Value="@MyViewModel.PostingType"
                              ValueExpression="@(() => MyViewModel.PostingType)"
                              ValueChanged="@((e)=>OnPostingTypeChanged(e))">
@@ -45,7 +30,7 @@
                         <option value="@((int)type)">@type</option>
                     }
                 </InputSelect>
- *@            </div>
+            </div>
 
             <!-- From Date -->
             <div class="col-md-2 d-grid">
@@ -67,17 +52,17 @@
                 </div>
             </div>
 
-            <div class="col-md-2">
+            @* <div class="col-md-2">
                 <InputSelect class="form-select" id="ddPostingStatus"
                              TValue="int"
                              ValueExpression="@(()=> MyViewModel.PostingStatus)"
                              Value="@MyViewModel.PostingStatus"
                              ValueChanged="@((e)=>OnStatusChanged(e))">
                     <option value="0">All</option>
-                    <option value="1">Submitted</option>
-                    <option value="2">Posted</option>
+                    <option value="1">Posted</option>
+                    <option value="2">Submitted</option>
                 </InputSelect>
-            </div>
+            </div> *@
 
             <!-- Refresh Button -->
             <div class="col-md-2 d-grid">
@@ -105,7 +90,7 @@
                         <th style="width:10%">Debit</th>
                         <th style="width:10%">Credit</th>
                         <th style="width:10%">Status</th>
-                        <th style="width:5%">Post</th>
+                        <th style="width:5%">Unpost</th>
                         <th style="width:5%">Action</th>
                     </tr>
                 </thead>
@@ -127,16 +112,15 @@
                             <td class="text-danger amount1">@_CR</td>
                             <td class="TextCenter">@item.Status</td>
                             <td class="text-center">
-                                <input type="checkbox" disabled="@_Posted"
+                                <input type="checkbox"
                                        checked="@item.Selected)" />
                             </td>
 
                             <td>
                                 <button class="btn btn-link"
-                                        disabled="@_Posted"
-                                        @onclick="() => PostVoucher(item.ID)">
+                                        @onclick="() => UnPostingVoucher(item.ID)">
 
-                                    @if (PostingVoucherID == _RowID)
+                                    @if (UnPostVoucherID == _RowID)
                                     {
                                         <span class="spinner-border spinner-border-sm me-1"
                                               role="status"
@@ -144,7 +128,7 @@
                                     }
                                     else
                                     {
-                                        <i class="bi bi-upload"></i>
+                                        <i class="bi bi-arrow-counterclockwise"></i>
                                     }
                                 </button>
                             </td>
@@ -175,7 +159,7 @@
                 </ul>
             </nav>
         </div>
-       
+
     </div>
     @if (MyModel.IsPosting)
     {
@@ -205,9 +189,9 @@ else
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @if (PostingVoucherID > 0)
+                @if (UnPostVoucherID > 0)
                 {
-                    <p>Save Voucher No @PostingVoucher</p>
+                    <p>Save Voucher No @UnPostVoucher</p>
                 }
                 else
                 {
@@ -218,9 +202,9 @@ else
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                @if (PostingVoucherID > 0)
+                @if (UnPostVoucherID > 0)
                 {
-                    <button type="submit" class="btn btn-success btn-sm" data-bs-dismiss="modal" aria-label="Close" title="Post All" @onclick="() => PostVoucher(PostingVoucherID)"> Save</button>
+                    <button type="submit" class="btn btn-success btn-sm" data-bs-dismiss="modal" aria-label="Close" title="Post All" @onclick="() => UnPostingVoucher(UnPostVoucherID)"> Save</button>
                 }
 
             </div>

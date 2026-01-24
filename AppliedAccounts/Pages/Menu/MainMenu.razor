@@ -6,7 +6,7 @@
 @code {
     [Parameter] public MenusClass MenuClass { get; set; }
 
-    private string buildNum { get; set; } = "2.0.6";
+    private string buildNum { get; set; } = "2.0.7";
     private bool SubMenu { get; set; } = false;
     private async Task Beep() { await js.InvokeVoidAsync("playBeep"); }
     private async Task MenuClick(int MenuID)

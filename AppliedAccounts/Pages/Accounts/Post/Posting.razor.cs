@@ -1,12 +1,8 @@
 ﻿using AppliedAccounts.Data;
-using AppliedAccounts.Models;
-using AppliedAccounts.Pages.Menu;
-using Microsoft.AspNetCore.Components;
+using AppliedAccounts.Models.Posting;
 using Microsoft.JSInterop;
-using System.Runtime.CompilerServices;
+using static AppliedAccounts.Models.Posting.PostingModel;
 using static AppliedGlobals.AppErums;
-
-
 
 
 namespace AppliedAccounts.Pages.Accounts.Post
@@ -21,7 +17,7 @@ namespace AppliedAccounts.Pages.Accounts.Post
         public string PostingVoucher { get; set; } =string.Empty;
 
 
-        protected override async Task OnInitializedAsync()
+        protected override void OnInitialized()
         {
             MyModel.Source = new(AppGlobal.AppPaths);
            
@@ -29,24 +25,26 @@ namespace AppliedAccounts.Pages.Accounts.Post
             MyViewModel = new();
             MyViewModel.Dt_From = AppRegistry.GetDate(DBFile, "Post_dt_From");
             MyViewModel.Dt_To = AppRegistry.GetDate(DBFile, "Post_dt_To");
-            MyViewModel.PostingType = AppRegistry.GetNumber(DBFile, "Post_Type");
+            MyViewModel.PostingType = (PostingTypes)AppRegistry.GetNumber(DBFile, "Post_Type");
             
-            
-            await MyModel.LoadData(MyViewModel.PostingType);
+            MyModel.LoadData(MyViewModel.PostingType);
         }
 
         #region Change Event
-        private async void OnPostingTypeChanged(int value)
+
+        private async Task OnPostingTypeChanged(PostingTypes value)
         {
             MyViewModel.PostingType = value;
-
-            await MyModel.LoadData(MyViewModel.PostingType);
+            await MyModel.LoadData(value, MyViewModel.PostingStatus);
         }
+       
 
-        private void OnStatusChanged(int value)
+        private async void OnStatusChanged(int _PostingStatus)
         {
 
-            MyViewModel.PostingStatus = value;
+            MyViewModel.PostingStatus = _PostingStatus;
+            await MyModel.LoadData(MyViewModel.PostingType, _PostingStatus);
+        
         }
 
         #endregion
@@ -71,7 +69,6 @@ namespace AppliedAccounts.Pages.Accounts.Post
                 filter = $" Vou_Date >= '{MyViewModel.Dt_From:yyyy-MM-dd}' AND Vou_Date <= '{MyViewModel.Dt_To:yyyy-MM-dd}' ";
             }
             MyModel.Filter = filter;
-
         }
 
 
@@ -89,20 +86,12 @@ namespace AppliedAccounts.Pages.Accounts.Post
             StateHasChanged();
         }
 
-       
-
-
-
         public class PostingViewModel
         {
-            public int PostingType { get; set; }
+            public PostingTypes PostingType { get; set; }
             public int PostingStatus { get; set; }
             public DateTime Dt_From { get; set; }
             public DateTime Dt_To { get; set; }
         }
-
-       
-        
-
     }
 }

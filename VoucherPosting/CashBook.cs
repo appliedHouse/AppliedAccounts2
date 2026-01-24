@@ -7,6 +7,7 @@ using static AppMessages.Enums;
 
 namespace VoucherPosting
 {
+    // Posting of Cash Voucher
     public class CashBook
     {
 
@@ -200,6 +201,16 @@ namespace VoucherPosting
             }
 
             return true;
+        }
+
+        public async Task DoCashUnPost()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task DoBankUnPost()
+        {
+            throw new NotImplementedException();
         }
     }
 }

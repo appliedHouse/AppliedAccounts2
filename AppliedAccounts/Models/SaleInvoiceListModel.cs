@@ -21,6 +21,7 @@ namespace AppliedAccounts.Models
         public bool SelectAll { get; set; }
         public long VoucherID { get; set; }
         public string SearchText { get; set; } = string.Empty;
+
         #region Constructor
         public SaleInvoiceListModel() { }
         public SaleInvoiceListModel(GlobalService _AppGlobal)
@@ -38,7 +39,6 @@ namespace AppliedAccounts.Models
             Records = GetFilterRecords();
         }
         #endregion
-
 
         #region Filter Records
         private List<SalesRecord> GetFilterRecords()
