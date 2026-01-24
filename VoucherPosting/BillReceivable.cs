@@ -1,14 +1,11 @@
-﻿using AppliedAccounts.Data;
-using AppliedDB;
+﻿using AppliedDB;
 using AppMessages;
-using Microsoft.Data.Sqlite;
 using System.Data;
-using System.Drawing;
 using static AppliedDB.Enums;
 using static AppliedDB.VoucherTypeClass;
 using static AppMessages.Enums;
 
-namespace AppliedAccounts.Models.Posting
+namespace VoucherPosting
 {
     public class BillReceivable
     {
@@ -20,14 +17,14 @@ namespace AppliedAccounts.Models.Posting
         #region Bill Receivable / Sales Invoices
         public async Task<bool> PostBillReceivable(string UserName, int id)
         {
-            MsgClass = new();
-            Source!.BeginTransaction();
-
             if (Source == null)
             {
+                MsgClass = new();
                 MsgClass.Warning(Messages.DataSourceIsNull);
                 return false;
             }
+
+            Source.BeginTransaction();
 
             var _Filter = $"Vou_Type='{VoucherType.Receivable}' AND TranID={id}";
             var tb_Ledger = Source.GetTable(Tables.Ledger, _Filter);
@@ -54,9 +51,9 @@ namespace AppliedAccounts.Models.Posting
 
             if (MsgClass.Count == 0)
             {
-                int COA_DR = AppRegistry.GetNumber(UserName, "BRec_Receivable");
-                int COA_CR = AppRegistry.GetNumber(UserName, "BRec_Stock");
-                int COA_Tax = AppRegistry.GetNumber(UserName, "BRec_Tax");
+                int COA_DR = Source.GetNumber("BRec_Receivable");
+                int COA_CR = Source.GetNumber("BRec_Stock");
+                int COA_Tax = Source.GetNumber("BRec_Tax");
 
                 if (COA_DR == 0 || COA_CR == 0 || COA_Tax == 0)
                 {
@@ -89,7 +86,7 @@ namespace AppliedAccounts.Models.Posting
                             if (Vou_No != Row["Vou_No"].ToString())
                             {
                                 MsgClass.Warning(Messages.SalesInvoiceVoucherNotMatched);
-                                break;
+                                return await Task.FromResult(false);
                             }
                             var _Description = (string)Row["Inventory"] + ": " + (string)Row["Description"];
 
@@ -117,7 +114,7 @@ namespace AppliedAccounts.Models.Posting
                             #endregion
 
                             #region Tax Entry
-                            if (Conversion.ToDecimal(Row["Tax_Amount"]) > 0)
+                            if (VoucherPosting.Conversion.ToDecimal(Row["Tax_Amount"]) > 0)
                             {
                                 CurrentRow = Source.GetNewRow(Tables.Ledger);
                                 CurrentRow["ID"] = 0;
@@ -170,13 +167,23 @@ namespace AppliedAccounts.Models.Posting
                         Source.RollbackTransaction();
                         MsgClass = new();
                         MsgClass.Danger(Messages.SalesInvoicePostingFailed);
-                        return false;
+                        return false; 
                     }
                 }
             }
 
-            Source.CommitTransaction();
-            return MsgClass.Count == 0;
+
+            if (MsgClass.Count == 0)
+            {
+                Source.CommitTransaction();
+                return true;
+            }
+            else
+            {
+                Source.RollbackTransaction();
+                return false;
+            }
+            
         }
 
         private bool SalesInvoiceValidation()

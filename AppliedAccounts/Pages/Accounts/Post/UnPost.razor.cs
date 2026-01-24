@@ -1,5 +1,5 @@
 ﻿using AppliedAccounts.Data;
-using AppliedAccounts.Models.UnPost;
+using AppliedAccounts.Models.Posting;
 using Microsoft.JSInterop;
 using static AppliedGlobals.AppErums;
 
@@ -18,9 +18,9 @@ namespace AppliedAccounts.Pages.Accounts.Post
 
             MyModel.Source.SetKey("IsPosting", false, KeyTypes.Boolean, "Is posting is in progress..");
             MyViewModel = new();
-            MyViewModel.Dt_From = AppRegistry.GetDate(DBFile, "UnPost_dt_From");
-            MyViewModel.Dt_To = AppRegistry.GetDate(DBFile, "UnPost_dt_To");
-            MyViewModel.PostingType = AppRegistry.GetNumber(DBFile, "UnPost_Type");
+            MyViewModel.Dt_From = MyModel.Source.GetDate("UnPost_dt_From");
+            MyViewModel.Dt_To = MyModel.Source.GetDate("UnPost_dt_To");
+            MyViewModel.PostingType = (PostingTypes)MyModel.Source.GetNumber("UnPost_Type");
 
             await MyModel.LoadData(MyViewModel.PostingType);
         }
@@ -69,7 +69,7 @@ namespace AppliedAccounts.Pages.Accounts.Post
 
     public class UnPostViewModel
     {
-        public int PostingType { get; set; }
+        public PostingTypes PostingType { get; set; }
         public int PostingStatus { get; set; }
         public DateTime Dt_From { get; set; }
         public DateTime Dt_To { get; set; }

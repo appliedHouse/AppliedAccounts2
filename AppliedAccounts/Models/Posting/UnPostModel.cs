@@ -1,4 +1,5 @@
-﻿using AppliedAccounts.Services;
+﻿using AppliedAccounts.Pages.Accounts.Post;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
@@ -6,7 +7,7 @@ using System.Data;
 using VoucherPosting;
 using static AppMessages.Enums;
 
-namespace AppliedAccounts.Models.UnPost
+namespace AppliedAccounts.Models.Posting
 {
     public class UnPostModel
     {
@@ -25,7 +26,7 @@ namespace AppliedAccounts.Models.UnPost
         }
 
         #region Load Data
-        public async Task LoadData(int PostingType)
+        public async Task LoadData(PostingTypes PostingType)
         {
             Source ??= new(AppGlobal.AppPaths);
 
@@ -34,7 +35,7 @@ namespace AppliedAccounts.Models.UnPost
             switch (PostingType)
             {
                 // Cash Books
-                case 1:
+                case PostingTypes.CashBook:
                     Filter = "";
                     var _CashAccList = Source.GetTable(SQLQueries.Quries.GetCashAccounts());
                     if (_CashAccList.Rows.Count > 0)
@@ -48,7 +49,7 @@ namespace AppliedAccounts.Models.UnPost
                     break;
 
                 // Bank Books
-                case 2:
+                case PostingTypes.BankBook:
                     Filter = "";
                     var _BankAccList = Source.GetTable(SQLQueries.Quries.GetBankAccounts());
                     if (_BankAccList.Rows.Count > 0)
@@ -59,38 +60,35 @@ namespace AppliedAccounts.Models.UnPost
                     var _DataTableBank = Source.GetTable(AppliedDB.Enums.Tables.Book, Filter);
                     DataListModelList = GetPostingTable(_DataTableBank);
                     break;
-                case 3:
+                case PostingTypes.WriteCheques:
                     DataListModelList.Clear();
                     break;
 
-                case 4:
+                case PostingTypes.BillPayable:
                     DataListModelList.Clear();
                     break;
 
-                case 5:
+                case PostingTypes.BillReceivable:
                     DataListModelList.Clear();
                     break;
 
-                case 6:
+                case PostingTypes.Receipt:
                     DataListModelList.Clear();
                     break;
 
-                case 7:
+                case PostingTypes.Payment:
                     DataListModelList.Clear();
                     break;
 
-                case 8:
+                case PostingTypes.SalesReturn:
                     DataListModelList.Clear();
                     break;
 
-                case 9:
+                case PostingTypes.Production:
                     DataListModelList.Clear();
                     break;
 
-                case 10:
-                    DataListModelList.Clear();
-                    break;
-
+                
                 default:
                     DataListModelList.Clear();
                     break;
@@ -147,14 +145,14 @@ namespace AppliedAccounts.Models.UnPost
 
 
 
-        #region Voucher Posting
+        #region Voucher UnPost
 
-        public async Task DoVoucherUnPost(long _VouID, int _PostType)
+        public async Task DoVoucherUnPost(long _VouID, PostingTypes _PostType)
         {
             if (_PostType == 0) { return; }         // Return if type not assigned.
 
             // Cash Book Posting
-            if (_PostType == (int)PostingTypes.CashBook)
+            if (_PostType == PostingTypes.CashBook)
             {
                 VoucherPostingModel postingModel = new();
 
@@ -176,7 +174,7 @@ namespace AppliedAccounts.Models.UnPost
             }
 
             // Bank Book Posting
-            if (_PostType == (int)PostingTypes.BankBook)
+            if (_PostType == PostingTypes.BankBook)
             {
                 VoucherPostingModel postingModel = new();
 
@@ -198,8 +196,10 @@ namespace AppliedAccounts.Models.UnPost
             }
 
             // Bill Receivable Posting  
-            if (_PostType == (int)PostingTypes.BillReceivable)
+            if (_PostType == PostingTypes.BillReceivable)
             {
+                VoucherPosting.BillReceivable UnPostBillReceivable = new();
+
                 return;
             }
             return;
@@ -225,21 +225,6 @@ namespace AppliedAccounts.Models.UnPost
             public bool Active { get; set; }
             public bool Selected { get; set; }
 
-        }
-
-        public enum PostingTypes
-        {
-            None = 0,
-            CashBook = 1,
-            BankBook = 2,
-            WriteCheques = 3,
-            BillPayable = 4,
-            BillReceivable = 5,
-            Payment = 6,
-            Receipt = 7,
-            JournalVoucher = 8,
-            SalesReturn = 9,
-            Production = 10,
         }
         #endregion
     }

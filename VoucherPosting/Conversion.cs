@@ -1,7 +1,9 @@
 ﻿using Format = AppliedGlobals.AppValues.Format;
 
-namespace AppliedAccounts.Data
+namespace VoucherPosting
 {
+
+    // It is duplicate conversion. Original available at AppliedAccounts.Data.Conversion
     public class Conversion
     {
         public static string Row2Money(object _Value, string _Format)
@@ -62,11 +64,11 @@ namespace AppliedAccounts.Data
                 var type = _Value.GetType();
 
                 if (type == typeof(string)) { return decimal.Parse((string)_Value); }
-                if (type == typeof(int)) { return decimal.Parse(_Value.ToString()); }
-                if (type == typeof(long)) { return decimal.Parse(_Value.ToString()); }
-                if (type == typeof(short)) { return decimal.Parse(_Value.ToString()); }
-                if (type == typeof(float)) { return decimal.Parse(_Value.ToString()); }
-                if (type == typeof(double)) { return decimal.Parse(_Value.ToString()); }
+                if (type == typeof(int)) { return decimal.Parse(_Value.ToString()!); }
+                if (type == typeof(long)) { return decimal.Parse(_Value.ToString()!); }
+                if (type == typeof(short)) { return decimal.Parse(_Value.ToString()!); }
+                if (type == typeof(float)) { return decimal.Parse(_Value.ToString()!); }
+                if (type == typeof(double)) { return decimal.Parse(_Value.ToString()!); }
                 if (type == typeof(decimal)) { return (decimal)_Value; }
                 return 0.00M;
             }
