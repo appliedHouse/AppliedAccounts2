@@ -31,21 +31,8 @@
                     }
                 </InputSelect>
 
-@*                 <InputSelect id="ddPostingType"
-                             class="form-select"
-                             TValue="PostingTypes"
-                             Value="@MyViewModel.PostingType"
-                             ValueExpression="@(() => MyViewModel.PostingType)"
-                             ValueChanged="@((e)=>OnPostingTypeChanged(e))">
-
-                    <option value="0">Select...</option>
-
-                    @foreach (PostingModel.PostingTypes type in Enum.GetValues(typeof(PostingModel.PostingTypes)))
-                    {
-                        <option value="@((int)type)">@type</option>
-                    }
-                </InputSelect>
- *@            </div>
+        
+            </div>
 
             <!-- From Date -->
             <div class="col-md-2 d-grid">

@@ -163,8 +163,8 @@
             PostingMasterIsNull = 6003,
             PostingDataIsNull = 6004,
             VoucherAlreadyPosted = 6005,
-            
-            
+            VoucherNotPosted = 6006,
+
             TransactionRollback = 7001,
             TransactionCommited = 7002,
             
@@ -175,6 +175,7 @@
             SalesInvoiceVoucherNotMatched = 8005,
             SalesInvoicePostingFailed = 8006,
             SalesInvoiceAccountNotValid = 8007,
+            
         }
 
         public enum Class

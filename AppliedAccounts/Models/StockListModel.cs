@@ -79,7 +79,9 @@ namespace AppliedAccounts.Models
 
         public bool Delete()
         {
-            return Source.Delete(Tables.Inventory, Record2Row());
+            DataRow _DeleteRow = Record2Row();
+            return Source.Delete(_DeleteRow);
+            //return Source.Delete(Tables.Inventory, Record2Row());
 
         }
         #endregion

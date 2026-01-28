@@ -16,7 +16,7 @@ namespace AppliedAccounts.Pages.Accounts.Post
         {
             MyModel.Source = new(AppGlobal.AppPaths);
 
-            MyModel.Source.SetKey("IsPosting", false, KeyTypes.Boolean, "Is posting is in progress..");
+            MyModel.Source.SetKey("IsUnPost", false, KeyTypes.Boolean, "Is Un-post is in progress..");
             MyViewModel = new();
             MyViewModel.Dt_From = MyModel.Source.GetDate("UnPost_dt_From");
             MyViewModel.Dt_To = MyModel.Source.GetDate("UnPost_dt_To");
@@ -27,16 +27,16 @@ namespace AppliedAccounts.Pages.Accounts.Post
 
         public void Refresh()
         {
-            MyModel.Source.SetKey("UnPost_Type", MyViewModel.PostingType, KeyTypes.Number, "");
-            MyModel.Source.SetKey("UnPost_dt_From", MyViewModel.Dt_From, KeyTypes.Date, "");
-            MyModel.Source.SetKey("UnPost_dt_To", MyViewModel.Dt_To, KeyTypes.Date, "");
-            MyModel.Source.SetKey("UnPostCash", false, KeyTypes.Boolean, "");    // Reset Post Cash Voucher Status
-            MyModel.Source.SetKey("UnPostBank", false, KeyTypes.Boolean, "");    // Reset Post Bank Voucher Status
-            MyModel.Source.SetKey("UnPostReceipt", false, KeyTypes.Boolean, "");
+            AppRegistry.SetKey(DBFile, "UnPost_Type", (int)MyViewModel.PostingType, KeyTypes.Number, "");
+            AppRegistry.SetKey(DBFile, "UnPost_dt_From", MyViewModel.Dt_From, KeyTypes.Date, "");
+            AppRegistry.SetKey(DBFile, "UnPost_dt_To", MyViewModel.Dt_To, KeyTypes.Date, "");
+            AppRegistry.SetKey(DBFile, "UnPostCash", false, KeyTypes.Boolean, "");    // Reset Post Cash Voucher Status
+            AppRegistry.SetKey(DBFile, "UnPostBank", false, KeyTypes.Boolean, "");    // Reset Post Bank Voucher Status
+            AppRegistry.SetKey(DBFile, "UnPostReceipt", false, KeyTypes.Boolean, "");
         }
 
         #region Change Event
-        private async void OnPostingTypeChanged(int value)
+        private async void OnPostingTypeChanged(PostingTypes value)
         {
             MyViewModel.PostingType = value;
 
@@ -50,6 +50,8 @@ namespace AppliedAccounts.Pages.Accounts.Post
 
         #endregion
 
+
+        
 
         public async Task UnPostingVoucher(long id)
         {

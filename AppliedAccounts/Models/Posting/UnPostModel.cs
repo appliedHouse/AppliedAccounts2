@@ -162,7 +162,7 @@ namespace AppliedAccounts.Models.Posting
                 MsgClass.ClearMessages();                            // Clear all previous messages. 
                 CashBook postCashBook = new(Source, postingModel);
                 await postCashBook.DoCashUnPost();                  // Cash Posting main method.
-                if (postCashBook.PostSuccessful)
+                if (postCashBook.UnPostSuccessful)
                 {
                     MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
                     await LoadData(_PostType);              // Refresh display Data afger save voucher.

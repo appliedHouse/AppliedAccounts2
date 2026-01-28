@@ -5,7 +5,7 @@
 
 @inject GlobalService AppGlobal
 
-<ShowPageHeading PageTitle="VOUCHER POSTING" />
+<ShowPageHeading PageTitle="VOUCHER UN-POST" />
 <PageErrors Messages="@MyModel.MsgClass" />
 
 
@@ -16,18 +16,15 @@
 
             <!-- Posting Type Dropdown -->
             <div class="col-md-4">
-                <InputSelect id="ddPostingType"
-                             class="form-select"
-                             TValue="int"
-                             Value="@MyViewModel.PostingType"
-                             ValueExpression="@(() => MyViewModel.PostingType)"
-                             ValueChanged="@((e)=>OnPostingTypeChanged(e))">
+                <InputSelect class="form-select"
+                             TValue="PostingTypes"
+                             Value="MyViewModel.PostingType"
+                             ValueChanged="OnPostingTypeChanged"
+                             ValueExpression="@(() => MyViewModel.PostingType)">
 
-                    <option value="0">Select...</option>
-
-                    @foreach (PostingModel.PostingTypes type in Enum.GetValues(typeof(PostingModel.PostingTypes)))
+                    @foreach (PostingTypes type in Enum.GetValues<PostingTypes>())
                     {
-                        <option value="@((int)type)">@type</option>
+                        <option value="@type">@type</option>
                     }
                 </InputSelect>
             </div>
@@ -51,18 +48,6 @@
                                @bind-Value="MyViewModel.Dt_To" />
                 </div>
             </div>
-
-            @* <div class="col-md-2">
-                <InputSelect class="form-select" id="ddPostingStatus"
-                             TValue="int"
-                             ValueExpression="@(()=> MyViewModel.PostingStatus)"
-                             Value="@MyViewModel.PostingStatus"
-                             ValueChanged="@((e)=>OnStatusChanged(e))">
-                    <option value="0">All</option>
-                    <option value="1">Posted</option>
-                    <option value="2">Submitted</option>
-                </InputSelect>
-            </div> *@
 
             <!-- Refresh Button -->
             <div class="col-md-2 d-grid">

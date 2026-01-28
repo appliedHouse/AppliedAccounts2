@@ -809,10 +809,6 @@ namespace AppliedDB
 
         #region Maximum ID of the Table
 
-
-
-
-
         public static long GetMaxID(string _Table, string ConnectionString)
         {
             // Create this function due to command.transaction issue.
@@ -858,29 +854,44 @@ namespace AppliedDB
         #endregion
 
         #region Delete Row
-        public bool Delete(Tables _Table, DataRow _Row)
-        {
-            var _DataTable = GetTable(_Table);
-            var _NewRow = _DataTable.NewRow();
-            var _RowArray = _Row.ItemArray;
+        //public bool Delete(Tables _Table, DataRow _Row)
+        //{
+        //    var _DataTable = GetTable(_Table);
+        //    var _NewRow = _DataTable.NewRow();
+        //    var _RowArray = _Row.ItemArray;
 
-            _NewRow.ItemArray = _RowArray;
+        //    _NewRow.ItemArray = _RowArray;
 
-            MyCommands = new(_NewRow, MyConnection);
-            return MyCommands.DeleteRow();
-        }
+        //    MyCommands = new(_NewRow, MyConnection);
+        //    return MyCommands.DeleteRow();
+        //}
+
+        //public bool Delete(DataRow _Row)
+        //{
+        //    if (MyCommands.CommandDelete != null) { MyCommands.CommandDelete.Transaction = _transaction; }
+
+        //    var IsDeleted = false;
+        //    MyCommands = new(_Row, MyConnection);
+        //    var result = MyCommands.DeleteRow();
+        //    if (result)
+        //    {
+        //        IsDeleted = true;
+        //    }
+        //    return IsDeleted;
+        //}
 
         public bool Delete(DataRow _Row)
         {
-
-            var IsDeleted = false;
+            // Create commands FIRST
             MyCommands = new(_Row, MyConnection);
-            var result = MyCommands.DeleteRow();
-            if (result)
+
+            // THEN attach the transaction
+            if (_transaction != null && MyCommands.CommandDelete != null)
             {
-                IsDeleted = true;
+                MyCommands.CommandDelete.Transaction = _transaction;
             }
-            return IsDeleted;
+
+            return MyCommands.DeleteRow();
         }
 
 
@@ -1342,6 +1353,7 @@ namespace AppliedDB
             _transaction?.Rollback();
             _transaction = null;
         }
+        #endregion
 
         public DataRow RemoveNullValues(DataRow row)
         {
@@ -1375,7 +1387,7 @@ namespace AppliedDB
             return row;
         }
 
-        #endregion
+       
     }
 
 
