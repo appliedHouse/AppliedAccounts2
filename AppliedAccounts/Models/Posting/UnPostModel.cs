@@ -183,7 +183,8 @@ namespace AppliedAccounts.Models.Posting
 
                 MsgClass.ClearMessages();                           // Clear all previous messages. 
                 CashBook postBankBook = new(Source, postingModel);
-                await postBankBook.DoBankUnPost();                  // Bank Posting main method.
+                // Cash & Bank Voucher data table is same. so here using same fucntion as using for cash
+                await postBankBook.DoCashUnPost();                   
                 if (postBankBook.PostSuccessful)
                 {
                     MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.

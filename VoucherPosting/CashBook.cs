@@ -260,15 +260,11 @@ namespace VoucherPosting
                 catch (Exception ex)
                 {
                     MsgClass.Danger(ex.Message);
-                    //Source.RollbackTransaction();
+                    Source.RollbackTransaction();
                 }
             });
         }
-
-        public async Task DoBankUnPost()
-        {
-            throw new NotImplementedException();
-        }
+       
         #endregion
     }
 }
