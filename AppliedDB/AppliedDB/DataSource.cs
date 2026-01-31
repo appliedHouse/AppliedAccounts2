@@ -9,7 +9,7 @@ using Tables = AppliedDB.Enums.Tables;
 
 namespace AppliedDB
 {
-    public class DataSource
+    public class DataSource : IDisposable
     {
         public AppValues.AppPath AppPaths { get; set; }
         public SqliteConnection MyConnection { get; set; }
@@ -37,6 +37,10 @@ namespace AppliedDB
             {
                 MyCommand = new SqliteCommand("", MyConnection);
             }
+        }
+
+        public DataSource()
+        {
         }
 
 
@@ -1115,53 +1119,148 @@ namespace AppliedDB
 
         public void SetKey(string Key, object KeyValue, KeyTypes keytype, string _Title)
         {
+            if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
+
+            DataTable TB_Registry = GetTable(Tables.Registry, $"Code = '{Key}'");
+            DataRow CurrentRow;
+            //var SQLAction = string.Empty;
+
+            if (TB_Registry.Rows.Count == 1)
+            {
+                //SQLAction = "Update";
+                CurrentRow = TB_Registry.DefaultView[0].Row;
+                CurrentRow.AcceptChanges();
+            }
+            else
+            {
+                //SQLAction = "Insert";
+                CurrentRow = TB_Registry.NewRow();
+                CurrentRow["ID"] = GetMaxID(Tables.Registry, MyConnection);
+            }
+
+            CurrentRow["Code"] = Key;
+            CurrentRow["Title"] = _Title;
+            CurrentRow["UserName"] = DBFile;
+            switch (keytype)
+            {
+                case KeyTypes.Number:
+                    CurrentRow["nValue"] = KeyValue;
+                    break;
+                case KeyTypes.Currency:
+                    CurrentRow["mValue"] = KeyValue;
+                    break;
+                case KeyTypes.Date:
+                    CurrentRow["dValue"] = KeyValue;
+                    break;
+                case KeyTypes.Boolean:
+                    CurrentRow["bValue"] = KeyValue;
+                    break;
+                case KeyTypes.Text:
+                    CurrentRow["cValue"] = KeyValue;
+                    break;
+                case KeyTypes.From:
+                    CurrentRow["From"] = KeyValue;
+                    break;
+                case KeyTypes.To:
+                    CurrentRow["To"] = KeyValue;
+                    break;
+                default:
+                    break;
+            }
+
+            var cmd = new CommandClass(CurrentRow, MyConnection);
+            cmd.SaveChanges();
+
+            MyConnection.Close();
+        }
+
+        public object GetKey(string Key, KeyTypes keytype)
+        {
+
+            object ReturnValue;
+            var Registry = GetTable(Tables.Registry, $" WHERE Code = '{Key}'");
+
+            if (Registry.Rows.Count == 1)
+            {
+                DataRow Row = Registry.Rows[0];
+                ReturnValue = keytype switch
+                {
+                    KeyTypes.Number => Row["nValue"],
+                    KeyTypes.Currency => Row["mValue"],
+                    KeyTypes.Boolean => Row["bValue"],
+                    KeyTypes.Date => Row["dValue"],
+                    KeyTypes.Text => Row["cValue"],
+                    _ => string.Empty
+                };
+            }
+            else
+            {
+                ReturnValue = keytype switch
+                {
+                    KeyTypes.Number => 0,
+                    KeyTypes.Currency => 0.00,
+                    KeyTypes.Boolean => false,
+                    KeyTypes.Date => DateTime.Now,
+                    KeyTypes.Text => string.Empty,
+                    _ => string.Empty
+                };
+            }
+
+            if (ReturnValue == DBNull.Value) { return string.Empty; }
+            return ReturnValue;
+        }
+
+        // Depreciated 29-Jan-2026
+        #region Set Key Depreciated
+        public void SetKey1(string Key, object KeyValue, KeyTypes keytype, string _Title)
+        {
 
             Registry _Registry = new(MyConnection, DBFile);
             _Registry.SetKey(Key, KeyValue, keytype, _Title);
         }
+        #endregion
 
         public async Task SetKeyAsync(string Key, object KeyValue, KeyTypes keytype, string _Title)
         {
             await Task.Run(() =>
             {
-                Registry _Registry = new(MyConnection, DBFile);
-                _Registry.SetKey(Key, KeyValue, keytype, _Title);
+                SetKey(Key, KeyValue, keytype, _Title);
             });
         }
 
         public string GetText(string Key)
         {
-            Registry _Registry = new(MyConnection, DBFile);
-            return (string)_Registry.GetKey(Key, KeyTypes.Text);
+            //Registry _Registry = new(MyConnection, DBFile);
+            return (string)GetKey(Key, KeyTypes.Text);
         }
         public int GetNumber(string Key)
         {
-            Registry _Registry = new(MyConnection, DBFile);
-            return (int)_Registry.GetKey(Key, KeyTypes.Number);
+            //Registry _Registry = new(MyConnection, DBFile);
+            return (int)GetKey(Key, KeyTypes.Number);
         }
 
         public DateTime GetDate(string Key)
         {
-            Registry _Registry = new(MyConnection, DBFile);
-            return (DateTime)_Registry.GetKey(Key, KeyTypes.Date);
+            //Registry _Registry = new(MyConnection, DBFile);
+            return (DateTime)GetKey(Key, KeyTypes.Date);
         }
 
         public bool GetBoolean(string Key)
         {
-            Registry _Registry = new(MyConnection, DBFile);
-            return (bool)_Registry.GetKey(Key, KeyTypes.Boolean);
+            //Registry _Registry = new(MyConnection, DBFile);
+            return (bool)GetKey(Key, KeyTypes.Boolean);
         }
 
         public DateTime GetFrom(string Key)
         {
-            Registry _Registry = new(MyConnection, DBFile);
-            return (DateTime)_Registry.GetKey(Key, KeyTypes.From);
+            //Registry _Registry = new(MyConnection, DBFile);
+            return (DateTime)GetKey(Key, KeyTypes.From);
         }
 
         public DateTime GetTo(string Key)
         {
-            Registry _Registry = new(MyConnection, DBFile);
-            return (DateTime)_Registry.GetKey(Key, KeyTypes.To);
+            //Registry _Registry = new(MyConnection, DBFile);
+            return (DateTime)GetKey(Key, KeyTypes.To);
         }
 
         public DateTime[] GetFromTo(string Key)
@@ -1387,7 +1486,35 @@ namespace AppliedDB
             return row;
         }
 
-       
+        #region Disposed
+        public void Dispose()
+        {
+            try
+            {
+                _transaction?.Dispose();
+                _transaction = null;
+
+                MyCommand?.Dispose();
+                MyCommand = null!;
+
+                if (MyConnection?.State == ConnectionState.Open)
+                    MyConnection.Close();
+
+                MyConnection?.Dispose();
+                MyConnection = null!;
+
+                if (MyConnection2?.State == ConnectionState.Open)
+                    MyConnection2.Close();
+
+                MyConnection2?.Dispose();
+                MyConnection2 = null!;
+            }
+            catch
+            {
+                // NEVER throw from Dispose
+            }
+        }
+        #endregion
     }
 
 

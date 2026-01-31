@@ -27,23 +27,25 @@ builder.Services.AddScoped<ToastService>();
 builder.Services.AddScoped<PrintService>();
 builder.Services.AddScoped<MessagesService>();
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<GlobalService>();
 
-builder.Services.AddScoped<GlobalService>(sp =>
-{
-    // Access configuration and navigation manager
-    var config = sp.GetRequiredService<IConfiguration>();
-    var navManager = sp.GetRequiredService<NavigationManager>();
-    var JSRuntime = sp.GetRequiredService<IJSRuntime>();
-    var StateProvider = sp.GetRequiredService<AuthenticationStateProvider>();
 
-    // Initialize GlobalService with dependencies
-    var globalService = new GlobalService(config, navManager, JSRuntime, StateProvider);
+//builder.Services.AddScoped<GlobalService>(sp =>
+//{
+//    // Access configuration and navigation manager
+//    var config = sp.GetRequiredService<IConfiguration>();
+//    var navManager = sp.GetRequiredService<NavigationManager>();
+//    var JSRuntime = sp.GetRequiredService<IJSRuntime>();
+//    var StateProvider = sp.GetRequiredService<AuthenticationStateProvider>();
 
-    // Set the Language.ID value here
-    globalService.Language.ID = 1; // Example: Setting ID to 1
+//    // Initialize GlobalService with dependencies
+//    var globalService = new GlobalService(config, navManager, JSRuntime, StateProvider);
 
-    return globalService;
-});
+//    // Set the Language.ID value here
+//    globalService.Language.ID = 1; // Example: Setting ID to 1
+
+//    return globalService;
+//});
 
 var app = builder.Build();
 

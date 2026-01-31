@@ -71,6 +71,8 @@ namespace AppliedGlobals
             public int? Digits { get; set; }
             public string? DigitTitle { get; set; }
             public string? Format { get; set; }
+            public string? Units { get; set; }
+            public string? UnitsTitle { get; set; }
         }
         #endregion
 

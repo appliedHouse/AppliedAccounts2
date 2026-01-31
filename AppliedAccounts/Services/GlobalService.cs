@@ -4,11 +4,12 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using static AppliedGlobals.AppValues;
+using AppliedDB;
 
 namespace AppliedAccounts.Services
 {
-    public class GlobalService
-    {
+    public class GlobalService : IDisposable
+        {
         public readonly IConfiguration Config;
         public readonly NavigationManager NavManager;
         public readonly IJSRuntime JS;
@@ -20,9 +21,13 @@ namespace AppliedAccounts.Services
         public CurrencyClass Currency { get; set; } = new();
         public Format Format { get; set; } = new();
         public PrintReport Reporting { get; set; } = new();
+        public DataSource Source { get; private set; } = default!;
         public string DBFile => AppPaths.DBFile;
         public string UserID = string.Empty;
         public string UserRole = string.Empty;
+
+        public event Action? OnLanguageChanged;
+
 
         public GlobalService() { }
 
@@ -54,6 +59,8 @@ namespace AppliedAccounts.Services
             AppPaths.SessionPath = Config.GetValue<string>("Paths:SessionPath") ?? "Sessions";
             AppPaths.ExcelFilesPath = Config.GetValue<string>("Paths:ExcelFilesPath") ?? "ExcelFiles";
 
+            Source = new(AppPaths);
+
             Author = new()
             {
                 Company = Config.GetValue<string>("Author:Company") ?? "",
@@ -80,6 +87,7 @@ namespace AppliedAccounts.Services
                 Sign = Config.GetValue<string>("Currency:Sign"),
                 Title = Config.GetValue<string>("Currency:Title"),
                 Format = Config.GetValue<string>("Currency:Format"),
+                Units = Source.GetText("CurrencyUnit")
             };
 
             Reporting = new()
@@ -91,6 +99,21 @@ namespace AppliedAccounts.Services
 
         }
 
+        public void SetLanguage(int id)
+        {
+            if (Language.ID == id)
+                return;
+
+            Language.ID = id;
+
+            // Notify subscribers (components)
+            OnLanguageChanged?.Invoke();
+        }
+
+        public void Dispose()
+        {
+            Source?.Dispose();
+        }
     }
 }
 

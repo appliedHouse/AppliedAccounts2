@@ -19,19 +19,17 @@ namespace AppliedDB
 
             DataTable TB_Registry = DataSource.GetDataTable(Enums.Tables.Registry, MyConnection, $"Code = '{Key}'");
             DataRow CurrentRow ; 
-            string SQLAction;
-
-
+            //var SQLAction = string.Empty;
 
             if (TB_Registry.Rows.Count == 1)
             {
-                SQLAction = "Update";
+                //SQLAction = "Update";
                 CurrentRow = TB_Registry.DefaultView[0].Row;
                 CurrentRow.AcceptChanges();
             }
             else
             {
-                SQLAction = "Insert";
+                //SQLAction = "Insert";
                 CurrentRow = TB_Registry.NewRow();
                 CurrentRow["ID"] = DataSource.GetMaxID(Enums.Tables.Registry, MyConnection);
             }
