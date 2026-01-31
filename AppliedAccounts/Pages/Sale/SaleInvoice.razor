@@ -250,6 +250,7 @@
             </div>
 
             <!-- Control Buttons -->
+            @*
             <div class="container control-buttons">
                 <div class="grid gap-0 column-gap-3 ctrl-gap">
                     <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
@@ -310,6 +311,123 @@
                     <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="TestRecord">
                         <i class="bi bi-body-text"></i>
                     </button>
+                </div>
+            </div>
+            *@
+            <div class="container">
+                <div class="d-flex flex-row mb-3 filter position-relative">
+
+                    <!-- New -->
+                    <div class="p-2">
+                        <button type="button" class="btn btn-sm w1 btn-info"
+                                title="New"
+                                @onclick="MyModel.New">
+                            <i class="bi bi-plus-square"></i>
+                        </button>
+                    </div>
+
+                    <!-- Add / Save Detail -->
+                    <div class="p-2">
+                        <button type="button" class="btn btn-sm w1 btn-primary"
+                                title="Add"
+                                @onclick="MyModel.Save">
+                            <i class="bi bi-arrow-bar-down"></i>
+                        </button>
+                    </div>
+
+                    <!-- Save All -->
+                    <div class="p-2">
+                        <button type="button"
+                                class="btn btn-sm w1 btn-success"
+                                title="Save Invoice"
+                                @onclick="SaveAll">
+                            <i class="bi bi-floppy2-fill"></i>
+                        </button>
+                    </div>
+
+                    @if (MyModel.Count > 0)
+                    {
+                        <!-- Navigation -->
+                        <div class="btn-group p-2" role="group">
+
+                            <button class="btn btn-sm w1 btn-light"
+                                    title="First"
+                                    @onclick="MyModel.Top">
+                                <i class="bi bi-chevron-double-left"></i>
+                            </button>
+
+                            <button class="btn btn-sm w1 btn-light"
+                                    title="Next"
+                                    @onclick="MyModel.Next">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+
+                            <button class="btn btn-sm w1 btn-light"
+                                    title="Back"
+                                    @onclick="MyModel.Back">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+
+                            <button class="btn btn-sm w1 btn-light"
+                                    title="Last"
+                                    @onclick="MyModel.Last">
+                                <i class="bi bi-chevron-double-right"></i>
+                            </button>
+                        </div>
+
+                        <!-- Print / Export -->
+                        @if (MyModel.MyVoucher.Master.Vou_No.ToUpper() != "NEW")
+                        {
+                            <div class="p-2">
+                                <button class="btn btn-sm w1 btn-secondary"
+                                        title="Print"
+                                        @onclick="(() => Print(ReportType.Print))">
+                                    <i class="bi bi-printer"></i>
+                                </button>
+
+                                <button class="btn btn-sm w1 btn-secondary"
+                                        title="Preview"
+                                        @onclick="(() => Print(ReportType.Preview))">
+                                    <i class="bi bi-search"></i>
+                                </button>
+
+                                <button class="btn btn-sm w1 btn-secondary"
+                                        title="PDF"
+                                        @onclick="(() => Print(ReportType.PDF))">
+                                    <i class="bi bi-file-pdf"></i>
+                                </button>
+
+                                <button class="btn btn-sm w1 btn-secondary"
+                                        title="Excel"
+                                        @onclick="(() => Print(ReportType.Excel))">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+
+                                <button class="btn btn-sm w1 btn-secondary"
+                                        title="Word"
+                                        @onclick="(() => Print(ReportType.Word))">
+                                    <i class="bi bi-file-earmark-word"></i>
+                                </button>
+
+                                <button class="btn btn-sm w1 btn-secondary"
+                                        title="HTML"
+                                        @onclick="(() => Print(ReportType.HTML))">
+                                    <i class="bi bi-filetype-html"></i>
+                                </button>
+                            </div>
+                        }
+                    }
+
+                    <!-- Back -->
+                    <div class="p-2 ms-auto">
+                        <button type="button"
+                                class="btn btn-sm w1 btn-warning"
+                                title="Back"
+                                @onclick="BackPage">
+                            <i class="bi bi-arrow-left-circle"></i>
+                        </button>
+                    </div>
+
                 </div>
             </div>
 
