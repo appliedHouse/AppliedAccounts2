@@ -20,6 +20,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<UserProfile>();               // Create a User Model Class.
 builder.Services.AddScoped<ProtectedSessionStorage>();
+builder.Services.AddScoped<UserAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
 builder.Services.AddScoped<ToastService>();
 builder.Services.AddScoped<PrintService>();
@@ -54,11 +55,14 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+app.UseMiddleware<DatabaseValidation>(); 
 
-app.UseMiddleware<DatabaseValidation>(); // Custom middleware to validate the database
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+app.UseUserDatabaseValidation();         
+
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 

@@ -1,39 +1,52 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Data.Sqlite;
-using System.Threading.Tasks;
+﻿using Microsoft.Data.Sqlite;
 
 namespace AppliedAccounts.Middleware
 {
-    // You may need to install the Microsoft.AspNetCore.Http.Abstractions package into your project
     public class DatabasePatches
     {
         private readonly RequestDelegate _next;
+        private readonly string _connectionString;
 
         public DatabasePatches(RequestDelegate next)
         {
             _next = next;
+
+            var userFile = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                "SqliteDB",
+                "AppliedUser2.db"
+            );
+
+            _connectionString = $"Data Source={userFile}";
         }
 
-        public Task Invoke(HttpContext httpContext)
+        public async Task Invoke(HttpContext context)
         {
+            try
+            {
+                using var conn = new SqliteConnection(_connectionString);
+                await conn.OpenAsync();   // ✅ Connection test
+            }
+            catch (Exception ex)
+            {
+                // ❌ Connection failed → show error page
+                context.Response.StatusCode = 500;
+                await context.Response.WriteAsync(
+                    "Database connection failed. Please contact administrator."
+                );
+                return;
+            }
 
-            return _next(httpContext);
+            // ✅ Continue pipeline
+            await _next(context);
         }
     }
 
-    // Extension method used to add the middleware to the HTTP request pipeline.
     public static class DatabasePatchesExtensions
     {
         public static IApplicationBuilder UseDatabasePatches(this IApplicationBuilder builder)
         {
-            var _UserFile = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqliteDB", "AppliedUser2.db");
-            var _Connection = new SqliteConnection($"Data Source={_UserFile}");
-            {
-                // Set the connection string properties if needed
-                // e.g., Password = "your_password"
-            }
-            ;
             return builder.UseMiddleware<DatabasePatches>();
         }
     }

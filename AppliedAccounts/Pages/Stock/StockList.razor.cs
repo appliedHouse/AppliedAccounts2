@@ -11,6 +11,11 @@ namespace AppliedAccounts.Pages.Stock
         public bool ShowForm { get; set; }                  //play List or Edit form
 
 
+        public StockList()
+        {
+
+        }
+
         public void BackPage()
         {
             ShowList = !ShowList;
