@@ -1514,6 +1514,18 @@ namespace AppliedDB
                 // NEVER throw from Dispose
             }
         }
+
+        public int GetCount(Tables book, string filter)
+        {
+            using var cmd = MyConnection.CreateCommand();
+            cmd.CommandText = $"SELECT COUNT(*) FROM {book} WHERE {filter}";
+
+            if (cmd.Connection.State != ConnectionState.Open)
+                cmd.Connection.Open();
+
+            return Convert.ToInt32(cmd.ExecuteScalar());
+        }
+
         #endregion
     }
 

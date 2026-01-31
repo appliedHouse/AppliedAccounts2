@@ -1,103 +1,49 @@
-﻿
-
-namespace AppliedDB
+﻿namespace AppliedDB
 {
     public class PageModel
     {
-        public int TotalRecords { get; set; } = 1;
-        public int Current { get; set; } = 1;
-        public int Size { get; set; } = 12; // Items per page
-        public int Count  => (int)Math.Round(TotalRecords / (double)Size);
-        public int MaxButtons { get; set; } = 10; // Number of page buttons to show in Pagination tags
-        public List<int> PageList { get; set; } = [];   // List of Pages 1,2,3,4,5........n
+        public int TotalRecords { get; set; } = 0;
+        public int Current { get; private set; } = 1;
+        public int Size { get; set; } = 12;
+        public int MaxButtons { get; set; } = 10;
 
+        public int Count => Math.Max(1, (int)Math.Ceiling(TotalRecords / (double)Size));
 
-        #region Text
-        //public void ChangePage1(int page)
-        //{
-        //    if (page > 0 && page <= Count)
-        //    {
-        //        Current = page;
-        //    }
+        public List<int> PageList { get; private set; } = new();
 
-        //    PageList.Clear();
+        public event Action<int>? PageChanged;
 
-        //    if(Current <= MaxButtons)
-        //    {
-        //        for (int i = 1; i <= Count; i++)
-        //        {
-        //            if(i<=MaxButtons)
-        //            { PageList.Add(i); }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        PageList.Add(Current-9);
-        //        PageList.Add(Current-8);
-        //        PageList.Add(Current-7);
-        //        PageList.Add(Current-6);
-        //        PageList.Add(Current-5);
-        //        PageList.Add(Current-4);
-        //        PageList.Add(Current-3);
-        //        PageList.Add(Current-2);
-        //        PageList.Add(Current-1);
-        //        PageList.Add(Current);
-        //    }
-        //}
-        #endregion
 
         public void ChangePage(int page)
         {
-            // Ensure Count is at least 1 to avoid division by zero
-            int pageCount = Math.Max(Count, 1);
+            int newPage = Math.Clamp(page, 1, Count);
 
-            // Clamp the requested page between 1 and pageCount
-            if (page < 1)
-                Current = 1;
-            else if (page > pageCount)
-                Current = pageCount;
-            else
-                Current = page;
+            if (newPage == Current) { return; }
 
-            PageList.Clear();
+            Current = newPage;
+            BuildPageList();
 
-            if (Current <= MaxButtons)
-            {
-                for (int i = 1; i <= pageCount && i <= MaxButtons; i++)
-                {
-                    PageList.Add(i);
-                }
-            }
-            else
-            {
-                for (int i = Current - MaxButtons + 1; i <= Current; i++)
-                {
-                    if (i > 0 && i <= pageCount)
-                        PageList.Add(i);
-                }
-            }
+            PageChanged?.Invoke(Current);
         }
 
-        public void Refresh(int _TotalRecords)
+        public void Refresh(int totalRecords)
         {
-            TotalRecords = _TotalRecords;
+            TotalRecords = totalRecords;
+            BuildPageList();
             ChangePage(Current);
         }
 
-        public void GetPageList()
+        private void BuildPageList()
         {
-            PageList = [];
+            PageList.Clear();
 
-            if(Size <= Count)
-            {
-                // Select full length of pages if Size is less than Count
-                PageList.AddRange(Enumerable.Range(1, Size));
-            }
-            else
-            {
-                // Select full length of Count if Size is greater than Count
-                PageList.AddRange(Enumerable.Range(1, Count));
-            }
+            int half = MaxButtons / 2;
+            int start = Math.Max(1, Current - half);
+            int end = Math.Min(Count, start + MaxButtons - 1);
+            start = Math.Max(1, end - MaxButtons + 1);
+
+            for (int i = start; i <= end; i++)
+                PageList.Add(i);
         }
     }
 }
