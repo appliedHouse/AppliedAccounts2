@@ -18,18 +18,25 @@ namespace AppliedAccounts.Middleware
         {
 
 
-            if (string.IsNullOrEmpty(authProvider.AppUser.DataFile))
-            {
-                await _next(context);
-                return; // user not logged in yet
-            }
 
 
             // Run validation only once per application startup
             if (!_validationPerformed)
             {
+
+                if (string.IsNullOrEmpty(authProvider.AppUser.DataFile))
+                //if (authProvider.Claims.Count() > 0)
+                {
+                    await _next(context);
+                    return; // user not logged in yet
+                }
+
                 lock (_lock)
                 {
+
+
+
+
                     if (!_validationPerformed)
                     {
                         try
