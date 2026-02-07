@@ -84,7 +84,7 @@ namespace VoucherPosting
                 LedgerRow["BookID"] = _MasterRow.Field<long>("BookID");
 
                 LedgerRow["COA"] = _MasterRow.Field<long>("BookID");
-                LedgerRow["DR"] = _MasterRow.Field<decimal>("Amount") < 0 ? _MasterRow.Field<decimal>("Amount") : 0;
+                LedgerRow["DR"] = _MasterRow.Field<decimal>("Amount") < 0 ? Math.Abs(_MasterRow.Field<decimal>("Amount")) : 0;
                 LedgerRow["CR"] = _MasterRow.Field<decimal>("Amount") > 0 ? _MasterRow.Field<decimal>("Amount") : 0;
                 LedgerRow["Customer"] = DBNull.Value;
                 LedgerRow["Project"] = DBNull.Value;

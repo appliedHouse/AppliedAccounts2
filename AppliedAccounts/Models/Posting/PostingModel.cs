@@ -202,8 +202,8 @@ namespace AppliedAccounts.Models.Posting
             {
                 VoucherPostingModel postingModel = new();
 
-                postingModel.MasterTable = Source.GetTable(AppliedDB.Enums.Tables.Book, $"ID={_VouID}");
-                postingModel.DetailTable = Source.GetTable(AppliedDB.Enums.Tables.Book2, $"TranID={_VouID}");
+                postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
+                postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
 
                 MsgClass.ClearMessages();                            // Clear all previous messages. 
                 CashBook postCashBook = new(Source, postingModel);

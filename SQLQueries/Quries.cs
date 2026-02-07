@@ -146,7 +146,7 @@ namespace SQLQueries
         #region General Ledger
         public static string GeneralLedger(long COAID, string OBDate, string FilterOB, string GroupBy, string Filter, string OrderBy)
         {
-            var _Text = new StringBuilder();
+            //var _Text = new StringBuilder();
             var _Text1 = new StringBuilder();           // Opening Balance
             var _Text2 = new StringBuilder();           // Ledger
             var _Text3 = new StringBuilder();           // Combine Opening and Ledger
