@@ -1,0 +1,23 @@
+﻿@page "/Accounts/JV"
+@using AppliedAccounts.Libs
+@using AppliedAccounts.Models.Accounts
+@inject GlobalService AppGlobal;
+
+@code {
+
+    public JVModel MyModel { get; set; }
+    public JVViewModel MyVM => MyModel.JvVM;
+
+    protected override void OnInitialized()
+    {
+        MyModel = new(AppGlobal);
+    }
+}
+
+<PageHeading Text="Receipt" />
+
+@if (MyModel.MsgClass.Count > 0)
+{
+    <PageErrors Messages="MyModel.MsgClass"></PageErrors>
+}
+
