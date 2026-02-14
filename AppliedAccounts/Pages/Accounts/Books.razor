@@ -45,11 +45,7 @@
 }
 
 <style>
-    .myContainer .row {
-        display: flex;
-        justify-content: center; /* Centers horizontally */
-        gap: 0px; /* Optional: Adds spacing between columns */
-    }
+    
 
     .itemRemove {
         color: darkgray;
@@ -84,7 +80,7 @@ else
                     <div class="col-md-4">
 
                         <div class="form-floating">
-                            <InputSelect id="ddBook" 
+                            <InputSelect id="ddBook"
                                          class="form-control item-height" 
                                          TValue="long" 
                                          Value="@MyModel.MyVoucher.Master.BookID" 
@@ -145,7 +141,7 @@ else
                     </div>
                 </div>
                 <hr class="divder-line" />
-                <div class="row  g-md-2 mb-2">
+                <div class="row g-md-2 mb-2">
 
                     <div class="col-md-4">
                         <div class="form-floating">
@@ -192,9 +188,7 @@ else
                             <label for="ddCompany">Company / Customer / Sub Account</label>
                         </div>
                     </div>
-
                 </div>
-
                 <div class="row g-md-2 mb-2">
                     <div class="col-md-4">
                         <div class="form-floating">
@@ -218,7 +212,7 @@ else
                     <div class="col-md-4">
                         <div class="form-floating">
                             <InputSelect id="ddProject" class="form-control item-height" TValue="long" Value="@MyModel.MyVoucher.Detail.Project" ValueExpression="@(() => @MyModel.MyVoucher.Detail.Project)" ValueChanged="@((e) => ProjectIDChanged(e))">
-                                @if (MyModel.Employees.Any())
+                                @if (MyModel.Projects.Any())
                                 {
                                     @foreach (var item in MyModel.Projects)
                                     {
@@ -275,7 +269,6 @@ else
                             <i class="bi bi-plus-square"></i>
                         </button>
                     </div>
-
                     <div class="p-2">
                         <button type="button" class="btn btn-sm w1 btn-primary" title="Add" @onclick="MyModel.Save">
                             <i class="bi bi-arrow-bar-down"></i>

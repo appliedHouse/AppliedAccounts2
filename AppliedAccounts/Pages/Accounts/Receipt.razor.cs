@@ -103,16 +103,11 @@ namespace AppliedAccounts.Pages.Accounts
             try
             {
                 MyModel.TestNewAsync();
-
-
-
             }
             catch (Exception ex)
             {
                 ToastService.ShowToast(ToastClass.ErrorToast, ex.Message);
             }
-
-
         }
     }
 }

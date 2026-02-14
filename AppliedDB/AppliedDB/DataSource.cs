@@ -1032,6 +1032,25 @@ namespace AppliedDB
 
         #endregion
 
+        #region Get JV (Journal voucher)
+
+        public DataTable? GetJV(string Vou_No)
+        {
+            if (string.IsNullOrEmpty(Vou_No))
+            {
+                var QueryText = $"SELECT * FROM [ledger] WHERE [Vou_No] = '{Vou_No}'";
+                using var _Table = GetDataTable(DBFile, QueryText, "Ledger");
+                if (_Table != null && _Table.Columns.Count > 0)
+                {
+                    return _Table;
+                }
+            }
+            return null;
+        }
+
+
+        #endregion
+
         #region Geting a DB Directory()
 
 
@@ -1525,7 +1544,6 @@ namespace AppliedDB
 
             return Convert.ToInt32(cmd.ExecuteScalar());
         }
-
         #endregion
     }
 

@@ -1,12 +1,11 @@
 ﻿@page "/Accounts/JV"
 @using AppliedAccounts.Libs
 @using AppliedAccounts.Models.Accounts
-@inject GlobalService AppGlobal;
+@inject GlobalService AppGlobal
+@inject PrintService ReportService
+
 
 @code {
-
-    public JVModel MyModel { get; set; }
-    public JVViewModel MyVM => MyModel.JvVM;
 
     protected override void OnInitialized()
     {
@@ -14,10 +13,296 @@
     }
 }
 
-<PageHeading Text="Receipt" />
+<PageHeading Text="JOURNAL VOUCHER (JV)" />
 
 @if (MyModel.MsgClass.Count > 0)
 {
     <PageErrors Messages="MyModel.MsgClass"></PageErrors>
 }
 
+
+@if (IsPageValid)
+{
+    <div class="container">
+        <div id="Transaction">
+
+            <EditForm Model="@MyModel">
+                <div class="container myContainer flex-md-row "></div>
+                <input @bind-value="@MyModel.Transaction.ID" hidden />
+                <div class="row g-md-2 mb-2 my-2">
+                    <div class="col-md-2">
+                        <div class="form-floating">
+                            <InputText disabled class="form-control" id="txtVouNo" placeholder="Voucher No" @bind-Value="MyModel.Transaction.Vou_No" disable>
+                            </InputText>
+                            <label for="txtVouNo">Voucher Number</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-floating">
+                            <InputText class="form-control" id="txtRefNo" placeholder="Reference number" @bind-Value="MyModel.Transaction.Ref_No">
+                            </InputText>
+                            <label for="txtRefNo">Reference Number</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <InputDate class="form-control" id="dtVouDate" placeholder="Voucher Date" @bind-Value="MyModel.Transaction.Vou_Date">
+                            </InputDate>
+                            <label for="dtVouDate">Voucher Date</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <InputSelect id="ddAccounts" class="form-control item-height" TValue="long" Value="@MyModel.Transaction.COA" ValueExpression="@(() => @MyModel.Transaction.COA)" ValueChanged="@((e) => AccountIDChanged(e))">
+                                @if (MyModel.Accounts.Any())
+                                {
+                                    @foreach (var item in MyModel.Accounts)
+                                    {
+                                        <option value="@item.ID">@item.Title</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="0">No Records - Accounts</option>
+                                }
+
+                            </InputSelect>
+                            <label for="ddAccounts">Account</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-md-2 mb-2 my-2">
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <InputSelect id="ddCompany" class="form-control item-height"
+                                         TValue="long"
+                                         Value="@MyModel.Transaction.Company"
+                                         ValueExpression="@(() => @MyModel.Transaction.Company)"
+                                         ValueChanged="@((e) => CompanyIDChanged(e))">
+                                @if (MyModel.Companies.Any())
+                                {
+                                    @foreach (var item in MyModel.Companies)
+                                    {
+                                        <option value="@item.ID">@item.Title</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="0">No Records -  Company</option>
+                                }
+
+                            </InputSelect>
+                            <label for="ddCompany">Company / Customer / Sub Account</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <InputSelect id="ddEmployee" class="form-control item-height"
+                                         TValue="long"
+                                         Value="@MyModel.Transaction.Employee"
+                                         ValueExpression="@(() => @MyModel.Transaction.Employee)"
+                                         ValueChanged="@((e) => EmployeeIDChanged(e))">
+                                @if (MyModel.Employees.Any())
+                                {
+                                    @foreach (var item in MyModel.Employees)
+                                    {
+                                        <option value="@item.ID">@item.Title</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="0">No Records - Employee</option>
+                                }
+
+                            </InputSelect>
+                            <label for="ddEmployee">Employee</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <InputSelect id="ddProject" class="form-control item-height"
+                                         TValue="long"
+                                         Value="@MyModel.Transaction.Project"
+                                         ValueExpression="@(() => MyModel.Transaction.Project)"
+                                         ValueChanged="@((e) => ProjectIDChanged(e))">
+                                @if (MyModel.Projects.Any())
+                                {
+                                    @foreach (var item in MyModel.Projects)
+                                    {
+                                        <option value="@item.ID">@item.Title</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="0">No Records - Project</option>
+                                }
+
+                            </InputSelect>
+                            <label for="ddProject">Project</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-md-2 mb-2 my-2">
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <InputText class="form-control" id="txtRefNo" placeholder="Reference number" @bind-Value="MyModel.Transaction.Ref_No">
+                            </InputText>
+                            <label for="txtRefNo">Reference Number</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-floating">
+                            <InputNumber class="form-control" id="txtDebit" placeholder="Debit Amount" @bind-Value="MyModel.Transaction.DR">
+                            </InputNumber>
+                            <label for="txtDebit">Debit</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-floating">
+                            <InputNumber class="form-control" id="txtCredit" placeholder="Credit Amount" @bind-Value="MyModel.Transaction.CR">
+                            </InputNumber>
+                            <label for="txtCredit">Credit</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <InputText class="form-control" id="txtDescription" placeholder="Description" @bind-Value="MyModel.Transaction.Description">
+                            </InputText>
+                            <label for="txtDescription">Description</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-md-2 mb-2 my-2">
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <InputText title="Non printable text for memories" class="form-control" id="txtDescription" placeholder="Comments" @bind-Value="MyModel.Transaction.Comments">
+                            </InputText>
+                            <label  for="txtDescription">Comments</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container">
+                    <div class="d-flex flex-row mb-3 filter position-relative">
+                        <div class="p-2">
+                            <button type="button" class="btn btn-sm w1 btn-info" title="New" @onclick="MyModel.New">
+                                <i class="bi bi-plus-square"></i>
+                            </button>
+                        </div>
+                        <div class="p-2">
+                            <button type="button" class="btn btn-sm w1 btn-primary" title="Add" @onclick="MyModel.Save">
+                                <i class="bi bi-arrow-bar-down"></i>
+                            </button>
+                        </div>
+                        <div class="p-2">
+                            <button type="button" class="btn btn-sm w1 btn-success" title="Save" data-bs-toggle="modal" data-bs-target="#SaveVoucher">
+                                <i class="bi bi-floppy2-fill"></i>
+                            </button>
+                        </div>
+
+                        @if (MyModel.MyVoucher != null && MyModel.Count > 1)
+                        {
+                            <div class="btn-group p-2" role="group" aria-label="Navigation">
+                                <button type="button" class="btn btn-sm w1 btn-light" title="Top" @onclick="MyModel.Top">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </button>
+
+                                <button type="button" class="btn btn-sm w1 btn-light" title="Next" @onclick="MyModel.Next">
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+
+                                <button type="button" class="btn btn-sm w1 btn-light" title="Back" @onclick="MyModel.Back">
+                                    <i class="bi bi-chevron-left"></i>
+                                </button>
+
+                                <button type="button" class="btn btn-sm w1 btn-light" title="Last" @onclick="MyModel.Last">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </button>
+                            </div>
+                            <div><ReportingButtons ReturnValue="Print" ID="@MyModel.Transaction.ID" /></div>
+                        }
+
+                        <!-- Float Back Button to the Right -->
+                        <div class="p-2 ms-auto">
+                            <button type="button" class="btn btn-sm w1 btn-warning" title="Back" @onclick="BackPage"><i class="bi bi-arrow-left-circle"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </EditForm>
+        </div>
+
+
+    </div>
+
+    <div class="TranList">
+        <div class="table-container">
+            <table class="table-list">
+                <thead>
+                    <tr>
+                        <th style="width:8%">Sr. No.</th>
+                        <th style="width:8%">Vou No</th>
+                        <th style="width:8%">Vou Date</th>
+                        <th style="width:20%">Account</th>
+                        <th style="width:20%">Project</th>
+                        <th style="width:10%">Debit</th>
+                        <th style="width:10%">Credit</th>
+                        <th style="width:6%">
+                            <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @if (MyModel.Count > 0)
+                    {
+                        @foreach (var item in MyModel.MyVoucher)
+                        {
+
+                            <tr>
+                                <td>@item.Sr_No</td>
+                                <td>@item.Vou_No</td>
+                                <td>@item.Vou_Date</td>
+                                <td class="left">@item.TitleAccount</td>
+                                <td class="left">@item.TitleProject</td>
+                                <td class="amount">@item.DR.ToString(Format.Digit)</td>
+                                <td class="amount">@item.CR.ToString(Format.Digit)</td>
+
+                                <td clas class="tb-col-left" s="td-btn">
+                                    <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(() => MyModel.Edit(item.ID))"><i class="bi bi-pencil-fill"></i></button>
+                                </td>
+
+                            </tr>
+                        }
+
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>
+                                <button id="btnAdd">Add Transaction</button>
+                            </td>
+                        </tr>
+
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>TOTAL</td>
+                        <td class="amount">@MyModel.Tot_DR.ToString(Format.Digit)</td>
+                        <td class="amount">@MyModel.Tot_CR.ToString(Format.Digit)</td>
+                        <td class="center">
+                            <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+}

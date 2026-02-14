@@ -189,11 +189,11 @@ namespace AppliedAccounts.Models
 
                         MyVoucher.Master = VoucherData!.Select(first => new Master()
                         {
-                            ID1 = first.Field<int>("ID1"),
+                            ID1 = first.Field<long>("ID1"),
                             Vou_No = first.Field<string>("Vou_No") ?? "",
                             Vou_Date = first.Field<DateTime>("Vou_Date"),
-                            Company = first.Field<int>("Company"),
-                            Employee = first.Field<int>("Employee"),
+                            Company = first.Field<long>("Company"),
+                            Employee = first.Field<long>("Employee"),
                             Ref_No = first.Field<string>("Ref_No") ?? "",
                             Inv_No = first.Field<string>("Inv_No") ?? "",
                             Inv_Date = first.Field<DateTime>("Inv_Date"),
@@ -210,18 +210,18 @@ namespace AppliedAccounts.Models
 
                         MyVoucher.Details = [.. VoucherData.Select(row => new Detail()
                         {
-                            ID2 = row.Field<int?>("ID2") ?? 0,
-                            TranID = row.Field<int?>("TranID") ?? 0,
+                            ID2 = row.Field<long?>("ID2") ?? 0,
+                            TranID = row.Field<long?>("TranID") ?? 0,
                             Sr_No = row.Field<int?>("Sr_No") ?? 0,
-                            Inventory = row.Field<int?>("Inventory") ?? 0,
+                            Inventory = row.Field<long?>("Inventory") ?? 0,
                             Batch = row.Field<string>("Batch") ?? "",
-                            Unit = row.Field<int?>("Unit") ?? 0,
+                            Unit = row.Field<long?>("Unit") ?? 0,
                             Qty = row.Field<decimal?>("Qty") ?? 0.00M,
                             Rate = row.Field<decimal?>("Rate") ?? 0.00M,
-                            TaxID = row.Field<int?>("Tax") ?? 0,
+                            TaxID = row.Field<long?>("Tax") ?? 0,
                             TaxRate = row.Field<decimal?>("Tax_Rate") ?? 0.00M,
                             Description = row.Field<string>("Description") ?? "",
-                            Project = row.Field<int?>("Project") ?? 0,
+                            Project = row.Field<long?>("Project") ?? 0,
 
                             TitleInventory = row.Field<string>("TitleStock") ?? "",
                             TitleProject = row.Field<string>("TitleProject") ?? "",

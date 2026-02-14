@@ -63,22 +63,22 @@ namespace AppliedDB
         public static string SaleInvoiceList()
         {
             var _Text = new StringBuilder();
-            _Text.Append("SELECT ");
-            _Text.Append("[BR].[ID],");
-            _Text.Append("[BR].[Vou_No],");
-            _Text.Append("[BR].[Ref_No],");
-            _Text.Append("[BR].[Vou_Date],");
-            _Text.Append("[BR].[Inv_Date],");
-            _Text.Append("[BR].[Pay_Date],");
-            _Text.Append("[C].[Title] As[Company],");
-            _Text.Append("[E].[Title] As[Salesman],");
-            _Text.Append("[C].[City] As[City],");
-            _Text.Append("[BR].[Amount],");
-            _Text.Append("[BR].[Description],");
-            _Text.Append("[BR].[Status]");
-            _Text.Append("FROM [BillReceivable] [BR]");
-            _Text.Append("LEFT JOIN[Customers] [C] ON [C].[ID] = [BR].[Company]");
-            _Text.Append("LEFT JOIN[Employees] [E] ON [C].[ID] = [BR].[Employee]");
+            _Text.AppendLine("SELECT ");
+            _Text.AppendLine("[BR].[ID],");
+            _Text.AppendLine("[BR].[Vou_No],");
+            _Text.AppendLine("[BR].[Ref_No],");
+            _Text.AppendLine("[BR].[Vou_Date],");
+            _Text.AppendLine("[BR].[Inv_Date],");
+            _Text.AppendLine("[BR].[Pay_Date],");
+            _Text.AppendLine("[C].[Title] As[Company],");
+            _Text.AppendLine("[E].[Title] As[Salesman],");
+            _Text.AppendLine("[C].[City] As[City],");
+            _Text.AppendLine("[BR].[Amount],");
+            _Text.AppendLine("[BR].[Description],");
+            _Text.AppendLine("[BR].[Status]");
+            _Text.AppendLine("FROM [BillReceivable] [BR]");
+            _Text.AppendLine("LEFT JOIN [Customers] [C] ON [C].[ID] = [BR].[Company]");
+            _Text.AppendLine("LEFT JOIN [Employees] [E] ON [E].[ID] = [BR].[Employee]");
 
             return _Text.ToString();
         }

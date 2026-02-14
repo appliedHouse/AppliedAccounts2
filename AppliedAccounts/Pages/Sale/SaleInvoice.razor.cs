@@ -60,7 +60,6 @@ namespace AppliedAccounts.Pages.Sale
         }
         #endregion
 
-
         #region Submit & Digitis
         public void Submit()
         {
@@ -83,6 +82,7 @@ namespace AppliedAccounts.Pages.Sale
         }
         #endregion
 
+        #region Save Invoice to DB
         public async void SaveAll()
         {
             var IsSaved = await MyModel.SaveAllAsync();
@@ -95,6 +95,7 @@ namespace AppliedAccounts.Pages.Sale
                 NavManager.NavigateTo($"/Sale/SaleInvoice/{MyModel.MyVoucher.Master.ID1}");
             }
         }
+        #endregion
 
         #region Delete
         public void Delete(int _Sr_No)
@@ -109,7 +110,6 @@ namespace AppliedAccounts.Pages.Sale
 
         }
         #endregion
-
 
         #region Home & Back Buttons
         public void GotoHome()
@@ -143,8 +143,5 @@ namespace AppliedAccounts.Pages.Sale
 
 
         #endregion
-
-
-
     }
 }
