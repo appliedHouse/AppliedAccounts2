@@ -156,9 +156,10 @@ namespace AppliedAccounts.Models
                     {
                         if (Validated(SQLType.Insert))
                         {
-                            var _Command = Commands.Insert(CurrentRow, DataFile);
-                            Effected = _Command.ExecuteNonQuery();
-                            MyMessage = $"{Effected} Record(s) updated.";
+                            //var _Command = Commands.Insert(CurrentRow, DataFile);
+                            //Effected = _Command.ExecuteNonQuery();
+                            //MyMessage = $"{Effected} Record(s) updated.";
+                            // 14-FEB-2026 Remaks
 
                         }
                     }
@@ -167,9 +168,9 @@ namespace AppliedAccounts.Models
                     {
                         if (Validated(SQLType.Update))
                         {
-                            var _Command = Commands.UpDate(CurrentRow, DataFile);
-                            Effected = _Command.ExecuteNonQuery();
-                            MyMessage = $"{Effected} Record(s) updated.";
+                            //var _Command = Commands.UpDate(CurrentRow, DataFile);
+                            //Effected = _Command.ExecuteNonQuery();
+                            //MyMessage = $"{Effected} Record(s) updated.";
                         }
                     }
                     TB_RevSheet = DataSource.GetDataTable(DataFile, Tables.RevSheet);
@@ -189,8 +190,8 @@ namespace AppliedAccounts.Models
                 {
                     GetCurrentRow();
 
-                    var _Command = Commands.Delete(CurrentRow, DataFile);
-                    var Effected = _Command.ExecuteNonQuery();
+                    var _Command = CommandConstructor.Commands.Delete(CurrentRow, DataFile);
+                    var Effected = _Command!.ExecuteNonQuery();
                     MyMessage = $"{Effected} Record(s) deleted.";
                     TB_RevSheet = DataSource.GetDataTable(DataFile, Tables.RevSheet);
                 }

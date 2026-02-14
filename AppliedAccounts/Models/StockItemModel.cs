@@ -95,6 +95,8 @@ namespace AppliedAccounts.Models
         #region Save
         public void Save()
         {
+
+
             MsgClass.ClearMessages();
 
             CurrentRow["ID"] = ID;

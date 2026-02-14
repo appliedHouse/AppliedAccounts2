@@ -36,7 +36,7 @@ namespace AppMessages
         }
 
         #region Message Body
-        public int MessageID { get; set; } = 0;
+        public long MessageID { get; set; } = 0;
         public string Code { get; set; } = string.Empty;
         public int RowEffected { get; set; } = 0;
         public string MessageText { get; set; } = "Empty...";

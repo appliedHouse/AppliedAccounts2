@@ -21,7 +21,7 @@ namespace AppliedDB
         public bool IsSaved { get; set; } = false;
         public MessageClass MsgClass { get; set; } = new();
 
-        private SqliteTransaction? _transaction;
+        public SqliteTransaction? DBtransaction;
 
 
         #region Constructor
@@ -890,9 +890,9 @@ namespace AppliedDB
             MyCommands = new(_Row, MyConnection);
 
             // THEN attach the transaction
-            if (_transaction != null && MyCommands.CommandDelete != null)
+            if (DBtransaction != null && MyCommands.CommandDelete != null)
             {
-                MyCommands.CommandDelete.Transaction = _transaction;
+                MyCommands.CommandDelete.Transaction = DBtransaction;
             }
 
             return MyCommands.DeleteRow();
@@ -1107,11 +1107,11 @@ namespace AppliedDB
             if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
 
             MyCommands = new(newRow, MyConnection);
-            if (_transaction != null)
+            if (DBtransaction != null)
             {
-                if(MyCommands.CommandInsert != null) { MyCommands.CommandInsert.Transaction = _transaction; }
-                if (MyCommands.CommandUpdate != null) { MyCommands.CommandUpdate.Transaction = _transaction; }
-                if (MyCommands.CommandDelete != null) { MyCommands.CommandDelete.Transaction = _transaction; }
+                if(MyCommands.CommandInsert != null) { MyCommands.CommandInsert.Transaction = DBtransaction; }
+                if (MyCommands.CommandUpdate != null) { MyCommands.CommandUpdate.Transaction = DBtransaction; }
+                if (MyCommands.CommandDelete != null) { MyCommands.CommandDelete.Transaction = DBtransaction; }
             }
 
             var result = MyCommands.SaveChanges();
@@ -1126,12 +1126,6 @@ namespace AppliedDB
             }
         }
 
-        // Depreciated....... NOT IN USE... 14-Dec-2025.
-        public bool Save(Tables _Table, DataRow newRow)
-        {
-            MyCommands = new(newRow, MyConnection);
-            return MyCommands.SaveChanges();
-        }
         #endregion
 
         #region Get Registry Keys
@@ -1457,19 +1451,19 @@ namespace AppliedDB
             if (MyConnection.State != ConnectionState.Open)
                 MyConnection.Open();
 
-            _transaction = MyConnection.BeginTransaction();
+            DBtransaction = MyConnection.BeginTransaction();
         }
 
         public void CommitTransaction()
         {
-            _transaction?.Commit();
-            _transaction = null;
+            DBtransaction?.Commit();
+            DBtransaction = null;
         }
 
         public void RollbackTransaction()
         {
-            _transaction?.Rollback();
-            _transaction = null;
+            DBtransaction?.Rollback();
+            DBtransaction = null;
         }
         #endregion
 
@@ -1510,8 +1504,8 @@ namespace AppliedDB
         {
             try
             {
-                _transaction?.Dispose();
-                _transaction = null;
+                DBtransaction?.Dispose();
+                DBtransaction = null;
 
                 MyCommand?.Dispose();
                 MyCommand = null!;
@@ -1539,7 +1533,7 @@ namespace AppliedDB
             using var cmd = MyConnection.CreateCommand();
             cmd.CommandText = $"SELECT COUNT(*) FROM {book} WHERE {filter}";
 
-            if (cmd.Connection.State != ConnectionState.Open)
+            if (cmd.Connection!.State != ConnectionState.Open)
                 cmd.Connection.Open();
 
             return Convert.ToInt32(cmd.ExecuteScalar());

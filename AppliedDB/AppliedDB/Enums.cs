@@ -95,7 +95,7 @@
             QuotStatus = 806,
 
             TempLedger = 9999,
-
+            IdGenerator = 10000,
         }
         public enum SQLType
         {

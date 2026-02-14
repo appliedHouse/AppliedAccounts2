@@ -22,7 +22,6 @@ namespace AppliedAccounts.Pages.Sale
 
         }
 
-
         #region Delete
         public async void Delete(long ID)
         {

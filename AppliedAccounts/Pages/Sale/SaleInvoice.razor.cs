@@ -91,8 +91,12 @@ namespace AppliedAccounts.Pages.Sale
 
             if (IsSaved)
             {
-                ToastService.ShowToast(ToastClass.SaveToast, $"Save | {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
+                ToastService.ShowToast(ToastClass.SaveToast, $"Saved | {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
                 NavManager.NavigateTo($"/Sale/SaleInvoice/{MyModel.MyVoucher.Master.ID1}");
+            }
+            else
+            {
+                ToastService.ShowToast(ToastClass.ErrorToast, $"Not Saved | {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
             }
         }
         #endregion
@@ -124,7 +128,7 @@ namespace AppliedAccounts.Pages.Sale
 
         public void TestRecord()
         {
-
+            MyModel.TestData();
         }
 
         #endregion

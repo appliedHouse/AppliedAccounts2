@@ -1,10 +1,12 @@
 ﻿using AppliedDB;
 using AppliedGlobals;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Data.Sqlite;
 using System.Data;
+using System.Runtime.Serialization;
 using System.Text;
 using static AppliedDB.Enums;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
-using Microsoft.Data.Sqlite;
 
 namespace AppliedAccounts.Data
 {
@@ -77,12 +79,12 @@ namespace AppliedAccounts.Data
             var _CommandText = string.Empty;
 
             #region return if table exist
-            if (string.IsNullOrEmpty(MyConnection.ConnectionString))
+            if (MyConnection != null)
             {
                 _CommandText = $"SELECT count(name) FROM Sqlite_master WHERE type in('table', 'view') AND name ='{_TableName}'";
                 _Command = new SqliteCommand(_CommandText, MyConnection);
                 if (!MyConnection.State.Equals(ConnectionState.Open)) { MyConnection.Open(); }
-                long TableExist = (long)_Command.ExecuteScalar();
+                long TableExist = (long)_Command.ExecuteScalar()!;
                 if (TableExist > 0) { return; }
             }
             #endregion
@@ -261,6 +263,10 @@ namespace AppliedAccounts.Data
                     _CommandText = view_Receipts();
                     break;
 
+                case Tables.IdGenerator:
+                    _CommandText = IdGenerator();
+                    break;
+
 
                 default:
                     break;
@@ -292,7 +298,7 @@ namespace AppliedAccounts.Data
 
         }
 
-
+       
 
         #endregion
 
@@ -755,5 +761,18 @@ namespace AppliedAccounts.Data
         }
         #endregion
 
+        
+        #region ID Generator Table
+        private string IdGenerator()
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("CREATE TABLE IdGenerator (");
+            _Text.AppendLine("    TableName TEXT PRIMARY KEY,");
+            _Text.AppendLine("    LastId INTEGER NOT NULL");
+            _Text.AppendLine(");");
+
+            return _Text.ToString();
+        }
+        #endregion
     }
 }

@@ -268,8 +268,8 @@ namespace AppliedAccounts.Data
                     break;
             }
 
-            if (SQLAction == "Insert") { var cmd = AppliedDB.Commands.Insert(CurrentRow, DataFile); cmd?.Connection.Open(); cmd?.ExecuteNonQuery(); cmd?.Connection.Close(); return true; }
-            if (SQLAction == "Update") { var cmd = AppliedDB.Commands.UpDate(CurrentRow, DataFile); cmd?.Connection.Open(); cmd?.ExecuteNonQuery(); cmd?.Connection.Close(); return true; }
+            if (SQLAction == "Insert") { var cmd = AppliedDB.CommandConstructor.Commands.Insert(CurrentRow, DataFile); cmd?.Connection.Open(); cmd?.ExecuteNonQuery(); cmd?.Connection.Close(); return true; }
+            if (SQLAction == "Update") { var cmd = AppliedDB.CommandConstructor.Commands.UpDate(CurrentRow, DataFile); cmd?.Connection.Open(); cmd?.ExecuteNonQuery(); cmd?.Connection.Close(); return true; }
             return false;
         }
         public static int ExpDays(string DataFile)

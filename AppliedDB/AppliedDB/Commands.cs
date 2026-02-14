@@ -2,152 +2,154 @@
 using Microsoft.Data.Sqlite;
 using System.Data;
 using System.Text;
+using static AppliedDB.CommandConstructor;
 using Messages = AppMessages.Enums.Messages;
 
 namespace AppliedDB
 {
-    public class Commands
-    {
-        public static SqliteCommand? Insert(DataRow CurrentRow, SqliteConnection DBConnection)
-        {
-            if (CurrentRow.Field<long>("ID") == 0)
-            {
-                DataColumnCollection _Columns = CurrentRow.Table.Columns;
 
-                StringBuilder _CommandString = new();
-                string _LastColumn = _Columns[_Columns.Count - 1].ColumnName.ToString();
-                string _TableName = CurrentRow.Table.TableName;
-                string _ParameterName;
-                if (_TableName == "") { return null; }
-                _CommandString.Append("INSERT INTO [");
-                _CommandString.Append(_TableName);
-                _CommandString.Append("] VALUES (");
+    //public class Commands
+    //{
+    //    public static SqliteCommand? Insert(DataRow CurrentRow, SqliteConnection DBConnection)
+    //    {
+    //        if (CurrentRow.Field<long>("ID") == 0)
+    //        {
+    //            DataColumnCollection _Columns = CurrentRow.Table.Columns;
 
-                foreach (DataColumn _Column in _Columns)
-                {
-                    string _ColumnName = _Column.ColumnName.ToString();
-                    _CommandString.Append(string.Concat('@', _Column.ColumnName));
-                    if (_ColumnName != _LastColumn)
-                    { _CommandString.Append(','); }
-                    else
-                    { _CommandString.Append(") "); }
-                }
+    //            StringBuilder _CommandString = new();
+    //            string _LastColumn = _Columns[_Columns.Count - 1].ColumnName.ToString();
+    //            string _TableName = CurrentRow.Table.TableName;
+    //            string _ParameterName;
+    //            if (_TableName == "") { return null; }
+    //            _CommandString.Append("INSERT INTO [");
+    //            _CommandString.Append(_TableName);
+    //            _CommandString.Append("] VALUES (");
 
-                SqliteCommand _Command = new SqliteCommand(_CommandString.ToString(), DBConnection);
+    //            foreach (DataColumn _Column in _Columns)
+    //            {
+    //                string _ColumnName = _Column.ColumnName.ToString();
+    //                _CommandString.Append(string.Concat('@', _Column.ColumnName));
+    //                if (_ColumnName != _LastColumn)
+    //                { _CommandString.Append(','); }
+    //                else
+    //                { _CommandString.Append(") "); }
+    //            }
 
-                foreach (DataColumn _Column in _Columns)
-                {
-                    if (_Column == null) { continue; }
-                    _ParameterName = string.Concat('@', _Column.ColumnName.Replace(" ", ""));
-                    _Command.Parameters.AddWithValue(_ParameterName, CurrentRow[_Column.ColumnName]);
-                }
+    //            SqliteCommand _Command = new SqliteCommand(_CommandString.ToString(), DBConnection);
 
-                if (CurrentRow.Field<long>("ID") == 0)
-                {
-                    CurrentRow["ID"] = DataSource.GetMaxID(_TableName, DBConnection.ConnectionString);
-                    _Command.Parameters["@ID"].Value = CurrentRow["ID"];
-                }
+    //            foreach (DataColumn _Column in _Columns)
+    //            {
+    //                if (_Column == null) { continue; }
+    //                _ParameterName = string.Concat('@', _Column.ColumnName.Replace(" ", ""));
+    //                _Command.Parameters.AddWithValue(_ParameterName, CurrentRow[_Column.ColumnName]);
+    //            }
 
-                return _Command;
-            }
-            return null;
-        }
-        public static SqliteCommand? Insert(DataRow CurrentRow, string DBFile)
-        {
-            var _Connection = Connections.GetClientConnection(DBFile);
-            if (_Connection is not null)
-            {
-                return Insert(CurrentRow, _Connection);
-            }
-            return null;
-        }
-        public static SqliteCommand? UpDate(DataRow CurrentRow, SqliteConnection DBConnection)
-        {
-            //if (CurrentRow.RowState == DataRowState.Modified)
-            if (CurrentRow.Field<long>("ID") != 0)
-            {
-                var _TableName = CurrentRow.Table.TableName;
-                var _Columns = CurrentRow.Table.Columns;
-                var _CommandString = new StringBuilder();
-                var _LastColumn = _Columns[_Columns.Count - 1].ColumnName.ToString();
+    //            //if (CurrentRow.Field<long>("ID") == 0)
+    //            //{
+    //            //    CurrentRow["ID"] = DataSource.GetMaxID(_TableName, DBConnection.ConnectionString);
+    //            //    _Command.Parameters["@ID"].Value = CurrentRow["ID"];
+    //            //}
 
-                _CommandString.Append(string.Concat("UPDATE [", _TableName, "] SET "));
+    //            return _Command;
+    //        }
+    //        return null;
+    //    }
+    //    public static SqliteCommand? Insert(DataRow CurrentRow, string DBFile)
+    //    {
+    //        var _Connection = Connections.GetClientConnection(DBFile);
+    //        if (_Connection is not null)
+    //        {
+    //            return Insert(CurrentRow, _Connection);
+    //        }
+    //        return null;
+    //    }
+    //    public static SqliteCommand? UpDate(DataRow CurrentRow, SqliteConnection DBConnection)
+    //    {
+    //        //if (CurrentRow.RowState == DataRowState.Modified)
+    //        if (CurrentRow.Field<long>("ID") != 0)
+    //        {
+    //            var _TableName = CurrentRow.Table.TableName;
+    //            var _Columns = CurrentRow.Table.Columns;
+    //            var _CommandString = new StringBuilder();
+    //            var _LastColumn = _Columns[_Columns.Count - 1].ColumnName.ToString();
 
-                foreach (DataColumn _Column in _Columns)
-                {
-                    if (_Column.ColumnName == "ID") { continue; }
-                    _CommandString.Append(string.Concat("[", _Column.ColumnName, "]"));
-                    _CommandString.Append('=');
-                    _CommandString.Append(string.Concat('@', _Column.ColumnName.Replace(" ", "")));
+    //            _CommandString.Append(string.Concat("UPDATE [", _TableName, "] SET "));
 
-                    if (_Column.ColumnName == _LastColumn)
-                    {
-                        _CommandString.Append(string.Concat(" WHERE ID = @ID"));
-                    }
-                    else
-                    {
-                        _CommandString.Append(',');
-                    }
-                }
+    //            foreach (DataColumn _Column in _Columns)
+    //            {
+    //                if (_Column.ColumnName == "ID") { continue; }
+    //                _CommandString.Append(string.Concat("[", _Column.ColumnName, "]"));
+    //                _CommandString.Append('=');
+    //                _CommandString.Append(string.Concat('@', _Column.ColumnName.Replace(" ", "")));
 
-                SqliteCommand _Command = new SqliteCommand(_CommandString.ToString(), DBConnection);
+    //                if (_Column.ColumnName == _LastColumn)
+    //                {
+    //                    _CommandString.Append(string.Concat(" WHERE ID = @ID"));
+    //                }
+    //                else
+    //                {
+    //                    _CommandString.Append(',');
+    //                }
+    //            }
 
-                foreach (DataColumn _Column in _Columns)
-                {
-                    if (_Column == null) { continue; }
-                    var _ParameterName = string.Concat('@', _Column.ColumnName.Replace(" ", ""));
-                    _Command.Parameters.AddWithValue(_ParameterName, CurrentRow[_Column.ColumnName]);
-                }
+    //            SqliteCommand _Command = new SqliteCommand(_CommandString.ToString(), DBConnection);
 
-                return _Command;
-            }
-            return null;
+    //            foreach (DataColumn _Column in _Columns)
+    //            {
+    //                if (_Column == null) { continue; }
+    //                var _ParameterName = string.Concat('@', _Column.ColumnName.Replace(" ", ""));
+    //                _Command.Parameters.AddWithValue(_ParameterName, CurrentRow[_Column.ColumnName]);
+    //            }
 
-        }
-        public static SqliteCommand? UpDate(DataRow CurrentRow, string DBFile)
-        {
-            var _Connection = Connections.GetClientConnection(DBFile);
-            if (_Connection is not null)
-            {
-                return UpDate(CurrentRow, _Connection);
-            }
-            return null;
-        }
-        public static SqliteCommand? Delete(DataRow CurrentRow, SqliteConnection DBConnection)
-        {
-            if (CurrentRow.Field<long>("ID") != 0)
-            {
-                var _TableName = CurrentRow.Table.TableName;
-                if (_TableName == "") { return null; }
-                var _Command = new SqliteCommand("", DBConnection);
-                _Command.Parameters.AddWithValue("@ID", CurrentRow["ID"]);
-                _Command.CommandText = $"DELETE FROM [{_TableName}] WHERE ID=@ID";
-                return _Command;
-            }
-            return null;
+    //            return _Command;
+    //        }
+    //        return null;
 
-        }
-        public static SqliteCommand? Delete(DataRow CurrentRow, string DBFile)
-        {
-            if (CurrentRow.Field<long>("ID") != 0)
-            {
-                var _TableName = CurrentRow.Table.TableName;
-                var _Connection = Connections.GetClientConnection(DBFile);
-                using var _Command = new SqliteCommand("", _Connection);
+    //    }
+    //    public static SqliteCommand? UpDate(DataRow CurrentRow, string DBFile)
+    //    {
+    //        var _Connection = Connections.GetClientConnection(DBFile);
+    //        if (_Connection is not null)
+    //        {
+    //            return UpDate(CurrentRow, _Connection);
+    //        }
+    //        return null;
+    //    }
+    //    public static SqliteCommand? Delete(DataRow CurrentRow, SqliteConnection DBConnection)
+    //    {
+    //        if (CurrentRow.Field<long>("ID") != 0)
+    //        {
+    //            var _TableName = CurrentRow.Table.TableName;
+    //            if (_TableName == "") { return null; }
+    //            var _Command = new SqliteCommand("", DBConnection);
+    //            _Command.Parameters.AddWithValue("@ID", CurrentRow["ID"]);
+    //            _Command.CommandText = $"DELETE FROM [{_TableName}] WHERE ID=@ID";
+    //            return _Command;
+    //        }
+    //        return null;
 
-                if (_TableName == "")
-                {
-                    return null;
-                }
+    //    }
+    //    public static SqliteCommand? Delete(DataRow CurrentRow, string DBFile)
+    //    {
+    //        if (CurrentRow.Field<long>("ID") != 0)
+    //        {
+    //            var _TableName = CurrentRow.Table.TableName;
+    //            var _Connection = Connections.GetClientConnection(DBFile);
+    //            using var _Command = new SqliteCommand("", _Connection);
 
-                _Command.Parameters.AddWithValue("@ID", CurrentRow["ID"]);
-                _Command.CommandText = $"DELETE FROM [{_TableName}] WHERE ID=@ID";
-                return _Command;
-            }
-            return null;
-        }
+    //            if (_TableName == "")
+    //            {
+    //                return null;
+    //            }
 
-    }
+    //            _Command.Parameters.AddWithValue("@ID", CurrentRow["ID"]);
+    //            _Command.CommandText = $"DELETE FROM [{_TableName}] WHERE ID=@ID";
+    //            return _Command;
+    //        }
+    //        return null;
+    //    }
+
+    //}
     public class CommandClass
     {
         public SqliteCommand CommandInsert { get; set; } = new();
@@ -189,6 +191,22 @@ namespace AppliedDB
             CommandInsert = Commands.Insert(Row, DBConnection)!;
             CommandUpdate = Commands.UpDate(Row, DBConnection)!;
             CommandDelete = Commands.Delete(Row, DBConnection)!;
+        }
+
+        public CommandClass(DataRow _Row, SqliteConnection DBConnection, SqliteTransaction Transaction)
+        {
+            Row = _Row;
+
+            if (_Row.Field<long>("ID") == 0) { Action = "Insert"; }
+            else { Action = "Update"; }
+
+            CommandInsert = Commands.Insert(Row, DBConnection)!;
+            CommandUpdate = Commands.UpDate(Row, DBConnection)!;
+            CommandDelete = Commands.Delete(Row, DBConnection)!;
+
+            if (CommandInsert != null) { CommandInsert.Transaction = Transaction; }
+            if (CommandUpdate != null) { CommandUpdate.Transaction = Transaction; }
+            if (CommandDelete != null) { CommandDelete.Transaction = Transaction; }
         }
 
         #endregion
@@ -245,12 +263,9 @@ namespace AppliedDB
                         CommandInsert.Transaction.Save(savePoint);
                     }
 
-                    // Get next ID
-                    using var cmdMaxID = CommandInsert.Connection.CreateCommand();
-                    cmdMaxID.Transaction = CommandInsert.Transaction;
-                    cmdMaxID.CommandText = $"SELECT IFNULL(MAX(ID),0) + 1 FROM [{Row.Table.TableName}]";
-
-                    var nextId = (long)cmdMaxID.ExecuteScalar()!;
+                    var _Connection = CommandInsert.Connection;
+                    var _Transaction = CommandInsert.Transaction;
+                    var nextId = GetNextId(_Connection, _Transaction, Row.Table.TableName);  //  (long)cmdMaxID.ExecuteScalar()!;
                     CommandInsert.Parameters["@ID"].Value = nextId;
 
                     Effected = CommandInsert.ExecuteNonQuery();
@@ -258,7 +273,7 @@ namespace AppliedDB
 
                     // Release savepoint if used
                     if (savePoint != null) { CommandInsert.Transaction!.Release(savePoint); }
-                        
+
 
                     MyMessages.Add(Messages.Save);
                     return true;
@@ -275,6 +290,51 @@ namespace AppliedDB
             }
 
             return false;
+        }
+
+        public static long GetNextId(SqliteConnection connection, SqliteTransaction? transaction, string tableName)
+        {
+            using var cmd = connection.CreateCommand();
+
+            // Assign transaction only if it's not null
+            if (transaction != null)
+                cmd.Transaction = transaction;
+
+            // 1️⃣ Check if IdGenerator row exists
+            cmd.CommandText = "SELECT LastId FROM IdGenerator WHERE TableName = @name";
+            cmd.Parameters.AddWithValue("@name", tableName);
+            var result = cmd.ExecuteScalar();
+
+            if (result == null)
+            {
+                // 2️⃣ Row does not exist → get max ID from main table
+                cmd.CommandText = $"SELECT IFNULL(MAX(ID),0) FROM [{tableName}]";
+                var maxId = Convert.ToInt64(cmd.ExecuteScalar()!);
+
+                // 3️⃣ Insert row with LastId = maxId
+                cmd.CommandText = "INSERT INTO IdGenerator (TableName, LastId) VALUES (@name, @lastId)";
+
+                // Clear parameters and add new ones to avoid duplicate parameter error
+                cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("@name", tableName);
+                cmd.Parameters.AddWithValue("@lastId", maxId);
+                cmd.ExecuteNonQuery();
+
+                result = maxId;
+            }
+
+            // 4️⃣ Increment LastId atomically
+            cmd.CommandText = "UPDATE IdGenerator SET LastId = LastId + 1 WHERE TableName = @name";
+            cmd.Parameters.Clear();
+            cmd.Parameters.AddWithValue("@name", tableName);
+            cmd.ExecuteNonQuery();
+
+            // 5️⃣ Return new LastId
+            cmd.CommandText = "SELECT LastId FROM IdGenerator WHERE TableName = @name";
+            cmd.Parameters.Clear();
+            cmd.Parameters.AddWithValue("@name", tableName);
+
+            return Convert.ToInt64(cmd.ExecuteScalar()!);
         }
 
 
