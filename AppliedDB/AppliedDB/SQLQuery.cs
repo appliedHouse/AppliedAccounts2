@@ -608,6 +608,32 @@ namespace AppliedDB
         }
         #endregion
 
+        #region JV (Journal Voucher)
+        public static string JV()
+        {
+            var _Text = new StringBuilder();
+            return "SELECT * FROM [ledger] [L]";
+        }
+
+        public static string View_JV()
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("SELECT[L].*,");
+            _Text.AppendLine("[A].[Title] [TitleAccount],");
+            _Text.AppendLine("[C].[Title] [TitleCompany],");
+            _Text.AppendLine("[E].[Title] [TitleEmployee],");
+            _Text.AppendLine("[P].[Title] [TitleProject],");
+            _Text.AppendLine("[I].[Title] [TitleStock]");
+            _Text.AppendLine("FROM [ledger] [L] ");
+            _Text.AppendLine("LEFT JOIN[COA]       [A] ON[A].[ID] = [L].[COA]");
+            _Text.AppendLine("LEFT JOIN[Customers] [C] ON[C].[ID] = [L].[Customer]");
+            _Text.AppendLine("LEFT JOIN[Employees] [E] ON[E].[ID] = [L].[Employee]");
+            _Text.AppendLine("LEFT JOIN[Project]   [P] ON[P].[ID] = [L].[Project]");
+            _Text.AppendLine("LEFT JOIN[Inventory] [I] ON[I].[ID] = [L].[Inventory]");
+            return _Text.ToString();
+        }
+
+        #endregion
 
         public static QueryClass GetQuery(Query _SQLQuery)
         {
@@ -629,6 +655,7 @@ namespace AppliedDB
             if (_SQLQuery.Equals(Query.Chk_BillReceivable2)) { return new QueryClass { QueryText = Chk_BillReceivable2(), TableName = Tables.Chk_BillReceivable2.ToString() }; }
             if (_SQLQuery.Equals(Query.Book)) { return new QueryClass { QueryText = Book(), TableName = Tables.Book.ToString() }; }
             if (_SQLQuery.Equals(Query.Book2)) { return new QueryClass { QueryText = Book2(), TableName = Tables.Book2.ToString() }; }
+            if (_SQLQuery.Equals(Query.JV)) { return new QueryClass { QueryText = JV(), TableName = Tables.Book2.ToString() }; }
 
 
             return new QueryClass();

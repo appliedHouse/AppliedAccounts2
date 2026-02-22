@@ -225,8 +225,11 @@ namespace AppliedDB
             {
                 try
                 {
-                    if (CommandUpdate.Connection!.State != ConnectionState.Open)
-                        CommandUpdate.Connection.Open();
+                    if (CommandUpdate.Transaction == null)
+                    {
+                        if (CommandUpdate.Connection!.State != ConnectionState.Open)
+                            CommandUpdate.Connection.Open();
+                    }
 
                     Effected = CommandUpdate.ExecuteNonQuery();
                     PrimaryKeyID = (long)CommandUpdate.Parameters["@ID"].Value!;
@@ -252,9 +255,11 @@ namespace AppliedDB
             {
                 try
                 {
-                    if (CommandInsert.Connection!.State != ConnectionState.Open)
-                        CommandInsert.Connection.Open();
-
+                    if (CommandInsert.Transaction == null)
+                    {
+                        if (CommandInsert.Connection!.State != ConnectionState.Open)
+                            CommandInsert.Connection.Open();
+                    }
                     // Only create savepoint if transaction exists
                     string savePoint = null!;
                     if (CommandInsert.Transaction != null)

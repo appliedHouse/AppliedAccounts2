@@ -1,7 +1,10 @@
-﻿using AppliedDB;
+﻿using AppliedAccounts.Pages.Accounts;
+using AppliedAccounts.Pages.Menu;
+using AppliedDB;
 using AppliedGlobals;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
 using System.Data;
 using System.Runtime.Serialization;
 using System.Text;
@@ -159,6 +162,7 @@ namespace AppliedAccounts.Data
                     break;
                 case Tables.JVList:
                     break;
+              
                 case Tables.Customers:
                     break;
                 case Tables.City:
@@ -209,7 +213,8 @@ namespace AppliedAccounts.Data
                     break;
                 case Tables.Ledger:
                     break;
-                case Tables.view_Ledger:
+                case Tables.View_Ledger:
+                    _CommandText = View_Ledger();
                     break;
                 case Tables.CashBookTitles:
                     break;
@@ -298,7 +303,29 @@ namespace AppliedAccounts.Data
 
         }
 
-       
+        private string View_Ledger()
+        {
+            var _Text = new StringBuilder();
+
+            _Text.AppendLine("CREATE VIEW [View_Ledger] AS ");
+            _Text.AppendLine("SELECT ");
+            _Text.AppendLine("       [L].*,");
+            _Text.AppendLine("       [A].[Title] AS [TitleAccount],");
+            _Text.AppendLine("       [C].[Title] AS [TitleCompany],");
+            _Text.AppendLine("       [E].[Title] AS [TitleEmployee],");
+            _Text.AppendLine("       [P].[Title] AS [TitleProject],");
+            _Text.AppendLine("       [I].[Title] AS [TitleStock]");
+            _Text.AppendLine("FROM [ledger] [L]");
+            _Text.AppendLine("       LEFT JOIN [COA] [A] ON [A].[ID] = [L].[COA]");
+            _Text.AppendLine("       LEFT JOIN [Customers] [C] ON [C].[ID] = [L].[Customer]");
+            _Text.AppendLine("       LEFT JOIN [Employees] [E] ON [E].[ID] = [L].[Employee]");
+            _Text.AppendLine("       LEFT JOIN [Project] [P] ON [P].[ID] = [L].[Project]");
+            _Text.AppendLine("       LEFT JOIN [Inventory] [I] ON [I].[ID] = [L].[Inventory];");
+
+            return _Text.ToString();
+        }
+
+
 
         #endregion
 

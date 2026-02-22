@@ -1,7 +1,7 @@
 ﻿
 // Source : https://stackoverflow.com/questions/2600746/print-value-of-number-int-spelled-out
 
-namespace Applied_WebApplication.Data
+namespace AppliedAccounts.Data
 {
     public class NumInWords
     {
@@ -301,6 +301,7 @@ namespace Applied_WebApplication.Data
             }
             return cts;
         }
+
     }
 }
 

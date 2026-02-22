@@ -9,7 +9,6 @@ using Messages = AppMessages.Enums.Messages;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
 using Enums = AppliedDB.Enums;
 using AppMessages;
-using Applied_WebApplication.Data;
 
 namespace AppliedAccounts.Models
 {

@@ -1,0 +1,110 @@
+﻿@page "/Accounts/JVList"
+@attribute [Authorize]
+@using AppliedAccounts.Libs
+@using AppliedAccounts.Models.Accounts
+@using AppliedDB
+@inject GlobalService AppGlobal
+@inject PrintService ReportService
+@inject ToastService ToastService
+
+
+@code {
+
+    protected override void OnInitialized()
+    {
+     
+        MyModel ??= new JVListViewModel();
+        Source = new DataSource(AppGlobal.AppPaths);
+        GetKeys();
+        LoadData();
+
+
+    }
+}
+
+
+
+<ShowPageHeading PageTitle="Journal Vouchers (JVs) List" />
+<ShowMessages MsgClass="MsgClass" />
+
+
+@if (MyModel.IsWaiting)
+{
+    <ShowWaiting MyMessage="Printing Report....." />
+}
+else
+{
+    <EditForm Model="@MyModel">
+        <div class="d-flex flex-row mb-3 filter" hidden="@MyModel.IsWaiting">
+
+            <div class="p-2">
+                <InputDate id="dateStat" class="item-height" @bind-Value="MyModel.Date1">
+
+                </InputDate>
+            </div>
+            <div class="p-2">
+                <InputDate id="dateEnd" class="item-height" @bind-Value="MyModel.Date2">
+
+                </InputDate>
+            </div>
+            <div class="p-2 search-btn">
+                <label for="floatingInput">
+                    <InputText id="txtSearch" class="item-height" placeholder="Filter list"
+                               @bind-Value="MyModel.SearchText"
+                               @onclick="Refresh">
+                    </InputText>
+                </label>
+            </div>
+            <div class="p-2">
+                <Btn_Refresh OnClick="Refresh" />
+                <Btn_Add OnClick="New" />
+            </div>
+
+        </div>
+         <div class="container">
+       
+            <table class="table-list">
+                <thead>
+                    <tr>
+                        <th style="width:8%">Voucher</th>
+                        <th style="width:8%">Date</th>
+                        <th style="width:10%">Reference</th>
+                        <th style="width:10%">Debit</th>
+                        <th style="width:10%">Credit</th>
+                        <th style="width:45%">Description</th>
+                        <th style="width:9%">
+                            <button class="btn btn-Add"><i class="bi bi-pencil-fill"></i></button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (JVListDataModel Record in JVItems )
+                    {
+                        string _NavTo = $"/Accounts/JV/{Record.Vou_No}";
+                        <tr>
+                            <td>@Record.Vou_No</td>
+                            <td>@Record.Vou_Date.ToString(Format.DDMMMYY)</td>
+                            <td class="left">@Record.Ref_No</td>
+                            <td class="amount">@Record.DR</td>
+                            <td class="amount">@Record.CR</td>
+                            <td class="left">@Record.Description</td>
+                            <td>
+                                <EditButton NavTo=@_NavTo Title="Edit Voucher" />
+                                <PrintButton ReturnValue="Print" VoucherID=Record.ID />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+             <div class="d-flex">
+                   <div class="p-1" style="height:40px">
+                       <NavPageBar Paging="Pages"></NavPageBar>
+                   </div>
+            </div>
+       
+    </div>
+
+
+    </EditForm>
+}

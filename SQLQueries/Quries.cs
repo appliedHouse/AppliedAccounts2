@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿using System.Net.NetworkInformation;
+using System.Text;
+using System.Text.RegularExpressions;
+using static System.Net.WebRequestMethods;
 
 namespace SQLQueries
 {
@@ -455,6 +458,62 @@ namespace SQLQueries
             return _Text.ToString();
 
         }
+        #endregion
+
+        #region Journal Voucher (JV)
+        public static string JournalVoucher()
+        {
+            var _Text = new StringBuilder();
+
+            _Text.AppendLine("SELECT [L].*,");
+            _Text.AppendLine("[A].[Title] AS [TitleAccount],");
+            _Text.AppendLine("[C].[Title] AS [TitleCompany],");
+            _Text.AppendLine("[E].[Title] AS [TitleEmployee],");
+            _Text.AppendLine("[P].[Title] AS [TitleProject]");
+            _Text.AppendLine("FROM [Ledger] [L]");
+            _Text.AppendLine("LEFT JOIN [COA]       [A] ON [A].[ID] = [L].[COA]");
+            _Text.AppendLine("LEFT JOIN [Customers] [C] ON [C].[ID] = [L].[Customer]");
+            _Text.AppendLine("LEFT JOIN [Employees] [E] ON [E].[ID] = [L].[Employee]");
+            _Text.AppendLine("LEFT JOIN [Project]   [P] ON [P].[ID] = [L].[Project]");
+            //if (_Filter.Length > 0)
+            //{
+            //    _Text.AppendLine($"WHERE {_Filter}");
+            //}
+            return _Text.ToString();
+        }
+        #endregion
+
+        #region Journal Voucher List
+        public static string JournalVoucherList(string _Filter)
+        {
+            var _Text = new StringBuilder();
+
+            _Text.AppendLine("SELECT * FROM (");
+            _Text.AppendLine("SELECT");
+            _Text.AppendLine("    Vou_No,");
+            _Text.AppendLine("    MIN(SR_NO) AS First_SR_NO,");
+            _Text.AppendLine("    Vou_Type,");
+            _Text.AppendLine("    Vou_Date,");
+            _Text.AppendLine("    Ref_No,");
+            _Text.AppendLine("    Description,");
+            _Text.AppendLine("    Comments,");
+            _Text.AppendLine("    SUM(DR) AS DR,");
+            _Text.AppendLine("    SUM(CR) AS CR,");
+            _Text.AppendLine("    Status");
+            _Text.AppendLine("FROM Ledger");
+            _Text.AppendLine("GROUP BY Vou_No");
+            _Text.AppendLine(") AS [Vouchers] ");
+            
+            if (!string.IsNullOrWhiteSpace(_Filter))
+            {
+                _Text.AppendLine($" WHERE {_Filter}");
+            }
+
+            
+
+            return _Text.ToString();
+        }
+
         #endregion
     }
 }

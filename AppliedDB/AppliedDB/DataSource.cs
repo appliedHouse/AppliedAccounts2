@@ -1,6 +1,7 @@
 ﻿using AppliedGlobals;
 using AppMessages;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
 using System.Data;
 using System.Text;
 using static AppliedDB.Enums;
@@ -226,7 +227,7 @@ namespace AppliedDB
 
         #region Get Table Static
 
-       
+
         public static DataTable GetDataTable(Tables _Table, SqliteCommand _Command)
         {
             try
@@ -326,7 +327,7 @@ namespace AppliedDB
                 using var reader = command.ExecuteReader();
                 var dt = GetDataTableExtention(reader);
 
-                if(dt.Rows.Count == 0) { dt.Load(reader); }             // try again to load data directly. if not found...
+                if (dt.Rows.Count == 0) { dt.Load(reader); }             // try again to load data directly. if not found...
 
 
                 dt.TableName = table.ToString();
@@ -416,8 +417,8 @@ namespace AppliedDB
         public DataRow? GetDataRow(Tables _Table, long ID)
         {
             var _Connection = Connections.GetSqliteConnection(MyConnection.DataSource)!;
-            var _DataTable =  GetDataTable(_Table, _Connection,$"ID={ID}");
-            if(_DataTable.Rows.Count > 0)
+            var _DataTable = GetDataTable(_Table, _Connection, $"ID={ID}");
+            if (_DataTable.Rows.Count > 0)
             {
                 DataRow row = _DataTable.Rows[0];
                 row.AcceptChanges();                    // Add here to Rowstate must be unchanged
@@ -818,7 +819,7 @@ namespace AppliedDB
             // Create this function due to command.transaction issue.
             // Create a new connection without transaction to avoid error in transaction mode.
             var _Connection = Connections.GetSqliteConnectionbyString(ConnectionString);
-            DataTable _DataTable = GetDataTable(_Table,_Connection!);
+            DataTable _DataTable = GetDataTable(_Table, _Connection!);
             if (_DataTable.Rows.Count == 0) { return 1; }
             long _MaxID = (long)_DataTable.Compute("MAX(ID)", "") + 1;
             _DataTable.Dispose();
@@ -851,7 +852,7 @@ namespace AppliedDB
             var _Text = $"SELECT Max(ID) AS MaxID FROM[{_Table}]";
             var _DataTable = GetTable(_Text);
             if (_DataTable.Rows.Count == 0) { return 1; }
-            long _MaxID = _DataTable.Rows[0].Field<long>("MaxID") ;
+            long _MaxID = _DataTable.Rows[0].Field<long>("MaxID");
             _DataTable.Dispose();
             return _MaxID + 1;
         }
@@ -1036,10 +1037,13 @@ namespace AppliedDB
 
         public DataTable? GetJV(string Vou_No)
         {
-            if (string.IsNullOrEmpty(Vou_No))
+            if (!string.IsNullOrEmpty(Vou_No))
             {
-                var QueryText = $"SELECT * FROM [ledger] WHERE [Vou_No] = '{Vou_No}'";
-                using var _Table = GetDataTable(DBFile, QueryText, "Ledger");
+
+                var _Filter = $"Vou_No = '{Vou_No}'";
+                var _Query = SQLQueries.Quries.JournalVoucher();
+                
+                using var _Table = GetTable(_Query, _Filter, "Sr_No");
                 if (_Table != null && _Table.Columns.Count > 0)
                 {
                     return _Table;
@@ -1109,7 +1113,7 @@ namespace AppliedDB
             MyCommands = new(newRow, MyConnection);
             if (DBtransaction != null)
             {
-                if(MyCommands.CommandInsert != null) { MyCommands.CommandInsert.Transaction = DBtransaction; }
+                if (MyCommands.CommandInsert != null) { MyCommands.CommandInsert.Transaction = DBtransaction; }
                 if (MyCommands.CommandUpdate != null) { MyCommands.CommandUpdate.Transaction = DBtransaction; }
                 if (MyCommands.CommandDelete != null) { MyCommands.CommandDelete.Transaction = DBtransaction; }
             }
@@ -1130,6 +1134,10 @@ namespace AppliedDB
 
         #region Get Registry Keys
 
+        public void SetKey(string Key, object KeyValue, KeyTypes keytype)
+        {
+            SetKey(Key, KeyValue, keytype, string.Empty);
+        }
         public void SetKey(string Key, object KeyValue, KeyTypes keytype, string _Title)
         {
             if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
@@ -1148,12 +1156,14 @@ namespace AppliedDB
             {
                 //SQLAction = "Insert";
                 CurrentRow = TB_Registry.NewRow();
-                CurrentRow["ID"] = GetMaxID(Tables.Registry, MyConnection);
+                CurrentRow["ID"] = 0;   //GetMaxID(Tables.Registry, MyConnection);
             }
 
+            if (_Title != null) { CurrentRow["Title"] = _Title; }
             CurrentRow["Code"] = Key;
             CurrentRow["Title"] = _Title;
             CurrentRow["UserName"] = DBFile;
+
             switch (keytype)
             {
                 case KeyTypes.Number:
@@ -1191,7 +1201,7 @@ namespace AppliedDB
         {
 
             object ReturnValue;
-            var Registry = GetTable(Tables.Registry, $" WHERE Code = '{Key}'");
+            var Registry = GetTable(Tables.Registry, $" Code = '{Key}'");
 
             if (Registry.Rows.Count == 1)
             {
@@ -1203,6 +1213,8 @@ namespace AppliedDB
                     KeyTypes.Boolean => Row["bValue"],
                     KeyTypes.Date => Row["dValue"],
                     KeyTypes.Text => Row["cValue"],
+                    KeyTypes.From => Row["From"],
+                    KeyTypes.To => Row["To"],
                     _ => string.Empty
                 };
             }
@@ -1215,6 +1227,8 @@ namespace AppliedDB
                     KeyTypes.Boolean => false,
                     KeyTypes.Date => DateTime.Now,
                     KeyTypes.Text => string.Empty,
+                    KeyTypes.From => DateTime.MinValue,
+                    KeyTypes.To => DateTime.Now,
                     _ => string.Empty
                 };
             }
@@ -1328,12 +1342,14 @@ namespace AppliedDB
                     {
                         _DataType = typeof(int);
                     }
+                    else if(upperColumnName == "DR" ||
+                            upperColumnName == "CR")
+                    {
+                        _DataType = typeof(decimal);
+                    }
 
                     dt.Columns.Add(_ColumnName, _DataType);
                 }
-
-                var _Stop = true;
-
 
                 while (_reader.Read())
                 {
@@ -1469,7 +1485,7 @@ namespace AppliedDB
 
         public DataRow RemoveNullValues(DataRow row)
         {
-            
+
             foreach (DataColumn column in row.Table.Columns)
             {
                 if (row.IsNull(column))

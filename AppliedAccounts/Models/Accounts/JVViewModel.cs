@@ -1,10 +1,11 @@
-﻿namespace AppliedAccounts.Models.Accounts
+﻿using AppliedAccounts.Pages.Accounts.Post;
+namespace AppliedAccounts.Models.Accounts
 {
     public class JVViewModel
     {
         public long ID { get; set; }
         public long TranId { get; set; }
-        public string Vou_Type { get; set; }
+        public string Vou_Type { get; set; } = PostingTypes.JV.ToString();
         public string Vou_No { get; set; } = "New";
         public DateTime Vou_Date { get; set; }
         public int Sr_No { get; set; }

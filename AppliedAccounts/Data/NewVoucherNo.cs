@@ -62,10 +62,10 @@ namespace AppliedAccounts.Data
             return GetNewVoucherNo(_DBFile, Tables.Receipts, "RV", _VouDate);
         }
 
-        //public static string GetJournalVoucher(string _DBFile, DateTime _VouDate)
-        //{
-        //    return GetNewVoucherNo(_DBFile, Tables.JVList, "JV", _VouDate);
-        //}
+        public static string GetJournalVoucher(string _DBFile, DateTime _VouDate)
+        {
+            return GetNewVoucherNo(_DBFile, Tables.Ledger, "JV", _VouDate);
+        }
 
     }
 

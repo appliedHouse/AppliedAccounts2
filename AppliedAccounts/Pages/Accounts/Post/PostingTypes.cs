@@ -10,7 +10,7 @@
         BillReceivable = 5,
         Payment = 6,
         Receipt = 7,
-        JournalVoucher = 8,
+        JV = 8,
         SalesReturn = 9,
         Production = 10,
     }

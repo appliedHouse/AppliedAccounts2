@@ -202,7 +202,18 @@ namespace AppMessages
             };
         }
 
-       
+        public void AddReange(List<Message> messageList)
+        {
+            if (messageList.Count > 0)
+            {
+                foreach (Message message in messageList) 
+                {
+                    MessageList.Add(message);
+                }
+            }
+        }
+
+
         #endregion
     }
 }
