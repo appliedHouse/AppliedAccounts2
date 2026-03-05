@@ -76,9 +76,9 @@ namespace Menus
             _Menus.Add(new MenuItem { ID = 33, Title = "Reports", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 3, NavigateTo = "/Menu/Sale/Reports" }); 
 
             // Sub Menu Stock
-            _Menus.Add(new MenuItem { ID = 41, Title = "Dictionery", Active = true, Icon = "bi bi-journal-code", Level = 2, ParentID = 4, NavigateTo = "" });
-            _Menus.Add(new MenuItem { ID = 42, Title = "Production", Active = true, Icon = "bi bi-bricks", Level = 2, ParentID = 4, NavigateTo = "" });
-            _Menus.Add(new MenuItem { ID = 43, Title = "Reports", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 4, NavigateTo = "" });
+            _Menus.Add(new MenuItem { ID = 41, Title = "Dictionery", Active = true, Icon = "bi bi-journal-code", Level = 2, ParentID = 4, NavigateTo = "/Menu/Stock/Dictionery" });
+            _Menus.Add(new MenuItem { ID = 42, Title = "Production", Active = true, Icon = "bi bi-bricks", Level = 2, ParentID = 4, NavigateTo = "/Menu/Stock/Production" });
+            _Menus.Add(new MenuItem { ID = 43, Title = "Reports", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 4, NavigateTo = "/Menu/Stock/Reports" });
 
             // Sub Menu HR
             _Menus.Add(new MenuItem { ID = 51, Title = "Employees", Active = true, Icon = "bi bi-person-fill", Level = 2, ParentID = 5, NavigateTo = "" });

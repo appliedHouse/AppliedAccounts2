@@ -756,7 +756,7 @@ namespace AppliedDB
             if (DBFile.Length == 0) { return new(); }
             //========================================================
 
-            DataTable _DataTable;
+            //DataTable _DataTable;
             var _CommandText = _Query;
             var _Connection = Connections.GetClientConnection(DBFile);
             if (_Connection is not null)
@@ -769,7 +769,7 @@ namespace AppliedDB
                 dt.TableName = _TableName;
                 return dt;
             }
-            return null;
+            return null!;
         }
         public static List<Dictionary<long, string>> GetDataList(string DBFile, Tables _Table)
         {
@@ -912,7 +912,7 @@ namespace AppliedDB
                 _DataTable.Dispose();
                 return _NewRow;
             }
-            return null;
+            return null!;
         }
 
 

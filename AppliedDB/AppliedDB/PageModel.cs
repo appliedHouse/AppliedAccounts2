@@ -45,5 +45,10 @@
             for (int i = start; i <= end; i++)
                 PageList.Add(i);
         }
+
+        public string GetFilterString()
+        {
+            return $" LIMIT {Size} OFFSET {(Current - 1) * Size}";
+        }
     }
 }

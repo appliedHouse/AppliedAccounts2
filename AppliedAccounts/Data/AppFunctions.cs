@@ -15,7 +15,7 @@ namespace AppliedAccounts.Data
         public static Message Save(string DataFile, DataTable _Table, DataRow _Row)
         {
             var _ID = (int)_Row["ID"];
-            int _Effected;
+            //int _Effected;
 
 
             // _Message = (new MessageClass()).Empty;

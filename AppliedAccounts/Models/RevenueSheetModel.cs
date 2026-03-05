@@ -146,7 +146,7 @@ namespace AppliedAccounts.Models
         #region Record Save - (Insert - Update) 
         public void Save()
         {
-            var Effected = 0;
+            //var Effected = 0;
 
             if (TB_RevSheet is not null)
             {

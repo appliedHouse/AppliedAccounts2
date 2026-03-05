@@ -55,6 +55,7 @@
             RowValueNull = 115,
             RowNotValidated = 217,
 
+
             ColumnIsNull = 14,
             ColumnDBNullValue = 117,
             ColumnValueZero = 15,
@@ -180,6 +181,10 @@
             VoucherAmountIsZero = 600110,
             VoucherDateNotSame = 600111,
             VoucherAmountNotEqual = 600112,
+            PackingIdIsZero = 600114,
+            Row_PackingIdZero = 600115,
+            Row_SizeIDZero = 600116,
+            Row_SubCategoryIDZero = 600117,
         }
 
         public enum Class

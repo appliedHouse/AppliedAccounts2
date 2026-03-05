@@ -1,6 +1,7 @@
 ﻿using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
+using Org.BouncyCastle.Asn1.Esf;
 using System.Data;
 using Tables = AppliedDB.Enums.Tables;
 
@@ -36,14 +37,19 @@ namespace AppliedAccounts.Models
 
         public void LoadData()
         {
-            var _DataList = Source.GetTable(Tables.Inventory);
+            //var _DataList = Source.GetTable(Tables.Inventory);
             Category = Source.GetCodeTitle(Tables.Inv_Category, "Title");
             Packing = Source.GetCodeTitle(Tables.Inv_Packing, "Title");
             SubCategory = Source.GetCodeTitle(Tables.Inv_SubCategory, "Title");
             UOM = Source.GetCodeTitle(Tables.Inv_UOM, "Title");
             Size = Source.GetCodeTitle(Tables.Inv_Size, "Title");
-            Records = [.. Source.GetTable(SQLQueries.Quries.Inventory()).AsEnumerable().Select(row => Row2Record(row))];
+            RefreshData();
             FilterRecords = Records;
+        }
+
+        public void RefreshData()
+        {
+            Records = [.. Source.GetTable(SQLQueries.Quries.Inventory()).AsEnumerable().Select(row => Row2Record(row))];
         }
 
         #region Add, Edit & Delete
@@ -80,11 +86,41 @@ namespace AppliedAccounts.Models
         public bool Delete()
         {
             DataRow _DeleteRow = Record2Row();
-            return Source.Delete(_DeleteRow);
-            //return Source.Delete(Tables.Inventory, Record2Row());
+            var _result = Source.Delete(_DeleteRow);
+            RefreshData();
+            return _result;
 
         }
         #endregion
+
+        #region Save
+        public bool Save()
+        {
+            var _Row = Record2Row();
+
+            if (Validated(_Row))
+            {
+                Source.Save(_Row);
+                MsgClass = Source.MyCommands.MyMessages;
+                RefreshData();
+                return Source.IsSaved;
+            }
+            return false;
+        }
+
+        private bool Validated(DataRow Row)
+        {
+            MsgClass.ClearMessages();
+            if (string.IsNullOrEmpty(Row["Code"].ToString())) { MsgClass.Alert(AppMessages.Enums.Messages.CodeIsNull); }
+            if (string.IsNullOrEmpty(Row["Title"].ToString())) { MsgClass.Alert(AppMessages.Enums.Messages.TitleIsNull); }
+            if ((long)Row["Packing"] == 0) { MsgClass.Alert(AppMessages.Enums.Messages.Row_PackingIdZero); }
+            if ((long)Row["UOM"] == 0) { MsgClass.Alert(AppMessages.Enums.Messages.Row_UnitIDZero); }
+            if ((long)Row["Size"] == 0) { MsgClass.Alert(AppMessages.Enums.Messages.Row_SizeIDZero); }
+            if ((long)Row["SubCategory"] == 0) { MsgClass.Alert(AppMessages.Enums.Messages.Row_SubCategoryIDZero); }
+            return MsgClass.Count == 0;
+        }
+        #endregion
+
 
         #region DataRow to Record and Record to DataRow
         private DataRow Record2Row()
@@ -97,7 +133,6 @@ namespace AppliedAccounts.Models
             row["Packing"] = Record.Packing;
             row["UOM"] = Record.UOM;
             row["Size"] = Record.Size;
-            row["Category"] = Record.Category;
             row["SubCategory"] = Record.SubCategory;
             row["Notes"] = Record.Notes;
 
@@ -109,14 +144,14 @@ namespace AppliedAccounts.Models
 
             return new RecordModel
             {
-                ID = row.Field<int>("ID"),
+                ID = row.Field<long>("ID"),
                 Code = row.Field<string>("Code") ?? string.Empty,
                 Title = row.Field<string>("Title") ?? string.Empty,
-                Qty_Packing = row.Field<int>("Qty_Packing"),
-                Packing = row.Field<int>("Packing"),
-                UOM = row.Field<int>("UOM"),
-                Size = row.Field<int>("Size"),
-                SubCategory = row.Field<int>("SubCategory"),
+                Qty_Packing = row.Field<long>("Qty_Packing"),
+                Packing = row.Field<long>("Packing"),
+                UOM = row.Field<long>("UOM"),
+                Size = row.Field<long>("Size"),
+                SubCategory = row.Field<long>("SubCategory"),
                 Notes = row.Field<string>("Notes")!,
                 TitleCategory = row.Field<string>("TitleCategory")!,
                 TitleSubCategory = row.Field<string>("TitleSubCategory")!,
@@ -127,25 +162,16 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-        #region Save
-        public bool Save()
-        {
-            var _Row = Record2Row();
-            Source.Save(_Row);
-            MsgClass = Source.MyCommands.MyMessages;
-            return Source.IsSaved;
-        }
-        #endregion
-
+        
         #region Get & Set Registry Keys
         public void GetKeys()
         {
-
+            SearchText = Source.GetText("StockList");
         }
 
         public void SetKeys()
         {
-
+            Source.SetKey("StockList", SearchText, AppliedGlobals.AppErums.KeyTypes.Text,"Inventory List");
         }
         #endregion
 
@@ -155,7 +181,7 @@ namespace AppliedAccounts.Models
             public long ID { get; set; }
             public string Code { get; set; } = string.Empty;
             public string Title { get; set; } = string.Empty;
-            public int Qty_Packing { get; set; }
+            public long Qty_Packing { get; set; }
             public long Packing { get; set; }
             public long UOM { get; set; }
             public long Size { get; set; }

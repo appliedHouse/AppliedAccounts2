@@ -33,7 +33,7 @@ namespace AppliedAccounts.Middleware
                 // ❌ Connection failed → show error page
                 context.Response.StatusCode = 500;
                 await context.Response.WriteAsync(
-                    "Database connection failed. Please contact administrator."
+                    "Database connection failed. Please contact administrator." + ex.Message
                 );
                 return;
             }

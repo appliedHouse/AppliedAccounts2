@@ -22,10 +22,20 @@ namespace AppliedAccounts.Pages.Accounts.Post
             MyViewModel.Dt_To = MyModel.Source.GetDate("UnPost_dt_To");
             MyViewModel.PostingType = (PostingTypes)MyModel.Source.GetNumber("UnPost_Type");
 
-            await MyModel.LoadData(MyViewModel.PostingType);
+            MyModel.Pages.PageChanged += OnPageChangedInternal;
+
+            await MyModel.LoadData(MyViewModel);
         }
 
-        public void Refresh()
+        private async void OnPageChangedInternal(int page)
+        {
+            if (MyViewModel is null) { return; }
+            await MyModel.LoadData(MyViewModel);
+            await InvokeAsync(StateHasChanged);
+        }
+
+
+        public async void Refresh()
         {
             AppRegistry.SetKey(DBFile, "UnPost_Type", (int)MyViewModel.PostingType, KeyTypes.Number, "");
             AppRegistry.SetKey(DBFile, "UnPost_dt_From", MyViewModel.Dt_From, KeyTypes.Date, "");
@@ -33,21 +43,24 @@ namespace AppliedAccounts.Pages.Accounts.Post
             AppRegistry.SetKey(DBFile, "UnPostCash", false, KeyTypes.Boolean, "");    // Reset Post Cash Voucher Status
             AppRegistry.SetKey(DBFile, "UnPostBank", false, KeyTypes.Boolean, "");    // Reset Post Bank Voucher Status
             AppRegistry.SetKey(DBFile, "UnPostReceipt", false, KeyTypes.Boolean, "");
+
+            MyModel.Pages = new();
+
+            MyModel.FilterDates[0] = MyViewModel.Dt_From;
+            MyModel.FilterDates[1] = MyViewModel.Dt_To;
+
+            await MyModel.LoadData(MyViewModel);
+            await InvokeAsync(StateHasChanged);
         }
 
         #region Change Event
         private async void OnPostingTypeChanged(PostingTypes value)
         {
             MyViewModel.PostingType = value;
-
-            await MyModel.LoadData(MyViewModel.PostingType);
+            await MyModel.LoadData(MyViewModel);
+            await InvokeAsync(StateHasChanged);
         }
-
-        private void OnStatusChanged(int value)
-        {
-            MyViewModel.PostingStatus = value;
-        }
-
+        
         #endregion
 
 
@@ -56,15 +69,21 @@ namespace AppliedAccounts.Pages.Accounts.Post
         public async Task UnPostingVoucher(long id)
         {
             MyModel.IsPosting = true;
-            StateHasChanged();
+
+            //StateHasChanged();
 
             await AppGlobal.JS.InvokeVoidAsync("showModal", "SaveVoucher");
-
             await MyModel.DoVoucherUnPost(id, MyViewModel.PostingType);
-
             await AppGlobal.JS.InvokeVoidAsync("hideModal", "SaveVoucher");
             MyModel.IsPosting = false;
-            StateHasChanged();
+            
+            await MyModel.LoadData(MyViewModel);
+            await InvokeAsync(StateHasChanged);
+
+
+
+
+
         }
     }
 

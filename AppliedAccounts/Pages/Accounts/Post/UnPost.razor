@@ -33,9 +33,10 @@
             <div class="col-md-2 d-grid">
                 <div class="input-group">
                     <label class="input-group-text" style="width:30%">From</label>
+
                     <InputDate class="form-control TextCenter"
                                style="width:70%"
-                               @bind-Value="MyViewModel.Dt_From" />
+                               @bind-Value="MyViewModel.Dt_From"/>
                 </div>
             </div>
 
@@ -45,13 +46,13 @@
                     <label class="input-group-text" style="width:30%">To</label>
                     <InputDate class="form-control TextCenter"
                                style="width:70%"
-                               @bind-Value="MyViewModel.Dt_To" />
+                               @bind-Value="MyViewModel.Dt_To"/>
                 </div>
             </div>
 
             <!-- Refresh Button -->
             <div class="col-md-2 d-grid">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" @onclick="Refresh">
                     Refresh
                 </button>
             </div>
@@ -93,8 +94,8 @@
                             <td class="TextCenter">@item.Vou_No</td>
                             <td class="TextCenter">@item.Vou_Date.ToString(Format.DDMMMYYYY)</td>
                             <td>@item.Title</td>
-                            <td class="text-danger amount1">@_DR</td>
-                            <td class="text-danger amount1">@_CR</td>
+                            <td class="text-danger right">@_DR</td>
+                            <td class="text-danger right">@_CR</td>
                             <td class="TextCenter">@item.Status</td>
                             <td class="text-center">
                                 <input type="checkbox"
@@ -122,27 +123,11 @@
                     }
                 </tbody>
             </table>
-            <nav class="pagination-bar">
-                <ul class="pagination pagination-sm mb-0 justify-content-center">
-                    <li class="page-item disabled">
-                        <a class="page-link">Previous</a>
-                    </li>
-
-                    <li class="page-item active">
-                        <a class="page-link">1</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link">2</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link">3</a>
-                    </li>
-
-                    <li class="page-item">
-                        <a class="page-link">Next</a>
-                    </li>
-                </ul>
-            </nav>
+            <div class="d-flex">
+                <div class="p-1" style="height:40px">
+                    <NavPageBar Paging="MyModel.Pages"></NavPageBar>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -150,7 +135,7 @@
     {
         <div class="fade-overlay">
             <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Posting...</span>
+                <span class="visually-hidden">Unpost is being processed...</span>
             </div>
         </div>
     }

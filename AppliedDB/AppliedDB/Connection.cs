@@ -139,7 +139,7 @@ namespace AppliedDB
                     _Connection.ConnectionString = $"Data Source={_UsersDBFile}";
                     return _Connection;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // Error handling code type here....
                 }
@@ -158,7 +158,7 @@ namespace AppliedDB
                     _Connection.ConnectionString = _ConnectionString;
                     return _Connection;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // Error handling code type here....
                 }

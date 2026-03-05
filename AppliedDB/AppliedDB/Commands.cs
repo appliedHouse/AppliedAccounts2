@@ -270,7 +270,7 @@ namespace AppliedDB
 
                     var _Connection = CommandInsert.Connection;
                     var _Transaction = CommandInsert.Transaction;
-                    var nextId = GetNextId(_Connection, _Transaction, Row.Table.TableName);  //  (long)cmdMaxID.ExecuteScalar()!;
+                    var nextId = GetNextId(_Connection!, _Transaction, Row.Table.TableName);  //  (long)cmdMaxID.ExecuteScalar()!;
                     CommandInsert.Parameters["@ID"].Value = nextId;
 
                     Effected = CommandInsert.ExecuteNonQuery();
@@ -280,7 +280,7 @@ namespace AppliedDB
                     if (savePoint != null) { CommandInsert.Transaction!.Release(savePoint); }
 
 
-                    MyMessages.Add(Messages.Save);
+                    MyMessages.Success(Messages.Save);
                     return true;
                 }
                 catch (Exception ex)

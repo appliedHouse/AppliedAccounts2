@@ -35,6 +35,7 @@ namespace AppliedAccounts.Pages.Stock
             ShowList = false;
             ShowForm = true;
             MyModel.Edit(ID);
+            MyModel.LoadData();
 
         }
         public async void Delete(long? ID)
@@ -44,6 +45,7 @@ namespace AppliedAccounts.Pages.Stock
                 ShowList = true;
                 ShowForm = false;
                 await Toaster.ShowToastAsync(ToastClass.DeleteToast);
+                MyModel.LoadData();
             }
         }
         public async void Save()
@@ -54,6 +56,9 @@ namespace AppliedAccounts.Pages.Stock
                 ShowForm = false;
                 await Toaster.ShowToastAsync(ToastClass.SaveToast);
             }
+            MyModel.LoadData();
+
+            await InvokeAsync(StateHasChanged);
         }
 
         #endregion
@@ -95,6 +100,14 @@ namespace AppliedAccounts.Pages.Stock
                 .First() ?? "";
         }
 
+        public void UOMChanged(long _ID)
+        {
+            MyModel.Record.UOM = _ID;
+            MyModel.Record.TitleUOM = MyModel.UOM
+                .Where(e => e.ID == MyModel.Record.UOM)
+                .Select(e => e.Title)
+                .First() ?? "";
+        }
 
 
         #endregion
@@ -118,9 +131,9 @@ namespace AppliedAccounts.Pages.Stock
                 case 1:
                     MyModel.BrowseClass = new();
                     MyModel.BrowseClass.Type = 1;
-                    MyModel.BrowseClass.Heading = "Category";
-                    MyModel.BrowseClass.Selected = MyModel.Record.Category;
-                    MyModel.BrowseClass.BrowseList = MyModel.Category;
+                    MyModel.BrowseClass.Heading = "Unit of Measure";
+                    MyModel.BrowseClass.Selected = MyModel.Record.UOM;
+                    MyModel.BrowseClass.BrowseList = MyModel.UOM;
                     break;
 
 

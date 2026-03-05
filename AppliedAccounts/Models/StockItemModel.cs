@@ -98,6 +98,7 @@ namespace AppliedAccounts.Models
 
 
             MsgClass.ClearMessages();
+            
 
             CurrentRow["ID"] = ID;
             CurrentRow["Code"] = Code;
@@ -107,7 +108,10 @@ namespace AppliedAccounts.Models
             CurrentRow["UOM"] = UOM;
             CurrentRow["SubCategory"] = StockCategory;
             CurrentRow["Notes"] = Description;
-            AppFunctions.Save(DataFile, TB_Stock, CurrentRow);                      // change it to Source (DataSource) of DB
+
+            
+            // Depreciated
+            //AppFunctions.Save(DataFile, TB_Stock, CurrentRow);                      // change it to Source (DataSource) of DB
             MsgClass.Add(string.Concat([Code, ",", Title, " : Add Record"]));
 
 
