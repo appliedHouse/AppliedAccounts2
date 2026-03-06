@@ -1,0 +1,39 @@
+﻿@page "/Menu/Stock/Directory/{DirectoryName}"
+
+@inject GlobalService AppGlobal
+
+@code {
+    [Parameter] public string TableName { get; set; }
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+}
+
+
+
+<ShowMessages MsgClass="MsgClass"></ShowMessages>
+
+@if (StockDirectoryList.Count > 0)
+{
+    <div class="container">
+        <table class="table-list">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in StockDirectoryList)
+                {
+                    <tr>
+                        <td>@item.Code</td>
+                        <td>@item.Title</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

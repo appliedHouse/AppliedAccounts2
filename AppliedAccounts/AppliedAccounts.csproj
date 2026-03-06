@@ -67,7 +67,6 @@
 
   <ItemGroup>
     <Folder Include="Pages\Reporting\" />
-    <Folder Include="Pages\Stock\Directory\" />
     <Folder Include="wwwroot\ExcelFiles\" />
   </ItemGroup>
 

@@ -100,13 +100,13 @@
             {
                 Labels.Add(row["Title"].ToString()!);
                 DataValues.Add(Conversion.ToInteger(row["Amount"]));
-                DataPie.Add(decimal.Parse(row["Amount"].ToString() ?? ""));
+                DataPie.Add(decimal.Parse(row["Amount"].ToString()!));
                 counter++;
             }
             else
             {
                 OtherAmount += Conversion.ToInteger(row["Amount"]);
-                OtherPie += decimal.Parse(row["Amount"].ToString() ?? "");
+                OtherPie += decimal.Parse(row["Amount"].ToString()!);
             }
         }
 
