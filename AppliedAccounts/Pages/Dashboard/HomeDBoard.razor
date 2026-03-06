@@ -96,17 +96,20 @@
 
         foreach (DataRow row in _DataTable.Rows)
         {
+            int amount = Convert.ToInt32(row["Amount"] == DBNull.Value ? 0 : row["Amount"]);
+            decimal amountDecimal = Convert.ToDecimal(row["Amount"] == DBNull.Value ? 0 : row["Amount"]);
+
             if (counter < 8)
             {
                 Labels.Add(row["Title"].ToString()!);
-                DataValues.Add(Conversion.ToInteger(row["Amount"]));
-                DataPie.Add(decimal.Parse(row["Amount"].ToString()!));
+                DataValues.Add(amount);
+                DataPie.Add(amountDecimal);
                 counter++;
             }
             else
             {
-                OtherAmount += Conversion.ToInteger(row["Amount"]);
-                OtherPie += decimal.Parse(row["Amount"].ToString()!);
+                OtherAmount += amount;
+                OtherPie += amountDecimal;
             }
         }
 

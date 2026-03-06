@@ -123,11 +123,11 @@ namespace Menus
 
 
             // Stock - Dictionery
-            _Menus.Add(new MenuItem { ID = 4101, Title = "Category", Active = true, Icon = "bi bi-stack", Level = 3, ParentID = 41, NavigateTo = "/Stock/Category" });
-            _Menus.Add(new MenuItem { ID = 4102, Title = "Sub Category", Active = true, Icon = "bi bi-subtract", Level = 3, ParentID = 41, NavigateTo = "/Stock/Sub Category" });
-            _Menus.Add(new MenuItem { ID = 4103, Title = "Packing", Active = true, Icon = "bi bi-box", Level = 3, ParentID = 41, NavigateTo = "/Stock/Packing" });
-            _Menus.Add(new MenuItem { ID = 4104, Title = "Size", Active = true, Icon = "bi bi-measuring-cup", Level = 3, ParentID = 41, NavigateTo = "/Stock/Size" });
-            _Menus.Add(new MenuItem { ID = 4104, Title = "Measurement", Active = true, Icon = "bi bi-chevron-bar-contract", Level = 3, ParentID = 41, NavigateTo = "/Stock/UOM" });
+            _Menus.Add(new MenuItem { ID = 4101, Title = "Category", Active = true, Icon = "bi bi-stack", Level = 3, ParentID = 41, NavigateTo = "/Menu/Stock/Directory/Inv_Category" });
+            _Menus.Add(new MenuItem { ID = 4102, Title = "Sub Category", Active = true, Icon = "bi bi-subtract", Level = 3, ParentID = 41, NavigateTo = "/Menu/Stock/Directory/Inv_SubCategory" });
+            _Menus.Add(new MenuItem { ID = 4103, Title = "Packing", Active = true, Icon = "bi bi-box", Level = 3, ParentID = 41, NavigateTo = "/Menu/Stock/Directory/Inv_Packing" });
+            _Menus.Add(new MenuItem { ID = 4104, Title = "Size", Active = true, Icon = "bi bi-measuring-cup", Level = 3, ParentID = 41, NavigateTo = "/Menu/Stock/Directory/Inv_Size" });
+            _Menus.Add(new MenuItem { ID = 4105, Title = "Measurement", Active = true, Icon = "bi bi-chevron-bar-contract", Level = 3, ParentID = 41, NavigateTo = "/Menu/Stock/Directory/Inv_UOM" });
 
 
             return _Menus;

@@ -152,9 +152,9 @@
                             <td class="tb-col-left">@_Record.TitleNote</td>
                             <td class="amount">@_Record.OBal</td>
                             <td clas class="tb-col-left" s="td-btn">
-                                <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(()=> Edit((int)_Record.ID))"><i class="bi bi-pencil-fill"></i></button>
+                                <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(()=> Edit((long)_Record.ID))"><i class="bi bi-pencil-fill"></i></button>
                                 <label style="padding-left:5px; padding-right:5px;"> | </label>
-                                <button id="btnDel" type="submit" class="btn-Del" @onclick="(()=> MyModel.Delete((int)_Record.ID))"><i class="bi bi-trash-fill"></i></button>
+                                <button id="btnDel" type="submit" class="btn-Del" @onclick="(()=> MyModel.Delete((long)_Record.ID))"><i class="bi bi-trash-fill"></i></button>
                             </td>
                         </tr>
                     }

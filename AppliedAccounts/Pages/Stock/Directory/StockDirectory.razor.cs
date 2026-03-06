@@ -1,6 +1,6 @@
 ﻿using AppliedDB;
 using AppMessages;
-using System.Data;
+using static AppliedDB.Enums;
 
 namespace AppliedAccounts.Pages.Stock.Directory
 {
@@ -11,47 +11,60 @@ namespace AppliedAccounts.Pages.Stock.Directory
         public string Filter { get; set; }
         public string Sort { get; set; }
        
-        public List<StockDirectoryVM> StockDirectoryList { get; set; }
+        public List<CodeTitle> StockDirectoryList { get; set; }
 
-        public StockDirectory()
+        protected override void OnParametersSet()
         {
-            Source = new DataSource(AppGlobal.AppPaths);
-
-            if(TableName == null)
+            if (!string.IsNullOrEmpty(TableName))
             {
-                MsgClass = new MessageClass();
-                //MsgClass.Critical(Enums.Messages.DataTableNotFound);
+                LoadData(TableName);
             }
         }
 
 
-        public void LoadData()
+        public void LoadData(string _TableName)
         {
-            var _Query = $"SELECT * FROM {TableName}";
-            var _Filter = string.Empty ;
-            var _Sort = string.Empty ;
+            var _Sort = "Title" ;
+            Source ??= new(AppGlobal.AppPaths);
 
-            var _Data = Source.GetTable(_Query, _Filter, _Sort).AsEnumerable().ToList();
-            foreach (var item in _Data)
+            switch (_TableName)
             {
-                var _item = new StockDirectoryVM();
-               
-
+                case "Inv_Category":
+                    StockDirectoryList = Source.GetCodeTitle(Tables.Inv_Category, _Sort);
+                    SubHeadingTitle = "Stock Category";
+                    break;
+                case "Inv_SubCategory":
+                    StockDirectoryList = Source.GetCodeTitle(Tables.Inv_SubCategory, _Sort);
+                    SubHeadingTitle = "Stock Sub Category";
+                    break;
+                case "Inv_Packing":
+                    StockDirectoryList = Source.GetCodeTitle(Tables.Inv_Packing, _Sort);
+                    SubHeadingTitle = "Stock Packing";
+                    break;
+                case "Inv_Size":
+                    StockDirectoryList = Source.GetCodeTitle(Tables.Inv_Size, _Sort);
+                    SubHeadingTitle = "Stock Item Size";
+                    break;
+                case "Inv_UOM":
+                    StockDirectoryList = Source.GetCodeTitle(Tables.Inv_UOM, _Sort);
+                    SubHeadingTitle = "Stock Unit of Measurement";
+                    break;
+                default:
+                    break;
             }
+        }
+
+        public void Add()
+        {
             
         }
+
+        public bool Delete(long _ID) { return true; }
+        public bool Edit(long _ID) { return true; }
+
     }
 
-    public class StockDirectoryVM
-    {
-
-        public long ID { get; set; }
-        public string Code { get; set; }
-        public string Title { get; set; }
-
-
-        
-    }
+    
 }
 
 
