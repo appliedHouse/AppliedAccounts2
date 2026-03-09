@@ -1,7 +1,6 @@
 ﻿using AppliedGlobals;
 using AppMessages;
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Logging;
 using System.Data;
 using System.Text;
 using static AppliedDB.Enums;

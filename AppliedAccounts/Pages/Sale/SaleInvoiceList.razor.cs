@@ -184,8 +184,6 @@ namespace AppliedAccounts.Pages.Sale
         }
 
 
-
-
         private void GetReportData()
         {
             string _Query = ReportQuery.SaleInvoiceQuery($"[TranID]={MyModel.VoucherID}");

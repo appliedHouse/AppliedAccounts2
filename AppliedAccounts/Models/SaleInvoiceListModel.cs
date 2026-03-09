@@ -1,9 +1,11 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Pages.Sale.Quotations;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using AppReports;
 using System.Data;
+using static AppliedDB.Enums;
 
 namespace AppliedAccounts.Models
 {
@@ -15,6 +17,7 @@ namespace AppliedAccounts.Models
         public SalesRecord Record { get; set; } = new();
         public List<SalesRecord> Records { get; set; } = new();
         public List<DataRow> Data { get; set; } = new();
+        public PageModel Pages { get; set; } = new();
 
         public MessageClass MsgClass { get; set; } = new();
         public decimal TotalAmount { get; set; } = 0.00M;
@@ -35,7 +38,17 @@ namespace AppliedAccounts.Models
         #region Load Data
         private void LoadData()
         {
-            Data = Source.GetList(AppliedDB.Enums.Query.SaleInvoiceList);
+            var _Query = SQLQuery.GetQuery(Query.SaleInvoiceList);
+            var _Limit = Pages.GetFilterString();
+            var _Sort = "Vou_Date, Vou_No";
+
+
+            Pages.TotalRecords = Source.RecordCound(Tables.BillReceivable, ) + 1;
+
+            
+            var DataTable = Source.  GetDataTable(_Query,_Limit,_Sort);
+
+            Data = Source.GetList(_Query);
             Records = GetFilterRecords();
         }
         #endregion
