@@ -71,7 +71,7 @@ namespace AppliedAccounts.Models.Posting
                         Filter += AppliedDB.Functions.GetDateFilter(FilterDates);
                         
                     }
-                    var _Sort = Sort + Pages.GetFilterString();            // Add pagination filter to select records / rows.
+                    var _Sort = Sort + Pages.GetLimit();            // Add pagination filter to select records / rows.
                     var _DataTableCash = Source.GetTable(Tables.Book, Filter, _Sort);
                     DataListModelList = GetPostingTable(_DataTableCash);
                     Pages.Refresh(Source.GetCount(Tables.Book, Filter));
@@ -90,7 +90,7 @@ namespace AppliedAccounts.Models.Posting
                        
 
                     }
-                    _Sort = Sort + Pages.GetFilterString();            // Add pagination filter to select records / rows.
+                    _Sort = Sort + Pages.GetLimit();            // Add pagination filter to select records / rows.
                     var _DataTableBank = Source.GetTable(Tables.Book, Filter, _Sort);
                     DataListModelList = GetPostingTable(_DataTableBank);
                     Pages.Refresh(Source.GetCount(Tables.Book, Filter));

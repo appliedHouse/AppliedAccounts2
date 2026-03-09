@@ -63,6 +63,7 @@ namespace AppliedDB
         public static string SaleInvoiceList()
         {
             var _Text = new StringBuilder();
+            _Text.AppendLine("SELECT * FROM (");
             _Text.AppendLine("SELECT ");
             _Text.AppendLine("[BR].[ID],");
             _Text.AppendLine("[BR].[Vou_No],");
@@ -79,6 +80,7 @@ namespace AppliedDB
             _Text.AppendLine("FROM [BillReceivable] [BR]");
             _Text.AppendLine("LEFT JOIN [Customers] [C] ON [C].[ID] = [BR].[Company]");
             _Text.AppendLine("LEFT JOIN [Employees] [E] ON [E].[ID] = [BR].[Employee]");
+            _Text.AppendLine(") AS [SaleInvoice] ");
 
             return _Text.ToString();
         }

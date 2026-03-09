@@ -1300,7 +1300,8 @@ namespace AppliedDB
         #region Count Record
         public int RecordCound(Tables _Table, string _Filter)
         {
-            string _Query = $"SELECT COUNT(*) FROM {_Table} WHERE {_Filter}";
+            string _Query = $"SELECT COUNT(*) FROM {_Table} ";
+            _Query += string.IsNullOrEmpty(_Filter) ? "" : $"WHERE {_Filter}";
             using var command = new SqliteCommand(_Query, MyConnection);
             if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
             var result = Convert.ToInt32(command.ExecuteScalar()); MyConnection.Close();

@@ -39,6 +39,7 @@
             await DeletePrintedReports();
         }
 
+        MyModel ??= new();
         IsSearchText = string.IsNullOrEmpty(MyModel.SearchText) ? false : true;
         IsRecords = MyModel.Records.Count == 0 ? true : false;
 

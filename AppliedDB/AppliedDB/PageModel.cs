@@ -33,6 +33,13 @@
             ChangePage(Current);
         }
 
+        public void Refresh()
+        {
+            //TotalRecords = totalRecords;
+            BuildPageList();
+            ChangePage(Current);
+        }
+
         private void BuildPageList()
         {
             PageList.Clear();
@@ -46,7 +53,7 @@
                 PageList.Add(i);
         }
 
-        public string GetFilterString()
+        public string GetLimit()
         {
             return $" LIMIT {Size} OFFSET {(Current - 1) * Size}";
         }

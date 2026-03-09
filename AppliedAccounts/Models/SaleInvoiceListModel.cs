@@ -1,6 +1,4 @@
-﻿using AppliedAccounts.Data;
-using AppliedAccounts.Pages.Sale.Quotations;
-using AppliedAccounts.Services;
+﻿using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using AppReports;
@@ -16,7 +14,7 @@ namespace AppliedAccounts.Models
         public string DBFile { get; set; } = string.Empty;
         public SalesRecord Record { get; set; } = new();
         public List<SalesRecord> Records { get; set; } = new();
-        public List<DataRow> Data { get; set; } = new();
+        public DataTable Data { get; set; } = new();
         public PageModel Pages { get; set; } = new();
 
         public MessageClass MsgClass { get; set; } = new();
@@ -24,6 +22,8 @@ namespace AppliedAccounts.Models
         public bool SelectAll { get; set; }
         public long VoucherID { get; set; }
         public string SearchText { get; set; } = string.Empty;
+        public string Filter { get; set; } = string.Empty;
+
 
         #region Constructor
         public SaleInvoiceListModel() { }
@@ -38,52 +38,69 @@ namespace AppliedAccounts.Models
         #region Load Data
         private void LoadData()
         {
-            var _Query = SQLQuery.GetQuery(Query.SaleInvoiceList);
-            var _Limit = Pages.GetFilterString();
+            var _Query = SQLQuery.SaleInvoiceList();
+            var _Limit = Pages.GetLimit();
             var _Sort = "Vou_Date, Vou_No";
 
+            if (!string.IsNullOrWhiteSpace(SearchText))
+            {
+                string[] columns =
+                {
+                    "Company",
+                    "Employee",
+                    "City",
+                    "Description",
+                    "Vou_No",
+                    "Vou_Date",
+                    "Inv_Date",
+                    "Pay_Date"
+                };
 
-            Pages.TotalRecords = Source.RecordCound(Tables.BillReceivable, ) + 1;
+                Filter = string.Join(" OR ", columns.Select(c => $"{c} like '%{SearchText}%'"));
+            }
+            else
+            {
+                Filter = string.Empty;
+            }
 
-            
-            var DataTable = Source.  GetDataTable(_Query,_Limit,_Sort);
-
-            Data = Source.GetList(_Query);
-            Records = GetFilterRecords();
+            Pages.TotalRecords = Source.RecordCound(Tables.BillReceivable, Filter) + 1;
+            Data = Source.GetTable(_Query, Filter, _Sort + _Limit);
+            Records = Data.AsEnumerable().Select(row => GetRecord(row)).ToList();
+            Pages.Refresh();  // Count total records for paging.
         }
         #endregion
 
         #region Filter Records
-        private List<SalesRecord> GetFilterRecords()
-        {
-            var _FilterRecords = new List<SalesRecord>();
+        //private List<SalesRecord> GetFilterRecords()
+        //{
+        //    var _FilterRecords = new List<SalesRecord>();
 
-            if (SearchText.Length > 0)
-            {
-                _FilterRecords = Data.AsEnumerable().Where(row =>
-                (row.Field<string>("Vou_No") ?? string.Empty)!.Contains(SearchText) ||
-                AppFunctions.Date2Text(row.Field<DateTime>("Vou_Date"))!.Contains(SearchText) ||
-                AppFunctions.Date2Text(row.Field<DateTime>("Inv_Date"))!.Contains(SearchText) ||
-                AppFunctions.Date2Text(row.Field<DateTime>("Pay_Date"))!.Contains(SearchText) ||
-                (row.Field<string>("Company") ?? string.Empty).Contains(SearchText) ||
-                (row.Field<string>("City") ?? string.Empty).Contains(SearchText) ||
-                (row.Field<string>("Salesman") ?? string.Empty).Contains(SearchText) ||
-                (row.Field<string>("Ref_No") ?? string.Empty).Contains(SearchText)
-                ).Select(row => GetRecord(row)).ToList();
+        //    //if (SearchText.Length > 0)
+        //    //{
+        //    //    _FilterRecords = Data.AsEnumerable().Where(row =>
+        //    //    (row.Field<string>("Vou_No") ?? string.Empty)!.Contains(SearchText) ||
+        //    //    AppFunctions.Date2Text(row.Field<DateTime>("Vou_Date"))!.Contains(SearchText) ||
+        //    //    AppFunctions.Date2Text(row.Field<DateTime>("Inv_Date"))!.Contains(SearchText) ||
+        //    //    AppFunctions.Date2Text(row.Field<DateTime>("Pay_Date"))!.Contains(SearchText) ||
+        //    //    (row.Field<string>("Company") ?? string.Empty).Contains(SearchText) ||
+        //    //    (row.Field<string>("City") ?? string.Empty).Contains(SearchText) ||
+        //    //    (row.Field<string>("Salesman") ?? string.Empty).Contains(SearchText) ||
+        //    //    (row.Field<string>("Ref_No") ?? string.Empty).Contains(SearchText)
+        //    //    ).Select(row => GetRecord(row)).ToList();
 
-            }
+        //    //}
 
-            if (SearchText.Length == 0)
-            {
-                _FilterRecords = [.. Data.AsEnumerable().ToList().Select(GetRecord)];
-                //_FilterRecords = Data.AsEnumerable().ToList().Select(row => GetRecord(row)).ToList();
-            }
+        //    //if (SearchText.Length == 0)
+        //    //{
+        //    //    _FilterRecords = [.. Data.AsEnumerable().ToList().Select(GetRecord)];
+        //    //    //_FilterRecords = Data.AsEnumerable().ToList().Select(row => GetRecord(row)).ToList();
+        //    //}
 
-            TotalAmount = _FilterRecords.Sum(row => row.Amount);
+        //    //TotalAmount = _FilterRecords.Sum(row => row.Amount);
 
 
-            return _FilterRecords;
-        }
+        //    return _FilterRecords;
+        //}
 
         #endregion
 
@@ -142,14 +159,15 @@ namespace AppliedAccounts.Models
         #region Search
         public void Search()
         {
-            Records = GetFilterRecords();
+            LoadData();
+            //Records = GetFilterRecords();
 
         }
 
         public void ClearText()
         {
             SearchText = string.Empty;
-            Records = GetFilterRecords();
+            LoadData();
         }
         #endregion
 
