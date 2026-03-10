@@ -2,6 +2,7 @@
 using AppliedDB;
 using AppMessages;
 using AppReports;
+using Microsoft.AspNetCore.Components;
 using System.Data;
 using static AppliedDB.Enums;
 
@@ -9,7 +10,7 @@ namespace AppliedAccounts.Models
 {
     public class SaleInvoiceListModel
     {
-        public GlobalService AppGlobal { get; set; }
+        [Inject] public GlobalService AppGlobal { get; set; } = default!;
         public DataSource Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public SalesRecord Record { get; set; } = new();
@@ -26,20 +27,20 @@ namespace AppliedAccounts.Models
 
 
         #region Constructor
-        public SaleInvoiceListModel() { }
-        public SaleInvoiceListModel(GlobalService _AppGlobal)
+        public SaleInvoiceListModel(GlobalService _AppGlobal) 
         {
             AppGlobal = _AppGlobal;
             Source = new(AppGlobal.AppPaths);
             LoadData();
         }
+        
         #endregion
 
         #region Load Data
-        private void LoadData()
+        public async Task LoadData()
         {
+            //Source ??= new(AppGlobal.AppPaths);
             var _Query = SQLQuery.SaleInvoiceList();
-            var _Limit = Pages.GetLimit();
             var _Sort = "Vou_Date, Vou_No";
 
             if (!string.IsNullOrWhiteSpace(SearchText))
@@ -62,46 +63,13 @@ namespace AppliedAccounts.Models
             {
                 Filter = string.Empty;
             }
-
-            Pages.TotalRecords = Source.RecordCound(Tables.BillReceivable, Filter) + 1;
-            Data = Source.GetTable(_Query, Filter, _Sort + _Limit);
+            
+            //Pages.TotalRecords = Source.RecordCound(Tables.BillReceivable, Filter) + 1;
+            Data = Source.GetTable(_Query, Filter, _Sort + Pages.GetLimit());
             Records = Data.AsEnumerable().Select(row => GetRecord(row)).ToList();
-            Pages.Refresh();  // Count total records for paging.
+            Pages.Refresh(Source.RecordCound(Tables.BillReceivable, Filter));
+
         }
-        #endregion
-
-        #region Filter Records
-        //private List<SalesRecord> GetFilterRecords()
-        //{
-        //    var _FilterRecords = new List<SalesRecord>();
-
-        //    //if (SearchText.Length > 0)
-        //    //{
-        //    //    _FilterRecords = Data.AsEnumerable().Where(row =>
-        //    //    (row.Field<string>("Vou_No") ?? string.Empty)!.Contains(SearchText) ||
-        //    //    AppFunctions.Date2Text(row.Field<DateTime>("Vou_Date"))!.Contains(SearchText) ||
-        //    //    AppFunctions.Date2Text(row.Field<DateTime>("Inv_Date"))!.Contains(SearchText) ||
-        //    //    AppFunctions.Date2Text(row.Field<DateTime>("Pay_Date"))!.Contains(SearchText) ||
-        //    //    (row.Field<string>("Company") ?? string.Empty).Contains(SearchText) ||
-        //    //    (row.Field<string>("City") ?? string.Empty).Contains(SearchText) ||
-        //    //    (row.Field<string>("Salesman") ?? string.Empty).Contains(SearchText) ||
-        //    //    (row.Field<string>("Ref_No") ?? string.Empty).Contains(SearchText)
-        //    //    ).Select(row => GetRecord(row)).ToList();
-
-        //    //}
-
-        //    //if (SearchText.Length == 0)
-        //    //{
-        //    //    _FilterRecords = [.. Data.AsEnumerable().ToList().Select(GetRecord)];
-        //    //    //_FilterRecords = Data.AsEnumerable().ToList().Select(row => GetRecord(row)).ToList();
-        //    //}
-
-        //    //TotalAmount = _FilterRecords.Sum(row => row.Amount);
-
-
-        //    return _FilterRecords;
-        //}
-
         #endregion
 
         #region Get Records by Row & ID
@@ -157,17 +125,16 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Search
-        public void Search()
+        public async void Search()
         {
-            LoadData();
-            //Records = GetFilterRecords();
+            await LoadData();
 
         }
 
-        public void ClearText()
+        public async void ClearText()
         {
             SearchText = string.Empty;
-            LoadData();
+            await LoadData();
         }
         #endregion
 

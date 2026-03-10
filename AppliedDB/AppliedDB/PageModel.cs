@@ -18,7 +18,10 @@
         {
             int newPage = Math.Clamp(page, 1, Count);
 
-            if (newPage == Current) { return; }
+            if (newPage == Current)
+            {
+                return;
+            }
 
             Current = newPage;
             BuildPageList();
