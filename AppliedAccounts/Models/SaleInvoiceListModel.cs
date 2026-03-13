@@ -1,77 +1,75 @@
-﻿using AppliedAccounts.Data;
-using AppliedAccounts.Services;
+﻿using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using AppReports;
+using Microsoft.AspNetCore.Components;
 using System.Data;
+using static AppliedDB.Enums;
 
 namespace AppliedAccounts.Models
 {
     public class SaleInvoiceListModel
     {
-        public GlobalService AppGlobal { get; set; }
+        [Inject] public GlobalService AppGlobal { get; set; } = default!;
         public DataSource Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public SalesRecord Record { get; set; } = new();
         public List<SalesRecord> Records { get; set; } = new();
-        public List<DataRow> Data { get; set; } = new();
+        public DataTable Data { get; set; } = new();
+        public PageModel Pages { get; set; } = new();
 
         public MessageClass MsgClass { get; set; } = new();
         public decimal TotalAmount { get; set; } = 0.00M;
         public bool SelectAll { get; set; }
         public long VoucherID { get; set; }
         public string SearchText { get; set; } = string.Empty;
+        public string Filter { get; set; } = string.Empty;
+
 
         #region Constructor
-        public SaleInvoiceListModel() { }
-        public SaleInvoiceListModel(GlobalService _AppGlobal)
+        public SaleInvoiceListModel(GlobalService _AppGlobal) 
         {
             AppGlobal = _AppGlobal;
             Source = new(AppGlobal.AppPaths);
             LoadData();
         }
+        
         #endregion
 
         #region Load Data
-        private void LoadData()
+        public async Task LoadData()
         {
-            Data = Source.GetList(AppliedDB.Enums.Query.SaleInvoiceList);
-            Records = GetFilterRecords();
-        }
-        #endregion
+            //Source ??= new(AppGlobal.AppPaths);
+            var _Query = SQLQuery.SaleInvoiceList();
+            var _Sort = "Vou_Date, Vou_No";
 
-        #region Filter Records
-        private List<SalesRecord> GetFilterRecords()
-        {
-            var _FilterRecords = new List<SalesRecord>();
-
-            if (SearchText.Length > 0)
+            if (!string.IsNullOrWhiteSpace(SearchText))
             {
-                _FilterRecords = Data.AsEnumerable().Where(row =>
-                (row.Field<string>("Vou_No") ?? string.Empty)!.Contains(SearchText) ||
-                AppFunctions.Date2Text(row.Field<DateTime>("Vou_Date"))!.Contains(SearchText) ||
-                AppFunctions.Date2Text(row.Field<DateTime>("Inv_Date"))!.Contains(SearchText) ||
-                AppFunctions.Date2Text(row.Field<DateTime>("Pay_Date"))!.Contains(SearchText) ||
-                (row.Field<string>("Company") ?? string.Empty).Contains(SearchText) ||
-                (row.Field<string>("City") ?? string.Empty).Contains(SearchText) ||
-                (row.Field<string>("Salesman") ?? string.Empty).Contains(SearchText) ||
-                (row.Field<string>("Ref_No") ?? string.Empty).Contains(SearchText)
-                ).Select(row => GetRecord(row)).ToList();
+                string[] columns =
+                {
+                    "Company",
+                    "Employee",
+                    "City",
+                    "Description",
+                    "Vou_No",
+                    "Vou_Date",
+                    "Inv_Date",
+                    "Pay_Date"
+                };
 
+                Filter = string.Join(" OR ", columns.Select(c => $"{c} like '%{SearchText}%'"));
             }
-
-            if (SearchText.Length == 0)
+            else
             {
-                _FilterRecords = [.. Data.AsEnumerable().ToList().Select(GetRecord)];
-                //_FilterRecords = Data.AsEnumerable().ToList().Select(row => GetRecord(row)).ToList();
+                Filter = string.Empty;
             }
+            
+            //Pages.TotalRecords = Source.RecordCound(Tables.BillReceivable, Filter) + 1;
+            Data = Source.GetTable(_Query, Filter, _Sort + Pages.GetLimit());
+            Records = Data.AsEnumerable().Select(row => GetRecord(row)).ToList();
+            Pages.Refresh(Source.RecordCound(Tables.BillReceivable, Filter));
 
-            TotalAmount = _FilterRecords.Sum(row => row.Amount);
-
-
-            return _FilterRecords;
         }
-
         #endregion
 
         #region Get Records by Row & ID
@@ -127,16 +125,16 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Search
-        public void Search()
+        public async void Search()
         {
-            Records = GetFilterRecords();
+            await LoadData();
 
         }
 
-        public void ClearText()
+        public async void ClearText()
         {
             SearchText = string.Empty;
-            Records = GetFilterRecords();
+            await LoadData();
         }
         #endregion
 
