@@ -34,14 +34,23 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (IsPrinted)
-        {
-            await DeletePrintedReports();
-        }
+        if (IsPrinted) { await DeletePrintedReports(); }
 
+        MyModel ??= new(AppGlobal);
         IsSearchText = string.IsNullOrEmpty(MyModel.SearchText) ? false : true;
-        IsRecords = MyModel.Records.Count == 0 ? true : false ;
+        IsRecords = MyModel.Records.Count == 0 ? true : false;
 
+        MyModel.Pages.PageChanged += OnPageChangedInternal;
+        await MyModel.LoadData();
+
+    }
+
+
+    private async void OnPageChangedInternal(int page)
+    {
+        if (MyModel is null) { return; }
+        await MyModel.LoadData();
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task DeletePrintedReports()
@@ -204,6 +213,11 @@
                     </tr>
                 </tfoot>
             </table>
+            <div class="d-flex">
+                <div class="p-1" style="height:40px">
+                    <NavPageBar Paging="MyModel.Pages"></NavPageBar>
+                </div>
+            </div>
         </div>
     }
 }
