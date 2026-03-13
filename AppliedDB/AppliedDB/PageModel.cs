@@ -18,7 +18,10 @@
         {
             int newPage = Math.Clamp(page, 1, Count);
 
-            if (newPage == Current) { return; }
+            if (newPage == Current)
+            {
+                return;
+            }
 
             Current = newPage;
             BuildPageList();
@@ -29,6 +32,13 @@
         public void Refresh(int totalRecords)
         {
             TotalRecords = totalRecords;
+            BuildPageList();
+            ChangePage(Current);
+        }
+
+        public void Refresh()
+        {
+            //TotalRecords = totalRecords;
             BuildPageList();
             ChangePage(Current);
         }
@@ -46,7 +56,7 @@
                 PageList.Add(i);
         }
 
-        public string GetFilterString()
+        public string GetLimit()
         {
             return $" LIMIT {Size} OFFSET {(Current - 1) * Size}";
         }
