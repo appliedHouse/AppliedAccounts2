@@ -1,16 +1,13 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
-using AppliedAccounts.Services;
 using AppliedDB;
 using Microsoft.AspNetCore.Components;
-using System.Net;
 
 namespace AppliedAccounts.Pages.Accounts
 {
     public partial class BooksList
     {
 
-        //public AppliedGlobals.AppUserModel UserProfile { get; set; }
         public BookListModel MyModel { get; set; } = new();
         public NavigationManager NavManager { get; set; }
 
@@ -35,7 +32,6 @@ namespace AppliedAccounts.Pages.Accounts
         {
             MyModel.SetKeys();              // Save the current page setting in Registry 
             MyModel.Pages = new();          // Reset the page model
-            //MyModel.LoadData();             // Load Data according to dates and search text.
             await InvokeAsync(StateHasChanged);
         }
         #endregion
@@ -72,6 +68,9 @@ namespace AppliedAccounts.Pages.Accounts
 
 
     }
+
+    #region book view Model
+
     public class BookView
     {
         public long ID { get; set; }
@@ -87,5 +86,5 @@ namespace AppliedAccounts.Pages.Accounts
         public string TBalance { get; set; }
 
     }
-
+    #endregion
 }

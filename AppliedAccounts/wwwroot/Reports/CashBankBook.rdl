@@ -9,7 +9,7 @@
       <am:Name>MSRB</am:Name>
       <am:Version>15.0.20283.0</am:Version>
     </am:UpdatedBy>
-    <am:LastModifiedTimestamp>2025-05-06T15:20:02.6073667Z</am:LastModifiedTimestamp>
+    <am:LastModifiedTimestamp>2026-01-18T12:09:47.3347700Z</am:LastModifiedTimestamp>
   </am:AuthoringMetadata>
   <df:DefaultFontFamily>Segoe UI</df:DefaultFontFamily>
   <AutoRefresh>0</AutoRefresh>
@@ -17,7 +17,7 @@
     <DataSource Name="Source_CashBankBook">
       <ConnectionProperties>
         <DataProvider>ODBC</DataProvider>
-        <ConnectString>Dsn=Mumtaz</ConnectString>
+        <ConnectString>Dsn=ESA_2</ConnectString>
         <IntegratedSecurity>true</IntegratedSecurity>
       </ConnectionProperties>
       <rd:SecurityType>Integrated</rd:SecurityType>
@@ -28,30 +28,22 @@
     <DataSet Name="ds_CashBank">
       <Query>
         <DataSourceName>Source_CashBankBook</DataSourceName>
-        <CommandText>SELECT * FROM (
-SELECT[CB].*,
-[B].[Title] AS [BookTitle],
-[C].[Title] AS [AccountTitle],
-[T].[Title] AS [CustomerTitle],
-[E].[Title] AS [EmployeeTitle],
-[P].[Title] AS [projectTitle]
-FROM [BankBook] [CB]
-LEFT JOIN [COA]       [B] ON [B].[ID] = [CB].[BookID]
-LEFT JOIN [COA]       [C] ON [C].[ID] = [CB].[COA]
-LEFT JOIN [Customers] [T] ON [T].[ID] = [CB].[Customer]
-LEFT JOIN [Employees] [E] ON [E].[ID] = [CB].[Employee]
-LEFT JOIN [Project]   [P] ON [P].[ID] = [CB].[Project])
-WHERE ID=210</CommandText>
+        <CommandText>SELECT * FROM [View_Book]
+ WHERE ID1 = 1</CommandText>
         <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
       </Query>
       <Fields>
-        <Field Name="ID">
-          <DataField>ID</DataField>
+        <Field Name="ID1">
+          <DataField>ID1</DataField>
           <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
         <Field Name="Vou_Date">
           <DataField>Vou_Date</DataField>
           <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="TitleBook">
+          <DataField>TitleBook</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="Vou_No">
           <DataField>Vou_No</DataField>
@@ -65,32 +57,48 @@ WHERE ID=210</CommandText>
           <DataField>COA</DataField>
           <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
+        <Field Name="Amount">
+          <DataField>Amount</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
         <Field Name="Ref_No">
           <DataField>Ref_No</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="Sheet_No">
-          <DataField>Sheet_No</DataField>
+        <Field Name="SheetNo">
+          <DataField>SheetNo</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="DR">
           <DataField>DR</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
+        <Field Name="Remarks">
+          <DataField>Remarks</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
         <Field Name="CR">
           <DataField>CR</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="Customer">
-          <DataField>Customer</DataField>
+        <Field Name="ID2">
+          <DataField>ID2</DataField>
           <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
         <Field Name="Employee">
           <DataField>Employee</DataField>
           <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
+        <Field Name="TranID">
+          <DataField>TranID</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
         <Field Name="Project">
           <DataField>Project</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="SR_NO">
+          <DataField>SR_NO</DataField>
           <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
         <Field Name="Description">
@@ -101,28 +109,28 @@ WHERE ID=210</CommandText>
           <DataField>Comments</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
+        <Field Name="TitleCOA">
+          <DataField>TitleCOA</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
         <Field Name="Status">
           <DataField>Status</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="BookTitle">
-          <DataField>BookTitle</DataField>
+        <Field Name="Company">
+          <DataField>Company</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="TitleCompany">
+          <DataField>TitleCompany</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="AccountTitle">
-          <DataField>AccountTitle</DataField>
+        <Field Name="TitleEmployee">
+          <DataField>TitleEmployee</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="CustomerTitle">
-          <DataField>CustomerTitle</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="EmployeeTitle">
-          <DataField>EmployeeTitle</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="projectTitle">
-          <DataField>projectTitle</DataField>
+        <Field Name="TitleProject">
+          <DataField>TitleProject</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
       </Fields>
@@ -790,7 +798,7 @@ WHERE ID=210</CommandText>
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=First(Fields!AccountTitle.Value, "ds_CashBank")</Value>
+                    <Value>=First(Fields!TitleCOA.Value, "ds_CashBank")</Value>
                     <Style />
                   </TextRun>
                 </TextRuns>
@@ -820,7 +828,7 @@ WHERE ID=210</CommandText>
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=First(Fields!CustomerTitle.Value, "ds_CashBank")</Value>
+                    <Value>=First(Fields!TitleCompany.Value, "ds_CashBank")</Value>
                     <Style />
                   </TextRun>
                 </TextRuns>
@@ -850,7 +858,7 @@ WHERE ID=210</CommandText>
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=First(Fields!EmployeeTitle.Value, "ds_CashBank")</Value>
+                    <Value>=First(Fields!TitleEmployee.Value, "ds_CashBank")</Value>
                     <Style />
                   </TextRun>
                 </TextRuns>
@@ -880,7 +888,7 @@ WHERE ID=210</CommandText>
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=First(Fields!projectTitle.Value, "ds_CashBank")</Value>
+                    <Value>=First(Fields!TitleProject.Value, "ds_CashBank")</Value>
                     <Style />
                   </TextRun>
                 </TextRuns>
@@ -910,7 +918,7 @@ WHERE ID=210</CommandText>
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=First(Fields!BookTitle.Value, "ds_CashBank")</Value>
+                    <Value>=First(Fields!TitleBook.Value, "ds_CashBank")</Value>
                     <Style>
                       <FontSize>11pt</FontSize>
                       <FontWeight>Bold</FontWeight>

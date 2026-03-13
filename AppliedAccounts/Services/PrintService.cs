@@ -42,6 +42,8 @@ namespace AppliedAccounts.Services
                 Model.OutputReport.RootPath = Config.AppPaths.RootPath;
                 Model.OutputReport.FilePath = Config.AppPaths.PDFPath;
 
+                Config.Reporting.ReportTitle = _Config.Client.DisplayName;
+
                 if (string.IsNullOrEmpty(Config.Reporting.ReportTitle)) { Config.Reporting.ReportTitle = "APPLIED SOFTWARE HOUSE"; }
                 if (string.IsNullOrEmpty(Config.Reporting.ReportFooter)) { Config.Reporting.ReportFooter = "APPLIED ACCOUNTS"; }
 
@@ -49,7 +51,7 @@ namespace AppliedAccounts.Services
                 Model.ReportParameters =
                 [
                     new ReportParameter("CompanyName", Config.Reporting.ReportTitle ),
-                new ReportParameter("Footer", Config.Reporting.ReportFooter)
+                    new ReportParameter("Footer", Config.Reporting.ReportFooter)
                 ];
             }
         }

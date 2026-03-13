@@ -42,10 +42,10 @@ namespace AppliedAccounts.Data
                 {
                     return int.Parse((string)_Value); 
                 }
-                if (type == typeof(decimal)) { return int.Parse(_Value.ToString()); }
-                if (type == typeof(long)) { return int.Parse(_Value.ToString()); }
-                if (type == typeof(float)) { return (int)Math.Round(float.Parse(_Value.ToString())); }
-                if (type == typeof(double)) { return (int)Math.Round(double.Parse(_Value.ToString())); }
+                if (type == typeof(decimal)) { return int.Parse(_Value.ToString()!); }
+                if (type == typeof(long)) { return int.Parse(_Value.ToString()!); }
+                if (type == typeof(float)) { return (int)Math.Round(float.Parse(_Value.ToString()!)); }
+                if (type == typeof(double)) { return (int)Math.Round(double.Parse(_Value.ToString()!)); }
                 if (type == typeof(int)) { return (int)_Value; }
                 return 0;
             }

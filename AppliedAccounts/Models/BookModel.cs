@@ -378,7 +378,7 @@ namespace AppliedAccounts.Models
                                             if (!save2)
                                             {
                                                 MsgClass.Error(MESSAGE.NotSave);
-                                                var stop = true;
+                                                //var stop = true;
                                                 // roll Bank master record from Data Table
                                             }
                                         }

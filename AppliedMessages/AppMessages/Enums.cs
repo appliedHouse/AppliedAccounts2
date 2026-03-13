@@ -55,6 +55,7 @@
             RowValueNull = 115,
             RowNotValidated = 217,
 
+
             ColumnIsNull = 14,
             ColumnDBNullValue = 117,
             ColumnValueZero = 15,
@@ -163,11 +164,27 @@
             PostingMasterIsNull = 6003,
             PostingDataIsNull = 6004,
             VoucherAlreadyPosted = 6005,
-            
-            
+            VoucherNotPosted = 6006,
+            VoucherNumberEmpty = 6007,
+
             TransactionRollback = 7001,
             TransactionCommited = 7002,
-
+            
+            SalesInvoiceIDIsNull = 8001,
+            SalesInvoiceRowCountZero = 8002,
+            SalesInvoiceIsAlreadyPosted = 8003,
+            SalesInvoiceVoucherAlreadyPosted = 8004,
+            SalesInvoiceVoucherNotMatched = 8005,
+            SalesInvoicePostingFailed = 8006,
+            SalesInvoiceAccountNotValid = 8007,
+            VoucherNotFound = 600109,
+            VoucherAmountIsZero = 600110,
+            VoucherDateNotSame = 600111,
+            VoucherAmountNotEqual = 600112,
+            PackingIdIsZero = 600114,
+            Row_PackingIdZero = 600115,
+            Row_SizeIDZero = 600116,
+            Row_SubCategoryIDZero = 600117,
         }
 
         public enum Class

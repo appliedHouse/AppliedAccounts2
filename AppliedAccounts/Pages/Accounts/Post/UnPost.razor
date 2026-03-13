@@ -1,0 +1,219 @@
+﻿@page "/Unpost"
+@using System.Data
+@using AppliedAccounts.Models
+@using AppliedAccounts.Models.Posting
+
+@inject GlobalService AppGlobal
+
+<ShowPageHeading PageTitle="VOUCHER UN-POST" />
+<PageErrors Messages="@MyModel.MsgClass" />
+
+
+<!-- HEADING MENU -->
+<EditForm Model="MyViewModel" OnValidSubmit="Refresh">
+    <div class="container mb-2">
+        <div class="row d-flex align-items-baseline">
+
+            <!-- Posting Type Dropdown -->
+            <div class="col-md-4">
+                <InputSelect class="form-select"
+                             TValue="PostingTypes"
+                             Value="MyViewModel.PostingType"
+                             ValueChanged="OnPostingTypeChanged"
+                             ValueExpression="@(() => MyViewModel.PostingType)">
+
+                    @foreach (PostingTypes type in Enum.GetValues<PostingTypes>())
+                    {
+                        <option value="@type">@type</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <!-- From Date -->
+            <div class="col-md-2 d-grid">
+                <div class="input-group">
+                    <label class="input-group-text" style="width:30%">From</label>
+
+                    <InputDate class="form-control TextCenter"
+                               style="width:70%"
+                               @bind-Value="MyViewModel.Dt_From"/>
+                </div>
+            </div>
+
+            <!-- To Date -->
+            <div class="col-md-2 d-grid">
+                <div class="input-group">
+                    <label class="input-group-text" style="width:30%">To</label>
+                    <InputDate class="form-control TextCenter"
+                               style="width:70%"
+                               @bind-Value="MyViewModel.Dt_To"/>
+                </div>
+            </div>
+
+            <!-- Refresh Button -->
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary" @onclick="Refresh">
+                    Refresh
+                </button>
+            </div>
+
+        </div>
+    </div>
+</EditForm>
+
+
+<!-- LIST OF LEDGER -->
+@if (MyModel.DataListModelList != null && MyModel.DataListModelList.Count > 0)
+{
+    <div class="page-wrapper">
+        <div class="container table-container">
+            <table class="table-list">
+                <thead>
+                    <tr>
+                        <th style="width:10%">Vou No</th>
+                        <th style="width:10%">Vou Date</th>
+                        <th style="width:40%">Account Title</th>
+                        <th style="width:10%">Debit</th>
+                        <th style="width:10%">Credit</th>
+                        <th style="width:10%">Status</th>
+                        <th style="width:5%">Unpost</th>
+                        <th style="width:5%">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in MyModel.DataListModelList)
+                    {
+                        var rowDate = item.Vou_Date.ToString(Format.DDMMMYY);
+                        var _RowID = item.ID;
+                        var _DR = item.DR.ToString(Format.Digit);
+                        var _CR = item.CR.ToString(Format.Digit);
+                        var _Posted = item.Status == "Posted" ? true : false;
+
+                        <tr>
+                            <td class="TextCenter">@item.Vou_No</td>
+                            <td class="TextCenter">@item.Vou_Date.ToString(Format.DDMMMYYYY)</td>
+                            <td>@item.Title</td>
+                            <td class="text-danger right">@_DR</td>
+                            <td class="text-danger right">@_CR</td>
+                            <td class="TextCenter">@item.Status</td>
+                            <td class="text-center">
+                                <input type="checkbox"
+                                       checked="@item.Selected)" />
+                            </td>
+
+                            <td>
+                                <button class="btn btn-link"
+                                        @onclick="() => UnPostingVoucher(item.ID)">
+
+                                    @if (UnPostVoucherID == _RowID)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-1"
+                                              role="status"
+                                              aria-hidden="true"></span>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    }
+                                </button>
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="d-flex">
+                <div class="p-1" style="height:40px">
+                    <NavPageBar Paging="MyModel.Pages"></NavPageBar>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    @if (MyModel.IsPosting)
+    {
+        <div class="fade-overlay">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Unpost is being processed...</span>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="container">
+        <div class="alert alert-danger">
+            <h5>No Record Found</h5>
+        </div>
+    </div>
+}
+
+
+<!-- Modal -->
+<div class="modal fade" id="PostVoucher" tabindex="-1" aria-labelledby="PostVoucherLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="PostVoucherLabel">Post Voucher</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if (UnPostVoucherID > 0)
+                {
+                    <p>Save Voucher No @UnPostVoucher</p>
+                }
+                else
+                {
+                    <p>No voucher found to post</p>
+                }
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                @if (UnPostVoucherID > 0)
+                {
+                    <button type="submit" class="btn btn-success btn-sm" data-bs-dismiss="modal" aria-label="Close" title="Post All" @onclick="() => UnPostingVoucher(UnPostVoucherID)"> Save</button>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.showModal = (id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+
+        let modal = bootstrap.Modal.getInstance(el);
+        if (!modal) {
+            modal = new bootstrap.Modal(el);
+        }
+        modal.show();
+    };
+
+    window.hideModal = (id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+
+        const modal = bootstrap.Modal.getInstance(el);
+        modal?.hide();
+    };
+</script>
+
+<style>
+    .fade-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.4); /* semi-transparent black */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999; /* top-most */
+    }
+</style>

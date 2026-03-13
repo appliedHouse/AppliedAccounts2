@@ -158,7 +158,7 @@ namespace AppMessages
         public Message GetMessage(Messages _Code)
         {
             var _Message = new Message(); ;
-            if (MessagesTable is not null)
+            if (MessagesTable != null)
             {
                 if (MessagesTable.Rows.Count > 0)
                 {
@@ -167,9 +167,10 @@ namespace AppMessages
                     if (MessagesTable.DefaultView.Count == 1)
                     {
                         DataRow _Row = MessagesTable.DefaultView[0].Row;
-                        _Message.MessageID = (int)_Row["ID"];
+                        int.TryParse(_Row["Class"].ToString(), out int _Class);
+                        _Message.MessageID = (long)_Row["ID"];
                         _Message.MessageText = (string)_Row["MessageText"];
-                        _Message.MessageClass = (Class)_Row["Class"];
+                        _Message.MessageClass = (Class)_Class;
                         _Message.MessageDate = DateTime.Now;
                         return _Message;
                     }
@@ -201,7 +202,18 @@ namespace AppMessages
             };
         }
 
-       
+        public void AddReange(List<Message> messageList)
+        {
+            if (messageList.Count > 0)
+            {
+                foreach (Message message in messageList) 
+                {
+                    MessageList.Add(message);
+                }
+            }
+        }
+
+
         #endregion
     }
 }

@@ -381,7 +381,7 @@ namespace AppliedAccounts.Pages.ImportData
 
                 if (string.IsNullOrEmpty(Row["Code"].ToString())) { Error++; continue; }
                 if ((string)Row["Active"] != "1") { Skip++; continue; }
-                if (MyModel.Counter == 1) { continue; }     // Skip record of Heading in Excel File. 
+                //if (MyModel.Counter == 0) { continue; }     // Skip record of Heading in Excel File. 
 
 
                 DataRow _Row1 = Sale1.NewRow();
@@ -559,8 +559,8 @@ namespace AppliedAccounts.Pages.ImportData
                 var BillRec1 = Source.GetTable(Tables.BillReceivable);
                 var BillRec2 = Source.GetTable(Tables.BillReceivable2);
                 
-                var MaxID1 = Source.GetMaxID(Tables.BillReceivable);
-                var MaxID2 = Source.GetMaxID(Tables.BillReceivable2);
+                //var MaxID1 = Source.GetMaxID(Tables.BillReceivable);
+                //var MaxID2 = Source.GetMaxID(Tables.BillReceivable2);
 
                 var master = BillRec1.NewRow();
                 var details = new List<DataRow>();
@@ -597,14 +597,14 @@ namespace AppliedAccounts.Pages.ImportData
                     if (Validated)
                     {
                         MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} validated for post / save... ");
-                        master["ID"] = MaxID1; MaxID1++;           // Set a DataRow for insert command
+                        master["ID"] = 0;           // Set a DataRow for insert command
                         CommandClass _Commands = new(master, AppGlobal.DBFile);
                         var IsSaved = _Commands.SaveChanges();
                         MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} saved ---> {IsSaved} ");
-                        var _TranID = (long)master["ID"];        // Get ID after save row in Sqlite Data Table.
+                        var _TranID = _Commands.PrimaryKeyID;        // Get ID after save row in Sqlite Data Table.
                         foreach (var Row in details)
                         {
-                            Row["ID"] = MaxID2; MaxID2++;
+                            Row["ID"] = 0;
                             Row["TranID"] = _TranID;
                             _Commands = new(Row, AppGlobal.DBFile);
                             await Task.Run(() =>

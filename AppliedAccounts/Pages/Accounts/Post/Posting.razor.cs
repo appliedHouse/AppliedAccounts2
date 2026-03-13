@@ -1,12 +1,8 @@
 ﻿using AppliedAccounts.Data;
-using AppliedAccounts.Models;
-using AppliedAccounts.Pages.Menu;
-using Microsoft.AspNetCore.Components;
+using AppliedAccounts.Models.Posting;
 using Microsoft.JSInterop;
-using System.Runtime.CompilerServices;
+using static AppliedAccounts.Pages.Accounts.Post.Posting;
 using static AppliedGlobals.AppErums;
-
-
 
 
 namespace AppliedAccounts.Pages.Accounts.Post
@@ -26,32 +22,47 @@ namespace AppliedAccounts.Pages.Accounts.Post
             MyModel.Source = new(AppGlobal.AppPaths);
            
             MyModel.Source.SetKey("IsPosting", false, KeyTypes.Boolean, "Is posting is in progress..");
-            MyViewModel = new();
+            MyViewModel = new(); ;
             MyViewModel.Dt_From = AppRegistry.GetDate(DBFile, "Post_dt_From");
             MyViewModel.Dt_To = AppRegistry.GetDate(DBFile, "Post_dt_To");
-            MyViewModel.PostingType = AppRegistry.GetNumber(DBFile, "Post_Type");
-            
-            
-            await MyModel.LoadData(MyViewModel.PostingType);
+            MyViewModel.PostingType = (PostingTypes)AppRegistry.GetNumber(DBFile, "Post_Type");
+
+            MyModel.Pages.PageChanged += OnPageChangedInternal;
+
+            await MyModel.LoadData(MyViewModel);
+            await InvokeAsync(StateHasChanged);
+        }
+
+        private async void OnPageChangedInternal(int page)
+        {
+            if (MyViewModel is null)
+                return;
+
+            await MyModel.LoadData(MyViewModel);
+            await InvokeAsync(StateHasChanged);
+
         }
 
         #region Change Event
-        private async void OnPostingTypeChanged(int value)
+
+        private async Task OnPostingTypeChanged(PostingTypes value)
         {
             MyViewModel.PostingType = value;
-
-            await MyModel.LoadData(MyViewModel.PostingType);
+            await MyModel.LoadData(MyViewModel);
         }
+       
 
-        private void OnStatusChanged(int value)
+        private async void OnStatusChanged(int _PostingStatus)
         {
 
-            MyViewModel.PostingStatus = value;
+            MyViewModel.PostingStatus = _PostingStatus;
+            await MyModel.LoadData(MyViewModel);
+        
         }
 
         #endregion
 
-        public void Refresh()
+        public async void Refresh()
         {
             AppRegistry.SetKey(DBFile, "Post_Type", MyViewModel.PostingType, KeyTypes.Number);
             AppRegistry.SetKey(DBFile, "Post_dt_From", MyViewModel.Dt_From, KeyTypes.Date);
@@ -60,20 +71,10 @@ namespace AppliedAccounts.Pages.Accounts.Post
             AppRegistry.SetKey(DBFile, "PostBank", false, KeyTypes.Boolean);    // Reset Post Bank Voucher Status
             AppRegistry.SetKey(DBFile, "PostReceipt", false, KeyTypes.Boolean);
 
-            //return RedirectToPage();
+            MyModel.Pages = new();
+            await MyModel.LoadData(MyViewModel);
+            await InvokeAsync(StateHasChanged);
         }
-        
-        public void GetFilter()
-        {
-            string filter = string.Empty;
-            if (MyViewModel.Dt_From != DateTime.MinValue && MyViewModel.Dt_To != DateTime.MinValue)
-            {
-                filter = $" Vou_Date >= '{MyViewModel.Dt_From:yyyy-MM-dd}' AND Vou_Date <= '{MyViewModel.Dt_To:yyyy-MM-dd}' ";
-            }
-            MyModel.Filter = filter;
-
-        }
-
 
         public async Task PostVoucher(long id)
         {
@@ -82,27 +83,19 @@ namespace AppliedAccounts.Pages.Accounts.Post
 
             await AppGlobal.JS.InvokeVoidAsync("showModal", "SaveVoucher");
 
-            await MyModel.DoVoucherPosting(id, MyViewModel.PostingType);
+            await MyModel.DoVoucherPosting(id, MyViewModel);
 
             await AppGlobal.JS.InvokeVoidAsync("hideModal", "SaveVoucher");
             MyModel.IsPosting = false;
             StateHasChanged();
         }
 
-       
-
-
-
         public class PostingViewModel
         {
-            public int PostingType { get; set; }
+            public PostingTypes PostingType { get; set; }
             public int PostingStatus { get; set; }
             public DateTime Dt_From { get; set; }
             public DateTime Dt_To { get; set; }
         }
-
-       
-        
-
     }
 }

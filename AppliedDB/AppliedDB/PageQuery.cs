@@ -1,6 +1,5 @@
 ﻿
 
-using System.Collections.Specialized;
 using System.Data;
 using System.Text;
 using static AppliedDB.Enums;
@@ -23,7 +22,7 @@ namespace AppliedDB
             var _Text = await GetCommandText();
             var _Table = Source.GetTable(_Text.ToString());
             //Pages.TotalRecords = _Table?.Rows.Count ?? 0;
-            Pages.GetPageList();
+            //Pages.ChangePage() ;
             return await Task.FromResult(_Table ?? new());
         }
 

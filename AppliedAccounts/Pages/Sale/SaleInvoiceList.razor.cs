@@ -22,7 +22,6 @@ namespace AppliedAccounts.Pages.Sale
 
         }
 
-
         #region Delete
         public async void Delete(long ID)
         {
@@ -42,20 +41,12 @@ namespace AppliedAccounts.Pages.Sale
         {
             MyModel.SelectAll = !MyModel.SelectAll;
             MyModel.Records?.ForEach(item => item.IsSelected = MyModel.SelectAll);
-            //StateHasChanged();
         }
 
         public void SelectOne(long _ID)
         {
             var item = MyModel.Records.Where(a => a.Id == _ID).First();
             item.IsSelected = !item.IsSelected;
-            //foreach (var item in Model.Records)
-            //{
-            //    if(item.Id == _ID)
-            //    {
-            //        item.IsSelected = !item.IsSelected;
-            //    }
-            //}
         }
         #endregion
 
@@ -183,8 +174,6 @@ namespace AppliedAccounts.Pages.Sale
             }
 
         }
-
-
 
 
         private void GetReportData()

@@ -1,6 +1,6 @@
-﻿using AppliedDB;
-using AppMessages;
+﻿using AppMessages;
 using System.Data;
+using AppliedDB;
 using Format = AppliedGlobals.AppValues.Format;
 
 namespace AppliedAccounts.Data
@@ -15,7 +15,7 @@ namespace AppliedAccounts.Data
         public static Message Save(string DataFile, DataTable _Table, DataRow _Row)
         {
             var _ID = (int)_Row["ID"];
-            int _Effected;
+            //int _Effected;
 
 
             // _Message = (new MessageClass()).Empty;
@@ -25,32 +25,32 @@ namespace AppliedAccounts.Data
                 _Table.DefaultView.RowFilter = $"ID={_ID}";
                 if (_Table.DefaultView.Count == 1)
                 {
-                    var _Command = Commands.UpDate(_Row, DataFile);
-                    if (_Command is not null)
-                    {
-                        _Effected = _Command.ExecuteNonQuery();
-                        //_Message = new(Messages.Save);
-                        //Message.RowEffected = _Effected;
-                    }
-                    else
-                    {
-                        //_Message = MessageClass.GetMessage(Messages.cmd_UpdateNull);
-                    }
+                    //var _Command = Commands.UpDate(_Row, DataFile);
+                    //if (_Command is not null)
+                    //{
+                    //    _Effected = _Command.ExecuteNonQuery();
+                    //    //_Message = new(Messages.Save);
+                    //    //Message.RowEffected = _Effected;
+                    //}
+                    //else
+                    //{
+                    //    //_Message = MessageClass.GetMessage(Messages.cmd_UpdateNull);
+                    //}
                 }
 
                 if (_Table.DefaultView.Count == 0)
                 {
-                    var _Command = Commands.Insert(_Row, DataFile);
-                    if (_Command is not null)
-                    {
-                        _Effected = _Command.ExecuteNonQuery();
-                        //_Message = MessageClass.Messages.GetMessage(Messages.RowInserted);
-                        //_Message.RowEffected = _Effected;
-                    }
-                    else
-                    {
-                        //_Message = MessageClass.GetMessage(Messages.cmd_InsertNull);
-                    }
+                    //var _Command = Commands.Insert(_Row, DataFile);
+                    //if (_Command is not null)
+                    //{
+                    //    _Effected = _Command.ExecuteNonQuery();
+                    //    //_Message = MessageClass.Messages.GetMessage(Messages.RowInserted);
+                    //    //_Message.RowEffected = _Effected;
+                    //}
+                    //else
+                    //{
+                    //    //_Message = MessageClass.GetMessage(Messages.cmd_InsertNull);
+                    //}
 
                 }
             }
@@ -73,7 +73,7 @@ namespace AppliedAccounts.Data
                 _Table.DefaultView.RowFilter = $"ID={_ID}";
                 if (_Table.DefaultView.Count == 1)
                 {
-                    var _Command = Commands.Delete(_Row, DataFile);
+                    var _Command = CommandConstructor.Commands.Delete(_Row, DataFile);
                     if (_Command != null)
                     {
                         _Effected = _Command.ExecuteNonQuery();
@@ -143,6 +143,8 @@ namespace AppliedAccounts.Data
             }
             return _Value;
         }
+
+        
 
     }
 

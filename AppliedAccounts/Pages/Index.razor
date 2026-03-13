@@ -26,6 +26,7 @@
         if(AppAuthState.Result.User.Identity!.IsAuthenticated)
         {
             UserModel = await Task.Run(()=> ((UserAuthenticationStateProvider)authStateProvider).AppUser);
+            
         }
     }
 

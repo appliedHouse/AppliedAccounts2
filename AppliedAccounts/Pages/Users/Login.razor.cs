@@ -1,6 +1,8 @@
 ﻿using AppliedAccounts.Authentication;
+using AppliedAccounts.Middleware;
 using AppliedDB;
 using Microsoft.Data.Sqlite;
+using System;
 using System.Data;
 
 namespace AppliedAccounts.Pages.Users
@@ -14,6 +16,7 @@ namespace AppliedAccounts.Pages.Users
         bool IsUserFound { get; set; } = false;
         string ErrorMessage { get; set; }
         int LanguageID { get; set; } = 1;                       // Default Language is 1 = English
+        private static readonly Lock _lock = new();
 
         public async void Submit()
         {
@@ -42,9 +45,21 @@ namespace AppliedAccounts.Pages.Users
                     _UserData.SessionGuid = _newGUID;
                     _UserData.LanguageID = LanguageID;
 
+                    bool IsDBFileValid = false;
                     await userAuthStateProvider.UpdateAuthonticateState(_UserData);
+                    IsDBFileValid = await UserDatabaseFileValidateAsync(AppUser.Profile.DataFile);
 
-                    NavManager.NavigateTo("/", true);
+                    if(IsDBFileValid)
+                    {
+                        NavManager.NavigateTo("/", true);
+                    }
+                    else
+                    {
+                        NavManager.NavigateTo("/DBNotValidate", true);
+                    }
+
+
+                    
 
                 }
                 else
@@ -58,6 +73,43 @@ namespace AppliedAccounts.Pages.Users
                 ErrorMessage = $"User: {MyModel.UserID} not exist.";
             }
         }
+
+
+        private async Task<bool> UserDatabaseFileValidateAsync(string dataFile)
+        {
+            try
+            {
+                lock (_lock)
+                {
+                    if (string.IsNullOrEmpty(dataFile))
+                        throw new Exception("User DataFile not assigned.");
+
+                    var dbPath = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot",
+                        "SqliteDB",
+                        dataFile
+                    );
+
+                    if (!File.Exists(dbPath))
+                    {
+                        return false;
+                    }
+                        
+
+                    // Try opening a connection
+                    using var conn = new SqliteConnection($"Data Source={dbPath}");
+                    conn.Open(); // Will throw if invalid/corrupt
+                    return true;
+
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public void ReLoad()
         {
             IsLogin = true;

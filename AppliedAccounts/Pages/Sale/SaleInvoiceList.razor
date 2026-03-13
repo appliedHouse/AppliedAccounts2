@@ -15,8 +15,8 @@
 @code {
     private Timer MyTime { get; set; }
     private string CurrentTime { get; set; }
-
-
+    private bool IsSearchText { get; set; }
+    private bool IsRecords { get; set; }
 
     protected override void OnInitialized()
     {
@@ -38,6 +38,10 @@
         {
             await DeletePrintedReports();
         }
+
+        IsSearchText = string.IsNullOrEmpty(MyModel.SearchText) ? false : true;
+        IsRecords = MyModel.Records.Count == 0 ? true : false ;
+
     }
 
     private async Task DeletePrintedReports()
@@ -103,12 +107,12 @@
                         <button type="button" class="btn btn-primary btn-sm" @onclick="() => MyModel.Search()">Search</button>
                     </div>
                     <div class="p-2">
-                        <button type="button" disabled="@(MyModel.SearchText.Length == 0)" class="btn btn-primary btn-sm" @onclick="() => MyModel.ClearText()">Clear</button>
+                        <button type="button" disabled="@IsSearchText" class="btn btn-primary btn-sm" @onclick="() => MyModel.ClearText()">Clear</button>
                     </div>
 
                     <div class="p-2">
-                        <button type="submit" disabled="@(MyModel.Records.Count ==0)" class="btn-print" @onclick="(() => PrintAll())"><i class="bi bi-printer-fill"></i> Selected</button>
-                        <button type="submit" disabled="@(MyModel.Records.Count ==0)" class="btn-print" @onclick="(() => PrintOnePDF())"><i class="bi bi-printer-fill"></i> One PDF</button>
+                        <button type="submit" disabled="@IsRecords" class="btn-print" @onclick="(() => PrintAll())"><i class="bi bi-printer-fill"></i> Selected</button>
+                        <button type="submit" disabled="@IsRecords" class="btn-print" @onclick="(() => PrintOnePDF())"><i class="bi bi-printer-fill"></i> One PDF</button>
                     </div>
 
                 </div>

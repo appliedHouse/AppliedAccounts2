@@ -63,22 +63,24 @@ namespace AppliedDB
         public static string SaleInvoiceList()
         {
             var _Text = new StringBuilder();
-            _Text.Append("SELECT ");
-            _Text.Append("[BR].[ID],");
-            _Text.Append("[BR].[Vou_No],");
-            _Text.Append("[BR].[Ref_No],");
-            _Text.Append("[BR].[Vou_Date],");
-            _Text.Append("[BR].[Inv_Date],");
-            _Text.Append("[BR].[Pay_Date],");
-            _Text.Append("[C].[Title] As[Company],");
-            _Text.Append("[E].[Title] As[Salesman],");
-            _Text.Append("[C].[City] As[City],");
-            _Text.Append("[BR].[Amount],");
-            _Text.Append("[BR].[Description],");
-            _Text.Append("[BR].[Status]");
-            _Text.Append("FROM [BillReceivable] [BR]");
-            _Text.Append("LEFT JOIN[Customers] [C] ON [C].[ID] = [BR].[Company]");
-            _Text.Append("LEFT JOIN[Employees] [E] ON [C].[ID] = [BR].[Employee]");
+            _Text.AppendLine("SELECT * FROM (");
+            _Text.AppendLine("SELECT ");
+            _Text.AppendLine("[BR].[ID],");
+            _Text.AppendLine("[BR].[Vou_No],");
+            _Text.AppendLine("[BR].[Ref_No],");
+            _Text.AppendLine("[BR].[Vou_Date],");
+            _Text.AppendLine("[BR].[Inv_Date],");
+            _Text.AppendLine("[BR].[Pay_Date],");
+            _Text.AppendLine("[C].[Title] As[Company],");
+            _Text.AppendLine("[E].[Title] As[Salesman],");
+            _Text.AppendLine("[C].[City] As[City],");
+            _Text.AppendLine("[BR].[Amount],");
+            _Text.AppendLine("[BR].[Description],");
+            _Text.AppendLine("[BR].[Status]");
+            _Text.AppendLine("FROM [BillReceivable] [BR]");
+            _Text.AppendLine("LEFT JOIN [Customers] [C] ON [C].[ID] = [BR].[Company]");
+            _Text.AppendLine("LEFT JOIN [Employees] [E] ON [E].[ID] = [BR].[Employee]");
+            _Text.AppendLine(") AS [SaleInvoice] ");
 
             return _Text.ToString();
         }
@@ -608,6 +610,32 @@ namespace AppliedDB
         }
         #endregion
 
+        #region JV (Journal Voucher)
+        public static string JV()
+        {
+            var _Text = new StringBuilder();
+            return "SELECT * FROM [ledger] [L]";
+        }
+
+        public static string View_JV()
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("SELECT[L].*,");
+            _Text.AppendLine("[A].[Title] [TitleAccount],");
+            _Text.AppendLine("[C].[Title] [TitleCompany],");
+            _Text.AppendLine("[E].[Title] [TitleEmployee],");
+            _Text.AppendLine("[P].[Title] [TitleProject],");
+            _Text.AppendLine("[I].[Title] [TitleStock]");
+            _Text.AppendLine("FROM [ledger] [L] ");
+            _Text.AppendLine("LEFT JOIN[COA]       [A] ON[A].[ID] = [L].[COA]");
+            _Text.AppendLine("LEFT JOIN[Customers] [C] ON[C].[ID] = [L].[Customer]");
+            _Text.AppendLine("LEFT JOIN[Employees] [E] ON[E].[ID] = [L].[Employee]");
+            _Text.AppendLine("LEFT JOIN[Project]   [P] ON[P].[ID] = [L].[Project]");
+            _Text.AppendLine("LEFT JOIN[Inventory] [I] ON[I].[ID] = [L].[Inventory]");
+            return _Text.ToString();
+        }
+
+        #endregion
 
         public static QueryClass GetQuery(Query _SQLQuery)
         {
@@ -629,6 +657,7 @@ namespace AppliedDB
             if (_SQLQuery.Equals(Query.Chk_BillReceivable2)) { return new QueryClass { QueryText = Chk_BillReceivable2(), TableName = Tables.Chk_BillReceivable2.ToString() }; }
             if (_SQLQuery.Equals(Query.Book)) { return new QueryClass { QueryText = Book(), TableName = Tables.Book.ToString() }; }
             if (_SQLQuery.Equals(Query.Book2)) { return new QueryClass { QueryText = Book2(), TableName = Tables.Book2.ToString() }; }
+            if (_SQLQuery.Equals(Query.JV)) { return new QueryClass { QueryText = JV(), TableName = Tables.Book2.ToString() }; }
 
 
             return new QueryClass();

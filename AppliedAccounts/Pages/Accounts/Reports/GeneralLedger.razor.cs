@@ -155,7 +155,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             var _DateFrom = MyModel.Date_From.ToString(Format.YMD);
             var _DateTo = MyModel.Date_To.ToString(Format.YMD);
 
-            var _FilterOB = $"[COA] = {MyModel.COAID} AND Date([Vou_Date]) < Date('{_OBDate}')";
+            var _FilterOB = $"[COA] = {MyModel.COAID} AND Date([Vou_Date]) <= Date('{_OBDate}')";
             var _Filter = $"[COA] = {MyModel.COAID} AND (Date([Vou_Date]) BETWEEN Date('{_DateFrom}') AND Date('{_DateTo}'))";
             var _GroupBy = "[COA]";
             var _SortBy = "[Vou_date], [Vou_no]";
