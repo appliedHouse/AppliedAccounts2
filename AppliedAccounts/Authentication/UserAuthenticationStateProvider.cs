@@ -39,7 +39,8 @@ namespace AppliedAccounts.Authentication
                             {
                                 new (ClaimTypes.Name, userSession.UserName),
                                 new (ClaimTypes.Role, userSession.Role),
-                                new (ClaimTypes.Actor, userSession.Email),
+                                new (ClaimTypes.Email, userSession.Email),
+                                new (ClaimTypes.Actor, userSession.DisplayName),
                                 new ("DBFile",userSession.SqliteFile),
                                 new ("Company",userSession.CompanyName),
                                 new ("Designation",userSession.Designation),
@@ -76,7 +77,7 @@ namespace AppliedAccounts.Authentication
             }
         }
 
-        public async Task UpdateAuthonticateState(UserSession? userSession)
+        public async Task UpdateAuthenticateState(UserSession? userSession)
         {
             ClaimsPrincipal claimsPrincipal;
             if (userSession != null)
@@ -121,6 +122,11 @@ namespace AppliedAccounts.Authentication
         public void GetAppUser(AuthenticationState _AuthState)
         {
             var claims = _AuthState.User.Identities.First().Claims.ToList();
+
+            int.TryParse(claims?.FirstOrDefault(x => x.Type
+                                .Equals("LanguageID", StringComparison.OrdinalIgnoreCase))?.Value,
+                                out int langId);
+
             AppUser = new AppUserModel();
             {
                 AppUser.UserID = _AuthState.User.Identity?.Name ?? "";
@@ -133,14 +139,17 @@ namespace AppliedAccounts.Authentication
                 AppUser.DataFile = claims?.FirstOrDefault(x => x.Type.Equals("DBFile", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
                 AppUser.Company = claims?.FirstOrDefault(x => x.Type.Equals("Company", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
                 AppUser.PIN = claims?.FirstOrDefault(x => x.Type.Equals("PIN", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
-                AppUser.LanguageID = int.Parse(claims?.FirstOrDefault(x => x.Type.Equals("LanguageID", StringComparison.OrdinalIgnoreCase))?.Value ?? "");
                 AppUser.Session = claims?.FirstOrDefault(x => x.Type.Equals("Session", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
+
             };
+
+            AppUser.LanguageID = langId;
+
         }
 
         public async Task Logout()
         {
-            await UpdateAuthonticateState(null);
+            await UpdateAuthenticateState(null);
         }
 
         public enum UserRolls
