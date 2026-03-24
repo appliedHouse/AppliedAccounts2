@@ -96,6 +96,7 @@ namespace Menus
             _Menus.Add(new MenuItem { ID = 2102, Title = "Nature", Active = true, Icon = "bi bi-tags", Level = 3, ParentID = 21, NavigateTo = "/Accounts/COANature" });
             _Menus.Add(new MenuItem { ID = 2103, Title = "Class", Active = true, Icon = "bi bi-layers", Level = 3, ParentID = 21, NavigateTo = "/Accounts/COAClass" });
             _Menus.Add(new MenuItem { ID = 2104, Title = "Notes", Active = true, Icon = "bi bi-journal-text", Level = 3, ParentID = 21, NavigateTo = "/Accounts/COANotes" });
+            _Menus.Add(new MenuItem { ID = 2105, Title = "Projects", Active = true, Icon = "bi bi-briefcase", Level = 3, ParentID = 21, NavigateTo = "/Accounts/Projects" });
 
             // Accounts - Trancaction
             _Menus.Add(new MenuItem { ID = 2201, Title = "Cash Book", Active = true, Icon = "bi bi-cash-coin", Level = 3, ParentID = 22, NavigateTo = "/Accounts/BooksList/1" });
