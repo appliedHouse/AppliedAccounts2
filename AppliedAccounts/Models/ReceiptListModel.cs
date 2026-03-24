@@ -1,5 +1,4 @@
-﻿using Applied_WebApplication.Data;
-using AppliedAccounts.Data;
+﻿using AppliedAccounts.Data;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
@@ -15,6 +14,7 @@ namespace AppliedAccounts.Models
 {
     public class ReceiptListModel
     {
+        #region Variables
         public GlobalService AppGlobal { get; set; }
         public DataSource Source { get; set; }
         public List<DataRow> DataList { get; set; }
@@ -28,7 +28,7 @@ namespace AppliedAccounts.Models
         public DateTime DT_End { get; set; }
         public bool PageIsValid { get; set; } = false;
         public PrintService ReportService { get; set; }
-
+        #endregion
 
         public ReceiptListModel(GlobalService _AppGlobal)
         {

@@ -7,6 +7,8 @@ using System.Data;
 using Format = AppliedGlobals.AppValues.Format;
 using Messages = AppMessages.Enums.Messages;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
+using Enums = AppliedDB.Enums;
+using AppMessages;
 
 namespace AppliedAccounts.Models
 {
@@ -16,7 +18,7 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> BookList { get; set; }
         public List<CodeTitle> NatureAccountsList { get; set; }
         public DataSource Source { get; set; }
-        public AppMessages.MessageClass MsgClass { get; set; }
+        public MessageClass MsgClass { get; set; }
         public PrintService ReportService { get; set; }
         public PageModel Pages { get; set; } = new();
 
@@ -53,7 +55,7 @@ namespace AppliedAccounts.Models
                 {
                     long.TryParse(result.ToString(), out long _Value);
                     BookNatureID = _Value;
-                }       
+                }
 
                 BookID = _BookID;
 
@@ -127,15 +129,6 @@ namespace AppliedAccounts.Models
             }
             #endregion
 
-            // Fatch Book Records between Date Range
-            //SELECT COUNT(*)
-            //FROM view_Book
-            //WHERE BookID = 31
-            //AND Vou_Date >= '2025-12-08 00:00:00'
-            //AND Vou_Date<  '2025-12-09 00:00:00';
-
-
-
             string _Filter = $"[BookID] = {_BookID} AND [Vou_Date] >= '{_Date1}' AND [Vou_Date] <= '{_Date2})'";
             if (SearchText.Length > 0)
             {
@@ -169,19 +162,20 @@ namespace AppliedAccounts.Models
                         _Record.Paid = _DR;
                         _Record.Balance = _Bal;
                         _Record.Description = Row.Field<string>("Description") ?? "";
-                        
+
                         _Record.TReceived = _CR.ToString(Format.Digit);
                         _Record.TPaid = _DR.ToString(Format.Digit);
                         _Record.TBalance = _Bal.ToString(Format.Digit);
-                    };
+                    }
+                    ;
 
                     _List.Add(_Record);
                 }
 
 
-                Pages.Refresh(TotalRecord);
+                Pages.Refresh(TotalRecord);  // Count total records for paging.
 
-                return _List;
+                return [.. _List.OrderBy(e => e.Vou_Date).ThenBy(e => e.Vou_No)];
             }
             return [];
         }
@@ -193,7 +187,7 @@ namespace AppliedAccounts.Models
 
             try
             {
-                ReportService = new(AppGlobal);
+                ReportService = new(AppGlobal); ;
                 ReportService.ReportType = _ReportType;
                 GetReportData();
                 ReportModel();                              // Add / update Report model data.
@@ -217,6 +211,7 @@ namespace AppliedAccounts.Models
             var _VoucherNo = ReportService.Data.ReportTable.Rows[0]["Vou_No"].ToString();
             var _Heading1 = $"General Ledger {BookNatureTitle}";
             var _Heading2 = $"Voucher {_VoucherNo}";
+            var _Spelling = new NumInWords();
 
             ReportService.Model.ReportDataSource = ReportService.Data;                   // Load Reporting Data to Report Model
 
@@ -226,10 +221,15 @@ namespace AppliedAccounts.Models
             ReportService.Model.OutputReport.FileName = $"Book_{_VoucherNo}" +
                 $"{ReportService.Model.OutputReport.FileExt}";          // without Extention
 
+            ReportService.Model.CurrencySign = AppGlobal.Currency.Sign ?? "RS.";
+            ReportService.Model.CurrencyUnit = AppGlobal.Currency.Units ?? "Ps.";
+
+            //ReportService.Model.AmountInWords = _Spelling.ChangeCurrencyToWords(_Amount, ReportService.Model.CurrencySign,  )
+
             ReportService.Model.AddReportParameter("Heading1", _Heading1);
             ReportService.Model.AddReportParameter("Heading2", _Heading2);
-            ReportService.Model.AddReportParameter("InWords", "Words");
-            ReportService.Model.AddReportParameter("CurrencySign", "SAR");
+            ReportService.Model.AddReportParameter("InWords", ReportService.Model.AmountInWords);
+            ReportService.Model.AddReportParameter("CurrencySign", ReportService.Model.CurrencySign);
             ReportService.Model.AddReportParameter("ShowImages", true.ToString());
 
         }

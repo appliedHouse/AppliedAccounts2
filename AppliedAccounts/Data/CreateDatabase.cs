@@ -1,10 +1,15 @@
-﻿using AppliedDB;
+﻿using AppliedAccounts.Pages.Accounts;
+using AppliedAccounts.Pages.Menu;
+using AppliedDB;
 using AppliedGlobals;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
 using System.Data;
+using System.Runtime.Serialization;
 using System.Text;
 using static AppliedDB.Enums;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
-using Microsoft.Data.Sqlite;
 
 namespace AppliedAccounts.Data
 {
@@ -77,12 +82,12 @@ namespace AppliedAccounts.Data
             var _CommandText = string.Empty;
 
             #region return if table exist
-            if (string.IsNullOrEmpty(MyConnection.ConnectionString))
+            if (MyConnection != null)
             {
                 _CommandText = $"SELECT count(name) FROM Sqlite_master WHERE type in('table', 'view') AND name ='{_TableName}'";
                 _Command = new SqliteCommand(_CommandText, MyConnection);
                 if (!MyConnection.State.Equals(ConnectionState.Open)) { MyConnection.Open(); }
-                long TableExist = (long)_Command.ExecuteScalar();
+                long TableExist = (long)_Command.ExecuteScalar()!;
                 if (TableExist > 0) { return; }
             }
             #endregion
@@ -157,6 +162,7 @@ namespace AppliedAccounts.Data
                     break;
                 case Tables.JVList:
                     break;
+              
                 case Tables.Customers:
                     break;
                 case Tables.City:
@@ -207,7 +213,8 @@ namespace AppliedAccounts.Data
                     break;
                 case Tables.Ledger:
                     break;
-                case Tables.view_Ledger:
+                case Tables.View_Ledger:
+                    _CommandText = View_Ledger();
                     break;
                 case Tables.CashBookTitles:
                     break;
@@ -261,6 +268,10 @@ namespace AppliedAccounts.Data
                     _CommandText = view_Receipts();
                     break;
 
+                case Tables.IdGenerator:
+                    _CommandText = IdGenerator();
+                    break;
+
 
                 default:
                     break;
@@ -290,6 +301,28 @@ namespace AppliedAccounts.Data
                 MyMessages.Add($"Error: {e.Message}");
             }
 
+        }
+
+        private string View_Ledger()
+        {
+            var _Text = new StringBuilder();
+
+            _Text.AppendLine("CREATE VIEW [View_Ledger] AS ");
+            _Text.AppendLine("SELECT ");
+            _Text.AppendLine("       [L].*,");
+            _Text.AppendLine("       [A].[Title] AS [TitleAccount],");
+            _Text.AppendLine("       [C].[Title] AS [TitleCompany],");
+            _Text.AppendLine("       [E].[Title] AS [TitleEmployee],");
+            _Text.AppendLine("       [P].[Title] AS [TitleProject],");
+            _Text.AppendLine("       [I].[Title] AS [TitleStock]");
+            _Text.AppendLine("FROM [ledger] [L]");
+            _Text.AppendLine("       LEFT JOIN [COA] [A] ON [A].[ID] = [L].[COA]");
+            _Text.AppendLine("       LEFT JOIN [Customers] [C] ON [C].[ID] = [L].[Customer]");
+            _Text.AppendLine("       LEFT JOIN [Employees] [E] ON [E].[ID] = [L].[Employee]");
+            _Text.AppendLine("       LEFT JOIN [Project] [P] ON [P].[ID] = [L].[Project]");
+            _Text.AppendLine("       LEFT JOIN [Inventory] [I] ON [I].[ID] = [L].[Inventory];");
+
+            return _Text.ToString();
         }
 
 
@@ -755,5 +788,18 @@ namespace AppliedAccounts.Data
         }
         #endregion
 
+        
+        #region ID Generator Table
+        private string IdGenerator()
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("CREATE TABLE IdGenerator (");
+            _Text.AppendLine("    TableName TEXT PRIMARY KEY,");
+            _Text.AppendLine("    LastId INTEGER NOT NULL");
+            _Text.AppendLine(");");
+
+            return _Text.ToString();
+        }
+        #endregion
     }
 }

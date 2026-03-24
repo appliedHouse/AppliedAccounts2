@@ -5,7 +5,7 @@
 
 @inject GlobalService AppGlobal
 
-<ShowPageHeading PageTitle="VOUCHER POSTING" />
+<ShowPageHeading PageTitle="VOUCHER UN-POST" />
 <PageErrors Messages="@MyModel.MsgClass" />
 
 
@@ -16,18 +16,15 @@
 
             <!-- Posting Type Dropdown -->
             <div class="col-md-4">
-                <InputSelect id="ddPostingType"
-                             class="form-select"
-                             TValue="int"
-                             Value="@MyViewModel.PostingType"
-                             ValueExpression="@(() => MyViewModel.PostingType)"
-                             ValueChanged="@((e)=>OnPostingTypeChanged(e))">
+                <InputSelect class="form-select"
+                             TValue="PostingTypes"
+                             Value="MyViewModel.PostingType"
+                             ValueChanged="OnPostingTypeChanged"
+                             ValueExpression="@(() => MyViewModel.PostingType)">
 
-                    <option value="0">Select...</option>
-
-                    @foreach (PostingModel.PostingTypes type in Enum.GetValues(typeof(PostingModel.PostingTypes)))
+                    @foreach (PostingTypes type in Enum.GetValues<PostingTypes>())
                     {
-                        <option value="@((int)type)">@type</option>
+                        <option value="@type">@type</option>
                     }
                 </InputSelect>
             </div>
@@ -36,9 +33,10 @@
             <div class="col-md-2 d-grid">
                 <div class="input-group">
                     <label class="input-group-text" style="width:30%">From</label>
+
                     <InputDate class="form-control TextCenter"
                                style="width:70%"
-                               @bind-Value="MyViewModel.Dt_From" />
+                               @bind-Value="MyViewModel.Dt_From"/>
                 </div>
             </div>
 
@@ -48,25 +46,13 @@
                     <label class="input-group-text" style="width:30%">To</label>
                     <InputDate class="form-control TextCenter"
                                style="width:70%"
-                               @bind-Value="MyViewModel.Dt_To" />
+                               @bind-Value="MyViewModel.Dt_To"/>
                 </div>
             </div>
 
-            @* <div class="col-md-2">
-                <InputSelect class="form-select" id="ddPostingStatus"
-                             TValue="int"
-                             ValueExpression="@(()=> MyViewModel.PostingStatus)"
-                             Value="@MyViewModel.PostingStatus"
-                             ValueChanged="@((e)=>OnStatusChanged(e))">
-                    <option value="0">All</option>
-                    <option value="1">Posted</option>
-                    <option value="2">Submitted</option>
-                </InputSelect>
-            </div> *@
-
             <!-- Refresh Button -->
             <div class="col-md-2 d-grid">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" @onclick="Refresh">
                     Refresh
                 </button>
             </div>
@@ -108,8 +94,8 @@
                             <td class="TextCenter">@item.Vou_No</td>
                             <td class="TextCenter">@item.Vou_Date.ToString(Format.DDMMMYYYY)</td>
                             <td>@item.Title</td>
-                            <td class="text-danger amount1">@_DR</td>
-                            <td class="text-danger amount1">@_CR</td>
+                            <td class="text-danger right">@_DR</td>
+                            <td class="text-danger right">@_CR</td>
                             <td class="TextCenter">@item.Status</td>
                             <td class="text-center">
                                 <input type="checkbox"
@@ -137,27 +123,11 @@
                     }
                 </tbody>
             </table>
-            <nav class="pagination-bar">
-                <ul class="pagination pagination-sm mb-0 justify-content-center">
-                    <li class="page-item disabled">
-                        <a class="page-link">Previous</a>
-                    </li>
-
-                    <li class="page-item active">
-                        <a class="page-link">1</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link">2</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link">3</a>
-                    </li>
-
-                    <li class="page-item">
-                        <a class="page-link">Next</a>
-                    </li>
-                </ul>
-            </nav>
+            <div class="d-flex">
+                <div class="p-1" style="height:40px">
+                    <NavPageBar Paging="MyModel.Pages"></NavPageBar>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -165,7 +135,7 @@
     {
         <div class="fade-overlay">
             <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Posting...</span>
+                <span class="visually-hidden">Unpost is being processed...</span>
             </div>
         </div>
     }

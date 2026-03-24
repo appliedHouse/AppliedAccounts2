@@ -1,101 +1,135 @@
-﻿using AppliedAccounts.Services;
+﻿using AppliedAccounts.Pages.Accounts.Post;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
 using System.Data;
 using VoucherPosting;
+using static AppliedDB.Enums;
 using static AppMessages.Enums;
 
-namespace AppliedAccounts.Models.UnPost
+namespace AppliedAccounts.Models.Posting
 {
     public class UnPostModel
     {
         [Inject] public GlobalService AppGlobal { get; set; } = default!;
+        public UnPostViewModel UnPostVM { get; set; } = new();
         public MessageClass MsgClass { get; set; } = new();
         public List<DataListModel> DataListModelList { get; set; } = new();
         public bool IsPosting { get; set; } = false;
         public DataSource Source { get; set; }
         public string Filter { get; set; } = string.Empty;
+        public string Sort {get; set; } = "Vou_Date, Vou_No";
         public int PostType { get; set; } = 0;
+
+        public PageModel Pages { get; set; } = new();
+
+        public DateTime[] FilterDates { get; set; } = { DateTime.Now, DateTime.Now };
 
         public UnPostModel()
         {
             if (AppGlobal != null) { Source = new(AppGlobal.AppPaths); }
+            Pages.PageChanged += OnPageChangedInternal;
+        }
+
+
+        private async void OnPageChangedInternal(int page)
+        {
+            if (UnPostVM is null) { return; }
+            await LoadData();
 
         }
 
         #region Load Data
-        public async Task LoadData(int PostingType)
+        public async Task LoadData()
+        {
+            await LoadData(UnPostVM);
+        }
+
+
+        public async Task LoadData(UnPostViewModel _UnPostVM)
         {
             Source ??= new(AppGlobal.AppPaths);
+            UnPostVM = _UnPostVM;
 
-            if (PostingType == 0) { return; }
+            FilterDates[0] = UnPostVM.Dt_From;
+            FilterDates[1] = UnPostVM.Dt_To;
 
-            switch (PostingType)
+
+            if (UnPostVM.PostingType == 0) { return; }
+
+            switch (UnPostVM.PostingType)
             {
                 // Cash Books
-                case 1:
+                case PostingTypes.CashBook:
                     Filter = "";
                     var _CashAccList = Source.GetTable(SQLQueries.Quries.GetCashAccounts());
                     if (_CashAccList.Rows.Count > 0)
                     {
                         var CashAccIDs = string.Join(",", _CashAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
-                        Filter = $"BookID IN ({CashAccIDs}) AND [Status] = 'Posted' ";
+                        Filter = $"BookID IN ({CashAccIDs}) AND [Status] = 'Posted' AND ";
+                        Filter += AppliedDB.Functions.GetDateFilter(FilterDates);
+                        
                     }
-                    var _DataTableCash = Source.GetTable(AppliedDB.Enums.Tables.Book, Filter);
+                    var _Sort = Sort + Pages.GetLimit();            // Add pagination filter to select records / rows.
+                    var _DataTableCash = Source.GetTable(Tables.Book, Filter, _Sort);
                     DataListModelList = GetPostingTable(_DataTableCash);
+                    Pages.Refresh(Source.GetCount(Tables.Book, Filter));
 
                     break;
 
                 // Bank Books
-                case 2:
+                case PostingTypes.BankBook:
                     Filter = "";
                     var _BankAccList = Source.GetTable(SQLQueries.Quries.GetBankAccounts());
                     if (_BankAccList.Rows.Count > 0)
                     {
                         var BankAccIDs = string.Join(",", _BankAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
-                        Filter = $"BookID IN ({BankAccIDs}) AND [Status] = 'Posted' ";
+                        Filter = $"BookID IN ({BankAccIDs}) AND [Status] = 'Posted' AND ";
+                        Filter += AppliedDB.Functions.GetDateFilter(FilterDates);
+                       
+
                     }
-                    var _DataTableBank = Source.GetTable(AppliedDB.Enums.Tables.Book, Filter);
+                    _Sort = Sort + Pages.GetLimit();            // Add pagination filter to select records / rows.
+                    var _DataTableBank = Source.GetTable(Tables.Book, Filter, _Sort);
                     DataListModelList = GetPostingTable(_DataTableBank);
+                    Pages.Refresh(Source.GetCount(Tables.Book, Filter));
+
                     break;
-                case 3:
+                case PostingTypes.WriteCheques:
                     DataListModelList.Clear();
                     break;
 
-                case 4:
+                case PostingTypes.BillPayable:
                     DataListModelList.Clear();
                     break;
 
-                case 5:
+                case PostingTypes.BillReceivable:
                     DataListModelList.Clear();
                     break;
 
-                case 6:
+                case PostingTypes.Receipt:
                     DataListModelList.Clear();
                     break;
 
-                case 7:
+                case PostingTypes.Payment:
                     DataListModelList.Clear();
                     break;
 
-                case 8:
+                case PostingTypes.SalesReturn:
                     DataListModelList.Clear();
                     break;
 
-                case 9:
+                case PostingTypes.Production:
                     DataListModelList.Clear();
                     break;
 
-                case 10:
-                    DataListModelList.Clear();
-                    break;
-
+                
                 default:
                     DataListModelList.Clear();
                     break;
             }
-            await Task.Delay(100);
+            //await Task.Delay(100);
         }
 
         private List<DataListModel> GetPostingTable(DataTable dataTable)
@@ -106,7 +140,7 @@ namespace AppliedAccounts.Models.UnPost
             try
             {
                 // Cash book
-                if (dataTable.TableName == AppliedDB.Enums.Tables.Book.ToString())
+                if (dataTable.TableName == Tables.Book.ToString())
                 {
                     //DataListModelList = CreatePostingTable(PostType);
 
@@ -121,7 +155,7 @@ namespace AppliedAccounts.Models.UnPost
                         _DataList.ID = ID;
                         _DataList.Vou_No = Row1.Field<string>("Vou_No") ?? string.Empty;
                         _DataList.Vou_Date = Row1.Field<DateTime>("Vou_Date");
-                        _DataList.Title = Source.SeekTitle(AppliedDB.Enums.Tables.COA, BookID);
+                        _DataList.Title = Source.SeekTitle(Tables.COA, BookID);
                         _DataList.DR = Row1.Field<decimal>("Amount") <= 0 ? Row1.Field<decimal>("Amount") : 0.0M;
                         _DataList.CR = Row1.Field<decimal>("Amount") > 0 ? Row1.Field<decimal>("Amount") : 0.0M;
                         _DataList.Status = Row1.Field<string>("Status") ?? "Submitted";
@@ -147,27 +181,27 @@ namespace AppliedAccounts.Models.UnPost
 
 
 
-        #region Voucher Posting
+        #region Voucher UnPost
 
-        public async Task DoVoucherUnPost(long _VouID, int _PostType)
+        public async Task DoVoucherUnPost(long _VouID, PostingTypes _PostType)
         {
             if (_PostType == 0) { return; }         // Return if type not assigned.
 
             // Cash Book Posting
-            if (_PostType == (int)PostingTypes.CashBook)
+            if (_PostType == PostingTypes.CashBook)
             {
                 VoucherPostingModel postingModel = new();
 
-                postingModel.MasterTable = Source.GetTable(AppliedDB.Enums.Tables.Book, $"ID={_VouID}");
-                postingModel.DetailTable = Source.GetTable(AppliedDB.Enums.Tables.Book2, $"TranID={_VouID}");
+                postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
+                postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
 
                 MsgClass.ClearMessages();                            // Clear all previous messages. 
                 CashBook postCashBook = new(Source, postingModel);
                 await postCashBook.DoCashUnPost();                  // Cash Posting main method.
-                if (postCashBook.PostSuccessful)
+                if (postCashBook.UnPostSuccessful)
                 {
                     MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
-                    await LoadData(_PostType);              // Refresh display Data afger save voucher.
+                    await LoadData();              // Refresh display Data afger save voucher.
                 }
                 else
                 {
@@ -176,20 +210,21 @@ namespace AppliedAccounts.Models.UnPost
             }
 
             // Bank Book Posting
-            if (_PostType == (int)PostingTypes.BankBook)
+            if (_PostType == PostingTypes.BankBook)
             {
                 VoucherPostingModel postingModel = new();
 
-                postingModel.MasterTable = Source.GetTable(AppliedDB.Enums.Tables.Book, $"ID={_VouID}");
-                postingModel.DetailTable = Source.GetTable(AppliedDB.Enums.Tables.Book2, $"TranID={_VouID}");
+                postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
+                postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
 
                 MsgClass.ClearMessages();                           // Clear all previous messages. 
                 CashBook postBankBook = new(Source, postingModel);
-                await postBankBook.DoBankUnPost();                  // Bank Posting main method.
+                // Cash & Bank Voucher data table is same. so here using same fucntion as using for cash
+                await postBankBook.DoCashUnPost();                   
                 if (postBankBook.PostSuccessful)
                 {
                     MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
-                    await LoadData(_PostType);              // Refresh display Data afger save voucher.
+                    await LoadData();              // Refresh display Data afger save voucher.
                 }
                 else
                 {
@@ -198,8 +233,10 @@ namespace AppliedAccounts.Models.UnPost
             }
 
             // Bill Receivable Posting  
-            if (_PostType == (int)PostingTypes.BillReceivable)
+            if (_PostType == PostingTypes.BillReceivable)
             {
+                BillReceivable UnPostBillReceivable = new();
+
                 return;
             }
             return;
@@ -225,21 +262,6 @@ namespace AppliedAccounts.Models.UnPost
             public bool Active { get; set; }
             public bool Selected { get; set; }
 
-        }
-
-        public enum PostingTypes
-        {
-            None = 0,
-            CashBook = 1,
-            BankBook = 2,
-            WriteCheques = 3,
-            BillPayable = 4,
-            BillReceivable = 5,
-            Payment = 6,
-            Receipt = 7,
-            JournalVoucher = 8,
-            SalesReturn = 9,
-            Production = 10,
         }
         #endregion
     }

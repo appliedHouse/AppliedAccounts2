@@ -1,6 +1,6 @@
 ﻿namespace AppliedGlobals
 {
-    public class AppErums
+    public  class AppErums
     {
         public enum KeyTypes
         {

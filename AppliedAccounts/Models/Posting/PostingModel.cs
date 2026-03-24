@@ -1,9 +1,14 @@
-﻿using AppliedAccounts.Services;
+﻿using AppliedAccounts.Pages.Accounts.Post;
+using AppliedAccounts.Pages.Sale.Quotations;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
+using Org.BouncyCastle.Crypto.Modes.Gcm;
 using System.Data;
 using VoucherPosting;
+using static AppliedAccounts.Pages.Accounts.Post.Posting;
+using static AppliedDB.Enums;
 using static AppMessages.Enums;
 
 
@@ -18,59 +23,87 @@ namespace AppliedAccounts.Models.Posting
         public DataSource Source { get; set; }
         public string Filter { get; set; } = string.Empty;
         public PostingTypes PostType { get; set; } = 0;
+        public PageModel Pages { get; set; } = new();
 
         public PostingModel()
         {
             if (AppGlobal != null) { Source = new(AppGlobal.AppPaths); }
+           
 
         }
+
+        
+
+
 
         #region Load Data
-        public async void LoadData(PostingTypes PostingType)
 
-        {
-            await LoadData(PostingType, 0);
-        }
-
-        public async Task LoadData(PostingTypes PostingType, int PostingStatus)
+        public async Task LoadData(PostingViewModel PostingModel)
         {
             Source ??= new(AppGlobal.AppPaths);
+            //Source = AppGlobal.Source;
 
-            if (PostingType == 0) { return; }
+            if (PostingModel.PostingType == 0) { return; }
 
-            switch (PostingType)
+            DateTime Date1 = PostingModel.Dt_From;
+            DateTime Date2 = PostingModel.Dt_To;
+            List<string> conditions = new();
+
+            switch (PostingModel.PostingType)
             {
                 // Cash Books
                 case PostingTypes.CashBook:
-                    Filter = "";
-                    if (PostingStatus == 1) { Filter = "AND Status='Submitted'"; }
-                    if (PostingStatus == 2) { Filter = "AND Status='Posted'"; }
+
+                    if (PostingModel.PostingStatus == 1) { conditions.Add($"Status='{PostingStatus.Submitted}'"); }
+                    if (PostingModel.PostingStatus == 2) { conditions.Add($"Status='{PostingStatus.Posted}'"); }
+
+                    conditions.Add($"Date(Vou_Date) >= '{Date1:yyyy-MM-dd}'");
+                    conditions.Add($"Date(Vou_Date) <= '{Date2:yyyy-MM-dd}'");
+
+                    string Filter = string.Join(" AND ", conditions);
+
+                    string _Limit = $"LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
 
                     var _CashAccList = Source.GetTable(SQLQueries.Quries.GetCashAccounts());
                     if (_CashAccList.Rows.Count > 0)
                     {
                         var CashAccIDs = string.Join(",", _CashAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
-                        Filter = $"BookID IN ({CashAccIDs}) {Filter} ";
+                        Filter = $"BookID IN ({CashAccIDs}) AND {Filter}";
+                        //Pages.TotalRecords = Source.GetCount(Tables.Book, Filter);
                     }
-                    var _DataTableCash = Source.GetTable(AppliedDB.Enums.Tables.Book, Filter);
-                    DataListModelList = GetPostingTable(_DataTableCash);
 
+                    _Limit = $"LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
+
+                    var _DataTableCash = Source.GetTable(Tables.Book, $"{Filter} {_Limit}");
+                    DataListModelList = GetPostingTable(_DataTableCash);
+                    Pages.Refresh(Source.GetCount(Tables.Book, Filter));
+                    
                     break;
 
                 // Bank Books
                 case PostingTypes.BankBook:
-                    Filter = "";
-                    if (PostingStatus==1) { Filter = "AND Status='Submitted'"; }
-                    if (PostingStatus==2) { Filter = "AND Status='Posted'"; }
-                    
+                    conditions = new();
+
+                    if (PostingModel.PostingStatus == 1) { conditions.Add($"Status='{PostingStatus.Submitted}'"); }
+                    if (PostingModel.PostingStatus == 2) { conditions.Add($"Status='{PostingStatus.Posted}'"); }
+
+                    conditions.Add($"Date(Vou_Date) >= '{Date1:yyyy-MM-dd}'");
+                    conditions.Add($"Date(Vou_Date) <= '{Date2:yyyy-MM-dd}'");
+
+                    Filter = string.Join(" AND ", conditions);
+
                     var _BankAccList = Source.GetTable(SQLQueries.Quries.GetBankAccounts());
                     if (_BankAccList.Rows.Count > 0)
                     {
                         var BankAccIDs = string.Join(",", _BankAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
-                        Filter = $"BookID IN ({BankAccIDs}) {Filter} ";
+                        Filter = $"BookID IN ({BankAccIDs}) AND {Filter} ";
                     }
-                    var _DataTableBank = Source.GetTable(AppliedDB.Enums.Tables.Book, Filter);
+
+                    _Limit = $"LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
+                    var _DataTableBank = Source.GetTable(Tables.Book, $"{Filter} {_Limit}" );
                     DataListModelList = GetPostingTable(_DataTableBank);
+                    Pages.Refresh(Source.GetCount(Tables.Book, Filter));
+
                     break;
                 case PostingTypes.WriteCheques:
                     DataListModelList.Clear();
@@ -96,7 +129,7 @@ namespace AppliedAccounts.Models.Posting
                     DataListModelList.Clear();
                     break;
 
-              
+
                 case PostingTypes.Production:
                     DataListModelList.Clear();
                     break;
@@ -116,7 +149,7 @@ namespace AppliedAccounts.Models.Posting
             try
             {
                 // Cash book
-                if (dataTable.TableName == AppliedDB.Enums.Tables.Book.ToString())
+                if (dataTable.TableName == Tables.Book.ToString())
                 {
                     //DataListModelList = CreatePostingTable(PostType);
 
@@ -131,7 +164,7 @@ namespace AppliedAccounts.Models.Posting
                         _DataList.ID = ID;
                         _DataList.Vou_No = Row1.Field<string>("Vou_No") ?? string.Empty;
                         _DataList.Vou_Date = Row1.Field<DateTime>("Vou_Date");
-                        _DataList.Title = Source.SeekTitle(AppliedDB.Enums.Tables.COA, BookID);
+                        _DataList.Title = Source.SeekTitle(Tables.COA, BookID);
                         _DataList.DR = Row1.Field<decimal>("Amount") <= 0 ? Row1.Field<decimal>("Amount") : 0.0M;
                         _DataList.CR = Row1.Field<decimal>("Amount") > 0 ? Row1.Field<decimal>("Amount") : 0.0M;
                         _DataList.Status = Row1.Field<string>("Status") ?? "Submitted";
@@ -148,27 +181,29 @@ namespace AppliedAccounts.Models.Posting
                 MsgClass.Critical(ex.Message);
                 throw;
             }
-            return _List;
+
+            
+            return [.. _List.OrderBy(e => e.Vou_Date).ThenBy(e => e.Vou_No)];
 
         }
 
-
+        
         #endregion
 
 
         #region Voucher Posting
 
-        public async Task DoVoucherPosting(long _VouID, PostingTypes _PostType)
+        public async Task DoVoucherPosting(long _VouID, PostingViewModel PostingModel)
         {
-            if (_PostType == 0) { return; }         // Return if type not assigned.
-            
+            if (PostingModel.PostingType == 0) { return; }         // Return if type not assigned.
+
             // Cash Book Posting
-            if (_PostType == PostingTypes.CashBook)
+            if (PostingModel.PostingType == PostingTypes.CashBook)
             {
                 VoucherPostingModel postingModel = new();
 
-                postingModel.MasterTable = Source.GetTable(AppliedDB.Enums.Tables.Book, $"ID={_VouID}");
-                postingModel.DetailTable = Source.GetTable(AppliedDB.Enums.Tables.Book2, $"TranID={_VouID}");
+                postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
+                postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
 
                 MsgClass.ClearMessages();                            // Clear all previous messages. 
                 CashBook postCashBook = new(Source, postingModel);
@@ -176,7 +211,7 @@ namespace AppliedAccounts.Models.Posting
                 if (postCashBook.PostSuccessful)
                 {
                     MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
-                    LoadData(_PostType);                    // Refresh display Data afger save voucher.
+                    LoadData(PostingModel);                    // Refresh display Data afger save voucher.
                 }
                 else
                 {
@@ -185,7 +220,7 @@ namespace AppliedAccounts.Models.Posting
             }
 
             // Bank Book Posting
-            if (_PostType == PostingTypes.BankBook)
+            if (PostingModel.PostingType == PostingTypes.BankBook)
             {
                 VoucherPostingModel postingModel = new();
 
@@ -198,7 +233,7 @@ namespace AppliedAccounts.Models.Posting
                 if (postBankBook.PostSuccessful)
                 {
                     MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
-                    LoadData(_PostType);              // Refresh display Data afger save voucher.
+                    LoadData(PostingModel);              // Refresh display Data afger save voucher.
                 }
                 else
                 {
@@ -207,7 +242,7 @@ namespace AppliedAccounts.Models.Posting
             }
 
             // Bill Receivable Posting  
-            if (_PostType == PostingTypes.BillReceivable)
+            if (PostingModel.PostingType == PostingTypes.BillReceivable)
             {
                 return;
             }
@@ -236,20 +271,9 @@ namespace AppliedAccounts.Models.Posting
 
         }
 
-        public enum PostingTypes
-        {
-            None = 0,
-            CashBook = 1,
-            BankBook = 2,
-            WriteCheques = 3,
-            BillPayable = 4,
-            BillReceivable = 5,
-            Payment = 6,
-            Receipt = 7,
-            JournalVoucher = 8,
-            SalesReturn = 9,
-            Production = 10,
-        }
+
         #endregion
+
+        
     }
 }

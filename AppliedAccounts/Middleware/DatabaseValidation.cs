@@ -1,45 +1,79 @@
-﻿namespace AppliedAccounts.Middleware
+﻿using Microsoft.Data.Sqlite;
+
+namespace AppliedAccounts.Middleware
 {
     public class DatabaseValidation
     {
-
         private readonly RequestDelegate _next;
-        private static bool _isDatabaseValid = false; // Cached validation result
-        private static bool _validationPerformed = false; // Ensure validation runs only once
+
+        private static bool _isDatabaseValid = false;
+        private static bool _validationPerformed = false;
+        private static readonly Lock  _lock = new();
 
         public DatabaseValidation(RequestDelegate next)
         {
             _next = next;
         }
 
-
-
-        public async Task InvokeAsync(HttpContext context, IServiceProvider serviceProvider)
+        public async Task InvokeAsync(HttpContext context)
         {
-            // If validation has already been performed, skip it
+            // Run validation only once (Thread Safe)
             if (!_validationPerformed)
             {
-                _validationPerformed = true; // Mark validation as performed
+                lock (_lock)
+                {
+                    if (!_validationPerformed)
+                    {
+                        string dbPath = Path.Combine(
+                            Directory.GetCurrentDirectory(),
+                            "wwwroot",
+                            "SqliteDB",
+                            "AppliedUsers2.db"
+                        );
 
-                string dbPath = Path.Combine(Directory.GetCurrentDirectory(),
-                    "wwwroot",
-                    "SqliteDB",
-                    "AppliedUsers2.db");
+                        try
+                        {
+                            // Check file exists
+                            if (File.Exists(dbPath))
+                            {
+                                // Check SQLite connection
+                                using var conn = new SqliteConnection($"Data Source={dbPath}");
+                                conn.Open();
 
-                // Check if the database file exists
-                _isDatabaseValid = File.Exists(dbPath);
+                                _isDatabaseValid = true;
+                            }
+                            else
+                            {
+                                _isDatabaseValid = false;
+                            }
+                        }
+                        catch
+                        {
+                            _isDatabaseValid = false;
+                        }
+
+                        _validationPerformed = true;
+                    }
+                }
             }
 
-            // If the database is invalid, redirect only once
+            // Redirect to error page if DB invalid
             if (!_isDatabaseValid && !context.Request.Path.StartsWithSegments("/Error"))
             {
-
                 context.Response.Redirect("/Error");
                 return;
             }
 
-            // Continue to the next middleware
             await _next(context);
+        }
+    }
+
+    // Extension Method
+    public static class DatabaseValidationExtensions
+    {
+        public static IApplicationBuilder UseDatabaseValidation(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<DatabaseValidation>();
         }
     }
 }

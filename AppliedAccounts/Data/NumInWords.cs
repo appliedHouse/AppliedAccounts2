@@ -1,10 +1,24 @@
 ﻿
 // Source : https://stackoverflow.com/questions/2600746/print-value-of-number-int-spelled-out
 
-namespace Applied_WebApplication.Data
+namespace AppliedAccounts.Data
 {
     public class NumInWords
     {
+        public string Currency { get; set; }
+        public string CurrencyUnit { get; set; }
+
+        public NumInWords(string _Currency, string _CurrencyUnit)
+        {
+            Currency = _Currency;
+            CurrencyUnit = _CurrencyUnit;
+        }
+
+        public NumInWords()
+        {
+        }
+
+
         #region Number to Words
         public string ChangeNumericToWords(double Amount)
         {
@@ -37,6 +51,11 @@ namespace Applied_WebApplication.Data
         public string ChangeCurrencyToWords(string Amount, string Currency, string Unit)
         {
             return ChangeToWords(Amount, true, Currency, Unit);
+        }
+
+        public string ChangeCurrencyToWords(string Amount)
+        {
+            return ChangeToWords(Amount, true, Currency, CurrencyUnit);
         }
 
 
@@ -282,6 +301,7 @@ namespace Applied_WebApplication.Data
             }
             return cts;
         }
+
     }
 }
 

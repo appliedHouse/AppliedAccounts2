@@ -76,9 +76,9 @@ namespace Menus
             _Menus.Add(new MenuItem { ID = 33, Title = "Reports", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 3, NavigateTo = "/Menu/Sale/Reports" }); 
 
             // Sub Menu Stock
-            _Menus.Add(new MenuItem { ID = 41, Title = "Dictionery", Active = true, Icon = "bi bi-journal-code", Level = 2, ParentID = 4, NavigateTo = "" });
-            _Menus.Add(new MenuItem { ID = 42, Title = "Production", Active = true, Icon = "bi bi-bricks", Level = 2, ParentID = 4, NavigateTo = "" });
-            _Menus.Add(new MenuItem { ID = 43, Title = "Reports", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 4, NavigateTo = "" });
+            _Menus.Add(new MenuItem { ID = 41, Title = "Dictionery", Active = true, Icon = "bi bi-journal-code", Level = 2, ParentID = 4, NavigateTo = "/Menu/Stock/Dictionery" });
+            _Menus.Add(new MenuItem { ID = 42, Title = "Production", Active = true, Icon = "bi bi-bricks", Level = 2, ParentID = 4, NavigateTo = "/Menu/Stock/Production" });
+            _Menus.Add(new MenuItem { ID = 43, Title = "Reports", Active = true, Icon = "bi bi-printer", Level = 2, ParentID = 4, NavigateTo = "/Menu/Stock/Reports" });
 
             // Sub Menu HR
             _Menus.Add(new MenuItem { ID = 51, Title = "Employees", Active = true, Icon = "bi bi-person-fill", Level = 2, ParentID = 5, NavigateTo = "" });
@@ -96,6 +96,7 @@ namespace Menus
             _Menus.Add(new MenuItem { ID = 2102, Title = "Nature", Active = true, Icon = "bi bi-tags", Level = 3, ParentID = 21, NavigateTo = "/Accounts/COANature" });
             _Menus.Add(new MenuItem { ID = 2103, Title = "Class", Active = true, Icon = "bi bi-layers", Level = 3, ParentID = 21, NavigateTo = "/Accounts/COAClass" });
             _Menus.Add(new MenuItem { ID = 2104, Title = "Notes", Active = true, Icon = "bi bi-journal-text", Level = 3, ParentID = 21, NavigateTo = "/Accounts/COANotes" });
+            _Menus.Add(new MenuItem { ID = 2105, Title = "Projects", Active = true, Icon = "bi bi-briefcase", Level = 3, ParentID = 21, NavigateTo = "/Accounts/Projects" });
 
             // Accounts - Trancaction
             _Menus.Add(new MenuItem { ID = 2201, Title = "Cash Book", Active = true, Icon = "bi bi-cash-coin", Level = 3, ParentID = 22, NavigateTo = "/Accounts/BooksList/1" });
@@ -105,7 +106,7 @@ namespace Menus
             _Menus.Add(new MenuItem { ID = 2205, Title = "Receivables", Active = true, Icon = "bi bi-file-text", Level = 3, ParentID = 22, NavigateTo = "/Sale/SaleInvoiceList" });
             _Menus.Add(new MenuItem { ID = 2206, Title = "Payables", Active = true, Icon = "bi bi-file-earmark-post", Level = 3, ParentID = 22, NavigateTo = "/Purchase/PurchaseList" });
             _Menus.Add(new MenuItem { ID = 2207, Title = "Receipts", Active = true, Icon = "bi bi-receipt", Level = 3, ParentID = 22, NavigateTo = "/Accounts/ReceiptList" });
-            _Menus.Add(new MenuItem { ID = 2208, Title = "J.Voucher", Active = true, Icon = "bi bi-journal", Level = 3, ParentID = 22, NavigateTo = "" });
+            _Menus.Add(new MenuItem { ID = 2208, Title = "J.Voucher", Active = true, Icon = "bi bi-journal", Level = 3, ParentID = 22, NavigateTo = "/Accounts/JVList" });
             _Menus.Add(new MenuItem { ID = 2209, Title = "Vouchers", Active = true, Icon = "bi bi-journals", Level = 3, ParentID = 22, NavigateTo = "" });
 
             // Accounts - Reports
@@ -120,6 +121,15 @@ namespace Menus
 
             // Sale - Transaction
             _Menus.Add(new MenuItem { ID = 3101, Title = "Client List", Active = true, Icon = "bi bi-people-fill", Level = 3, ParentID = 31, NavigateTo = "/CustomerList" });
+
+
+            // Stock - Dictionery
+            _Menus.Add(new MenuItem { ID = 4101, Title = "Category", Active = true, Icon = "bi bi-stack", Level = 3, ParentID = 41, NavigateTo = "/Menu/Stock/Directory/Inv_Category" });
+            _Menus.Add(new MenuItem { ID = 4102, Title = "Sub Category", Active = true, Icon = "bi bi-subtract", Level = 3, ParentID = 41, NavigateTo = "/Menu/Stock/Directory/Inv_SubCategory" });
+            _Menus.Add(new MenuItem { ID = 4103, Title = "Packing", Active = true, Icon = "bi bi-box", Level = 3, ParentID = 41, NavigateTo = "/Menu/Stock/Directory/Inv_Packing" });
+            _Menus.Add(new MenuItem { ID = 4104, Title = "Size", Active = true, Icon = "bi bi-measuring-cup", Level = 3, ParentID = 41, NavigateTo = "/Menu/Stock/Directory/Inv_Size" });
+            _Menus.Add(new MenuItem { ID = 4105, Title = "Measurement", Active = true, Icon = "bi bi-chevron-bar-contract", Level = 3, ParentID = 41, NavigateTo = "/Menu/Stock/Directory/Inv_UOM" });
+
 
             return _Menus;
         }

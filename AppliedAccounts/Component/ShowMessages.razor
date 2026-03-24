@@ -25,7 +25,7 @@
 
 @if (MsgClass is not null)
 {
-        @if (MsgClass.Count > 0)
+    @if (MsgClass.Count > 0)
     {
         <div class="messages">
             @foreach (var Message in MsgClass.MessageList)
@@ -83,6 +83,38 @@
                     </div>
                 }
             }
+
+        </div>
+
+        <div class="errors">
+            @foreach (var Message in MsgClass.Errors)
+            {
+                @if (Message.MessageClass.Equals(Enums.Class.Error))
+                {
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Error:"><use xlink:href="#exclamation-triangle-fill" /></svg>
+
+                        <div>@Message.MessageText</div>
+                    </div>
+                }
+                @if (Message.MessageClass.Equals(Enums.Class.Danger))
+                {
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill" /></svg>
+
+                        <div>@Message.MessageText</div>
+                    </div>
+                }
+                @if (Message.MessageClass.Equals(Enums.Class.Critical))
+                {
+                    <div class="alert alert-info d-flex align-items-center" role="alert">
+                        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Critical:"><use xlink:href="#exclamation-triangle-fill" /></svg>
+
+                        <div>@Message.MessageText</div>
+                    </div>
+                }
+            }
+
         </div>
     }
 }

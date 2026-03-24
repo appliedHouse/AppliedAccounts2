@@ -60,7 +60,6 @@ namespace AppliedAccounts.Pages.Sale
         }
         #endregion
 
-
         #region Submit & Digitis
         public void Submit()
         {
@@ -83,6 +82,7 @@ namespace AppliedAccounts.Pages.Sale
         }
         #endregion
 
+        #region Save Invoice to DB
         public async void SaveAll()
         {
             var IsSaved = await MyModel.SaveAllAsync();
@@ -91,10 +91,15 @@ namespace AppliedAccounts.Pages.Sale
 
             if (IsSaved)
             {
-                ToastService.ShowToast(ToastClass.SaveToast, $"Save | {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
+                ToastService.ShowToast(ToastClass.SaveToast, $"Saved | {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
                 NavManager.NavigateTo($"/Sale/SaleInvoice/{MyModel.MyVoucher.Master.ID1}");
             }
+            else
+            {
+                ToastService.ShowToast(ToastClass.ErrorToast, $"Not Saved | {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
+            }
         }
+        #endregion
 
         #region Delete
         public void Delete(int _Sr_No)
@@ -110,7 +115,6 @@ namespace AppliedAccounts.Pages.Sale
         }
         #endregion
 
-
         #region Home & Back Buttons
         public void GotoHome()
         {
@@ -124,7 +128,7 @@ namespace AppliedAccounts.Pages.Sale
 
         public void TestRecord()
         {
-
+            MyModel.TestData();
         }
 
         #endregion
@@ -143,8 +147,5 @@ namespace AppliedAccounts.Pages.Sale
 
 
         #endregion
-
-
-
     }
 }

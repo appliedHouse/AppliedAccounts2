@@ -139,7 +139,6 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-
         #region Get Report table
         //public DataTable GetReportTable()
         //{
@@ -189,11 +188,11 @@ namespace AppliedAccounts.Models
 
                         MyVoucher.Master = VoucherData!.Select(first => new Master()
                         {
-                            ID1 = first.Field<int>("ID1"),
+                            ID1 = first.Field<long>("ID1"),
                             Vou_No = first.Field<string>("Vou_No") ?? "",
                             Vou_Date = first.Field<DateTime>("Vou_Date"),
-                            Company = first.Field<int>("Company"),
-                            Employee = first.Field<int>("Employee"),
+                            Company = first.Field<long>("Company"),
+                            Employee = first.Field<long>("Employee"),
                             Ref_No = first.Field<string>("Ref_No") ?? "",
                             Inv_No = first.Field<string>("Inv_No") ?? "",
                             Inv_Date = first.Field<DateTime>("Inv_Date"),
@@ -210,18 +209,18 @@ namespace AppliedAccounts.Models
 
                         MyVoucher.Details = [.. VoucherData.Select(row => new Detail()
                         {
-                            ID2 = row.Field<int?>("ID2") ?? 0,
-                            TranID = row.Field<int?>("TranID") ?? 0,
+                            ID2 = row.Field<long?>("ID2") ?? 0,
+                            TranID = row.Field<long?>("TranID") ?? 0,
                             Sr_No = row.Field<int?>("Sr_No") ?? 0,
-                            Inventory = row.Field<int?>("Inventory") ?? 0,
+                            Inventory = row.Field<long?>("Inventory") ?? 0,
                             Batch = row.Field<string>("Batch") ?? "",
-                            Unit = row.Field<int?>("Unit") ?? 0,
+                            Unit = row.Field<long?>("Unit") ?? 0,
                             Qty = row.Field<decimal?>("Qty") ?? 0.00M,
                             Rate = row.Field<decimal?>("Rate") ?? 0.00M,
-                            TaxID = row.Field<int?>("Tax") ?? 0,
+                            TaxID = row.Field<long?>("Tax") ?? 0,
                             TaxRate = row.Field<decimal?>("Tax_Rate") ?? 0.00M,
                             Description = row.Field<string>("Description") ?? "",
-                            Project = row.Field<int?>("Project") ?? 0,
+                            Project = row.Field<long?>("Project") ?? 0,
 
                             TitleInventory = row.Field<string>("TitleStock") ?? "",
                             TitleProject = row.Field<string>("TitleProject") ?? "",
@@ -251,7 +250,7 @@ namespace AppliedAccounts.Models
         #region Is Voucher is valided 
         public bool IsVoucherValidated()            // Validate Master and Detail both of all record
         {
-            bool IsValid = true;                
+            bool IsValid = true;
             MsgClass.ClearMessages();
             if (!IsTransValidated())                // Temp code. update in future 20-DEC-2025
             {
@@ -283,7 +282,7 @@ namespace AppliedAccounts.Models
 
             if (MyVoucher.Detail.Sr_No == 0) { MsgClass.Add(MESSAGE.SerialNoIsZero); }
             if (MyVoucher.Detail.Inventory == 0) { MsgClass.Add(MESSAGE.Row_InventoryIDZero); }
-            if (MyVoucher.Detail.TaxID == 0) { MsgClass.Add(MESSAGE.Row_TaxIDZero); }
+
             if (MyVoucher.Detail.Unit == 0) { MsgClass.Add(MESSAGE.Row_UnitIDZero); }
             if (MyVoucher.Detail.Qty == 0) { MsgClass.Add(MESSAGE.Row_QtyZero); }
             if (MyVoucher.Detail.Rate == 0) { MsgClass.Add(MESSAGE.Row_RateZero); }
@@ -291,6 +290,10 @@ namespace AppliedAccounts.Models
             if (MyVoucher.Detail.Description.Length == 0) { MsgClass.Add(MESSAGE.DescriptionIsNothing); }
             if (MsgClass.Count > 0) { IsValid = false; }
 
+            if (MyVoucher.Detail.TaxRate == 0)
+            {
+                if (MyVoucher.Detail.TaxID == 0) { MsgClass.Add(MESSAGE.Row_TaxIDZero); }
+            }
             return IsValid;
         }
         #endregion
@@ -373,6 +376,7 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
+        #region Display detail List
         public List<Detail> GetDisplayList(bool _Deleted)
         {
             if (_Deleted)
@@ -381,6 +385,7 @@ namespace AppliedAccounts.Models
             }
             return MyVoucher.Details;
         }
+        #endregion
 
         #region Remove
 
@@ -459,7 +464,7 @@ namespace AppliedAccounts.Models
                 if (!IsSrNo)
                 {
                     MyVoucher.Detail.Action = "save";
-                    MyVoucher.Details.Add(MyVoucher.Detail);            
+                    MyVoucher.Details.Add(MyVoucher.Detail);
                 }
             }
             else
@@ -472,125 +477,170 @@ namespace AppliedAccounts.Models
 
         public async Task<bool> SaveAllAsync()
         {
+            if (IsWaiting) { return false; }
+                
+
+            IsWaiting = true;
             MsgClass = new();
+            bool isSaved = true;
 
-
-            var IsSaved = true;
-            if (!IsWaiting)
+            try
             {
-                IsWaiting = true;
-
-                await Task.Run(() =>
+                // Generate Voucher No if NEW
+                if (MyVoucher.Master.Vou_No?.ToUpper() == "NEW")
                 {
-                    DataRow NewRow1 = Source.GetNewRow(Tables.BillReceivable);
+                    MyVoucher.Master.Vou_No = NewVoucherNo.GetNewVoucherNo(Source.DBFile, Tables.BillReceivable, "BR");
+                }
 
-                    if (MyVoucher.Master.Vou_No.ToUpper().Equals("NEW"))
+                // =============================
+                // 1️⃣ CREATE MASTER ROW
+                // =============================
+                DataRow masterRow = Source.GetNewRow(Tables.BillReceivable);
+
+                masterRow["ID"] = MyVoucher.Master.ID1;
+                masterRow["Vou_No"] = MyVoucher.Master.Vou_No;
+                masterRow["Vou_Date"] = MyVoucher.Master.Vou_Date;
+                masterRow["Company"] = MyVoucher.Master.Company;
+                masterRow["Employee"] = MyVoucher.Master.Employee;
+                masterRow["Inv_No"] = MyVoucher.Master.Inv_No;
+                masterRow["Inv_Date"] = MyVoucher.Master.Inv_Date;
+                masterRow["Pay_Date"] = MyVoucher.Master.Pay_Date;
+                masterRow["Amount"] = CalculateNetAmount();
+                masterRow["Description"] = MyVoucher.Master.Remarks;
+                masterRow["Comments"] = MyVoucher.Master.Comments;
+                masterRow["Status"] = Submitted.ToString();
+
+                if (!Validate_Master(masterRow))
+                {
+                    MsgClass.Add(MESSAGE.RecordNotValidated);
+                    return false;
+                }
+
+                // =============================
+                // BEGIN TRANSACTION
+                // =============================
+                Source.BeginTransaction();
+
+                // =============================
+                // 2️⃣ SAVE MASTER
+                // =============================
+                CommandClass masterCommand = new(masterRow, Source.MyConnection, Source.DBtransaction!);
+
+                if (!masterCommand.SaveChanges())
+                {
+                    MsgClass.Add(MESSAGE.RowNotUpdated);
+                    isSaved = false;
+                }
+
+                if (isSaved && MyVoucher.Master.ID1 == 0)
+                {
+                    MyVoucher.Master.ID1 = masterCommand.PrimaryKeyID;
+                }
+
+                long saleInvoiceID = MyVoucher.Master.ID1;
+
+                // =============================
+                // 3️⃣ DELETE REMOVED DETAILS
+                // =============================
+                if (isSaved && Deleted != null && Deleted.Count > 0)
+                {
+                    foreach (var item in Deleted)
                     {
-                        MyVoucher.Master.Vou_No = NewVoucherNo.GetNewVoucherNo(Source.DBFile, Tables.BillReceivable, "BR");
+                        DataRow deleteRow = Source.GetNewRow(Tables.BillReceivable2);
+                        deleteRow["ID"] = item.ID2;
+
+                        CommandClass deleteCommand = new(deleteRow, Source.MyConnection, Source.DBtransaction!);
+
+                        if (!deleteCommand.DeleteRow())
+                        {
+                            MsgClass.Add(MESSAGE.RowNotDeleted);
+                            isSaved = false;
+                            break;
+                        }
                     }
 
-                    NewRow1["ID"] = MyVoucher.Master.ID1;
-                    NewRow1["Vou_No"] = MyVoucher.Master.Vou_No;
-                    NewRow1["Vou_Date"] = MyVoucher.Master.Vou_Date;
-                    NewRow1["Company"] = MyVoucher.Master.Company;
-                    NewRow1["Employee"] = MyVoucher.Master.Employee;
-                    NewRow1["Inv_No"] = MyVoucher.Master.Inv_No;
-                    NewRow1["Inv_Date"] = MyVoucher.Master.Inv_Date;
-                    NewRow1["Pay_Date"] = MyVoucher.Master.Pay_Date;
-                    NewRow1["Amount"] = CalculateNetAmount();
-                    NewRow1["Description"] = MyVoucher.Master.Remarks;
-                    NewRow1["Comments"] = MyVoucher.Master.Comments;
-                    NewRow1["Status"] = Submitted.ToString();
-
-                    if (Validate_Master(NewRow1))
+                    // Reset SR_NO only if deletion successful
+                    if (isSaved)
                     {
-                        CommandClass _Command = new(NewRow1, Source.DBFile);
-                        if (!_Command.SaveChanges())
+                        int sr = 1;
+                        foreach (var item in MyVoucher.Details)
                         {
-                            IsSaved = false;
+                            item.Sr_No = sr++;
+                        }
+                    }
+                }
+
+                // =============================
+                // 4️⃣ SAVE DETAILS
+                // =============================
+                if (isSaved)
+                {
+                    foreach (var item in MyVoucher.Details)
+                    {
+                        DataRow detailRow = Source.GetNewRow(Tables.BillReceivable2);
+
+                        detailRow["ID"] = item.ID2;
+                        detailRow["TranID"] = saleInvoiceID;
+                        detailRow["SR_NO"] = item.Sr_No;
+                        detailRow["Inventory"] = item.Inventory;
+                        detailRow["Batch"] = item.Batch;
+                        detailRow["Unit"] = item.Unit;
+                        detailRow["Qty"] = item.Qty;
+                        detailRow["Rate"] = item.Rate;
+                        detailRow["Tax"] = item.TaxID;
+                        detailRow["Tax_Rate"] = item.TaxRate;
+                        detailRow["Description"] = item.Description;
+                        detailRow["Project"] = item.Project;
+
+                        if (!Validate_Detail(detailRow))
+                        {
+                            MsgClass.Add(MESSAGE.RecordNotValidated);
+                            isSaved = false;
+                            break;
+                        }
+
+                        CommandClass detailCommand = new(detailRow, Source.MyConnection, Source.DBtransaction!);
+
+                        if (!detailCommand.SaveChanges())
+                        {
                             MsgClass.Add(MESSAGE.RowNotUpdated);
-                        }
-
-                        if (IsSaved)         // If master record saved successfully.
-                        {
-                            Deleted ??= [];
-                            if (Deleted.Count > 0)
-                            {
-                                foreach (var item in Deleted)
-                                {
-                                    DataRow RowDeleted = Source.GetNewRow(Tables.BillReceivable2);
-                                    RowDeleted["ID"] = item.ID2;
-                                    RowDeleted["TranID"] = SaleInvoiceID;
-                                    RowDeleted["SR_NO"] = item.Sr_No;
-                                    RowDeleted["Inventory"] = item.Inventory;
-                                    RowDeleted["Batch"] = item.Batch;
-                                    RowDeleted["Unit"] = item.Unit;
-                                    RowDeleted["Qty"] = item.Qty;
-                                    RowDeleted["Rate"] = item.Rate;
-                                    RowDeleted["Tax"] = item.TaxID;
-                                    RowDeleted["TaxRate"] = item.TaxRate;
-                                    RowDeleted["Description"] = item.Description;
-                                    RowDeleted["Project"] = item.Project;
-
-                                    _Command = new(RowDeleted, Source.DBFile);
-                                    if (!_Command.DeleteRow())
-                                    {
-                                        MsgClass.Add(MESSAGE.RowNotDeleted);
-                                    }
-                                }
-
-                                int _SRNO = 1;
-                                foreach (var item in MyVoucher.Details)
-                                {
-                                    item.Sr_No = _SRNO++;        // Reset Serial No after deleted row process 
-                                }
-                            }
-
-                            if (MyVoucher.Master.ID1 == 0)
-                            {
-                                MyVoucher.Master.ID1 = _Command.PrimaryKeyID;
-                                SaleInvoiceID = MyVoucher.Master.ID1;
-                            }
-
-                            foreach (var item in MyVoucher.Details)
-                            {
-                                DataRow RowDetail = Source.GetNewRow(Tables.BillReceivable2);
-                                RowDetail["ID"] = item.ID2;
-                                RowDetail["TranID"] = SaleInvoiceID;
-                                RowDetail["SR_NO"] = item.Sr_No;
-                                RowDetail["Inventory"] = item.Inventory;
-                                RowDetail["Batch"] = item.Batch;
-                                RowDetail["Unit"] = item.Unit;
-                                RowDetail["Qty"] = item.Qty;
-                                RowDetail["Rate"] = item.Rate;
-                                RowDetail["Tax"] = item.TaxID;
-                                RowDetail["Tax_Rate"] = item.TaxRate;
-                                RowDetail["Description"] = item.Description;
-                                RowDetail["Project"] = item.Project;
-
-
-                                if (Validate_Detail(RowDetail))
-                                {
-                                    _Command = new(RowDetail, Source.DBFile);
-                                    if (!_Command.SaveChanges())
-                                    {
-                                        IsSaved = false;
-                                        MsgClass.Add(MESSAGE.RowNotUpdated);
-                                        IsWaiting = false;
-                                        break;
-                                    }
-                                }
-                            }
-                            CalculateTotal();
-                            LoadData();
+                            isSaved = false;
+                            break;
                         }
                     }
-                });
+                }
 
+                // =============================
+                // 5️⃣ COMMIT / ROLLBACK
+                // =============================
+                if (isSaved)
+                    Source.CommitTransaction();
+                else
+                    Source.RollbackTransaction();
+
+                // =============================
+                // 6️⃣ REFRESH DATA
+                // =============================
+                if (isSaved)
+                {
+                    CalculateTotal();
+                    LoadData();
+                }
+            }
+            catch (Exception ex)
+            {
+                Source.RollbackTransaction();
+                MsgClass.Critical(ex.Message);
+                isSaved = false;
+            }
+            finally
+            {
                 IsWaiting = false;
             }
-            return IsSaved;
+
+            return isSaved;
         }
+
         #endregion
 
         #region Validation
@@ -679,6 +729,43 @@ namespace AppliedAccounts.Models
 
         #endregion
 
+        #region Test Voucher Data
+        public void TestData()
+        {
+            MyVoucher.Master.ID1 = 0;
+            MyVoucher.Master.Vou_No = "New";
+            MyVoucher.Master.Inv_No = "SRB-001";
+            MyVoucher.Master.Vou_Date = new DateTime(2024,10,23);
+            MyVoucher.Master.Company = 2;
+            MyVoucher.Master.Employee = 2;
+            MyVoucher.Master.Vou_Date = new DateTime(2024, 10, 23);
+            MyVoucher.Master.Pay_Date = new DateTime(2024, 10, 23);
+            MyVoucher.Master.Ref_No = "Test";
+            MyVoucher.Master.Remarks = "D-Type Rubber Fender";
+            MyVoucher.Master.Comments = "Damaged Ship Side Rubber Fender Length 200 Meters, Renewed with MS Channel & Stainless Steel (Marine Grade 316L) & Nuts, Bolts, Washers, conform to marine standard complete with fitting accessories.";
+
+            MyVoucher.Detail.Sr_No = 1;
+            MyVoucher.Detail.TranID = 0;
+            MyVoucher.Detail.ID2 = 0;
+            MyVoucher.Detail.Inventory = 4;
+            MyVoucher.Detail.Project = 1;
+            MyVoucher.Detail.Unit = 11;
+            MyVoucher.Detail.Qty = 1;
+            MyVoucher.Detail.Rate = 3750000;
+            MyVoucher.Detail.TaxID = 0;
+            MyVoucher.Detail.TaxRate = 15;
+            MyVoucher.Detail.Batch = "#01";
+
+            MyVoucher.Detail.Description = "D-Type Rubber Fender";
+
+            MyVoucher.Details.Add(MyVoucher.Detail);
+        }
+
+
+        #endregion
+
+
+
         #region Model
         public class Voucher
         {
@@ -760,6 +847,9 @@ namespace AppliedAccounts.Models
 
         }
         #endregion
+
+
+       
 
     }
 }

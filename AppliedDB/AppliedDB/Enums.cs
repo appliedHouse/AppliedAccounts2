@@ -22,20 +22,25 @@
             TB = 113,
             BillReceivable = 114,
             BillReceivable2 = 115,
-            view_BillReceivable = 116,
+            
             OBALCompany = 117,
             JVList = 118,
             SaleReturn = 120,
             BankBook = 121,
             RevSheet = 122,
-            view_BillPayable = 123,
+           
             Receipts = 124,                     // Receipt for single transaction (depreciated)
             Receipt = 125,                      // New receipt (master) for multiple transaction
             Receipt2 = 126,                     // New receipt (detail) for multiple transaction
-            view_Receipts = 127,                // View for new receipt (Multiple)
+            
             Book = 128,
             Book2 = 129,
+
+            view_BillReceivable = 116,
+            view_BillPayable = 123,
+            view_Receipts = 127,                // View for new receipt (Multiple)
             view_Book = 130,
+            View_Ledger = 132,
 
 
             Customers = 201,
@@ -95,7 +100,7 @@
             QuotStatus = 806,
 
             TempLedger = 9999,
-
+            IdGenerator = 10000,
         }
         public enum SQLType
         {
@@ -119,7 +124,6 @@
             PurchaseInvoiceList,
             PurchaseInvoiceView,
 
-
             COAList,
             Customers,
             CustomersList,
@@ -128,23 +132,28 @@
             COANotesList,
 
             Book,
+            Book2,
             CashBook,
             BankBook,
+
+            JV,
+            View_JV,
 
             Doner,
             Donation,
             DonationType,
             PaymentMode,
             Currency,
-            View_Production,
-            View_Sold,
-            View_Purchased,
+            
             Chk_BillReceivable2,
             Chk_BillReceivable1,
             StockPosition,
             StockPositionData,
             StockPositionSUM,
-            Book2,
+
+            View_Production,
+            View_Sold,
+            View_Purchased,
             View_Book
         }
 

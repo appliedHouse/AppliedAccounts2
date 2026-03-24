@@ -31,21 +31,8 @@
                     }
                 </InputSelect>
 
-@*                 <InputSelect id="ddPostingType"
-                             class="form-select"
-                             TValue="PostingTypes"
-                             Value="@MyViewModel.PostingType"
-                             ValueExpression="@(() => MyViewModel.PostingType)"
-                             ValueChanged="@((e)=>OnPostingTypeChanged(e))">
-
-                    <option value="0">Select...</option>
-
-                    @foreach (PostingModel.PostingTypes type in Enum.GetValues(typeof(PostingModel.PostingTypes)))
-                    {
-                        <option value="@((int)type)">@type</option>
-                    }
-                </InputSelect>
- *@            </div>
+        
+            </div>
 
             <!-- From Date -->
             <div class="col-md-2 d-grid">
@@ -123,9 +110,9 @@
                             <td class="TextCenter">@item.Vou_No</td>
                             <td class="TextCenter">@item.Vou_Date.ToString(Format.DDMMMYYYY)</td>
                             <td>@item.Title</td>
-                            <td class="text-danger amount1">@_DR</td>
-                            <td class="text-danger amount1">@_CR</td>
-                            <td class="TextCenter">@item.Status</td>
+                            <td class="amount-red">@_DR</td>
+                            <td class="amount-red">@_CR</td>
+                            <td class="text-center">@item.Status</td>
                             <td class="text-center">
                                 <input type="checkbox" disabled="@_Posted"
                                        checked="@item.Selected)" />
@@ -153,27 +140,11 @@
                     }
                 </tbody>
             </table>
-            <nav class="pagination-bar">
-                <ul class="pagination pagination-sm mb-0 justify-content-center">
-                    <li class="page-item disabled">
-                        <a class="page-link">Previous</a>
-                    </li>
-
-                    <li class="page-item active">
-                        <a class="page-link">1</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link">2</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link">3</a>
-                    </li>
-
-                    <li class="page-item">
-                        <a class="page-link">Next</a>
-                    </li>
-                </ul>
-            </nav>
+            <div class="d-flex">
+                <div class="p-1" style="height:40px">
+                    <NavPageBar Paging="MyModel.Pages"></NavPageBar>
+                </div>
+            </div>
         </div>
        
     </div>
@@ -189,7 +160,7 @@
 else
 {
     <div class="container">
-        <div class="alert alert-danger">
+        <div class="alert alert-info">
             <h5>No Record Found</h5>
         </div>
     </div>

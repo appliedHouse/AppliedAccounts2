@@ -12,16 +12,16 @@
 <!-- inject AuthenticationStateProvider authorized;-->
 
 @inject IJSRuntime js
-@inject GlobalService AppGlobal;
+@inject GlobalService AppGlobal
 
 @code {
 
     [Parameter] public int? Nature { get; set; } = 0;
-    private string UserRoll;
+    //private string UserRoll;
     private string DateFormat = Format.DDMMYY;
     private string CurrFormat = Format.Currency;
-    private decimal Tot_DR = 0.0M;
-    private decimal Tot_CR = 0.0M;
+    //private decimal Tot_DR = 0.0M;
+    //private decimal Tot_CR = 0.0M;
 
 
     protected override void OnInitialized()
@@ -93,14 +93,10 @@ else
             </InputSelect>
         </div>
         <div class="p-2">
-            <InputDate id="dateStat" class="item-height" @bind-Value="MyModel.DT_Start">
-
-            </InputDate>
+            <InputDate id="dateStat" class="item-height" @bind-Value="MyModel.DT_Start"></InputDate>
         </div>
         <div class="p-2">
-            <InputDate id="dateStat" class="item-height" @bind-Value="MyModel.DT_End">
-
-            </InputDate>
+            <InputDate id="dateEnd" class="item-height" @bind-Value="MyModel.DT_End"></InputDate>
         </div>
         <div class="p-2 search-btn">
             <label for="floatingInput">
@@ -113,8 +109,6 @@ else
         <div class="p-2">
             <Btn_Refresh OnClick="Refresh"/>
             <Btn_Add OnClick="New"/>
-            @* <button type="submit" class="btn btn-refresh" @onclick="Refresh" title="Refresh"></button>
-            <button type="submit" class="btn btn-new" @onclick="New" title="New"></button> *@
         </div>
         
     </div>

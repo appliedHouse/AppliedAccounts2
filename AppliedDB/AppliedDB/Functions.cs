@@ -24,7 +24,7 @@ namespace AppliedDB
                 return _DataTable.Rows[0];
             }
 
-            return null;
+            return null!;
 
 
         }
@@ -51,7 +51,7 @@ namespace AppliedDB
                 }
                 return CurrentRow;
             }
-            return null;
+            return null!;
         }
         public static DataTable ToDataTable<T>(this IList<T> data)
         {
@@ -73,13 +73,15 @@ namespace AppliedDB
             }
             return table;
         }
-        public static int MaxID(string DBFile, Tables _Table)
-        {
-            var _DataTable = DataSource.GetDataTable(DBFile, _Table);
-            var _MaxID = (int)_DataTable.Compute("MAX(ID)", "");
-            _DataTable.Dispose();
-            return _MaxID + 1; ;
-        }
+
+        // Depreciated
+        //public static int MaxID(string DBFile, Tables _Table)
+        //{
+        //    var _DataTable = DataSource.GetDataTable(DBFile, _Table);
+        //    var _MaxID = (int)_DataTable.Compute("MAX(ID)", "");
+        //    _DataTable.Dispose();
+        //    return _MaxID + 1; ;
+        //}
         public static string GetTitle(string DBFile, Tables _Table, long Id)
         {
             if (Id > 0)
@@ -135,6 +137,11 @@ namespace AppliedDB
                 return (decimal)_DataRow["Rate"];
             }
             return 0.00M;
+        }
+
+        public static string GetDateFilter(DateTime[] Dates)
+        {
+            return $" Date(Vou_Date)>='{Dates[0]:yyyy-MM-dd}' AND Date(Vou_Date)<='{Dates[1]:yyyy-MM-dd}'";
         }
     }
 }

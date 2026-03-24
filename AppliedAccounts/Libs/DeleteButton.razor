@@ -16,7 +16,7 @@
 
     public void Delete()
     {
-        var _Command = AppliedDB.Commands.Delete(Row, DBFile);
+        var _Command = AppliedDB.CommandConstructor.Commands.Delete(Row, DBFile);
         NavManager.NavigateTo(NavTo);
     }
 

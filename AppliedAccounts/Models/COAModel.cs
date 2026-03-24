@@ -171,8 +171,10 @@ namespace AppliedAccounts.Models
 
             if (Validate(_NewRow))
             {
-                Source!.Save(_NewRow);
+                Source.Save(_NewRow);
                 MsgClass = Source.MyCommands.MyMessages;
+                Data = [.. Source.GetTable(SQLQueries.Quries.COA()).AsEnumerable()];
+                Records = GetFilterRecords();
                 return Source.IsSaved;
             }
             return false;

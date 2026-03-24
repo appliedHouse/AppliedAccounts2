@@ -8,6 +8,8 @@
     private AppliedGlobals.AppUserModel AppUser { get; set; }
     private string? AppUserName { get; set; }
     private string? CompanyName;
+    private string SelectedLanguage = "en";
+
 
     protected override void OnInitialized()
     {
@@ -27,6 +29,26 @@
 
         });
     }
+
+    private void ChangeLanguage(string lang)
+    {
+        SelectedLanguage = lang;
+
+        // TODO later:
+        // - Save to localStorage
+        // - Notify localization service
+        // - Reload UI direction (RTL for Arabic/Urdu)
+    }
+
+    private string GetLanguageName() => SelectedLanguage switch
+    {
+        "en" => "English",
+        "ar" => "العربية",
+        "ur" => "اردو",
+        _ => "English"
+    };
+
+
     public string GetCompanyName() { return AppUser.Company ?? ""; }
     public string GetAppUserName() => AppUser.DisplayName ?? "";
     public void GoHome() { NavManager.NavigateTo("/"); }
@@ -46,6 +68,7 @@
                 <Btn_Login />
             </NotAuthorized>
             <Authorized>
+                
                 <div class="justify-content-end text-white">
                     @GetCompanyName()
                 </div>

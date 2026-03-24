@@ -15,8 +15,8 @@
 @code {
     private Timer MyTime { get; set; }
     private string CurrentTime { get; set; }
-
-
+    private bool IsSearchText { get; set; }
+    private bool IsRecords { get; set; }
 
     protected override void OnInitialized()
     {
@@ -34,10 +34,23 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (IsPrinted)
-        {
-            await DeletePrintedReports();
-        }
+        if (IsPrinted) { await DeletePrintedReports(); }
+
+        MyModel ??= new(AppGlobal);
+        IsSearchText = string.IsNullOrEmpty(MyModel.SearchText) ? false : true;
+        IsRecords = MyModel.Records.Count == 0 ? true : false;
+
+        MyModel.Pages.PageChanged += OnPageChangedInternal;
+        await MyModel.LoadData();
+
+    }
+
+
+    private async void OnPageChangedInternal(int page)
+    {
+        if (MyModel is null) { return; }
+        await MyModel.LoadData();
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task DeletePrintedReports()
@@ -103,12 +116,12 @@
                         <button type="button" class="btn btn-primary btn-sm" @onclick="() => MyModel.Search()">Search</button>
                     </div>
                     <div class="p-2">
-                        <button type="button" disabled="@(MyModel.SearchText.Length == 0)" class="btn btn-primary btn-sm" @onclick="() => MyModel.ClearText()">Clear</button>
+                        <button type="button" disabled="@IsSearchText" class="btn btn-primary btn-sm" @onclick="() => MyModel.ClearText()">Clear</button>
                     </div>
 
                     <div class="p-2">
-                        <button type="submit" disabled="@(MyModel.Records.Count ==0)" class="btn-print" @onclick="(() => PrintAll())"><i class="bi bi-printer-fill"></i> Selected</button>
-                        <button type="submit" disabled="@(MyModel.Records.Count ==0)" class="btn-print" @onclick="(() => PrintOnePDF())"><i class="bi bi-printer-fill"></i> One PDF</button>
+                        <button type="submit" disabled="@IsRecords" class="btn-print" @onclick="(() => PrintAll())"><i class="bi bi-printer-fill"></i> Selected</button>
+                        <button type="submit" disabled="@IsRecords" class="btn-print" @onclick="(() => PrintOnePDF())"><i class="bi bi-printer-fill"></i> One PDF</button>
                     </div>
 
                 </div>
@@ -200,6 +213,11 @@
                     </tr>
                 </tfoot>
             </table>
+            <div class="d-flex">
+                <div class="p-1" style="height:40px">
+                    <NavPageBar Paging="MyModel.Pages"></NavPageBar>
+                </div>
+            </div>
         </div>
     }
 }

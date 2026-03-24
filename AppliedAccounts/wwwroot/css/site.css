@@ -50,7 +50,7 @@
 /*== default accordiion height */
 .accordion-button {
     background-color: gold;
-    height:20px
+    height: 20px
 }
 
 
@@ -59,16 +59,23 @@
     font-family: Calibri;
     padding-top: 3px;
     padding-bottom: 3px;
-    margin-top:3px;
-    margin-bottom:3px;
-    margin-left:0px;
-    margin-right:0px;
-    border-radius:5px;
-    }
+    margin-top: 3px;
+    margin-bottom: 3px;
+    margin-left: 0px;
+    margin-right: 0px;
+    border-radius: 5px;
+}
 
     .row-filter button {
         margin-top: 5px;
     }
+
+
+.myContainer .row {
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    gap: 0px; /* Optional: Adds spacing between columns */
+}
 /*==============================================================================================================*/
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;

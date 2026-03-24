@@ -17,6 +17,11 @@ namespace AppReports
 
         public List<ReportParameter> ReportParameters { get; set; }
         private string DateTimeNow => DateTime.Now.ToString("yyyy-MM-dd [hh:mm:ss]");
+        public string CurrencySign { get; set; } = "Rs.";
+        public string CurrencyUnit { get; set; } = "Pesa";
+        public string AmountInWords => $"No {CurrencySign}";
+
+        
 
         #endregion
 

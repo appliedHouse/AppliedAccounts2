@@ -1,0 +1,48 @@
+﻿@page "/Menu/Stock/Directory/{TableName}"
+@using AppliedAccounts.Libs
+
+@inject GlobalService AppGlobal
+
+@code {
+    [Parameter] public string TableName { get; set; }
+
+    private string SubHeadingTitle { get; set; } = "Stock Sub Heading";
+    protected override void OnInitialized()
+    {
+        LoadData(TableName);
+
+    }
+}
+
+<PageHeading Text="@SubHeadingTitle" />
+<ShowMessages MsgClass="MsgClass"></ShowMessages>
+
+@if (StockDirectoryList.Count > 0)
+{
+    <div class="container">
+        <table class="table-list">
+            <thead>
+                <tr>
+                    <th style="width:20%">Code</th>
+                    <th style="width:60%">Title</th>
+                    <th style="width:20%"><button id="btnAdd" class="btn-Add" @onclick="Add"><i class="bi bi-plus-circle-fill"></i></button></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in StockDirectoryList)
+                {
+                    <tr>
+                        <td>@item.Code</td>
+                        <td>@item.Title</td>
+                        <td clas class="tb-col-left" s="td-btn">
+                            <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(() => Edit((long)item.ID))"><i class="bi bi-pencil-fill"></i></button>
+                            <label style="padding-left:5px; padding-right:5px;"> | </label>
+                            <button id="btnDel" type="submit" class="btn-Del" @onclick="(() => Delete((long)item.ID))"><i class="bi bi-trash-fill"></i></button>
+                        </td>
+                        
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

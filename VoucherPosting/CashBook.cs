@@ -15,6 +15,7 @@ namespace VoucherPosting
         public VoucherPostingModel PostingData { get; set; }
         public LedgerModel LedgerData { get; set; }
         public bool PostSuccessful { get; set; } = false;
+        public bool UnPostSuccessful { get; set; } = false;
         public MessageClass MsgClass { get; set; } = new MessageClass();
         public string Action { get; set; } = string.Empty;
         public string Vou_No { get; set; }
@@ -83,7 +84,7 @@ namespace VoucherPosting
                 LedgerRow["BookID"] = _MasterRow.Field<long>("BookID");
 
                 LedgerRow["COA"] = _MasterRow.Field<long>("BookID");
-                LedgerRow["DR"] = _MasterRow.Field<decimal>("Amount") < 0 ? _MasterRow.Field<decimal>("Amount") : 0;
+                LedgerRow["DR"] = _MasterRow.Field<decimal>("Amount") < 0 ? Math.Abs(_MasterRow.Field<decimal>("Amount")) : 0;
                 LedgerRow["CR"] = _MasterRow.Field<decimal>("Amount") > 0 ? _MasterRow.Field<decimal>("Amount") : 0;
                 LedgerRow["Customer"] = DBNull.Value;
                 LedgerRow["Project"] = DBNull.Value;
@@ -106,7 +107,7 @@ namespace VoucherPosting
                 {
                     LedgerRow = LedgerData.LedgerTable.NewRow();
 
-                    LedgerRow["ID"] = 0; 
+                    LedgerRow["ID"] = 0;
                     LedgerRow["TranID"] = _MasterRow.Field<long>("ID");
                     LedgerRow["Vou_Type"] = VoucherType.Cash.ToString();
                     LedgerRow["Vou_Date"] = _MasterRow.Field<DateTime>("Vou_Date").Date;
@@ -203,14 +204,67 @@ namespace VoucherPosting
             return true;
         }
 
+
+
+        #region Cash or Bank Voucher Unpost
+
         public async Task DoCashUnPost()
         {
-            throw new NotImplementedException();
-        }
+            MsgClass = new();
+            
+            Vou_No ??= string.Empty;
+            await Task.Run(() =>
+            {
+                try
+                {
+                    if (Vou_No.Length > 0)
+                    {
+                        var _Ledger = Source.GetTable(AppliedDB.Enums.Tables.Ledger, $"Vou_No='{Vou_No}'");
+                        if (_Ledger.Rows.Count > 0)
+                        {
+                            Source.BeginTransaction();
+                            #region Delete Voucher
+                            foreach (DataRow Row in _Ledger.Rows)
+                            {
+                                if(!Source.Delete(Row))
+                                {
+                                    UnPostSuccessful = false;
+                                    MsgClass.Warning(Messages.TransactionRollback);
+                                    Source.RollbackTransaction();               // Delete the row successfully Otherwsie rollback
+                                }
+                            }
+                            #endregion
 
-        public async Task DoBankUnPost()
-        {
-            throw new NotImplementedException();
+                            #region Mark as Posted
+
+                            DataRow _PostedRow = Source.GetDataRow(AppliedDB.Enums.Tables.Book, Vou_ID)!;
+                            if (_PostedRow != null)
+                            {
+                                _PostedRow["Status"] = "Submitted";
+                                Source.Save(_PostedRow);
+                                Source.CommitTransaction();                 // At the end commit the transaction
+                                UnPostSuccessful = true;
+                                MsgClass.Success(Messages.TransactionCommited);
+                            }
+                            else
+                            {
+                                UnPostSuccessful = false;
+                                MsgClass.Warning(Messages.TransactionRollback);
+                                Source.RollbackTransaction();               // Otherwsie rollback
+                            }
+
+                            #endregion
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MsgClass.Danger(ex.Message);
+                    Source.RollbackTransaction();
+                }
+            });
         }
+       
+        #endregion
     }
 }

@@ -9,7 +9,7 @@ using Tables = AppliedDB.Enums.Tables;
 
 namespace AppliedDB
 {
-    public class DataSource
+    public class DataSource : IDisposable
     {
         public AppValues.AppPath AppPaths { get; set; }
         public SqliteConnection MyConnection { get; set; }
@@ -21,7 +21,7 @@ namespace AppliedDB
         public bool IsSaved { get; set; } = false;
         public MessageClass MsgClass { get; set; } = new();
 
-        private SqliteTransaction? _transaction;
+        public SqliteTransaction? DBtransaction;
 
 
         #region Constructor
@@ -37,6 +37,10 @@ namespace AppliedDB
             {
                 MyCommand = new SqliteCommand("", MyConnection);
             }
+        }
+
+        public DataSource()
+        {
         }
 
 
@@ -222,7 +226,7 @@ namespace AppliedDB
 
         #region Get Table Static
 
-       
+
         public static DataTable GetDataTable(Tables _Table, SqliteCommand _Command)
         {
             try
@@ -322,7 +326,7 @@ namespace AppliedDB
                 using var reader = command.ExecuteReader();
                 var dt = GetDataTableExtention(reader);
 
-                if(dt.Rows.Count == 0) { dt.Load(reader); }             // try again to load data directly. if not found...
+                if (dt.Rows.Count == 0) { dt.Load(reader); }             // try again to load data directly. if not found...
 
 
                 dt.TableName = table.ToString();
@@ -412,8 +416,8 @@ namespace AppliedDB
         public DataRow? GetDataRow(Tables _Table, long ID)
         {
             var _Connection = Connections.GetSqliteConnection(MyConnection.DataSource)!;
-            var _DataTable =  GetDataTable(_Table, _Connection,$"ID={ID}");
-            if(_DataTable.Rows.Count > 0)
+            var _DataTable = GetDataTable(_Table, _Connection, $"ID={ID}");
+            if (_DataTable.Rows.Count > 0)
             {
                 DataRow row = _DataTable.Rows[0];
                 row.AcceptChanges();                    // Add here to Rowstate must be unchanged
@@ -751,7 +755,7 @@ namespace AppliedDB
             if (DBFile.Length == 0) { return new(); }
             //========================================================
 
-            DataTable _DataTable;
+            //DataTable _DataTable;
             var _CommandText = _Query;
             var _Connection = Connections.GetClientConnection(DBFile);
             if (_Connection is not null)
@@ -764,7 +768,7 @@ namespace AppliedDB
                 dt.TableName = _TableName;
                 return dt;
             }
-            return null;
+            return null!;
         }
         public static List<Dictionary<long, string>> GetDataList(string DBFile, Tables _Table)
         {
@@ -809,16 +813,12 @@ namespace AppliedDB
 
         #region Maximum ID of the Table
 
-
-
-
-
         public static long GetMaxID(string _Table, string ConnectionString)
         {
             // Create this function due to command.transaction issue.
             // Create a new connection without transaction to avoid error in transaction mode.
             var _Connection = Connections.GetSqliteConnectionbyString(ConnectionString);
-            DataTable _DataTable = GetDataTable(_Table,_Connection!);
+            DataTable _DataTable = GetDataTable(_Table, _Connection!);
             if (_DataTable.Rows.Count == 0) { return 1; }
             long _MaxID = (long)_DataTable.Compute("MAX(ID)", "") + 1;
             _DataTable.Dispose();
@@ -851,36 +851,51 @@ namespace AppliedDB
             var _Text = $"SELECT Max(ID) AS MaxID FROM[{_Table}]";
             var _DataTable = GetTable(_Text);
             if (_DataTable.Rows.Count == 0) { return 1; }
-            long _MaxID = _DataTable.Rows[0].Field<long>("MaxID") ;
+            long _MaxID = _DataTable.Rows[0].Field<long>("MaxID");
             _DataTable.Dispose();
             return _MaxID + 1;
         }
         #endregion
 
         #region Delete Row
-        public bool Delete(Tables _Table, DataRow _Row)
-        {
-            var _DataTable = GetTable(_Table);
-            var _NewRow = _DataTable.NewRow();
-            var _RowArray = _Row.ItemArray;
+        //public bool Delete(Tables _Table, DataRow _Row)
+        //{
+        //    var _DataTable = GetTable(_Table);
+        //    var _NewRow = _DataTable.NewRow();
+        //    var _RowArray = _Row.ItemArray;
 
-            _NewRow.ItemArray = _RowArray;
+        //    _NewRow.ItemArray = _RowArray;
 
-            MyCommands = new(_NewRow, MyConnection);
-            return MyCommands.DeleteRow();
-        }
+        //    MyCommands = new(_NewRow, MyConnection);
+        //    return MyCommands.DeleteRow();
+        //}
+
+        //public bool Delete(DataRow _Row)
+        //{
+        //    if (MyCommands.CommandDelete != null) { MyCommands.CommandDelete.Transaction = _transaction; }
+
+        //    var IsDeleted = false;
+        //    MyCommands = new(_Row, MyConnection);
+        //    var result = MyCommands.DeleteRow();
+        //    if (result)
+        //    {
+        //        IsDeleted = true;
+        //    }
+        //    return IsDeleted;
+        //}
 
         public bool Delete(DataRow _Row)
         {
-
-            var IsDeleted = false;
+            // Create commands FIRST
             MyCommands = new(_Row, MyConnection);
-            var result = MyCommands.DeleteRow();
-            if (result)
+
+            // THEN attach the transaction
+            if (DBtransaction != null && MyCommands.CommandDelete != null)
             {
-                IsDeleted = true;
+                MyCommands.CommandDelete.Transaction = DBtransaction;
             }
-            return IsDeleted;
+
+            return MyCommands.DeleteRow();
         }
 
 
@@ -896,7 +911,7 @@ namespace AppliedDB
                 _DataTable.Dispose();
                 return _NewRow;
             }
-            return null;
+            return null!;
         }
 
 
@@ -1017,6 +1032,28 @@ namespace AppliedDB
 
         #endregion
 
+        #region Get JV (Journal voucher)
+
+        public DataTable? GetJV(string Vou_No)
+        {
+            if (!string.IsNullOrEmpty(Vou_No))
+            {
+
+                var _Filter = $"Vou_No = '{Vou_No}'";
+                var _Query = SQLQueries.Quries.JournalVoucher();
+                
+                using var _Table = GetTable(_Query, _Filter, "Sr_No");
+                if (_Table != null && _Table.Columns.Count > 0)
+                {
+                    return _Table;
+                }
+            }
+            return null;
+        }
+
+
+        #endregion
+
         #region Geting a DB Directory()
 
 
@@ -1073,11 +1110,11 @@ namespace AppliedDB
             if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
 
             MyCommands = new(newRow, MyConnection);
-            if (_transaction != null)
+            if (DBtransaction != null)
             {
-                if(MyCommands.CommandInsert != null) { MyCommands.CommandInsert.Transaction = _transaction; }
-                if (MyCommands.CommandUpdate != null) { MyCommands.CommandUpdate.Transaction = _transaction; }
-                if (MyCommands.CommandDelete != null) { MyCommands.CommandDelete.Transaction = _transaction; }
+                if (MyCommands.CommandInsert != null) { MyCommands.CommandInsert.Transaction = DBtransaction; }
+                if (MyCommands.CommandUpdate != null) { MyCommands.CommandUpdate.Transaction = DBtransaction; }
+                if (MyCommands.CommandDelete != null) { MyCommands.CommandDelete.Transaction = DBtransaction; }
             }
 
             var result = MyCommands.SaveChanges();
@@ -1092,65 +1129,164 @@ namespace AppliedDB
             }
         }
 
-        // Depreciated....... NOT IN USE... 14-Dec-2025.
-        public bool Save(Tables _Table, DataRow newRow)
-        {
-            MyCommands = new(newRow, MyConnection);
-            return MyCommands.SaveChanges();
-        }
         #endregion
 
         #region Get Registry Keys
 
+        public void SetKey(string Key, object KeyValue, KeyTypes keytype)
+        {
+            SetKey(Key, KeyValue, keytype, string.Empty);
+        }
         public void SetKey(string Key, object KeyValue, KeyTypes keytype, string _Title)
+        {
+            if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
+
+            DataTable TB_Registry = GetTable(Tables.Registry, $"Code = '{Key}'");
+            DataRow CurrentRow;
+            //var SQLAction = string.Empty;
+
+            if (TB_Registry.Rows.Count == 1)
+            {
+                //SQLAction = "Update";
+                CurrentRow = TB_Registry.DefaultView[0].Row;
+                CurrentRow.AcceptChanges();
+            }
+            else
+            {
+                //SQLAction = "Insert";
+                CurrentRow = TB_Registry.NewRow();
+                CurrentRow["ID"] = 0;   //GetMaxID(Tables.Registry, MyConnection);
+            }
+
+            if (_Title != null) { CurrentRow["Title"] = _Title; }
+            CurrentRow["Code"] = Key;
+            CurrentRow["Title"] = _Title;
+            CurrentRow["UserName"] = DBFile;
+
+            switch (keytype)
+            {
+                case KeyTypes.Number:
+                    CurrentRow["nValue"] = KeyValue;
+                    break;
+                case KeyTypes.Currency:
+                    CurrentRow["mValue"] = KeyValue;
+                    break;
+                case KeyTypes.Date:
+                    CurrentRow["dValue"] = KeyValue;
+                    break;
+                case KeyTypes.Boolean:
+                    CurrentRow["bValue"] = KeyValue;
+                    break;
+                case KeyTypes.Text:
+                    CurrentRow["cValue"] = KeyValue;
+                    break;
+                case KeyTypes.From:
+                    CurrentRow["From"] = KeyValue;
+                    break;
+                case KeyTypes.To:
+                    CurrentRow["To"] = KeyValue;
+                    break;
+                default:
+                    break;
+            }
+
+            var cmd = new CommandClass(CurrentRow, MyConnection);
+            cmd.SaveChanges();
+
+            MyConnection.Close();
+        }
+
+        public object GetKey(string Key, KeyTypes keytype)
+        {
+
+            object ReturnValue;
+            var Registry = GetTable(Tables.Registry, $" Code = '{Key}'");
+
+            if (Registry.Rows.Count == 1)
+            {
+                DataRow Row = Registry.Rows[0];
+                ReturnValue = keytype switch
+                {
+                    KeyTypes.Number => Row["nValue"],
+                    KeyTypes.Currency => Row["mValue"],
+                    KeyTypes.Boolean => Row["bValue"],
+                    KeyTypes.Date => Row["dValue"],
+                    KeyTypes.Text => Row["cValue"],
+                    KeyTypes.From => Row["From"],
+                    KeyTypes.To => Row["To"],
+                    _ => string.Empty
+                };
+            }
+            else
+            {
+                ReturnValue = keytype switch
+                {
+                    KeyTypes.Number => 0,
+                    KeyTypes.Currency => 0.00,
+                    KeyTypes.Boolean => false,
+                    KeyTypes.Date => DateTime.Now,
+                    KeyTypes.Text => string.Empty,
+                    KeyTypes.From => DateTime.MinValue,
+                    KeyTypes.To => DateTime.Now,
+                    _ => string.Empty
+                };
+            }
+
+            if (ReturnValue == DBNull.Value) { return string.Empty; }
+            return ReturnValue;
+        }
+
+        // Depreciated 29-Jan-2026
+        #region Set Key Depreciated
+        public void SetKey1(string Key, object KeyValue, KeyTypes keytype, string _Title)
         {
 
             Registry _Registry = new(MyConnection, DBFile);
             _Registry.SetKey(Key, KeyValue, keytype, _Title);
         }
+        #endregion
 
         public async Task SetKeyAsync(string Key, object KeyValue, KeyTypes keytype, string _Title)
         {
             await Task.Run(() =>
             {
-                Registry _Registry = new(MyConnection, DBFile);
-                _Registry.SetKey(Key, KeyValue, keytype, _Title);
+                SetKey(Key, KeyValue, keytype, _Title);
             });
         }
 
         public string GetText(string Key)
         {
-            Registry _Registry = new(MyConnection, DBFile);
-            return (string)_Registry.GetKey(Key, KeyTypes.Text);
+            //Registry _Registry = new(MyConnection, DBFile);
+            return (string)GetKey(Key, KeyTypes.Text);
         }
         public int GetNumber(string Key)
         {
-            Registry _Registry = new(MyConnection, DBFile);
-            return (int)_Registry.GetKey(Key, KeyTypes.Number);
+            //Registry _Registry = new(MyConnection, DBFile);
+            return (int)GetKey(Key, KeyTypes.Number);
         }
 
         public DateTime GetDate(string Key)
         {
-            Registry _Registry = new(MyConnection, DBFile);
-            return (DateTime)_Registry.GetKey(Key, KeyTypes.Date);
+            //Registry _Registry = new(MyConnection, DBFile);
+            return (DateTime)GetKey(Key, KeyTypes.Date);
         }
 
         public bool GetBoolean(string Key)
         {
-            Registry _Registry = new(MyConnection, DBFile);
-            return (bool)_Registry.GetKey(Key, KeyTypes.Boolean);
+            //Registry _Registry = new(MyConnection, DBFile);
+            return (bool)GetKey(Key, KeyTypes.Boolean);
         }
 
         public DateTime GetFrom(string Key)
         {
-            Registry _Registry = new(MyConnection, DBFile);
-            return (DateTime)_Registry.GetKey(Key, KeyTypes.From);
+            //Registry _Registry = new(MyConnection, DBFile);
+            return (DateTime)GetKey(Key, KeyTypes.From);
         }
 
         public DateTime GetTo(string Key)
         {
-            Registry _Registry = new(MyConnection, DBFile);
-            return (DateTime)_Registry.GetKey(Key, KeyTypes.To);
+            //Registry _Registry = new(MyConnection, DBFile);
+            return (DateTime)GetKey(Key, KeyTypes.To);
         }
 
         public DateTime[] GetFromTo(string Key)
@@ -1164,7 +1300,8 @@ namespace AppliedDB
         #region Count Record
         public int RecordCound(Tables _Table, string _Filter)
         {
-            string _Query = $"SELECT COUNT(*) FROM {_Table} WHERE {_Filter}";
+            string _Query = $"SELECT COUNT(*) FROM {_Table} ";
+            _Query += string.IsNullOrEmpty(_Filter) ? "" : $"WHERE {_Filter}";
             using var command = new SqliteCommand(_Query, MyConnection);
             if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
             var result = Convert.ToInt32(command.ExecuteScalar()); MyConnection.Close();
@@ -1205,12 +1342,14 @@ namespace AppliedDB
                     {
                         _DataType = typeof(int);
                     }
+                    else if(upperColumnName == "DR" ||
+                            upperColumnName == "CR")
+                    {
+                        _DataType = typeof(decimal);
+                    }
 
                     dt.Columns.Add(_ColumnName, _DataType);
                 }
-
-                var _Stop = true;
-
 
                 while (_reader.Read())
                 {
@@ -1328,24 +1467,25 @@ namespace AppliedDB
             if (MyConnection.State != ConnectionState.Open)
                 MyConnection.Open();
 
-            _transaction = MyConnection.BeginTransaction();
+            DBtransaction = MyConnection.BeginTransaction();
         }
 
         public void CommitTransaction()
         {
-            _transaction?.Commit();
-            _transaction = null;
+            DBtransaction?.Commit();
+            DBtransaction = null;
         }
 
         public void RollbackTransaction()
         {
-            _transaction?.Rollback();
-            _transaction = null;
+            DBtransaction?.Rollback();
+            DBtransaction = null;
         }
+        #endregion
 
         public DataRow RemoveNullValues(DataRow row)
         {
-            
+
             foreach (DataColumn column in row.Table.Columns)
             {
                 if (row.IsNull(column))
@@ -1375,6 +1515,45 @@ namespace AppliedDB
             return row;
         }
 
+        #region Disposed
+        public void Dispose()
+        {
+            try
+            {
+                DBtransaction?.Dispose();
+                DBtransaction = null;
+
+                MyCommand?.Dispose();
+                MyCommand = null!;
+
+                if (MyConnection?.State == ConnectionState.Open)
+                    MyConnection.Close();
+
+                MyConnection?.Dispose();
+                MyConnection = null!;
+
+                if (MyConnection2?.State == ConnectionState.Open)
+                    MyConnection2.Close();
+
+                MyConnection2?.Dispose();
+                MyConnection2 = null!;
+            }
+            catch
+            {
+                // NEVER throw from Dispose
+            }
+        }
+
+        public int GetCount(Tables book, string filter)
+        {
+            using var cmd = MyConnection.CreateCommand();
+            cmd.CommandText = $"SELECT COUNT(*) FROM {book} WHERE {filter}";
+
+            if (cmd.Connection!.State != ConnectionState.Open)
+                cmd.Connection.Open();
+
+            return Convert.ToInt32(cmd.ExecuteScalar());
+        }
         #endregion
     }
 
