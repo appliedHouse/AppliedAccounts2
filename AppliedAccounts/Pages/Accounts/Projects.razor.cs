@@ -61,6 +61,31 @@ namespace AppliedAccounts.Pages.Accounts
 
         }
 
+        public void Edit(long _ID)
+        {
+            DataView dv = ProjectList.AsDataView();
+            dv.RowFilter = $"ID = {_ID}"; 
+
+            if (dv.Count > 0)
+            {
+                var row = dv[0];
+                MyModel = new ProjectsViewModel()
+                {
+                    ID = (long)row["ID"],
+                    Code = row["Code"]?.ToString() ?? "",
+                    Title = row["Title"]?.ToString() ?? "",
+                    Comments = row["Comments"]?.ToString() ?? ""
+                };
+
+                EditMode = true;
+                //InvokeAsync(StateHasChanged);
+            }
+        }
+
+        public void Delete(long _ID)
+        {
+
+        }
         public void BackPage()
         {
             AppGlobal.NavManager.NavigateTo("/Accounts/Dictionery", true);

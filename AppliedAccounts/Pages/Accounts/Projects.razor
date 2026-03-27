@@ -2,6 +2,7 @@
 @namespace AppliedAccounts.Pages.Accounts
 @using AppliedAccounts.Libs
 @using Microsoft.AspNetCore.Components.Forms
+@using System.Data
 @inject GlobalService AppGlobal
 
 
@@ -9,7 +10,8 @@
 
     private bool IsSubmitting { get; set; } = false;
     private string SubmitMessage { get; set; } = string.Empty;
-    
+    private bool EditMode { get; set; } = false;
+
 
     protected override void OnInitialized()
     {
@@ -36,185 +38,219 @@
 <PageHeading Text="List of Projects"></PageHeading>
 <ShowMessages MsgClass="MsgClass"></ShowMessages>
 
+@if (EditMode)
+{
+
+    <EditForm Model="MyModel" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" />
 
 
-<EditForm Model="MyModel" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary class="text-danger" />
 
+        <div class="container myContainer flex-md-row ">
 
+            <input @bind-value="MyModel.ID" hidden />
 
-    <div class="container myContainer flex-md-row ">
-
-        <input @bind-value="MyModel.ID" hidden />
-
-        <div class="row">
-            <div class="col-md-4">
-                <div class="form-floating">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-floating">
                     
-                    <InputText id="code" class="form-control" @bind-Value="MyModel.Code" />
-                    <label for="code">Code *</label>
-                    <ValidationMessage For="@(() => MyModel.Code)" />
+                        <InputText id="code" class="form-control" @bind-Value="MyModel.Code" />
+                        <label for="code">Code *</label>
+                        <ValidationMessage For="@(() => MyModel.Code)" />
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-floating">
+                    
+                        <InputText id="title" class="form-control" @bind-Value="MyModel.Title" />
+                        <label for="title">Title *</label>
+                        <ValidationMessage For="@(() => MyModel.Title)" />
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="form-floating">
-                    
-                    <InputText id="title" class="form-control" @bind-Value="MyModel.Title" />
-                    <label for="title">Title *</label>
-                    <ValidationMessage For="@(() => MyModel.Title)" />
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-4">
-                <div class="form-floating">
-                    <InputSelect id="ddCompany" class="form-control item-height" TValue="long" Value="@MyModel.Client" ValueExpression="@(() => @MyModel.Client)" ValueChanged="@((e) => CompanyIDChanged(e))">
-                        @if (Clients.Any())
-                        {
-                            @foreach (var item in Clients)
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <InputSelect id="ddCompany" class="form-control item-height" TValue="long" Value="@MyModel.Client" ValueExpression="@(() => @MyModel.Client)" ValueChanged="@((e) => CompanyIDChanged(e))">
+                            @if (Clients.Any())
                             {
-                                <option value="@item.ID">@item.Title</option>
+                                @foreach (var item in Clients)
+                                {
+                                    <option value="@item.ID">@item.Title</option>
+                                }
                             }
-                        }
-                        else
-                        {
-                            <option value="0">No Records -  Clients</option>
-                        }
-
-                    </InputSelect>
-                    <label for="ddCompany">Clients</label>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-floating">
-                    <InputSelect id="ddEmployee" class="form-control item-height" TValue="long" Value="@MyModel.ProjectManager" ValueExpression="@(() => @MyModel.ProjectManager)" ValueChanged="@((e) => EmployeeIDChanged(e))">
-                        @if (Employees.Any())
-                        {
-                            @foreach (var item in Employees)
+                            else
                             {
-                                <option value="@item.ID">@item.Title</option>
+                                <option value="0">No Records -  Clients</option>
                             }
-                        }
-                        else
-                        {
-                            <option value="0">No Records -  Employee</option>
-                        }
 
-                    </InputSelect>
-                    <label for="ddEmployee">Project Manager</label>
+                        </InputSelect>
+                        <label for="ddCompany">Clients</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <InputSelect id="ddEmployee" class="form-control item-height" TValue="long" Value="@MyModel.ProjectManager" ValueExpression="@(() => @MyModel.ProjectManager)" ValueChanged="@((e) => EmployeeIDChanged(e))">
+                            @if (Employees.Any())
+                            {
+                                @foreach (var item in Employees)
+                                {
+                                    <option value="@item.ID">@item.Title</option>
+                                }
+                            }
+                            else
+                            {
+                                <option value="0">No Records -  Employee</option>
+                            }
+
+                        </InputSelect>
+                        <label for="ddEmployee">Project Manager</label>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-4">
-                <div class="form-floating">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-floating">
                     
-                    <InputNumber id="budget" class="form-control" @bind-Value="MyModel.Budget" />
-                    <label for="budget">Budget (Amount)</label>
-                    <ValidationMessage For="@(() => MyModel.Budget)" />
+                        <InputNumber id="budget" class="form-control" @bind-Value="MyModel.Budget" />
+                        <label for="budget">Budget (Amount)</label>
+                        <ValidationMessage For="@(() => MyModel.Budget)" />
+                    </div>
                 </div>
-            </div>
 
-            <div class="col-md-4">
-                <div class="form-floating">
+                <div class="col-md-4">
+                    <div class="form-floating">
                     
-                    <InputNumber id="actualCost" class="form-control" @bind-Value="MyModel.ActualCost" />
-                    <label for="actualCost">Actual Cost (Amount)</label>
-                    <ValidationMessage For="@(() => MyModel.ActualCost)" />
+                        <InputNumber id="actualCost" class="form-control" @bind-Value="MyModel.ActualCost" />
+                        <label for="actualCost">Actual Cost (Amount)</label>
+                        <ValidationMessage For="@(() => MyModel.ActualCost)" />
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-4">
-                <div class="form-floating">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-floating">
                     
-                    <InputDate id="startDate" class="form-control" @bind-Value="MyModel.StartDate" />
-                    <label for="startDate">Start Date</label>
-                    <ValidationMessage For="@(() => MyModel.StartDate)" />
+                        <InputDate id="startDate" class="form-control" @bind-Value="MyModel.StartDate" />
+                        <label for="startDate">Start Date</label>
+                        <ValidationMessage For="@(() => MyModel.StartDate)" />
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <InputDate id="endDate" class="form-control" @bind-Value="MyModel.EndDate" />
+                        <label for="endDate">End Date</label>
+                        <ValidationMessage For="@(() => MyModel.EndDate)" />
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="form-floating">
-                    <InputDate id="endDate" class="form-control" @bind-Value="MyModel.EndDate" />
-                    <label for="endDate">End Date</label>
-                    <ValidationMessage For="@(() => MyModel.EndDate)" />
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-8">
-                <div class="form-floating">
-                    <InputText id="location" class="form-control" @bind-Value="MyModel.Location" />
-                    <label for="location">Location</label>
-                    <ValidationMessage For="@(() => MyModel.Location)" />
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-
-            <div class="col-md-4">
-                <div class="form-floating">
-                    <InputTextArea id="comments" class="form-control" rows="3" @bind-Value="MyModel.Comments" />
-                    <label for="comments">Comments</label>
-                    <ValidationMessage For="@(() => MyModel.Comments)" />
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="form-floating">
+                        <InputText id="location" class="form-control" @bind-Value="MyModel.Location" />
+                        <label for="location">Location</label>
+                        <ValidationMessage For="@(() => MyModel.Location)" />
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="form-floating">
-                    <InputTextArea id="terms" class="form-control" rows="3" @bind-Value="MyModel.Terms" />
-                    <label for="terms">Terms & Conditions</label>
-                    <ValidationMessage For="@(() => MyModel.Terms)" />
-                </div>
-            </div>
-        </div>
+            <div class="row">
 
-        <div class="row">
-            <div class="col-2">
-                <div class="form-check">
-                    <InputCheckbox id="isActive" class="form-check-input" @bind-Value="MyModel.IsActive" />
-                    <label class="form-check-label" for="isActive">Active Project</label>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <InputTextArea id="comments" class="form-control" rows="3" @bind-Value="MyModel.Comments" />
+                        <label for="comments">Comments</label>
+                        <ValidationMessage For="@(() => MyModel.Comments)" />
+                    </div>
                 </div>
-            </div>
 
-            <div class="col-2">
-                <div class="form-check">
-                    <InputCheckbox id="isCompleted" class="form-check-input" @bind-Value="MyModel.IsCompleted" />
-                    <label class="form-check-label" for="isCompleted">Completed</label>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <InputTextArea id="terms" class="form-control" rows="3" @bind-Value="MyModel.Terms" />
+                        <label for="terms">Terms & Conditions</label>
+                        <ValidationMessage For="@(() => MyModel.Terms)" />
+                    </div>
                 </div>
             </div>
 
-        </div>
+            <div class="row">
+                <div class="col-2">
+                    <div class="form-check">
+                        <InputCheckbox id="isActive" class="form-check-input" @bind-Value="MyModel.IsActive" />
+                        <label class="form-check-label" for="isActive">Active Project</label>
+                    </div>
+                </div>
+
+                <div class="col-2">
+                    <div class="form-check">
+                        <InputCheckbox id="isCompleted" class="form-check-input" @bind-Value="MyModel.IsCompleted" />
+                        <label class="form-check-label" for="isCompleted">Completed</label>
+                    </div>
+                </div>
+
+            </div>
 
         
-    </div>
+        </div>
 
-    <div class="container">
-        <div class="d-flex flex-row mb-3 filter position-relative">
-            <div class="p-2">
-                <button type="button" class="btn btn-sm w1 btn-info" title="New" @onclick="New">
-                    <i class="bi bi-plus-square"></i>
-                </button>
-            </div>
-            <div class="p-2">
-                <button type="button" class="btn btn-sm w1 btn-success" title="Add" @onclick="Save">
-                    <i class="bi bi-floppy-fill"></i>
-                </button>
-            </div>
-            <div class="p-2 ms-auto">
-                <button type="button" class="btn btn-sm w1 btn-warning" title="Back" @onclick="BackPage"><i class="bi bi-arrow-left-circle"></i></button>
+        <div class="container">
+            <div class="d-flex flex-row mb-3 filter position-relative">
+                <div class="p-2">
+                    <button type="button" class="btn btn-sm w1 btn-info" title="New" @onclick="New">
+                        <i class="bi bi-plus-square"></i>
+                    </button>
+                </div>
+                <div class="p-2">
+                    <button type="button" class="btn btn-sm w1 btn-success" title="Add" @onclick="Save">
+                        <i class="bi bi-floppy-fill"></i>
+                    </button>
+                </div>
+                <div class="p-2 ms-auto">
+                    <button type="button" class="btn btn-sm w1 btn-warning" title="Back" @onclick="BackPage"><i class="bi bi-arrow-left-circle"></i></button>
+                </div>
             </div>
         </div>
+    </EditForm>
+}
+else
+{
+    <div class="container">
+        <table class="table-list">
+            <thead>
+                <tr>
+                    <th style="width:10%">Code</th>
+                    <th style="width:30%">Title</th>
+                    <th style="width:50%">Comments</th>
+                    <th style="width:10%"><i class="bi bi-plus"></i>..</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (DataRow Row in ProjectList.Rows)
+                {
+                    long _ID = Row.Field<long>("ID");
+
+                    <tr>
+                        <td class="center">@(Row.Field<string>("Code") ?? "")</td>
+                        <td class="left">@(Row.Field<string>("Title") ?? "")</td>
+                        <td class="left">@(Row.Field<string>("Comments") ?? "")</td>
+                        <td>
+                            <button class="btn-Edit" @onclick="@(()=>Edit(_ID))"><i class="bi bi-pencil"></i></button>
+                            <button class="btn-Del" @onclick="@(()=>Delete(_ID))"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
-</EditForm>
+}
 
 <style>
     .row {
