@@ -1,15 +1,15 @@
 ﻿using AppliedAccounts.Pages.Accounts;
-using AppliedAccounts.Pages.Menu;
 using AppliedDB;
 using AppliedGlobals;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Logging;
 using System.Data;
-using System.Runtime.Serialization;
 using System.Text;
 using static AppliedDB.Enums;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
+
+// Updated on 27-Mar-2026 by Aamir Jahangir
 
 namespace AppliedAccounts.Data
 {
@@ -46,9 +46,9 @@ namespace AppliedAccounts.Data
             if (!string.IsNullOrEmpty(MyConnection.ConnectionString))
             {
                 var tableNames = new List<string>();
-                if (MyConnection.State != System.Data.ConnectionState.Open) { MyConnection.Open(); }
+                if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
                 var CommandText = "SELECT name FROM Sqlite_master WHERE type='table' AND name NOT LIKE 'Sqlite_%';";
-                var _Table = AppliedDB.DataSource.GetQueryTable(CommandText, MyConnection);
+                var _Table = DataSource.GetQueryTable(CommandText, MyConnection);
                 TableList = _Table.AsEnumerable().ToList();
             }
         }
@@ -162,7 +162,7 @@ namespace AppliedAccounts.Data
                     break;
                 case Tables.JVList:
                     break;
-              
+
                 case Tables.Customers:
                     break;
                 case Tables.City:
@@ -170,6 +170,7 @@ namespace AppliedAccounts.Data
                 case Tables.Country:
                     break;
                 case Tables.Project:
+                    _CommandText = ProjectsDB();
                     break;
                 case Tables.Employees:
                     break;
@@ -303,7 +304,18 @@ namespace AppliedAccounts.Data
 
         }
 
-        private string View_Ledger()
+        private static string ProjectsDB()          // 27-Mar-2026
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("CREATE TABLE [Project] (");
+            _Text.AppendLine("[ID] INT64 PRIMARY KEY NOT NULL UNIQUE, ");
+            _Text.AppendLine("[Code] NVARCHAR(6) NOT NULL UNIQUE, ");
+            _Text.AppendLine("[Title] NVARCHAR(100) NOT NULL UNIQUE, ");
+            _Text.AppendLine("[Comments] NVARCHAR(500));");
+            return _Text.ToString();
+        }
+
+        private static string View_Ledger()
         {
             var _Text = new StringBuilder();
 
@@ -788,7 +800,7 @@ namespace AppliedAccounts.Data
         }
         #endregion
 
-        
+
         #region ID Generator Table
         private string IdGenerator()
         {

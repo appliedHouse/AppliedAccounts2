@@ -1,5 +1,6 @@
 ﻿using AppMessages;
 using Microsoft.Data.Sqlite;
+using Enums = AppliedDB.Enums;
 
 namespace AppliedAccounts.Data
 {
@@ -15,12 +16,94 @@ namespace AppliedAccounts.Data
             IsPatchApplied.Add(BillReceivable2_AddUnit());
             IsPatchApplied.Add(BillPayable2_AddUnit());
             IsPatchApplied.Add(CustomerAddress3());
+            IsPatchApplied.Add(ProjectPatch());
         }
 
+        private bool ProjectPatch()
+        {
+            var dataTable = Source.GetTable(Enums.Tables.Project);
+
+            if (Source.MyConnection == null)
+            {
+                MsgClass.Danger("Database connection is not available.");
+                return false;
+            }
+
+            bool shouldCloseConnection = false;
+
+            var columns = new (string Name, string Type, string Default)[]
+            {
+                ("Client", "INTEGER", "0"),
+                ("ActualCost", "REAL", "0"),
+                ("Budget", "REAL", "0"),
+                ("Location", "TEXT", "NULL"),
+                ("StartDate", "TEXT", "datetime('now')"),
+                ("EndDate", "TEXT", "datetime('now')"),
+                ("IsActive", "INTEGER", "0"),
+                ("IsCompleted", "INTEGER", "0"),
+                ("ProjectManager", "INTEGER", "0"),
+                ("Terms", "TEXT", "NULL")
+            };
+
+            try
+            {
+                foreach (var col in columns)
+                {
+                    if (!dataTable.Columns.Contains(col.Name))
+                    {
+                        string query = string.Empty;
+
+                        if (col.Default == "NULL")
+                        { query = $"ALTER TABLE Project ADD COLUMN {col.Name} {col.Type};"; } // nullable
+                        else
+                        { query = $"ALTER TABLE Project ADD COLUMN {col.Name} {col.Type} NOT NULL DEFAULT {col.Default};"; }
+                        QueryExecutor(query, $"{col.Name} added successfully in Table Project", Source.MyConnection);
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ErrorMsgClass.Error($"Failed to add columns to Project table: {ex.Message}");
+                return false;
+            }
+            finally
+            {
+                try
+                {
+                    if (shouldCloseConnection && Source.MyConnection?.State == System.Data.ConnectionState.Open)
+                    {
+                        Source.MyConnection.Close();
+                    }
+                }
+                catch (Exception closeEx)
+                {
+                    ErrorMsgClass.Error($"Error closing connection: {closeEx.Message}");
+                }
+            }
+        }
+
+        private bool QueryExecutor(string query, string Message, SqliteConnection _Connection)
+        {
+            using (var command = new SqliteCommand(query, _Connection))
+            {
+                try
+                {
+                    command.ExecuteNonQuery();
+                    MsgClass.Add(Message);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    MsgClass.Add($"Error: {ex.Message}");
+                    return false;
+                }
+            }
+        }
         private bool CustomerAddress3()
         {
             // 1. Better naming - method name describes what it does
-            var dataTable = Source.GetTable(AppliedDB.Enums.Tables.Customers);
+            var dataTable = Source.GetTable(Enums.Tables.Customers);
 
             // 2. Check if column exists first (more efficient than querying the DB)
             if (dataTable.Columns.Contains("Address3"))
@@ -101,12 +184,12 @@ namespace AppliedAccounts.Data
         }
 
 
-        
+
         public bool BillReceivable2_AddUnit()
         {
             var _DataTable = Source.GetTable(AppliedDB.Enums.Tables.BillReceivable2);
             if (_DataTable.Columns.Contains("Unit")) return true; // Column already exists
-            if(Source.MyConnection == null) { return false; }
+            if (Source.MyConnection == null) { return false; }
 
             try
             {
