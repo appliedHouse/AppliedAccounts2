@@ -1298,7 +1298,7 @@ namespace AppliedDB
         #endregion
 
         #region Count Record
-        public int RecordCound(Tables _Table, string _Filter)
+        public int RecordCount(Tables _Table, string _Filter)
         {
             string _Query = $"SELECT COUNT(*) FROM {_Table} ";
             _Query += string.IsNullOrEmpty(_Filter) ? "" : $"WHERE {_Filter}";
@@ -1307,6 +1307,17 @@ namespace AppliedDB
             var result = Convert.ToInt32(command.ExecuteScalar()); MyConnection.Close();
             return result;
         }
+
+        public int RecordCount(string _Query, string _Filter)
+        {
+            _Query += string.IsNullOrEmpty(_Filter) ? "" : $"WHERE {_Filter}";
+            string CountQuery = $"SELECT COUNT(*) FROM ({_Query})";
+            using var command = new SqliteCommand(CountQuery, MyConnection);
+            if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
+            var result = Convert.ToInt32(command.ExecuteScalar()); MyConnection.Close();
+            return result;
+        }
+
         #endregion
 
         #region Data Table Extention

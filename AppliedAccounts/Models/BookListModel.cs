@@ -137,7 +137,7 @@ namespace AppliedAccounts.Models
             string _Sorting = $"[Vou_Date], [Vou_No] ";
             string _Limit = $"LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
 
-            TotalRecord = Source.RecordCound(Enums.Tables.view_Book, _Filter) + 1;   // +1 for Opening Balance
+            TotalRecord = Source.RecordCount(Enums.Tables.view_Book, _Filter) + 1;   // +1 for Opening Balance
             var _Data = Source.GetTable(_Query, _Filter, _Sorting + _Limit);
 
             if (_Data != null)

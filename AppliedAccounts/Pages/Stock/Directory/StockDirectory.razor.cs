@@ -8,9 +8,11 @@ namespace AppliedAccounts.Pages.Stock.Directory
     {
         public MessageClass MsgClass { get; set; }
         public DataSource Source { get; set; }
+        public CodeTitle MyModel { get; set; }
         public string Filter { get; set; }
         public string Sort { get; set; }
-       
+        public bool EditMode { get; set; } = false;
+
         public List<CodeTitle> StockDirectoryList { get; set; }
 
         protected override void OnParametersSet()
@@ -24,7 +26,7 @@ namespace AppliedAccounts.Pages.Stock.Directory
 
         public void LoadData(string _TableName)
         {
-            var _Sort = "Title" ;
+            var _Sort = "Title";
             Source ??= new(AppGlobal.AppPaths);
 
             switch (_TableName)
@@ -56,15 +58,27 @@ namespace AppliedAccounts.Pages.Stock.Directory
 
         public void Add()
         {
-            
+
         }
 
         public bool Delete(long _ID) { return true; }
-        public bool Edit(long _ID) { return true; }
+        public bool Edit(long _ID)
+        {
+            EditMode = true;
+            MyModel= StockDirectoryList.FirstOrDefault(x => x.ID == _ID)!;
+            return true;
+        }
+
+        public void Save()
+        {
+
+            EditMode = false;
+            //return true;
+
+        }
 
     }
 
-    
 }
 
 

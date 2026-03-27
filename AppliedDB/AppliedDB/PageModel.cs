@@ -3,13 +3,13 @@
     public class PageModel
     {
         public int TotalRecords { get; set; } = 0;
-        public int Current { get; private set; } = 1;
+        public int Current { get; set; } = 1;
         public int Size { get; set; } = 12;
         public int MaxButtons { get; set; } = 10;
 
         public int Count => Math.Max(1, (int)Math.Ceiling(TotalRecords / (double)Size));
 
-        public List<int> PageList { get; private set; } = new();
+        public List<int> PageList { get; set; } = new();
 
         public event Action<int>? PageChanged;
 

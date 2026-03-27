@@ -23,6 +23,8 @@
         try
         {
             MyModel = new(AppGlobal);
+            MyModel.LoadData();
+            IsSearchText = true;
             IsDataLoad = true;
         }
         catch (Exception)
@@ -30,18 +32,23 @@
             IsDataLoad = false; ;
         }
         IsPrinted = false;
+
+       
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (IsPrinted) { await DeletePrintedReports(); }
-
-        MyModel ??= new(AppGlobal);
-        IsSearchText = string.IsNullOrEmpty(MyModel.SearchText) ? false : true;
-        IsRecords = MyModel.Records.Count == 0 ? true : false;
 
         MyModel.Pages.PageChanged += OnPageChangedInternal;
-        await MyModel.LoadData();
+
+        if (IsPrinted) { await DeletePrintedReports(); }
+
+        //MyModel ??= new(AppGlobal);
+        IsSearchText = string.IsNullOrEmpty(MyModel.SearchText) ? true : false;
+        IsRecords = MyModel.Records.Count == 0 ? true : false;
+
+        
+        //await MyModel.LoadData();
 
     }
 
@@ -49,7 +56,7 @@
     private async void OnPageChangedInternal(int page)
     {
         if (MyModel is null) { return; }
-        await MyModel.LoadData();
+        MyModel.LoadData();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -193,7 +200,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td></td>
+                        <td  class="center">@MyModel.Pages.TotalRecords</td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -224,6 +231,6 @@
 else
 {
     <div class="alert alert-danger" role="alert">
-        <p>Data Not Load....</p>
+        <p>Data Not Loaded....</p>
     </div>
 }

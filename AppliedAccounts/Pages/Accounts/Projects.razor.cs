@@ -16,11 +16,19 @@ namespace AppliedAccounts.Pages.Accounts
         public MessageClass MsgClass { get; set; } = new();
 
         public DataSource Source { get; set; }
+        public bool EditMode { get; set; } = false;
 
+
+        protected override void OnInitialized()
+        {
+            Source = new(AppGlobal.AppPaths);
+            MyModel = new ProjectsViewModel();
+            LoadData();
+        }
 
         public Projects()
         {
-            
+            //Source ??= new(AppGlobal.AppPaths);
         }
 
 
@@ -52,11 +60,39 @@ namespace AppliedAccounts.Pages.Accounts
 
         public void Save()
         {
-            
+            EditMode = false;
             LoadData();
         }
 
         public void New()
+        {
+
+        }
+
+        public void Edit(long _ID)
+        {
+            EditMode = true;
+
+            var _Row = Source.Seek(Enums.Tables.Project, _ID);
+            MyModel = new()
+            {
+                ID = _Row.Field<long>("ID"),
+                Title = _Row.Field<string>("Title") ?? "",
+                Comments = _Row.Field<string>("Comments") ?? "",
+
+                Client = 0,
+                ActualCost = 0.00M,
+                Budget = 0.00M,
+                Location = "",
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now,
+                IsCompleted = false,
+                IsActive = true,
+                Terms = ""
+            };
+        }
+
+        public void Delete(long _ID)
         {
 
         }

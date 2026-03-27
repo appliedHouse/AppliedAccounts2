@@ -4,55 +4,55 @@
 @inject AuthenticationStateProvider AuthState
 
 @code {
-    [Parameter] public MenusClass MenuClass { get; set; }
+    //[Parameter] public MenusClass MenuClass { get; set; }
 
-    private string buildNum { get; set; } = "2.0.12";
-    private bool SubMenu { get; set; } = false;
-    private async Task Beep() { await js.InvokeVoidAsync("playBeep"); }
-    private async Task MenuClick(int MenuID)
-    {
-        await js.InvokeVoidAsync("playBeep"); await Task.Delay(100);
+    private string buildNum1 { get; set; } = "2.0.12";
+    //private bool SubMenu1 { get; set; } = false;
+    //private async Task Beep1() { await js.InvokeVoidAsync("playBeep"); }
+    // private async Task MenuClick1(int MenuID)
+    // {
+    //     await js.InvokeVoidAsync("playBeep"); await Task.Delay(100);
 
-        var _SelectedMenu = MenuClass.GetMenu(MenuID);
-        if (_SelectedMenu == null) { return; }
+    //     var _SelectedMenu = MenuClass.GetMenu(MenuID);
+    //     if (_SelectedMenu == null) { return; }
 
-        #region Logout User
-        if (MenuID == (int)MenuEnum.Menus.Logout)
-        {
-            var UserService = (UserAuthenticationStateProvider)AuthState;
-            await UserService.UpdateAuthonticateState(null);                    // Logout User
-            NavManager.NavigateTo("/");
-            return;
-        }
-        #endregion
+    //     #region Logout User
+    //     if (MenuID == (int)MenuEnum.Menus.Logout)
+    //     {
+    //         var UserService = (UserAuthenticationStateProvider)AuthState;
+    //         await UserService.UpdateAuthenticateState(null);                    // Logout User
+    //         NavManager.NavigateTo("/");
+    //         return;
+    //     }
+    //     #endregion
 
-        #region Home Button
-        if (MenuID == (int)MenuEnum.Menus.Home)
-        {
-            NavManager.NavigateTo("/");
-            return;
-        }
-        #endregion
+    //     #region Home Button
+    //     if (MenuID == (int)MenuEnum.Menus.Home)
+    //     {
+    //         NavManager.NavigateTo("/");
+    //         return;
+    //     }
+    //     #endregion
 
-        #region Menu button Click
+    //     #region Menu button Click
 
-        if (_SelectedMenu.Level == 1)
-        {
-            SubMenu = !SubMenu;
-            MenuClass.TopSelected(_SelectedMenu, SubMenu);
-        }
-        if (_SelectedMenu.Level == 2)
-        {
-            MenuClass.SecondLevel(_SelectedMenu);
-        }
-        #endregion
+    //     if (_SelectedMenu.Level == 1)
+    //     {
+    //         SubMenu = !SubMenu;
+    //         MenuClass.TopSelected(_SelectedMenu, SubMenu);
+    //     }
+    //     if (_SelectedMenu.Level == 2)
+    //     {
+    //         MenuClass.SecondLevel(_SelectedMenu);
+    //     }
+    //     #endregion
 
-        if (!string.IsNullOrEmpty(_SelectedMenu.NavigateTo))
-        {
-            NavManager.NavigateTo(_SelectedMenu.NavigateTo);
-        }
+    //     if (!string.IsNullOrEmpty(_SelectedMenu.NavigateTo))
+    //     {
+    //         NavManager.NavigateTo(_SelectedMenu.NavigateTo);
+    //     }
 
-    }
+    // }
 
     protected override void OnInitialized()
     {
@@ -76,7 +76,7 @@
         }
 
     </div>
-    <div class="build">Build: @buildNum</div>
+    <div class="build">Build: @BuildNum</div>
 </div>
 
 

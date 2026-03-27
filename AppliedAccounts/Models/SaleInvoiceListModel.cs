@@ -31,13 +31,20 @@ namespace AppliedAccounts.Models
         {
             AppGlobal = _AppGlobal;
             Source = new(AppGlobal.AppPaths);
-            LoadData();
+            if(AppGlobal.Client.UserID == "CDC")
+            {
+                Pages.Size = 500;                   // if user id CDC shows max 500 records in one page
+            }
+            //LoadData();
         }
         
         #endregion
 
         #region Load Data
-        public async Task LoadData()
+
+       
+
+        public void LoadData()
         {
             //Source ??= new(AppGlobal.AppPaths);
             var _Query = SQLQuery.SaleInvoiceList();
@@ -48,7 +55,7 @@ namespace AppliedAccounts.Models
                 string[] columns =
                 {
                     "Company",
-                    "Employee",
+                    "Salesman",
                     "City",
                     "Description",
                     "Vou_No",
@@ -66,8 +73,8 @@ namespace AppliedAccounts.Models
             
             //Pages.TotalRecords = Source.RecordCound(Tables.BillReceivable, Filter) + 1;
             Data = Source.GetTable(_Query, Filter, _Sort + Pages.GetLimit());
-            Records = Data.AsEnumerable().Select(row => GetRecord(row)).ToList();
-            Pages.Refresh(Source.RecordCound(Tables.BillReceivable, Filter));
+            Records = [.. Data.AsEnumerable().Select(row => GetRecord(row))]; 
+            Pages.Refresh(Source.RecordCount(_Query, Filter));
 
         }
         #endregion
@@ -127,14 +134,18 @@ namespace AppliedAccounts.Models
         #region Search
         public async void Search()
         {
-            await LoadData();
-
+            
+            LoadData();
+            Pages.Current = 1;
+            Pages.Refresh();
         }
 
         public async void ClearText()
         {
             SearchText = string.Empty;
-            await LoadData();
+            LoadData();
+            Pages.Refresh();
+            
         }
         #endregion
 

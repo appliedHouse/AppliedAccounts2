@@ -1,7 +1,15 @@
 ﻿
+@using AppliedAccounts.Component
+
 @code {
     [Parameter]
     public string Text { get; set; } = "....:Page Heading:...";
+    
+    [Parameter]
+    public string BackButtonNavTo { get; set; } = "/";
+    
+    [Parameter]
+    public bool ShowBackButton { get; set; } = true;
 }
 
 <style>
@@ -10,12 +18,28 @@
     color:white;
     font-family:Calibri;
     padding:0px;
+    margin:0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* position: relative; */
+}
+.back-button-container {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 </style>
 
 <div class="container-fluid m-0 p-0">
-    <div class="row p-0 g-0">
-        <h3 id="Heading" class="text-center">@Text</h3>
+    <div class="row p-0 g-0 position-relative">
+        @if (ShowBackButton)
+        {
+            <div class="back-button-container">
+                <Btn_Back NavTo="@BackButtonNavTo" />
+            </div>
+        }
+        <h3 id="Heading" class="text-center w-100">@Text</h3>
     </div>
-
 </div>

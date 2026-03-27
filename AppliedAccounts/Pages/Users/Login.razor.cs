@@ -32,7 +32,7 @@ namespace AppliedAccounts.Pages.Users
                 {
                     var _newGUID = Guid.NewGuid();
                     var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
-                    var _UserData = new UserSession();
+                    var _UserData = new UserSession(); ;
 
                     _UserData.UserName = AppUser.Profile.UserID;
                     _UserData.Role = AppUser.Profile.Role;
@@ -47,7 +47,7 @@ namespace AppliedAccounts.Pages.Users
 
 
                     bool IsDBFileValid = false;
-                    await userAuthStateProvider.UpdateAuthonticateState(_UserData);
+                    await userAuthStateProvider.UpdateAuthenticateState(_UserData);
                     IsDBFileValid = await UserDatabaseFileValidateAsync(AppUser.Profile.DataFile);
 
                     if(IsDBFileValid)

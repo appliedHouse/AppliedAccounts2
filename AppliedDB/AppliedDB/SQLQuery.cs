@@ -71,9 +71,9 @@ namespace AppliedDB
             _Text.AppendLine("[BR].[Vou_Date],");
             _Text.AppendLine("[BR].[Inv_Date],");
             _Text.AppendLine("[BR].[Pay_Date],");
-            _Text.AppendLine("[C].[Title] As[Company],");
-            _Text.AppendLine("[E].[Title] As[Salesman],");
-            _Text.AppendLine("[C].[City] As[City],");
+            _Text.AppendLine("[C].[Title] As [Company],");
+            _Text.AppendLine("[E].[Title] As [Salesman],");
+            _Text.AppendLine("[C].[City] As [City],");
             _Text.AppendLine("[BR].[Amount],");
             _Text.AppendLine("[BR].[Description],");
             _Text.AppendLine("[BR].[Status]");

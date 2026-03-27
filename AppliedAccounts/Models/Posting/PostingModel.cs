@@ -200,7 +200,7 @@ namespace AppliedAccounts.Models.Posting
             // Cash Book Posting
             if (PostingModel.PostingType == PostingTypes.CashBook)
             {
-                VoucherPostingModel postingModel = new();
+                VoucherPostingModel postingModel = new(); ;
 
                 postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
                 postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
@@ -211,7 +211,7 @@ namespace AppliedAccounts.Models.Posting
                 if (postCashBook.PostSuccessful)
                 {
                     MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
-                    LoadData(PostingModel);                    // Refresh display Data afger save voucher.
+                    await LoadData(PostingModel);           // Refresh display Data afger save voucher.
                 }
                 else
                 {
@@ -222,18 +222,18 @@ namespace AppliedAccounts.Models.Posting
             // Bank Book Posting
             if (PostingModel.PostingType == PostingTypes.BankBook)
             {
-                VoucherPostingModel postingModel = new();
+                VoucherPostingModel postingModel = new(); ;
 
-                postingModel.MasterTable = Source.GetTable(AppliedDB.Enums.Tables.Book, $"ID={_VouID}");
-                postingModel.DetailTable = Source.GetTable(AppliedDB.Enums.Tables.Book2, $"TranID={_VouID}");
+                postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
+                postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
 
                 MsgClass.ClearMessages();                           // Clear all previous messages. 
                 CashBook postBankBook = new(Source, postingModel);
                 await postBankBook.DoBankPosting();                  // Bank Posting main method.
                 if (postBankBook.PostSuccessful)
                 {
-                    MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
-                    LoadData(PostingModel);              // Refresh display Data afger save voucher.
+                    MsgClass.Success(Messages.Save);           // add message after Save selected Vouchers.
+                    await LoadData(PostingModel);              // Refresh display Data afger save voucher.
                 }
                 else
                 {

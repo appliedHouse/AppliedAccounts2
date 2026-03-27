@@ -17,32 +17,67 @@
 <PageHeading Text="@SubHeadingTitle" />
 <ShowMessages MsgClass="MsgClass"></ShowMessages>
 
-@if (StockDirectoryList.Count > 0)
+
+@if (EditMode)
 {
-    <div class="container">
-        <table class="table-list">
-            <thead>
-                <tr>
-                    <th style="width:20%">Code</th>
-                    <th style="width:60%">Title</th>
-                    <th style="width:20%"><button id="btnAdd" class="btn-Add" @onclick="Add"><i class="bi bi-plus-circle-fill"></i></button></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in StockDirectoryList)
-                {
+    <EditForm Model="MyModel">
+        <div class="container">
+            
+            <div class="row mt-3">
+                <InputNumber @bind-Value="@MyModel.ID" hidden />
+                <div class="col-md-3">
+                    <div class="form-floating mb-1 txt">
+                        <InputText @bind-Value="@MyModel.Code" class="form-control" id="txtCode" placeholder="Code" />
+                        <label for="txtCode">Code</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-1 txt">
+                        <InputText @bind-Value="@MyModel.Title" class="form-control" id="txtTitle" placeholder="Title / Name" />
+                        <label for="txtTitle">Title</label>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="container control-buttons">
+            <div class="row mt-2">
+            <button @onclick="Save" class="btn ctrl ctrl-edit"><i class="bi bi-floppy"></i></button>
+            </div>
+        </div>
+    </EditForm>
+}
+else
+{
+
+    @if (StockDirectoryList.Count > 0)
+    {
+        <div class="container">
+            <table class="table-list">
+                <thead>
                     <tr>
-                        <td>@item.Code</td>
-                        <td>@item.Title</td>
-                        <td clas class="tb-col-left" s="td-btn">
-                            <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(() => Edit((long)item.ID))"><i class="bi bi-pencil-fill"></i></button>
-                            <label style="padding-left:5px; padding-right:5px;"> | </label>
-                            <button id="btnDel" type="submit" class="btn-Del" @onclick="(() => Delete((long)item.ID))"><i class="bi bi-trash-fill"></i></button>
-                        </td>
-                        
+                        <th style="width:20%">Code</th>
+                        <th style="width:60%">Title</th>
+                        <th style="width:20%"><button id="btnAdd" class="btn-Add" @onclick="Add"><i class="bi bi-plus-circle-fill"></i></button></th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    @foreach (var item in StockDirectoryList)
+                    {
+                        if(item.ID == 0) { continue; }
+                        <tr>
+                            <td>@item.Code</td>
+                            <td>@item.Title</td>
+                            <td clas class="tb-col-left" s="td-btn">
+                                <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(() => Edit((long)item.ID))"><i class="bi bi-pencil-fill"></i></button>
+                                <label style="padding-left:5px; padding-right:5px;"> | </label>
+                                <button id="btnDel" type="submit" class="btn-Del" @onclick="(() => Delete((long)item.ID))"><i class="bi bi-trash-fill"></i></button>
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 }

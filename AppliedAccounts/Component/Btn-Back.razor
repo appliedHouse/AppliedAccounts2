@@ -1,19 +1,43 @@
 ﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
 @inject NavigationManager NavManager;
 
 @code {
-    [Parameter] public string NavTo { get; set; }
+    [Parameter] public string NavTo { get; set; } = "/";
+    [Parameter] public string CssClass { get; set; } = "";
 
     private void HandleClick(MouseEventArgs e)
     {
-        
-
         NavManager.NavigateTo(NavTo);
     }
 }
 
+<style>
+    .back-nav-button {
+        color: white !important;
+        background: transparent !important;
+        border: none !important;
+        opacity: 1 !important;
+        z-index: 1000 !important;
+        position: relative !important;
+    }
 
-<button class="btn btn-link btn-sm" title="Back" @onclick="HandleClick">
-    <i class="bi bi-arrow-left-circle" ></i>
+        .back-nav-button i {
+            color: white !important;
+            font-size: 1.5rem !important;
+        }
+
+        .back-nav-button:hover {
+            color: #ffcccc !important;
+        }
+
+            .back-nav-button:hover i {
+                color: #ffcccc !important;
+            }
+</style>
+
+<button class="btn btn-link btn-sm back-nav-button @CssClass"
+        title="Back"
+        @onclick="HandleClick">
+    <i class="bi bi-arrow-left-circle fs-5"></i>
 </button>
-
