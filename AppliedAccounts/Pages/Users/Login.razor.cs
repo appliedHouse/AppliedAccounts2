@@ -47,7 +47,7 @@ namespace AppliedAccounts.Pages.Users
 
 
                     bool IsDBFileValid = false;
-                    await userAuthStateProvider.UpdateAuthonticateState(_UserData);
+                    await userAuthStateProvider.UpdateAuthenticateState(_UserData);
                     IsDBFileValid = await UserDatabaseFileValidateAsync(AppUser.Profile.DataFile);
 
                     if(IsDBFileValid)
