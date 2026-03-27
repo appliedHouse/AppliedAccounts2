@@ -9,7 +9,7 @@ namespace AppliedAccounts.Pages.Menu
     {
         //[Parameter] public MenusClass MenuClass { get; set; }
 
-        private string buildNum { get; set; } = "2.0.6";
+        private string buildNum { get; set; } = "2.0.12";
         private bool SubMenu { get; set; } = false;
         public async Task Beep() { await js.InvokeVoidAsync("playBeep"); }
 
