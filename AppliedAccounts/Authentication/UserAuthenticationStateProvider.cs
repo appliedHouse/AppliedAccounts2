@@ -76,7 +76,7 @@ namespace AppliedAccounts.Authentication
             }
         }
 
-        public async Task UpdateAuthonticateState(UserSession? userSession)
+        public async Task UpdateAuthenticateState(UserSession? userSession)
         {
             ClaimsPrincipal claimsPrincipal;
             if (userSession != null)
@@ -140,7 +140,7 @@ namespace AppliedAccounts.Authentication
 
         public async Task Logout()
         {
-            await UpdateAuthonticateState(null);
+            await UpdateAuthenticateState(null);
         }
 
         public enum UserRolls
