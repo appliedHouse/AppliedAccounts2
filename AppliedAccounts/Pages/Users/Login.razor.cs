@@ -46,7 +46,7 @@ namespace AppliedAccounts.Pages.Users
                     _UserData.LanguageID = LanguageID;
 
                     bool IsDBFileValid = false;
-                    await userAuthStateProvider.UpdateAuthonticateState(_UserData);
+                    await userAuthStateProvider.UpdateAuthenticateState(_UserData);
                     IsDBFileValid = await UserDatabaseFileValidateAsync(AppUser.Profile.DataFile);
 
                     if(IsDBFileValid)
