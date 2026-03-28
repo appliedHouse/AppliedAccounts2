@@ -426,6 +426,19 @@ namespace AppliedDB
             return null;
         }
 
+        public DataRow? GetDataRow(string _Query)
+        {
+            var _Connection = Connections.GetSqliteConnection(MyConnection.DataSource)!;
+            var _DataTable = GetQueryTable(_Query, _Connection);
+            if (_DataTable.Rows.Count > 0)
+            {
+                DataRow row = _DataTable.Rows[0];
+                row.AcceptChanges();                    // Add here to Rowstate must be unchanged
+                return row;
+            }
+            return null;
+        }
+
         #endregion
 
         #region Seek

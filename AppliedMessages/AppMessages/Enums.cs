@@ -18,6 +18,7 @@
             RowNotInserted = 54,
             RowDeleted = 56,
             RowNotDeleted = 58,
+            RecordCanNotDelete = 59,
 
             // Reports
             prtReportError = 600101,
@@ -185,6 +186,7 @@
             Row_PackingIdZero = 600115,
             Row_SizeIDZero = 600116,
             Row_SubCategoryIDZero = 600117,
+            
         }
 
         public enum Class

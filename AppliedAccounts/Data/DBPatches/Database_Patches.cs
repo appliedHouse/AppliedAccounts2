@@ -33,16 +33,16 @@ namespace AppliedAccounts.Data
 
             var columns = new (string Name, string Type, string Default)[]
             {
-                ("Client", "INTEGER", "0"),
-                ("ActualCost", "REAL", "0"),
-                ("Budget", "REAL", "0"),
-                ("Location", "TEXT", "NULL"),
-                ("StartDate", "TEXT", "datetime('now')"),
-                ("EndDate", "TEXT", "datetime('now')"),
-                ("IsActive", "INTEGER", "0"),
-                ("IsCompleted", "INTEGER", "0"),
-                ("ProjectManager", "INTEGER", "0"),
-                ("Terms", "TEXT", "NULL")
+                ("Client", "INT64", "0"),
+                ("ActualCost", "DECIMAL", "0.00"),            // DECIMAL NOT NULL DEFAULT (0.00)
+                ("Budget", "DECIMAL", "0.00"),                // DECIMAL NOT NULL DEFAULT (0.00)
+                ("Location", "NVARCHAR", "NULL"),
+                ("StartDate", "DATETIME", "NULL"),
+                ("EndDate", "DATETIME", "NULL"),
+                ("IsActive", "BOOLEAN", "True"),
+                ("IsCompleted", "BOOLEAN", "False"),
+                ("ProjectManager", "INT64", "0"),
+                ("Terms", "NVARCHAR", "NULL")
             };
 
             try

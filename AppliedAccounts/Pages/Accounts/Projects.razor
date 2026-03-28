@@ -74,7 +74,11 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-floating">
-                        <InputSelect id="ddCompany" class="form-control item-height" TValue="long" Value="@MyModel.Client" ValueExpression="@(() => @MyModel.Client)" ValueChanged="@((e) => CompanyIDChanged(e))">
+                        <InputSelect id="ddCompany" class="form-control item-height" 
+                            TValue="long" 
+                            Value="@MyModel.Client" 
+                            ValueExpression="@(() => @MyModel.Client)" 
+                            ValueChanged="@((e) => CompanyIDChanged(e))">
                             @if (Clients.Any())
                             {
                                 @foreach (var item in Clients)
@@ -93,7 +97,11 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating">
-                        <InputSelect id="ddEmployee" class="form-control item-height" TValue="long" Value="@MyModel.ProjectManager" ValueExpression="@(() => @MyModel.ProjectManager)" ValueChanged="@((e) => EmployeeIDChanged(e))">
+                        <InputSelect id="ddEmployee" class="form-control item-height" 
+                            TValue="long" 
+                            Value="@MyModel.ProjectManager" 
+                            ValueExpression="@(() => @MyModel.ProjectManager)" 
+                            ValueChanged="@((e) => EmployeeIDChanged(e))">
                             @if (Employees.Any())
                             {
                                 @foreach (var item in Employees)
@@ -228,7 +236,7 @@ else
                     <th style="width:10%">Code</th>
                     <th style="width:30%">Title</th>
                     <th style="width:50%">Comments</th>
-                    <th style="width:10%"><i class="bi bi-plus"></i>..</th>
+                    <th style="width:10%" @onclick="New"><i class="bi bi-folder-plus"></i></th>
                     
                 </tr>
             </thead>

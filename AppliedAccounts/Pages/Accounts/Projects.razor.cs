@@ -2,6 +2,7 @@
 using AppMessages;
 using System.Data;
 using Enums = AppliedDB.Enums;
+using Messages = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Pages.Accounts
 {
@@ -20,7 +21,7 @@ namespace AppliedAccounts.Pages.Accounts
 
         public Projects()
         {
-            
+
         }
 
 
@@ -35,7 +36,7 @@ namespace AppliedAccounts.Pages.Accounts
         private void CompanyIDChanged(long _ID)
         {
             MyModel.Client = _ID;
-            MyModel.Title = Clients
+            MyModel.TitleClient = Clients
                 .Where(e => e.ID == MyModel.Client)
                 .Select(e => e.Title)
                 .First() ?? "";
@@ -44,7 +45,7 @@ namespace AppliedAccounts.Pages.Accounts
         private void EmployeeIDChanged(long _ID)
         {
             MyModel.ProjectManager = _ID;
-            MyModel.Title = Employees
+            MyModel.TitleManager = Employees
                 .Where(e => e.ID == MyModel.ProjectManager)
                 .Select(e => e.Title)
                 .First() ?? "";
@@ -52,65 +53,161 @@ namespace AppliedAccounts.Pages.Accounts
 
         public void Save()
         {
-            
+            DataRow? _Row = Source.GetDataRow(Enums.Tables.Project, MyModel.ID);
+            if (_Row == null)
+            {
+                _Row = Source.GetNewRow(Enums.Tables.Project);
+                _Row["ID"] = 0;
+            }
+
+            var _Terms = string.IsNullOrEmpty(MyModel.Terms) ? DBNull.Value : (object)MyModel.Terms;
+            var _Location = string.IsNullOrEmpty(MyModel.Location) ? DBNull.Value : (object)MyModel.Location;
+
+            _Row["Code"] = MyModel.Code;
+            _Row["Title"] = MyModel.Title;
+            _Row["Comments"] = MyModel.Comments;
+            _Row["Location"] = _Location;
+            _Row["Client"] = MyModel.Client;
+            _Row["ProjectManager"] = MyModel.ProjectManager;
+            _Row["StartDate"] = MyModel.StartDate;
+            _Row["EndDate"] = MyModel.EndDate;
+            _Row["ActualCost"] = MyModel.ActualCost;
+            _Row["Budget"] = MyModel.Budget;
+            _Row["IsActive"] = MyModel.IsActive;
+            _Row["IsCompleted"] = MyModel.IsCompleted;
+            _Row["Terms"] = _Terms;
+
+            Source.Save(_Row);
+            MsgClass = Source.MsgClass;
             LoadData();
+            EditMode = false;
         }
 
         public void New()
         {
+            EditMode = true;
+            //DataRow _Row = Source.GetNewRow(Enums.Tables.Project);
+
+            MyModel = new()
+            {
+                ID = 0,
+                StartDate = DateTime.Today,
+                EndDate = DateTime.Today,
+                Client = 0,
+                ProjectManager = 0,
+            };
+
+            InvokeAsync(StateHasChanged);
 
         }
 
         public void Edit(long _ID)
         {
-            DataView dv = ProjectList.AsDataView();
-            dv.RowFilter = $"ID = {_ID}"; 
-
-            if (dv.Count > 0)
+            if (_ID > 0)
             {
-                var row = dv[0];
-                MyModel = new ProjectsViewModel()
-                {
-                    ID = (long)row["ID"],
-                    Code = row["Code"]?.ToString() ?? "",
-                    Title = row["Title"]?.ToString() ?? "",
-                    Comments = row["Comments"]?.ToString() ?? ""
-                };
 
-                EditMode = true;
-                //InvokeAsync(StateHasChanged);
+                DataView dv = ProjectList.AsDataView();
+                dv.RowFilter = $"ID = {_ID}";
+
+                if (dv.Count > 0)
+                {
+                    var row = dv[0].Row;
+                    MyModel = new ProjectsViewModel()
+                    {
+                        ID = row.Field<long>("ID"),
+                        Code = row.Field<string>("Code") ?? "",
+                        Title = row.Field<string>("Title") ?? "",
+                        Comments = row.Field<string>("Comments") ?? "",
+                        Client = row.Field<long>("Client"),
+                        ProjectManager = row.Field<long>("ProjectManager"),
+                        StartDate = row["StartDate"] != DBNull.Value ? row.Field<DateTime>("StartDate") : DateTime.Now,
+                        EndDate = row["EndDate"] != DBNull.Value ? row.Field<DateTime>("EndDate") : DateTime.Now,
+                        IsActive = row.Field<bool>("IsActive"),
+                        IsCompleted = row.Field<bool>("IsCompleted"),
+                        Terms = row.Field<string>("Terms") ?? "",
+                        Location = row.Field<string>("Location") ?? "",
+                        ActualCost = row.Field<decimal>("ActualCost"),
+                        Budget = row.Field<decimal>("Budget")
+                    };
+
+                    EditMode = true;
+                }
+                else
+                {
+                    MsgClass.Alert($"Projct Id {_ID} not found to edit.");
+                }
             }
         }
 
         public void Delete(long _ID)
         {
+            if (_ID > 0)
+            {
 
+                DataRow? _Row = Source.GetDataRow(Enums.Tables.Project, _ID);
+                if (_Row != null)
+                {
+                    if (DelValidaded(_ID))
+                    {
+                        Source.Delete(_Row);
+                        LoadData();
+                    }
+                    else
+                    {
+                        MsgClass.Warning(Messages.RecordCanNotDelete);
+                    }
+                }
+            }
+            else
+            {
+                MsgClass.Alert(Messages.NoRecordFound);
+            }
         }
+
+        private bool DelValidaded(long _ID)
+        {
+            bool _Result = true;
+            DataRow?
+            _Row = Source.GetDataRow($"SELECT * FROM [Ledger] WHERE [Project] = {_ID} LIMIT 1;"); if (_Row != null) { return false; }
+            _Row = Source.GetDataRow($"SELECT * FROM [BillPayable2] WHERE [Project] = {_ID} LIMIT 1;"); if (_Row != null) { return false; }
+            _Row = Source.GetDataRow($"SELECT * FROM [BillReceivable2] WHERE [Project] = {_ID} LIMIT 1;"); if (_Row != null) { return false; }
+            _Row = Source.GetDataRow($"SELECT * FROM [CashBook] WHERE [Project] = {_ID} LIMIT 1;"); if (_Row != null) { return false; }
+            _Row = Source.GetDataRow($"SELECT * FROM [Receipt2] WHERE [Project] = {_ID} LIMIT 1;"); if (_Row != null) { return false; }
+            _Row = Source.GetDataRow($"SELECT * FROM [BankBook] WHERE [Project] = {_ID} LIMIT 1;"); if (_Row != null) { return false; }
+            _Row = Source.GetDataRow($"SELECT * FROM [CashBook] WHERE [Project] = {_ID} LIMIT 1;"); if (_Row != null) { return false; }
+            _Row = Source.GetDataRow($"SELECT * FROM [FinishedGoods] WHERE [Project] = {_ID} LIMIT 1;"); if (_Row != null) { return false; }
+
+            return _Result;
+        }
+
         public void BackPage()
         {
-            AppGlobal.NavManager.NavigateTo("/Accounts/Dictionery", true);
+            AppGlobal.NavManager.NavigateTo("Accounts/Projects", true);
         }
 
     }
 
     public class ProjectsViewModel
     {
-        public long ID { get; set; }
-        public string Code { get; set; }
-        public string Title { get; set; }
-        public string Comments { get; set; }
+        public long ID { get; set; } = 0;
+        public string Code { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string Comments { get; set; } = string.Empty;
 
 
-        public long Client { get; set; }
+        public long Client { get; set; } = 0;
         public decimal ActualCost { get; set; }
-        public decimal Budget { get; set; }
-        public string Location { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public bool IsActive { get; set; }  
-        public bool IsCompleted { get; set; }
-        public long ProjectManager { get; set; }
-        public string Terms { get; set; }
+        public decimal Budget { get; set; } = 0.00M;
+        public string Location { get; set; } = string.Empty;
+        public DateTime StartDate { get; set; } = DateTime.Today;
+        public DateTime EndDate { get; set; } = DateTime.Today;
+        public bool IsActive { get; set; } = true;
+        public bool IsCompleted { get; set; } = false;
+        public long ProjectManager { get; set; } = 0;
+        public string Terms { get; set; } = string.Empty;
+
+        public string TitleClient { get; set; } = string.Empty;
+        public string TitleManager { get; set; } = string.Empty;
 
     }
 }
