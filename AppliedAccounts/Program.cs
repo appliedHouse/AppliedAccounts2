@@ -15,6 +15,7 @@ Batteries.Init();                       // Start SQLite Engine.
 
 // Add services to the container.
 
+builder.Services.AddHttpClient();
 builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -25,9 +26,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateP
 builder.Services.AddScoped<ToastService>();
 builder.Services.AddScoped<PrintService>();
 builder.Services.AddScoped<MessagesService>();
-builder.Services.AddHttpClient();
 builder.Services.AddScoped<GlobalService>();
-
 
 //builder.Services.AddScoped<GlobalService>(sp =>
 //{

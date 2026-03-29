@@ -1,9 +1,13 @@
 ﻿@page "/Accounts/Projects"
 @namespace AppliedAccounts.Pages.Accounts
 @using AppliedAccounts.Libs
+@using AppliedAccounts.Services
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Data
+@using static AppMessages.Enums
+
 @inject GlobalService AppGlobal
+@inject MessagesService MsgService
 
 
 @code {
@@ -11,32 +15,10 @@
     private bool IsSubmitting { get; set; } = false;
     private string SubmitMessage { get; set; } = string.Empty;
     private bool EditMode { get; set; } = false;
-
-
-    protected override void OnInitialized()
-    {
-        Source = new(AppGlobal.AppPaths);
-        MyModel = new ProjectsViewModel();
-        LoadData();
-    }
-
-    
-
-    private async Task HandleValidSubmit()
-    {
-        IsSubmitting = true;
-
-        await Task.Delay(1000); // Simulate async operation
-
-        SubmitMessage = "Project saved successfully!";
-        IsSubmitting = false;
-    }
-
-    
 }
 
 <PageHeading Text="List of Projects"></PageHeading>
-<ShowMessages MsgClass="MsgClass"></ShowMessages>
+<ShowMessages MsgClass="MsgService.MsgClass"></ShowMessages>
 
 @if (EditMode)
 {

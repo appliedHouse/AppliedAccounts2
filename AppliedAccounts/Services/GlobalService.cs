@@ -29,7 +29,7 @@ namespace AppliedAccounts.Services
         public event Action? OnLanguageChanged;
 
 
-        public GlobalService() { }
+        //public GlobalService() { }
 
         public GlobalService(IConfiguration _Config, NavigationManager _NavManager, IJSRuntime _JS, AuthenticationStateProvider _StateProvider)
         {

@@ -14,14 +14,29 @@ namespace AppliedAccounts.Pages.Accounts
         public DataTable ProjectList { get; set; }
         public List<CodeTitle> Clients { get; set; }
         public List<CodeTitle> Employees { get; set; }
-        public MessageClass MsgClass { get; set; } = new();
+        //public MessageClass MsgClass { get; set; }
 
         public DataSource Source { get; set; }
 
 
-        public Projects()
+        protected override void OnInitialized()
         {
+            Source ??= new(AppGlobal.AppPaths);
+            MyModel = new ProjectsViewModel();
+            LoadData();
 
+            MsgService.Success(Messages.NoMessage);
+
+        }
+
+        private async Task HandleValidSubmit()
+        {
+            IsSubmitting = true;
+
+            await Task.Delay(1000); // Simulate async operation
+
+            SubmitMessage = "Project saved successfully!";
+            IsSubmitting = false;
         }
 
 
@@ -78,7 +93,7 @@ namespace AppliedAccounts.Pages.Accounts
             _Row["Terms"] = _Terms;
 
             Source.Save(_Row);
-            MsgClass = Source.MsgClass;
+            MsgService.MsgClass = Source.MsgClass;
             LoadData();
             EditMode = false;
         }
@@ -134,7 +149,7 @@ namespace AppliedAccounts.Pages.Accounts
                 }
                 else
                 {
-                    MsgClass.Alert($"Projct Id {_ID} not found to edit.");
+                    MsgService.Alert($"Projct Id {_ID} not found to edit.");
                 }
             }
         }
@@ -154,13 +169,13 @@ namespace AppliedAccounts.Pages.Accounts
                     }
                     else
                     {
-                        MsgClass.Warning(Messages.RecordCanNotDelete);
+                        MsgService.Warning(Messages.RecordCanNotDelete);
                     }
                 }
             }
             else
             {
-                MsgClass.Alert(Messages.NoRecordFound);
+                MsgService.Alert(Messages.NoRecordFound);
             }
         }
 

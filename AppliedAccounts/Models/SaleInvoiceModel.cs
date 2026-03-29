@@ -74,7 +74,7 @@ namespace AppliedAccounts.Models
                 if (AppGlobal is null) { return; }
                 Source ??= new(AppGlobal.AppPaths);
 
-                MsgClass = new(Msg.GetMessages());
+                MsgClass = new();
                 MyVoucher = new();
                 LastVoucherDate = GetDate(Source.DBFile, "SInvDate");           // Sale Invoice Date
 
@@ -262,7 +262,7 @@ namespace AppliedAccounts.Models
         public bool IsTransValidated()
         {
             bool IsValid = true;
-            MsgClass ??= new(Msg.GetMessages());
+            MsgClass ??= new();
             MsgClass.ClearMessages();
 
             if (MyVoucher.Master == null) { MsgClass.Add(MESSAGE.MasterRecordisNull); return false; }

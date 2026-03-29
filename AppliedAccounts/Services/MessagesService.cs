@@ -1,90 +1,139 @@
-﻿using AppliedDB;
-using AppMessages;
+﻿using AppMessages;
+using Microsoft.Data.Sqlite;
 using static AppMessages.Enums;
 
 namespace AppliedAccounts.Services
 {
-    public class MessagesService
+    public class MessagesService : IMessagesService
     {
         public MessageClass MsgClass { get; set; }
+        public long LanguageID { get; set; } = 1;            // Default Language 1 is English
 
-        public MessagesService()
+        private SqliteConnection SqlConnection { get; set; }
+        private readonly string MsgConnectionString;
+
+        public MessagesService(IConfiguration configuration)
         {
-            MsgClass = new MessageClass(Msg.GetMessages());
+            try
+            {
+                var MsgPath = configuration.GetSection("Paths:MessagesPath").Value;
+                if (MsgPath != null)
+                {
+                    var FilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", MsgPath, "Messages.db");
+                    MsgConnectionString = $"Data Source={FilePath}";
+                    SqlConnection = GetConnection();
+                    MsgClass = new() { MsgConnection = SqlConnection };
+                    SqlConnection = null!;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                MsgClass!.Error(ex.Message);
+            }
         }
 
-        internal void AddRange(MessageClass msgClass)
+        private SqliteConnection GetConnection()
+        {
+            return new SqliteConnection(MsgConnectionString);
+        }
+
+        public void AddRange(MessageClass msgClass)
         {
             MsgClass = msgClass;
         }
 
-        internal void Add(string _message)
+        public void Add(string _message)
         {
             MsgClass.Add(_message);
         }
 
         // Errors
 
-        internal void Error(Messages _code)
+        public void Error(Messages _code)
         {
             MsgClass.Errors.Add(MsgClass.GetMessage(_code, Class.Error));
         }
 
-        internal void Error(string _text)
+        public void Error(string _text)
         {
             MsgClass.Errors.Add(MsgClass.GetMessage(_text, Class.Error));
         }
 
         // Danger
-        internal void Danger(Messages _code)
+        public void Danger(Messages _code)
         {
             MsgClass.Errors.Add(MsgClass.GetMessage(_code, Class.Danger));
         }
 
-        internal void Danger(string _text)
+        public void Danger(string _text)
         {
             MsgClass.Errors.Add(MsgClass.GetMessage(_text, Class.Danger));
         }
 
         // Critical
-        internal void Critical(Messages _code)
+        public void Critical(Messages _code)
         {
             MsgClass.Errors.Add(MsgClass.GetMessage(_code, Class.Critical));
         }
-        internal void Critical(string _text)
+        public void Critical(string _text)
         {
             MsgClass.Errors.Add(MsgClass.GetMessage(_text, Class.Critical));
         }
 
         // Success
-        internal void Success(Messages _code)
+        public void Success(Messages _code)
         {
             MsgClass.MessageList.Add(MsgClass.GetMessage(_code, Class.Success));
         }
-        internal void Success(string _text)
+        public void Success(string _text)
         {
             MsgClass.MessageList.Add(MsgClass.GetMessage(_text, Class.Success));
         }
 
         //Warrning
-        internal void Warning(Messages _code)
+        public void Warning(Messages _code)
         {
             MsgClass.MessageList.Add(MsgClass.GetMessage(_code, Class.Warning));
         }
-        internal void Warning(string _text)
+        public void Warning(string _text)
         {
             MsgClass.MessageList.Add(MsgClass.GetMessage(_text, Class.Warning));
 
         }
 
         // Alert
-        internal void Alert(Messages _code)
+        public void Alert(Messages _code)
         {
             MsgClass.MessageList.Add(MsgClass.GetMessage(_code, Class.Alert));
         }
-        internal void Alert(string _text)
+        public void Alert(string _text)
         {
             MsgClass.MessageList.Add(MsgClass.GetMessage(_text, Class.Alert));
         }
+    }
+
+    public interface IMessagesService
+    {
+        void AddRange(MessageClass msgClass);
+        void Add(string message);
+
+        void Error(Messages code);
+        void Error(string text);
+
+        void Danger(Messages code);
+        void Danger(string text);
+
+        void Critical(Messages code);
+        void Critical(string text);
+
+        void Success(Messages code);
+        void Success(string text);
+
+        void Warning(Messages code);
+        void Warning(string text);
+
+        void Alert(Messages code);
+        void Alert(string text);
     }
 }
