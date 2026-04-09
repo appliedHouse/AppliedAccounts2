@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @using AppliedAccounts.Services
-@inject ToastService ToastService
+@inject AppliedAccounts.Services.ToastService ToastService
 
 @code {
     private ToastClass? Toast;
@@ -49,4 +49,6 @@
 <div class="col-12">
     @Body
 </div>
+
+<ToastNotificationLibrary.Components.Toast />
 

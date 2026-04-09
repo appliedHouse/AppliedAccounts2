@@ -1,6 +1,10 @@
-﻿using AppliedDB;
+﻿using AppliedAccounts.Services;
+using AppliedDB;
 using AppMessages;
+using System.Data;
 using static AppliedDB.Enums;
+
+
 
 namespace AppliedAccounts.Pages.Stock.Directory
 {
@@ -13,6 +17,11 @@ namespace AppliedAccounts.Pages.Stock.Directory
         public string Filter { get; set; }
         public string Sort { get; set; }
         public bool EditMode { get; set; }
+
+        //public ToastClass MyToastClass { get; set; }
+        //public ToastClass Toast { get; set; }
+
+
 
         public List<CodeTitle> StockDirectoryList { get; set; }
 
@@ -66,7 +75,7 @@ namespace AppliedAccounts.Pages.Stock.Directory
         {
             EditMode = true;
             var _data = StockDirectoryList.Where(e => e.ID == _ID).FirstOrDefault();
-            if(_data != null)
+            if (_data != null)
             {
                 MyModel.ID = _data.ID;
                 MyModel.Code = _data.Code;
@@ -76,7 +85,35 @@ namespace AppliedAccounts.Pages.Stock.Directory
             return true;
         }
         public bool Delete(long _ID) { EditMode = true; return true; }
-        public void Save() { EditMode = false; InvokeAsync(StateHasChanged); }
+
+        #region Save Methods
+        public void Save()
+        {
+            EditMode = false;
+            InvokeAsync(StateHasChanged);
+
+            if (Enum.TryParse<Tables>(TableName, out var table))
+            {
+                var _Row = Source.GetNewRow(table);
+                _Row["ID"] = MyModel.ID;
+                _Row["Code"] = MyModel.Code;
+                _Row["Title"] = MyModel.Title;
+
+                Source.Save(_Row);
+                if (Source.IsSaved)
+                {
+                    ToastService.ShowSuccess($"'{MyModel.Title}' has been saved successfully!");
+                    // Show Success Message
+                }
+            }
+            else
+            {
+                MsgClass.Critical(AppMessages.Enums.Messages.DataTableNotFound);
+            }
+        }
+
+        #endregion
+
         public void BackPage() { AppGlobal.NavManager.NavigateTo("/Menu/Stock"); }
 
     }

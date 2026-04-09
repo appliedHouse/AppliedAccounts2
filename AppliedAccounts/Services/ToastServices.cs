@@ -6,6 +6,7 @@
         public event Action<ToastClass>? OnShowToast;
         public event Action? OnHideToast;
         public ToastClass Toasters = new();
+        public bool ShowToaster { get; set; }
 
         public void ShowToast(ToastClass toast)
         {
@@ -26,13 +27,13 @@
 
         public void ShowToast(ToastClass toast, string? _Message)
         {
-            toast.ShowToast = true;
+            ShowToaster = true;
             toast.Message = _Message ?? toast.Message;
             OnShowToast?.Invoke(toast);
 
             Task.Delay(toast.delayTime).ContinueWith(_ =>
             {
-                toast.ShowToast = false;
+                ShowToaster = false;
                 OnHideToast?.Invoke(); // Notify UI to hide it
             });
         }

@@ -1,0 +1,24 @@
+﻿<!-- ToastNotificationLibrary.csproj -->
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+
+		<!-- NuGet Package Properties -->
+		<PackageId>AppliedAccounts.ToastNotification</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>YourName</Authors>
+		<Description>Reusable Toast Notification Library for Blazor Applications - .NET 9</Description>
+		<PackageTags>blazor toast notification net9 net9.0</PackageTags>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
+	</ItemGroup>
+
+</Project>

@@ -48,7 +48,6 @@
 
         }
 
-
         public enum ToastLevel
         {
             Info,
@@ -63,7 +62,7 @@
             Bottom,
         }
 
-        public static ToastClass SaveToast { get; set; } = new()
+        public static ToastClass SaveToast => new()
         {
             Message = "Save ",
             Level = ToastLevel.Success,
@@ -71,7 +70,7 @@
             ShowToast = true
 
         };
-        public static ToastClass NotSaveToast { get; set; } = new()
+        public static ToastClass NotSaveToast => new()
         {
             Message = "Not Save",
             Level = ToastLevel.Warning,
@@ -79,7 +78,7 @@
             ShowToast = true
 
         };
-        public static ToastClass DeleteToast { get; set; } = new()
+        public static ToastClass DeleteToast => new()
         {
             Message = "Delete",
             Level = ToastLevel.Warning,
@@ -87,7 +86,7 @@
             ShowToast = true,
         };
 
-        public static ToastClass ErrorToast { get; set; } = new()
+        public static ToastClass ErrorToast => new()
         {
             Message = "Error",
             Level = ToastLevel.Error,
@@ -95,7 +94,7 @@
             ShowToast = true,
         };
 
-        public static ToastClass DownLoadToast { get; set; } = new()
+        public static ToastClass DownLoadToast => new()
         {
             Message = "File has been download",
             Level = ToastLevel.Info,

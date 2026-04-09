@@ -5,6 +5,7 @@ using AppliedDB;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using SQLitePCL;
+using ToastNotificationLibrary.Extensions;
 
 
 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
@@ -27,23 +28,12 @@ builder.Services.AddScoped<ToastService>();
 builder.Services.AddScoped<PrintService>();
 builder.Services.AddScoped<MessagesService>();
 builder.Services.AddScoped<GlobalService>();
+builder.Services.AddToastNotification(options =>
+{
+    options.DefaultDuration = 4000;
+    options.DefaultPosition = ToastNotificationLibrary.Models.ToastPosition.TopEnd;
+});
 
-//builder.Services.AddScoped<GlobalService>(sp =>
-//{
-//    // Access configuration and navigation manager
-//    var config = sp.GetRequiredService<IConfiguration>();
-//    var navManager = sp.GetRequiredService<NavigationManager>();
-//    var JSRuntime = sp.GetRequiredService<IJSRuntime>();
-//    var StateProvider = sp.GetRequiredService<AuthenticationStateProvider>();
-
-//    // Initialize GlobalService with dependencies
-//    var globalService = new GlobalService(config, navManager, JSRuntime, StateProvider);
-
-//    // Set the Language.ID value here
-//    globalService.Language.ID = 1; // Example: Setting ID to 1
-
-//    return globalService;
-//});
 
 var app = builder.Build();
 

@@ -17,7 +17,6 @@ namespace AppliedAccounts.Pages.Accounts
 
         public bool IsPageValid { get; set; } = true;
         public ToastClass MyToastClass { get; set; }
-
         public ToastClass Toast { get; set; }
 
 

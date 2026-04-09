@@ -3,6 +3,8 @@
 
 @inject GlobalService AppGlobal
 
+@inject IToastService ToastService
+
 @code {
     [Parameter] public string? TableName { get; set; }
 
@@ -104,3 +106,4 @@ else
         </div>
     </EditForm>
 }
+
