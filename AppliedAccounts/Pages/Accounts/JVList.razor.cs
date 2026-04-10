@@ -2,9 +2,7 @@
 using AppliedDB;
 using AppliedGlobals;
 using AppMessages;
-using AppReports;
 using System.Data;
-using System.Text;
 
 namespace AppliedAccounts.Pages.Accounts
 {
@@ -34,27 +32,27 @@ namespace AppliedAccounts.Pages.Accounts
             {
                 Source ??= new DataSource(AppGlobal.AppPaths);
 
-                // Build base filter (without ORDER BY / LIMIT)
-                var baseFilter = new System.Text.StringBuilder();
-                baseFilter.AppendLine($"Vou_Type='{VoucherTypeClass.VoucherType.JV}' AND ");
-                baseFilter.AppendLine($"Vou_Date >= '{MyModel.Date1:yyyy-MM-dd}' AND");
-                baseFilter.AppendLine($"Vou_Date <= '{MyModel.Date2:yyyy-MM-dd}'");
-                if (MyModel.IsSearch)
-                {
-                    baseFilter.AppendLine($" AND (Vou_No LIKE '%{MyModel.SearchText}%' OR Description LIKE '%{MyModel.SearchText}%') ");
-                }
+                //// Build base filter (without ORDER BY / LIMIT)
+                //var baseFilter = new System.Text.StringBuilder();
+                //baseFilter.AppendLine($"Vou_Type='{VoucherTypeClass.VoucherType.JV}' AND ");
+                //baseFilter.AppendLine($"Vou_Date >= '{MyModel.Date1:yyyy-MM-dd}' AND");
+                //baseFilter.AppendLine($"Vou_Date <= '{MyModel.Date2:yyyy-MM-dd}'");
+                //if (MyModel.IsSearch)
+                //{
+                //    baseFilter.AppendLine($" AND (Vou_No LIKE '%{MyModel.SearchText}%' OR Description LIKE '%{MyModel.SearchText}%') ");
+                //}
 
-                // Get full (unpaged) set to calculate total records for paging
-                string fullQuery = SQLQueries.Quries.JournalVoucherList(baseFilter.ToString());
-                var fullTable = Source.GetTable(fullQuery);
-                int totalRecords = fullTable?.Rows.Count ?? 0;
+                //// Get full (unpaged) set to calculate total records for paging
+                //string fullQuery = SQLQueries.Quries.JournalVoucherList(baseFilter.ToString());
+                //var fullTable = Source.GetTable(fullQuery);
+                //int totalRecords = fullTable?.Rows.Count ?? 0;
 
-                // Refresh paging model
-                Pages.Refresh(totalRecords);
+                //// Refresh paging model
+                //Pages.Refresh(totalRecords);
 
-                // Build paged query by appending ORDER BY and LIMIT/OFFSET after the base query
-                string pagedQuery = fullQuery + $" ORDER BY [Vou_Date], [Vou_No] LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
-                DataTable _Table = Source.GetTable(pagedQuery);
+                //// Build paged query by appending ORDER BY and LIMIT/OFFSET after the base query
+                //string pagedQuery = fullQuery + $" ORDER BY [Vou_Date], [Vou_No] LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
+                DataTable _Table = Source.GetTable(GetFilter());
 
                 if (_Table != null && _Table.Rows.Count > 0)
                 {
@@ -81,19 +79,28 @@ namespace AppliedAccounts.Pages.Accounts
 
         private string GetFilter()
         {
-            StringBuilder _Text = new();
-            _Text.AppendLine($"Vou_Type='{VoucherTypeClass.VoucherType.JV}' AND ");
-            _Text.AppendLine($"Vou_Date >= '{MyModel.Date1:yyyy-MM-dd}' AND");
-            _Text.AppendLine($"Vou_Date <= '{MyModel.Date2:yyyy-MM-dd}'");
-
+            // Build base filter (without ORDER BY / LIMIT)
+            var baseFilter = new System.Text.StringBuilder();
+            baseFilter.AppendLine($"Vou_Type='{VoucherTypeClass.VoucherType.JV}' AND ");
+            baseFilter.AppendLine($"Vou_Date >= '{MyModel.Date1:yyyy-MM-dd}' AND");
+            baseFilter.AppendLine($"Vou_Date <= '{MyModel.Date2:yyyy-MM-dd}'");
             if (MyModel.IsSearch)
             {
-                _Text.AppendLine($" AND (Vou_No LIKE '%{MyModel.SearchText}%' OR Description LIKE '%{MyModel.SearchText}%') ");
+                baseFilter.AppendLine($" AND (Vou_No LIKE '%{MyModel.SearchText}%' OR Description LIKE '%{MyModel.SearchText}%') ");
             }
-            _Text.AppendLine($" ORDER BY [Vou_Date], [Vou_No] ");
-            _Text.AppendLine($"LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}");
 
-            return _Text.ToString();
+            // Get full (unpaged) set to calculate total records for paging
+            string fullQuery = SQLQueries.Quries.JournalVoucherList(baseFilter.ToString());
+            var fullTable = Source.GetTable(fullQuery);
+            int totalRecords = fullTable?.Rows.Count ?? 0;
+
+            // Refresh paging model
+            Pages.Refresh(totalRecords);
+
+            // Build paged query by appending ORDER BY and LIMIT/OFFSET after the base query
+            string pagedQuery = fullQuery + $" ORDER BY [Vou_Date], [Vou_No] LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
+
+            return pagedQuery;
         }
 
         #endregion

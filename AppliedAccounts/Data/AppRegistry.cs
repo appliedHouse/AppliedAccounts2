@@ -61,15 +61,32 @@ namespace AppliedAccounts.Data
             VW_Registry.RowFilter = string.Concat("Code='", Key, "'");
             if (VW_Registry.Count == 1)
             {
+                var row = VW_Registry[0];
                 ReturnValue = keytype switch
                 {
-                    KeyType.Number => VW_Registry[0]["nValue"],
-                    KeyType.Currency => VW_Registry[0]["mValue"],
-                    KeyType.Boolean => VW_Registry[0]["bValue"],
-                    KeyType.Date => VW_Registry[0]["dValue"],
-                    KeyType.Text => VW_Registry[0]["cValue"],
+                    KeyType.Number => row["nValue"],
+                    KeyType.Currency => row["mValue"],
+                    KeyType.Boolean => row["bValue"],
+                    KeyType.Date => row["dValue"],
+                    KeyType.Text => row["cValue"],
+                    KeyType.From => row["From"],
+                    KeyType.To => row["To"],
                     _ => string.Empty
                 };
+                if (ReturnValue == DBNull.Value)
+                {
+                    ReturnValue = keytype switch
+                    {
+                        KeyType.Number => 0,
+                        KeyType.Currency => 0.00M,
+                        KeyType.Boolean => false,
+                        KeyType.Date => DateTime.Now,
+                        KeyType.Text => string.Empty,
+                        KeyType.From => MinDate,
+                        KeyType.To => DateTime.Now,
+                        _ => string.Empty
+                    };
+                }
             }
             else
             {
@@ -92,28 +109,18 @@ namespace AppliedAccounts.Data
             VW_Registry.RowFilter = string.Concat("Code='", Key, "'");
             if (VW_Registry.Count == 1)
             {
-                return (DateTime)VW_Registry[0]["dValue"];
+                var val = VW_Registry[0].Row.Field<DateTime?>("dValue");
+                return val ?? DateTime.Now;
             }
-            else
-            {
-                return DateTime.Now;
-            }
+            return DateTime.Now;
         }
         public static int GetNumber(string DataFile, string Key)
         {
             try
             {
                 if (DataFile == null || DataFile == string.Empty) { return 0; }
-                DataView VW_Registry = GetRegistryView(DataFile);
-                VW_Registry.RowFilter = string.Concat("Code='", Key, "'");
-                if (VW_Registry.Count == 1)
-                {
-                    return (int)VW_Registry[0]["nValue"];
-                }
-                else
-                {
-                    return 0;
-                }
+                var obj = GetKey(DataFile, Key, KeyType.Number);
+                return obj == null ? 0 : Convert.ToInt32(obj);
             }
             catch (Exception)
             {
@@ -126,16 +133,8 @@ namespace AppliedAccounts.Data
         public static decimal GetCurrency(string DataFile, string Key)
         {
             if (DataFile == null || DataFile == string.Empty) { return 0.00M; }
-            DataView VW_Registry = GetRegistryView(DataFile);
-            VW_Registry.RowFilter = string.Concat("Code='", Key, "'");
-            if (VW_Registry.Count == 1)
-            {
-                return (decimal)VW_Registry[0]["mValue"];
-            }
-            else
-            {
-                return 0.00M;
-            }
+            var obj = GetKey(DataFile, Key, KeyType.Currency);
+            return obj == null ? 0.00M : Convert.ToDecimal(obj);
         }
         public static string GetText(string DataFile, string Key)
         {
@@ -144,9 +143,8 @@ namespace AppliedAccounts.Data
             VW_Registry.RowFilter = $"Code='{Key}'";
             if (VW_Registry.Count == 1)
             {
-                var value = VW_Registry[0]["cValue"];
-                if (value == DBNull.Value) { return ""; }
-                return (string)value;
+                var value = VW_Registry[0].Row.Field<string>("cValue");
+                return value ?? string.Empty;
             }
             else
             {
@@ -160,9 +158,8 @@ namespace AppliedAccounts.Data
             VW_Registry.RowFilter = string.Concat("Code='", Key, "'");
             if (VW_Registry.Count == 1)
             {
-                var value = VW_Registry[0]["bValue"];
-                if (value == DBNull.Value) { return false; }
-                return (bool)value;
+                var value = VW_Registry[0].Row.Field<bool?>("bValue");
+                return value ?? false;
             }
             else
             {
@@ -173,13 +170,8 @@ namespace AppliedAccounts.Data
         {
             if (DataFile == null || DataFile == string.Empty) { return new DateTime[2]; }
             DateTime[] Dates = new DateTime[2];
-            DataView VW_Registry = GetRegistryView(DataFile);
-            VW_Registry.RowFilter = string.Concat($"Code='{Key}'");
-            if (VW_Registry.Count == 1)
-            {
-                Dates[0] = (DateTime)VW_Registry[0]["From"];
-                Dates[1] = (DateTime)VW_Registry[0]["To"];
-            }
+            Dates[0] = GetFrom(DataFile, Key);
+            Dates[1] = GetTo(DataFile, Key);
             return Dates;
         }
 
@@ -187,14 +179,13 @@ namespace AppliedAccounts.Data
         {
             if (DataFile == null || DataFile == string.Empty) { return MinDate; }
 
-            DataView VW_Registry = GetRegistryView(DataFile,Key);
+            DataView VW_Registry = GetRegistryView(DataFile, Key);
             if (VW_Registry.Count == 1)
             {
-                var _Value = VW_Registry[0]["From"];
-                if(_Value == DBNull.Value) { return MinDate; }
-                return (DateTime)VW_Registry[0]["From"];
+                var val = VW_Registry[0].Row.Field<DateTime?>("From");
+                return val ?? MinDate;
             }
-            return DateTime.Now;
+            return MinDate;
         }
 
         public static DateTime GetTo(string DataFile, string Key)
@@ -204,11 +195,10 @@ namespace AppliedAccounts.Data
             DataView VW_Registry = GetRegistryView(DataFile, Key);
             if (VW_Registry.Count == 1)
             {
-                var _Value = VW_Registry[0]["To"];
-                if (_Value == DBNull.Value) { return MinDate; }
-                return (DateTime)VW_Registry[0]["To"];
+                var val = VW_Registry[0].Row.Field<DateTime?>("To");
+                return val ?? MinDate;
             }
-            return DateTime.Now;
+            return MinDate;
         }
 
         public static bool SetKey(string DataFile, string _Key, object KeyValue, KeyType _KeyType)

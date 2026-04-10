@@ -1245,7 +1245,21 @@ namespace AppliedDB
                 };
             }
 
-            if (ReturnValue == DBNull.Value) { return string.Empty; }
+            if (ReturnValue == DBNull.Value)
+            {
+                ReturnValue = keytype switch
+                {
+                    KeyTypes.Number => 0,
+                    KeyTypes.Currency => 0.00,
+                    KeyTypes.Boolean => false,
+                    KeyTypes.Date => DateTime.Now,
+                    KeyTypes.Text => string.Empty,
+                    KeyTypes.From => DateTime.MinValue,
+                    KeyTypes.To => DateTime.Now,
+                    _ => string.Empty
+                };
+            }
+
             return ReturnValue;
         }
 

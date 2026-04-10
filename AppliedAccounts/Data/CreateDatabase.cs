@@ -20,7 +20,6 @@ namespace AppliedAccounts.Data
         public List<DataRow> TableList { get; set; }
         public AppValues.AppPath AppPaths { get; set; }
         public AppUserModel UserModel { get; set; }
-        private string TableName { get; set; }
         private string UserName { get; set; }
         private string DBFile { get; set; }
         private List<string> MyMessages { get; set; }
@@ -176,7 +175,6 @@ namespace AppliedAccounts.Data
                     break;
                 case Tables.Directories:
                     _CommandText = Directories();
-                    _CommandText = DirectoriesINSERT();
                     break;
                 case Tables.Inventory:
                     break;
@@ -472,24 +470,7 @@ namespace AppliedAccounts.Data
 
         }
 
-        public string DirectoriesINSERT()
-        {
-            //DataTableClass _TableClass = new DataTableClass(UserName, Tables.Directories);
-            //SqliteCommand _Command = new(ConnectionClass.AppConnection(UserName));
-            //string[] Queries = new string[4];
-
-            //Queries[0] = "INSERT INTO [Directories] VALUES (1, 'CompanyStatus', 1, 'Customer')";
-            //Queries[1] = "INSERT INTO [Directories] VALUES (2, 'CompanyStatus', 2, 'Supplier');";
-            //Queries[2] = "INSERT INTO [Directories] VALUES (3, 'CompanyStatus', 3, 'Vendor');";
-            //Queries[3] = "INSERT INTO [Directories] VALUES (4, 'CompanyStatus', 4, 'Customer / Vendor');";
-
-            //foreach (string Query in Queries)
-            //{
-            //    _Command.CommandText = Query;
-            //    _Command.ExecuteNonQuery();
-            //}
-            return "";
-        }
+        
 
         #endregion
 
@@ -621,18 +602,6 @@ namespace AppliedAccounts.Data
             return Text.ToString();
         }
 
-        #endregion
-
-        #region Accounts (COA)
-        private string COA_Map()
-        {
-            var Text = new StringBuilder();
-            Text.AppendLine("CREATE TABLE [COA_Map] (");
-            Text.AppendLine("[ID] INT PRIMARY KEY NOT NULL UNIQUE,");
-            Text.AppendLine("[COA] INT NOT NULL UNIQUE REFERENCES [COA] ([ID]), ");
-            Text.AppendLine("[Stock] INT NOT NULL REFERENCES [Inventory] ([ID]));");
-            return Text.ToString();
-        }
         #endregion
 
         #region Stock in Hand
