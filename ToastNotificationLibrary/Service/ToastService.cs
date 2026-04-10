@@ -1,7 +1,7 @@
 ﻿// Services/ToastService.cs
-using System.Threading;
-using System.Threading.Tasks;
 using ToastNotificationLibrary.Models;
+using ToastNotificationLibrary.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ToastNotificationLibrary.Services;
 
@@ -12,18 +12,35 @@ public class ToastService : IToastService, IDisposable
 
     private CancellationTokenSource? _cancellationTokenSource;
     private ToastMessage? _currentToast;
+    private readonly ToastOptions? _options = new ToastOptions { DefaultDuration = 5000 };
+
+    public ToastService(IServiceProvider serviceProvider)
+    {
+        _options = serviceProvider.GetService(typeof(ToastOptions)) as ToastOptions;
+    }
 
     public void ShowSuccess(string message, int duration = 3000)
-        => Show(new ToastMessage(message, ToastLevel.Success, duration));
+        => Show(new ToastMessage(message, ToastLevel.Success, GetEffectiveDuration(duration)));
 
     public void ShowError(string message, int duration = 3000)
-        => Show(new ToastMessage(message, ToastLevel.Error, duration));
+        => Show(new ToastMessage(message, ToastLevel.Error, GetEffectiveDuration(duration)));
 
     public void ShowWarning(string message, int duration = 3000)
-        => Show(new ToastMessage(message, ToastLevel.Warning, duration));
+        => Show(new ToastMessage(message, ToastLevel.Warning, GetEffectiveDuration(duration)));
 
     public void ShowInfo(string message, int duration = 3000)
-        => Show(new ToastMessage(message, ToastLevel.Info, duration));
+        => Show(new ToastMessage(message, ToastLevel.Info, GetEffectiveDuration(duration)));
+
+    private int GetEffectiveDuration(int duration)
+    {
+        // If options provided and caller used the library default (3000), prefer configured DefaultDuration
+        if (_options != null && duration == 3000)
+        {
+            return _options.DefaultDuration;
+        }
+
+        return duration;
+    }
 
     public void Show(ToastMessage message)
     {
