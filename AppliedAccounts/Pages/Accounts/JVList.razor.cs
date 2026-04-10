@@ -18,7 +18,13 @@ namespace AppliedAccounts.Pages.Accounts
 
         public JVList()
         {
-
+            // subscribe to page change events so UI refreshes when user navigates pages
+            Pages.PageChanged += OnPageChanged;
+        }
+        private void OnPageChanged(int newPage)
+        {
+            LoadData();
+            InvokeAsync(StateHasChanged);
         }
 
         #region Load Data
@@ -27,9 +33,30 @@ namespace AppliedAccounts.Pages.Accounts
             try
             {
                 Source ??= new DataSource(AppGlobal.AppPaths);
-                string _Query = SQLQueries.Quries.JournalVoucherList(GetFilter());
-                DataTable _Table = Source.GetTable(_Query);
-                if (_Table.Rows.Count > 0)
+
+                // Build base filter (without ORDER BY / LIMIT)
+                var baseFilter = new System.Text.StringBuilder();
+                baseFilter.AppendLine($"Vou_Type='{VoucherTypeClass.VoucherType.JV}' AND ");
+                baseFilter.AppendLine($"Vou_Date >= '{MyModel.Date1:yyyy-MM-dd}' AND");
+                baseFilter.AppendLine($"Vou_Date <= '{MyModel.Date2:yyyy-MM-dd}'");
+                if (MyModel.IsSearch)
+                {
+                    baseFilter.AppendLine($" AND (Vou_No LIKE '%{MyModel.SearchText}%' OR Description LIKE '%{MyModel.SearchText}%') ");
+                }
+
+                // Get full (unpaged) set to calculate total records for paging
+                string fullQuery = SQLQueries.Quries.JournalVoucherList(baseFilter.ToString());
+                var fullTable = Source.GetTable(fullQuery);
+                int totalRecords = fullTable?.Rows.Count ?? 0;
+
+                // Refresh paging model
+                Pages.Refresh(totalRecords);
+
+                // Build paged query by appending ORDER BY and LIMIT/OFFSET after the base query
+                string pagedQuery = fullQuery + $" ORDER BY [Vou_Date], [Vou_No] LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
+                DataTable _Table = Source.GetTable(pagedQuery);
+
+                if (_Table != null && _Table.Rows.Count > 0)
                 {
                     JVItems = [.. (from DataRow _Row in _Table.Rows
                            select new JVListDataModel()

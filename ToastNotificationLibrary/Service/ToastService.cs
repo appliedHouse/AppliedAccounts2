@@ -1,7 +1,6 @@
 ﻿// Services/ToastService.cs
 using ToastNotificationLibrary.Models;
 using ToastNotificationLibrary.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ToastNotificationLibrary.Services;
 
@@ -12,7 +11,7 @@ public class ToastService : IToastService, IDisposable
 
     private CancellationTokenSource? _cancellationTokenSource;
     private ToastMessage? _currentToast;
-    private readonly ToastOptions? _options = new ToastOptions { DefaultDuration = 5000 };
+    private readonly ToastOptions? _options = new ToastOptions { DefaultDuration = 10000 };
 
     public ToastService(IServiceProvider serviceProvider)
     {
