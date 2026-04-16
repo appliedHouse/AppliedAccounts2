@@ -107,7 +107,7 @@
             RowNotUpdated = 143,
             SQLQueryIsNull = 215,
             UserProfileIsNull = 145,
-           
+
             BookIDIsZero = 147,
             BookNatureIsZero = 149,
             BookNatureIsNull = 209,
@@ -138,12 +138,12 @@
             EmployeeIDIsZero = 37,
             AccountIDIsZero = 191,
             CustomerIDIsZero = 192,
-            
+
             NoRecordFound = 193,
             PageIsNotValid = 195,
-           
+
             Row_NoStatus = 197,
-            
+
             SerialNoIsZero = 199,
             MasterRecordisNull = 201,
             DetailRecordsisNull = 203,
@@ -159,7 +159,7 @@
             VouTransNotDeleted = 406,
             VouMasterDeleted = 407,
             VouMasterNotDeleted = 408,
-            
+
             PostingMasterRecordNotFound = 6001,
             PostingDetailRecordNotFound = 6002,
             PostingMasterIsNull = 6003,
@@ -170,7 +170,7 @@
 
             TransactionRollback = 7001,
             TransactionCommited = 7002,
-            
+
             SalesInvoiceIDIsNull = 8001,
             SalesInvoiceRowCountZero = 8002,
             SalesInvoiceIsAlreadyPosted = 8003,
@@ -178,6 +178,15 @@
             SalesInvoiceVoucherNotMatched = 8005,
             SalesInvoicePostingFailed = 8006,
             SalesInvoiceAccountNotValid = 8007,
+
+            PurchasedInvoiceIDIsNull = 8101,
+            PurchasedInvoiceRowCountZero = 8102,
+            PurchasedInvoiceIsAlreadyPosted = 8103,
+            PurchasedInvoiceVoucherAlreadyPosted = 8104,
+            PurchasedInvoiceVoucherNotMatched = 8105,
+            PurchasedInvoicePostingFailed = 8106,
+            PurchasedInvoiceAccountNotValid = 8107,
+
             VoucherNotFound = 600109,
             VoucherAmountIsZero = 600110,
             VoucherDateNotSame = 600111,
@@ -185,9 +194,9 @@
             PackingIdIsZero = 600114,
             Row_PackingIdZero = 600115,
             Row_SizeIDZero = 600116,
-            Row_SubCategoryIDZero = 600117,
-            
+            Row_SubCategoryIDZero = 600117
         }
+           
 
         public enum Class
         {
