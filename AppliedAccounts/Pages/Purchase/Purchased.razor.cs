@@ -1,0 +1,149 @@
+﻿using AppliedAccounts.Models;
+using AppliedAccounts.Services;
+using AppReports;
+using Format = AppliedGlobals.AppValues.Format;
+
+namespace AppliedAccounts.Pages.Purchase
+{
+    public partial class Purchased
+    {
+        #region Variables
+
+        public PurchaseInvoiceModel MyModel { get; set; } = new();
+        public bool IsPageValid { get; set; }
+        public string ErrorMessage { get; set; }
+        private bool IsWaiting { get; set; }
+        private string SpinnerMessage { get; set; }
+
+        #endregion
+
+        #region Constructor
+        public Purchased()
+
+        {
+            IsPageValid = true;
+            IsWaiting = false;
+            ErrorMessage = string.Empty;
+        }
+        #endregion
+
+        #region DropDown List change
+        public void CompanyChanged(long _NewValue)
+        {
+            MyModel.MyVoucher.Master.Company = _NewValue;
+            MyModel.MyVoucher.Master.TitleCompany = MyModel.Companies.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
+        }
+        public void EmployeeChanged(long _NewValue)
+        {
+            MyModel.MyVoucher.Master.Employee = _NewValue;
+            MyModel.MyVoucher.Master.TitleEmployee = MyModel.Employees.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
+        }
+        public void InventoryChanged(long _NewValue)
+        {
+            MyModel.MyVoucher.Detail.Inventory = _NewValue;
+            MyModel.MyVoucher.Detail.TitleInventory = MyModel.Inventory.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
+        }
+        public void TaxChanged(long _NewValue)
+        {
+            MyModel.MyVoucher.Detail.TaxID = _NewValue;
+            MyModel.MyVoucher.Detail.TitleTaxID = MyModel.Taxes.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
+            MyModel.MyVoucher.Detail.TaxRate = MyModel.Source.SeekTaxRate(MyModel.MyVoucher.Detail.TaxID);
+        }
+        public void UnitChanged(long _NewValue)
+        {
+            MyModel.MyVoucher.Detail.Unit = _NewValue;
+            MyModel.MyVoucher.Detail.TitleUnit = MyModel.Units.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
+        }
+        public void ProjectChanged(long _NewValue)
+        {
+            MyModel.MyVoucher.Detail.Project = _NewValue;
+            MyModel.MyVoucher.Detail.TitleProject = MyModel.Projects.Where(e => e.ID == _NewValue).FirstOrDefault()!.Title ?? "";
+        }
+        #endregion
+
+        #region Submit & Digitis
+        public void Submit()
+        {
+
+        }
+
+
+        public bool ShowDigits = false;
+        public void Digits()
+        {
+            if (ShowDigits)
+            {
+                MyModel.Totals.NumberFormat = Format.Number;
+            }
+            else
+            {
+                MyModel.Totals.NumberFormat = Format.Digit;
+            }
+            //MyModel.CalculateTotal();
+        }
+        #endregion
+
+        #region Save Invoice to DB
+        public async void SaveAll()
+        {
+            var IsSaved = await MyModel.SaveAllAsync();
+
+            await InvokeAsync(StateHasChanged);
+
+            if (IsSaved)
+            {
+                ToastService.ShowToast(ToastClass.SaveToast, $"Saved | {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
+                NavManager.NavigateTo($"/Sale/SaleInvoice/{MyModel.MyVoucher.Master.ID1}");
+            }
+            else
+            {
+                ToastService.ShowToast(ToastClass.ErrorToast, $"Not Saved | {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
+            }
+        }
+        #endregion
+
+        #region Delete
+        public void Delete(int _Sr_No)
+        {
+            MyModel.MyVoucher.Detail = MyModel.MyVoucher.Details.Where(row => row.Sr_No == _Sr_No).First();
+            if (MyModel.MyVoucher.Detail is not null)
+            {
+                MyModel.Deleted.Add(MyModel.MyVoucher.Detail);                  // Save in deleted list
+                MyModel.MyVoucher.Details.Remove(MyModel.MyVoucher.Detail);     // remove from detail list
+                MyModel.MsgClass.Add(AppMessages.Enums.Messages.RowDeleted);    // Set message to display after deleted.
+            }
+
+        }
+        #endregion
+
+        #region Home & Back Buttons
+        //public void GotoHome()
+        //{
+        //    NavManager.NavigateTo("/");
+        //}
+
+        public void BackPage()
+        {
+            NavManager.NavigateTo("/Purchase/PurchaseList");
+        }
+
+        public void TestRecord()
+        {
+            MyModel.TestData();
+        }
+
+        #endregion
+
+        #region Print
+        public void Print(ReportType RptType)
+        {
+
+        }
+
+        public void Print()
+        {
+
+        }
+        #endregion
+    }
+}

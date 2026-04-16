@@ -18,6 +18,19 @@ namespace AppliedAccounts.Pages.Purchase
         private bool IsPrinting { get; set; } = false;
         public string PrintingMessage { get; set; }
 
+        protected override void OnInitialized()
+        {
+            try
+            {
+                { MyModel = new(AppGlobal); }
+            }
+            catch (Exception)
+            {
+                IsPageValid = false;
+            }
+
+        }
+
         public void Search()
         {
             MyModel.LoadData();

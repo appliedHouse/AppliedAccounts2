@@ -139,13 +139,6 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-        #region Get Report table
-        //public DataTable GetReportTable()
-        //{
-        //    return Source.GetTable(AppliedDB.Enums.Query.SaleInvoice, InvoiceID);
-        //}
-        #endregion
-
         #region Convert decimal to String Text
         public string ToAmount(object _Object)
         {

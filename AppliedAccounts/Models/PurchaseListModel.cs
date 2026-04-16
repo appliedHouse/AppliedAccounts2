@@ -50,33 +50,46 @@ namespace AppliedAccounts.Models
 
             foreach (DataRow item in _Table.Rows)
             {
+                var qty = item.GetDecimal("Qty");
+                var rate = item.GetDecimal("Rate");
+                var taxRate = item.GetDecimal("Tax_Rate");
+
                 var _Record = new PurchaseRecord
                 {
-                    ID1 = item.Field<long>("ID1"),
-                    Vou_No = item.Field<string>("Vou_No") ?? "",
-                    Vou_Date = item.Field<DateTime>("Vou_Date"),
-                    SupplierID = item.Field<long>("Company"),
-                    SupplierTitle = item.Field<string>("CompanyTitle") ?? "",
-                    Inv_No = item.Field<string>("Inv_No") ?? "",
-                    Inv_Date = item.Field<DateTime>("Inv_Date"),
-                    Pay_Date = item.Field<DateTime>("Pay_Date"),
-                    Amount = item.Field<decimal>("Amount"),
-                    Remarks = item.Field<string>("Remarks") ?? "",
-                    Comments = item.Field<string>("Comments") ?? "",
-                    Status = item.Field<string>("Status") ?? "",
-                    ID2 = item.Field<long>("ID2"),
-                    Sr_No = (int)item.Field<long>("Sr_No"),
-                    TranID = item.Field<long>("TranID"),
-                    Inventory = item.Field<long>("Inventory"),
-                    Batch = item.Field<string>("Batch") ?? "",
-                    Qty = item.Field<decimal>("Qty"),
-                    Rate = item.Field<decimal>("Rate"),
+                    ID1 = item.GetInt64("ID1"),
+                    Vou_No = item.GetString("Vou_No"),
+                    Vou_Date = item.GetDate("Vou_Date"),
 
-                    TaxID = item.Field<long>("Tax"),
-                    TaxRate = item.Field<decimal>("Tax_Rate"),
-                    Description = item.Field<string>("Description") ?? "",
-                    Project = item.Field<long>("Project"),
+                    SupplierID = item.GetInt64("Company"),
+                    SupplierTitle = item.GetString("CompanyTitle"),
 
+                    Inv_No = item.GetString("Inv_No"),
+                    Inv_Date = item.GetDate("Inv_Date"),
+                    Pay_Date = item.GetDate("Pay_Date"),
+
+                    Amount = item.GetDecimal("Amount"),
+
+                    Remarks = item.GetString("Remarks"),
+                    Comments = item.GetString("Comments"),
+                    Status = item.GetString("Status"),
+
+                    ID2 = item.GetInt64("ID2"),
+                    Sr_No = item.GetInt32("Sr_No"),
+                    TranID = item.GetInt64("TranID"),
+                    Inventory = item.GetInt64("Inventory"),
+
+                    Batch = item.GetString("Batch"),
+                    Qty = qty,
+                    Rate = rate,
+
+                    TaxID = item.GetInt64("Tax"),
+                    TaxRate = taxRate,
+                    TaxAmount = (qty * rate * taxRate) / 100,
+
+                    Description = item.GetString("Description"),
+                    Project = item.GetInt64("Project"),
+
+                    Ref_No = item.GetString("Ref_No")
                 };
                 _result.Add(_Record);
             }

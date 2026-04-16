@@ -211,7 +211,7 @@ namespace AppliedAccounts.Models.Posting
                 if (postCashBook.PostSuccessful)
                 {
                     MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
-                    LoadData(PostingModel);                    // Refresh display Data afger save voucher.
+                    LoadData(PostingModel);                 // Refresh display Data afger save voucher.
                 }
                 else
                 {

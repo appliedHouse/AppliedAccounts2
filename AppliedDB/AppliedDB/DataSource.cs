@@ -1069,8 +1069,6 @@ namespace AppliedDB
 
         #region Geting a DB Directory()
 
-
-
         public static Dictionary<int, string> GetDirectory(string _DirectoryName, string DBFile)
         {
             var _Connection = Connections.GetClientConnection(DBFile);
@@ -1112,7 +1110,6 @@ namespace AppliedDB
             }
             return _Dictionary;
         }
-
 
         #endregion
 
@@ -1262,16 +1259,6 @@ namespace AppliedDB
 
             return ReturnValue;
         }
-
-        // Depreciated 29-Jan-2026
-        #region Set Key Depreciated
-        public void SetKey1(string Key, object KeyValue, KeyTypes keytype, string _Title)
-        {
-
-            Registry _Registry = new(MyConnection, DBFile);
-            _Registry.SetKey(Key, KeyValue, keytype, _Title);
-        }
-        #endregion
 
         public async Task SetKeyAsync(string Key, object KeyValue, KeyTypes keytype, string _Title)
         {
@@ -1435,26 +1422,7 @@ namespace AppliedDB
 
             return dt;
 
-            //while (_reader.Read())
-            //    {
-            //        DataRow newRow = dt.NewRow();
-
-            //        for (int i = 0; i < _reader.FieldCount; i++)
-            //        {
-            //            string columnName = _reader.GetName(i);
-            //            Type columnType = dt.Columns[columnName].DataType;
-
-            //            if (_reader.IsDBNull(i)) { newRow[columnName] = DBNull.Value; }
-            //            else { newRow[columnName] = _reader.GetValue(i); }
-
-
-            //        }
-            //        dt.Rows.Add(newRow);
-
-            //    }
-            //}
-
-            //return dt;
+            
         }
 
         private static string ExtractTableNameFromQuery(string sqlQuery)
