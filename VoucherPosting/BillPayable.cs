@@ -9,7 +9,7 @@ namespace VoucherPosting
 {
     internal class BillPayable
     {
-        public MessageClass MsgClass { get; set; }
+        public MessageClass MsgClass { get; set; } = new();
         public DataSource Source { get; set; }
 
 

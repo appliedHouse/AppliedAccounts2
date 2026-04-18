@@ -4,7 +4,7 @@
 @using AppliedAccounts.Models.Accounts
 @inject GlobalService AppGlobal
 @inject PrintService ReportService
-@inject AppliedAccounts.Services.ToastService ToastService
+@inject IToastService ToastService
 
 
 @code {
@@ -356,16 +356,6 @@
         </div>
     </div>
 </div>
-
-<!-- Toast -->
-<div class="toast-container position-fixed @Toast.GetPosition()">
-    @if (Toast.ShowToast)
-    {
-        <ShowToastMessage toastClass="@Toast"></ShowToastMessage>
-    }
-</div>
-
-
 
 <!-- Browse Windows -->
 <div class="modal fade" id="winBrowse" tabindex="-1" aria-labelledby="browseModalLabel" aria-hidden="true">

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using SQLitePCL;
 using ToastNotificationLibrary.Extensions;
+using ToastNotificationLibrary.Models;
 
 
 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
@@ -24,14 +25,13 @@ builder.Services.AddSingleton<UserProfile>();               // Create a User Mod
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<UserAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
-builder.Services.AddScoped<ToastService>();
 builder.Services.AddScoped<PrintService>();
 builder.Services.AddScoped<MessagesService>();
 builder.Services.AddScoped<GlobalService>();
 builder.Services.AddToastNotification(options =>
 {
-    options.DefaultDuration = 4000;
-    options.DefaultPosition = ToastNotificationLibrary.Models.ToastPosition.TopEnd;
+    options.DefaultDuration = 3000;
+    options.DefaultPosition = ToastPosition.BottomEnd;
 });
 
 

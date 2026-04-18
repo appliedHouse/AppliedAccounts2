@@ -30,11 +30,11 @@ namespace AppliedAccounts.Pages.Accounts
         {
             if (MyModel.Save())
             {
-                ToastService.ShowToast(ToastClass.SaveToast, "Customer saved successfully.");
+                ToastService.ShowSuccess($"Successfully saved {MyModel.Record.Title}");
             }
             else
             {
-                ToastService.ShowToast(ToastClass.ErrorToast, "Failed to save customer.");
+                ToastService.ShowError($"Failed to save {MyModel.Record.Title}");
             }
         }
     }
