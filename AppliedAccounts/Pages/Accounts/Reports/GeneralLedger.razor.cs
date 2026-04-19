@@ -273,11 +273,19 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             var _DateFrom = MyModel.DtFrom_Com.ToString(Format.YMD);
             var _DateTo = MyModel.DtTo_Com.ToString(Format.YMD);
 
-            var _Nature = AppRegistry.GetText(AppGlobal.DBFile, "CompanyGLs");
+            var _Nature = Source.GetText("CompanyGLs");  //  AppRegistry.GetText(AppGlobal.DBFile, "CompanyGLs");
             var _FilterOB = $"[Customer] = {MyModel.CompanyID} AND  [COA] IN ({_Nature}) AND Date([Vou_Date]) < Date('{_DateFrom}')";
             var _Filter = $"[Customer] = {MyModel.CompanyID} AND  [COA] IN ({_Nature}) AND (Date([Vou_Date]) BETWEEN Date('{_DateFrom}') AND Date('{_DateTo}'))";
             var _GroupBy = "[Customer]";
             var _SortBy = "[Vou_date], [Vou_no]";
+
+            if(string.IsNullOrEmpty(_Nature))
+            {
+                ReportService.IsError = true;
+                MsgClass.Add(MESSAGES.CompanyLedgerAC_Notdefined);
+                ToastService.ShowError(MsgClass.MessageList.Last().MessageText,10000);
+                return _Result;
+            }
 
             var _Query = SQLQueries.Quries.Ledger2(_FilterOB, _Filter, _GroupBy, _OBDate, _SortBy);
 

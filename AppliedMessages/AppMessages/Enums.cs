@@ -194,7 +194,8 @@
             PackingIdIsZero = 600114,
             Row_PackingIdZero = 600115,
             Row_SizeIDZero = 600116,
-            Row_SubCategoryIDZero = 600117
+            Row_SubCategoryIDZero = 600117,
+            CompanyLedgerAC_Notdefined = 600118
         }
            
 
