@@ -16,9 +16,6 @@ namespace AppliedAccounts.Pages.Accounts
         public BookModel MyModel { get; set; } = new();
 
         public bool IsPageValid { get; set; } = true;
-        public ToastClass MyToastClass { get; set; }
-
-        public ToastClass Toast { get; set; }
 
 
         private decimal Tot_DR = 0.0M;
@@ -30,13 +27,6 @@ namespace AppliedAccounts.Pages.Accounts
         public Books() 
         {
         }
-
-        public void ShowToast(ToastClass _toast)
-        {
-            Toast = _toast;
-            ToastService.ShowToast(Toast);
-        }
-
         public void Start()
         {
             MyModel = new(ID, BookID, AppGlobal); ;
@@ -112,7 +102,8 @@ namespace AppliedAccounts.Pages.Accounts
 
 
 
-                ToastService.ShowToast(ToastClass.SaveToast, MyModel.MyVoucher.Master.Vou_No);
+                ToastService.ShowSuccess($"Book saved successfully with Voucher No: {MyModel.MyVoucher.Master.Vou_No}");
+                //   ShowToast(ToastClass.SaveToast, MyModel.MyVoucher.Master.Vou_No);
                 await InvokeAsync(StateHasChanged);
             }
             else

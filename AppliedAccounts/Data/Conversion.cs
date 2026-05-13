@@ -57,16 +57,17 @@ namespace AppliedAccounts.Data
 
         public static decimal ToDecimal(object _Value)
         {
+            if(_Value == null) { return 0.00M; }
             try
             {
                 var type = _Value.GetType();
 
                 if (type == typeof(string)) { return decimal.Parse((string)_Value); }
-                if (type == typeof(int)) { return decimal.Parse(_Value.ToString()); }
-                if (type == typeof(long)) { return decimal.Parse(_Value.ToString()); }
-                if (type == typeof(short)) { return decimal.Parse(_Value.ToString()); }
-                if (type == typeof(float)) { return decimal.Parse(_Value.ToString()); }
-                if (type == typeof(double)) { return decimal.Parse(_Value.ToString()); }
+                if (type == typeof(int)) { return decimal.Parse(_Value.ToString()!); }
+                if (type == typeof(long)) { return decimal.Parse(_Value.ToString()!); }
+                if (type == typeof(short)) { return decimal.Parse(_Value.ToString()!); }
+                if (type == typeof(float)) { return decimal.Parse(_Value.ToString()!); }
+                if (type == typeof(double)) { return decimal.Parse(_Value.ToString()!); }
                 if (type == typeof(decimal)) { return (decimal)_Value; }
                 return 0.00M;
             }

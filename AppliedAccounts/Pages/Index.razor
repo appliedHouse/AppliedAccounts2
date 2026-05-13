@@ -35,7 +35,7 @@
         if (firstRender)
         {
             
-            await Create_Update_Database();
+            //await Create_Update_Database();
             await DisplayGreetingMessage();
         }
     }
@@ -54,16 +54,17 @@
     }
 
     //Create or Update DataBase Tables.
-    private async Task Create_Update_Database()
-    {
-        if (UserModel != null)
-        {
-            await Task.Run(() =>
-            {
-                _ = new CreateDatabase(AppGlobal.AppPaths);         
-            });
-        }
-    }
+    // private async Task Create_Update_Database()
+    // {
+    //     if (UserModel != null)
+    //     {
+    //         await Task.Run(() =>
+    //         {
+    //             CreateDatabase _DB = new CreateDatabase(AppGlobal.AppPaths);
+    //             Database_Patches _DBPatches = new(new DataSource(AppGlobal.AppPaths));
+    //         });
+    //     }
+    // }
 }
 
 <AuthorizeView>

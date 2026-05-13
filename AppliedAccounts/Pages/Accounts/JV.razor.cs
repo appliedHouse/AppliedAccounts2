@@ -15,8 +15,6 @@ namespace AppliedAccounts.Pages.Accounts
         public JVModel MyModel { get; set; }
         public List<JVViewModel> MyVoucher => MyModel.MyVoucher;
         public bool IsPageValid { get; set; } = true;
-        public ToastClass MyToastClass { get; set; }
-        public ToastClass Toast { get; set; }
         public MessagesService MsgService { get; set; }
         public bool CanEdit => GetCanEdit();
         private bool GetCanEdit()
@@ -27,21 +25,7 @@ namespace AppliedAccounts.Pages.Accounts
         }
 
         #endregion
-
-
-        public JV()
-        {
-            //MyModel = new(AppGlobal);
-            MyToastClass = new();
-            Toast = new();
-        }
-
-        public void ShowToast(ToastClass _toast)
-        {
-            Toast = _toast;
-            ToastService.ShowToast(Toast);
-        }
-
+       
         #region Save
         public async void SaveAll()
         {
@@ -54,7 +38,7 @@ namespace AppliedAccounts.Pages.Accounts
                 MyModel.IsWaiting = false;
                 MyModel.LoadData();
 
-                ToastService.ShowToast(ToastClass.SaveToast, MyModel.Vou_No);
+                ToastService.ShowSuccess($"Sucessfully save {MyModel.Vou_No}" );
                 await InvokeAsync(StateHasChanged);
             }
             else

@@ -5,6 +5,8 @@ using AppliedDB;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using SQLitePCL;
+using ToastNotificationLibrary.Extensions;
+using ToastNotificationLibrary.Models;
 
 
 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
@@ -15,6 +17,7 @@ Batteries.Init();                       // Start SQLite Engine.
 
 // Add services to the container.
 
+builder.Services.AddHttpClient();
 builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -22,31 +25,15 @@ builder.Services.AddSingleton<UserProfile>();               // Create a User Mod
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<UserAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
-builder.Services.AddScoped<ToastService>();
 builder.Services.AddScoped<PrintService>();
 builder.Services.AddScoped<MessagesService>();
-builder.Services.AddScoped<ISQLiteDBBackupService, SQLiteDBBackupService>();
-
-builder.Services.AddHttpClient();
 builder.Services.AddScoped<GlobalService>();
+builder.Services.AddToastNotification(options =>
+{
+    options.DefaultDuration = 3000;
+    options.DefaultPosition = ToastPosition.BottomEnd;
+});
 
-
-//builder.Services.AddScoped<GlobalService>(sp =>
-//{
-//    // Access configuration and navigation manager
-//    var config = sp.GetRequiredService<IConfiguration>();
-//    var navManager = sp.GetRequiredService<NavigationManager>();
-//    var JSRuntime = sp.GetRequiredService<IJSRuntime>();
-//    var StateProvider = sp.GetRequiredService<AuthenticationStateProvider>();
-
-//    // Initialize GlobalService with dependencies
-//    var globalService = new GlobalService(config, navManager, JSRuntime, StateProvider);
-
-//    // Set the Language.ID value here
-//    globalService.Language.ID = 1; // Example: Setting ID to 1
-
-//    return globalService;
-//});
 
 var app = builder.Build();
 

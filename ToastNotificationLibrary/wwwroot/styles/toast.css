@@ -1,0 +1,306 @@
+/* =========================================
+   Toast Notification Styles (Production Ready)
+   ========================================= */
+
+.toast-notification-container {
+    z-index: 1080;
+    pointer-events: none;
+}
+
+    /* Allow interaction inside toast */
+    .toast-notification-container .toast {
+        pointer-events: auto;
+    }
+
+/* =========================================
+   Toast Base
+   ========================================= */
+.toast {
+    min-width: 320px;
+    max-width: 450px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: none;
+    /* Glass effect */
+    backdrop-filter: blur(12px);
+    /* Smooth shadow */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    /* Animation */
+    animation: slideInRight 0.5s ease-out;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+    /* Stack spacing */
+    .toast + .toast {
+        margin-top: 10px;
+    }
+
+    /* Hover effect */
+    .toast:hover {
+        opacity: 0.95;
+        transform: translateY(-2px);
+    }
+
+    /* Focus accessibility */
+    .toast:focus {
+        outline: 2px solid rgba(255, 255, 255, 0.6);
+    }
+
+/* =========================================
+   Toast Types
+   ========================================= */
+.toast-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border-left: 4px solid #155724;
+}
+
+.toast-error {
+    background: linear-gradient(135deg, #dc3545, #f86c6b);
+    border-left: 4px solid #721c24;
+}
+
+.toast-warning {
+    background: linear-gradient(135deg, #ffc107, #ffdb6b);
+    border-left: 4px solid #856404;
+    color: #212529; /* FIXED contrast */
+}
+
+.toast-info {
+    background: linear-gradient(135deg, #17a2b8, #5bc0de);
+    border-left: 4px solid #0c5460;
+}
+
+/* =========================================
+   Header
+   ========================================= */
+.toast-header {
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom: none;
+    padding: 12px 16px;
+}
+
+/* =========================================
+   Icon
+   ========================================= */
+.toast-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-weight: bold;
+    color: white;
+    transition: transform 0.3s ease;
+}
+
+.toast:hover .toast-icon {
+    transform: scale(1.1);
+}
+
+.toast-icon.toast-success {
+    background: #28a745;
+}
+
+.toast-icon.toast-error {
+    background: #dc3545;
+}
+
+.toast-icon.toast-warning {
+    background: #ffc107;
+    color: #856404;
+}
+
+.toast-icon.toast-info {
+    background: #17a2b8;
+}
+
+/* =========================================
+   Body
+   ========================================= */
+.toast-body {
+    padding: 16px;
+    color: white;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+/* =========================================
+   Progress Bar
+   ========================================= */
+.toast-progress {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.7);
+    transform-origin: left;
+}
+
+/* Pause progress on hover */
+.toast:hover .toast-progress {
+    animation-play-state: paused;
+}
+
+/* =========================================
+   Animations
+   ========================================= */
+
+/* Entry */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Exit */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(50%);
+    }
+}
+
+.toast.hide {
+    animation: fadeOut 0.4s ease-in forwards;
+}
+
+/* Progress */
+@keyframes progress {
+    from {
+        transform: scaleX(1);
+    }
+
+    to {
+        transform: scaleX(0);
+    }
+}
+
+/* =========================================
+   Position-based Animations
+   ========================================= */
+.toast-notification-container.top-0.end-0 .toast {
+    animation-name: slideInRight;
+}
+
+.toast-notification-container.top-0.start-0 .toast {
+    animation-name: slideInLeft;
+}
+
+.toast-notification-container.bottom-0.end-0 .toast {
+    animation-name: slideInUp;
+}
+
+.toast-notification-container.bottom-0.start-0 .toast {
+    animation-name: slideInLeft; /* FIXED */
+}
+
+/* =========================================
+   Position Offsets
+   ========================================= */
+.toast-notification-container.top-0.end-0 {
+    top: 30px !important;
+    right: 30px !important;
+}
+
+.toast-notification-container.top-0.start-0 {
+    top: 30px !important;
+    left: 30px !important;
+}
+
+.toast-notification-container.bottom-0.end-0 {
+    bottom: 30px !important;
+    right: 30px !important;
+}
+
+.toast-notification-container.bottom-0.start-0 {
+    bottom: 30px !important;
+    left: 30px !important;
+}
+
+/* Center positions */
+.toast-notification-container.top-0.start-50 {
+    top: 30px !important;
+    left: 50% !important;
+    transform: translateX(-50%);
+}
+
+.toast-notification-container.bottom-0.start-50 {
+    bottom: 30px !important;
+    left: 50% !important;
+    transform: translateX(-50%);
+}
+
+/* =========================================
+   Mobile Responsive
+   ========================================= */
+@media (max-width: 576px) {
+    .toast-notification-container {
+        padding: 0.5rem !important;
+    }
+
+    .toast {
+        width: calc(100vw - 1rem);
+        max-width: none;
+        min-width: auto;
+    }
+}
+
+/* =========================================
+   Dark Mode
+   ========================================= */
+@media (prefers-color-scheme: dark) {
+    .toast-header {
+        background: rgba(33, 37, 41, 0.95);
+        color: #fff;
+    }
+
+    .btn-close-white {
+        filter: invert(1);
+    }
+}

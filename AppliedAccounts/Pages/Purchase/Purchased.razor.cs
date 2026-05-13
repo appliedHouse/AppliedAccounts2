@@ -3,13 +3,13 @@ using AppliedAccounts.Services;
 using AppReports;
 using Format = AppliedGlobals.AppValues.Format;
 
-namespace AppliedAccounts.Pages.Sale
+namespace AppliedAccounts.Pages.Purchase
 {
-    public partial class SaleInvoice
+    public partial class Purchased
     {
         #region Variables
 
-        public SaleInvoiceModel MyModel { get; set; } = new();
+        public PurchaseInvoiceModel MyModel { get; set; } = new();
         public bool IsPageValid { get; set; }
         public string ErrorMessage { get; set; }
         private bool IsWaiting { get; set; }
@@ -18,7 +18,8 @@ namespace AppliedAccounts.Pages.Sale
         #endregion
 
         #region Constructor
-        public SaleInvoice()
+        public Purchased()
+
         {
             IsPageValid = true;
             IsWaiting = false;
@@ -116,14 +117,14 @@ namespace AppliedAccounts.Pages.Sale
         #endregion
 
         #region Home & Back Buttons
-        public void GotoHome()
-        {
-            NavManager.NavigateTo("/");
-        }
+        //public void GotoHome()
+        //{
+        //    NavManager.NavigateTo("/");
+        //}
 
         public void BackPage()
         {
-            NavManager.NavigateTo("/Sale/SaleInvoiceList");
+            NavManager.NavigateTo("/Purchase/PurchaseList");
         }
 
         public void TestRecord()
@@ -134,18 +135,15 @@ namespace AppliedAccounts.Pages.Sale
         #endregion
 
         #region Print
-        public void Print()
-        {
-            //ReportModel Reportmodel = Model.Print();
-
-        }
-
         public void Print(ReportType RptType)
         {
 
         }
 
+        public void Print()
+        {
 
+        }
         #endregion
     }
 }

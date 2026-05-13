@@ -1,10 +1,8 @@
 ﻿using AppliedAccounts.Pages.Accounts.Post;
-using AppliedAccounts.Pages.Sale.Quotations;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using Microsoft.AspNetCore.Components;
-using Org.BouncyCastle.Crypto.Modes.Gcm;
 using System.Data;
 using VoucherPosting;
 using static AppliedAccounts.Pages.Accounts.Post.Posting;
@@ -17,263 +15,198 @@ namespace AppliedAccounts.Models.Posting
     public class PostingModel
     {
         [Inject] public GlobalService AppGlobal { get; set; } = default!;
+
         public MessageClass MsgClass { get; set; } = new();
         public List<DataListModel> DataListModelList { get; set; } = new();
-        public bool IsPosting { get; set; } = false;
+        public bool IsPosting { get; set; }
         public DataSource Source { get; set; }
-        public string Filter { get; set; } = string.Empty;
-        public PostingTypes PostType { get; set; } = 0;
         public PageModel Pages { get; set; } = new();
 
-        public PostingModel()
-        {
-            if (AppGlobal != null) { Source = new(AppGlobal.AppPaths); }
-           
+        private Dictionary<long, string> _coaCache = new();
+        private List<long> _cashIds;
+        private List<long> _bankIds;
 
+        #region Init
+
+        public void Init()
+        {
+            Source ??= new DataSource(AppGlobal.AppPaths);
+
+            if (_coaCache.Count == 0)
+                LoadCOA();
+
+            _cashIds ??= LoadAccountIds(SQLQueries.Quries.GetCashAccounts());
+            _bankIds ??= LoadAccountIds(SQLQueries.Quries.GetBankAccounts());
         }
 
-        
+        private void LoadCOA()
+        {
+            var table = Source.GetTable(Tables.COA);
 
+            _coaCache = table.AsEnumerable()
+                .ToDictionary(
+                    r => r.Field<long>("ID"),
+                    r => r.Field<string>("Title") ?? ""
+                );
+        }
 
+        private List<long> LoadAccountIds(string query)
+        {
+            return Source.GetTable(query)
+                .AsEnumerable()
+                .Select(r => r.Field<long>("ID"))
+                .ToList();
+        }
+
+        #endregion
 
         #region Load Data
 
-        public async Task LoadData(PostingViewModel PostingModel)
+        public async Task LoadData(PostingViewModel model)
         {
-            Source ??= new(AppGlobal.AppPaths);
-            //Source = AppGlobal.Source;
+            Init();
 
-            if (PostingModel.PostingType == 0) { return; }
-
-            DateTime Date1 = PostingModel.Dt_From;
-            DateTime Date2 = PostingModel.Dt_To;
-            List<string> conditions = new();
-
-            switch (PostingModel.PostingType)
+            if (model.PostingType == 0)
             {
-                // Cash Books
-                case PostingTypes.CashBook:
-
-                    if (PostingModel.PostingStatus == 1) { conditions.Add($"Status='{PostingStatus.Submitted}'"); }
-                    if (PostingModel.PostingStatus == 2) { conditions.Add($"Status='{PostingStatus.Posted}'"); }
-
-                    conditions.Add($"Date(Vou_Date) >= '{Date1:yyyy-MM-dd}'");
-                    conditions.Add($"Date(Vou_Date) <= '{Date2:yyyy-MM-dd}'");
-
-                    string Filter = string.Join(" AND ", conditions);
-
-                    string _Limit = $"LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
-
-                    var _CashAccList = Source.GetTable(SQLQueries.Quries.GetCashAccounts());
-                    if (_CashAccList.Rows.Count > 0)
-                    {
-                        var CashAccIDs = string.Join(",", _CashAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
-                        Filter = $"BookID IN ({CashAccIDs}) AND {Filter}";
-                        //Pages.TotalRecords = Source.GetCount(Tables.Book, Filter);
-                    }
-
-                    _Limit = $"LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
-
-                    var _DataTableCash = Source.GetTable(Tables.Book, $"{Filter} {_Limit}");
-                    DataListModelList = GetPostingTable(_DataTableCash);
-                    Pages.Refresh(Source.GetCount(Tables.Book, Filter));
-                    
-                    break;
-
-                // Bank Books
-                case PostingTypes.BankBook:
-                    conditions = new();
-
-                    if (PostingModel.PostingStatus == 1) { conditions.Add($"Status='{PostingStatus.Submitted}'"); }
-                    if (PostingModel.PostingStatus == 2) { conditions.Add($"Status='{PostingStatus.Posted}'"); }
-
-                    conditions.Add($"Date(Vou_Date) >= '{Date1:yyyy-MM-dd}'");
-                    conditions.Add($"Date(Vou_Date) <= '{Date2:yyyy-MM-dd}'");
-
-                    Filter = string.Join(" AND ", conditions);
-
-                    var _BankAccList = Source.GetTable(SQLQueries.Quries.GetBankAccounts());
-                    if (_BankAccList.Rows.Count > 0)
-                    {
-                        var BankAccIDs = string.Join(",", _BankAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
-                        Filter = $"BookID IN ({BankAccIDs}) AND {Filter} ";
-                    }
-
-                    _Limit = $"LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
-                    var _DataTableBank = Source.GetTable(Tables.Book, $"{Filter} {_Limit}" );
-                    DataListModelList = GetPostingTable(_DataTableBank);
-                    Pages.Refresh(Source.GetCount(Tables.Book, Filter));
-
-                    break;
-                case PostingTypes.WriteCheques:
-                    DataListModelList.Clear();
-                    break;
-
-                case PostingTypes.BillPayable:
-                    DataListModelList.Clear();
-                    break;
-
-                case PostingTypes.BillReceivable:
-                    DataListModelList.Clear();
-                    break;
-
-                case PostingTypes.Receipt:
-                    DataListModelList.Clear();
-                    break;
-
-                case PostingTypes.Payment:
-                    DataListModelList.Clear();
-                    break;
-
-                case PostingTypes.SalesReturn:
-                    DataListModelList.Clear();
-                    break;
-
-
-                case PostingTypes.Production:
-                    DataListModelList.Clear();
-                    break;
-
-                default:
-                    DataListModelList.Clear();
-                    break;
+                DataListModelList.Clear();
+                return;
             }
-            await Task.Delay(100);
+
+            string filter = BuildFilter(model);
+            string paging = BuildPaging();
+
+            List<long> ids = model.PostingType switch
+            {
+                PostingTypes.CashBook => _cashIds,
+                PostingTypes.BankBook => _bankIds,
+                _ => null
+            };
+
+            if (ids == null || ids.Count == 0)
+            {
+                DataListModelList.Clear();
+                return;
+            }
+
+            string finalFilter = $"BookID IN ({string.Join(",", ids)}) AND {filter} {paging}";
+
+            var table = Source.GetTable(Tables.Book, finalFilter);
+
+            DataListModelList = Map(table);
+
+            Pages.Refresh(Source.GetCount(Tables.Book, $"BookID IN ({string.Join(",", ids)}) AND {filter}"));
+
+            await Task.CompletedTask;
         }
 
-        private List<DataListModel> GetPostingTable(DataTable dataTable)
+        private string BuildFilter(PostingViewModel model)
         {
+            var conditions = new List<string>();
 
-            var _List = new List<DataListModel>();
+            if (model.PostingStatus == 1)
+                conditions.Add($"Status='{PostingStatus.Submitted}'");
 
-            try
+            if (model.PostingStatus == 2)
+                conditions.Add($"Status='{PostingStatus.Posted}'");
+
+            var from = model.Dt_From.Date;
+            var to = model.Dt_To.Date.AddDays(1);
+
+            conditions.Add($"Vou_Date >= '{from:yyyy-MM-dd HH:mm:ss}'");
+            conditions.Add($"Vou_Date < '{to:yyyy-MM-dd HH:mm:ss}'");
+
+            return string.Join(" AND ", conditions);
+        }
+
+        private string BuildPaging()
+        {
+            return $"ORDER BY Vou_Date, Vou_No LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
+        }
+
+        private List<DataListModel> Map(DataTable table)
+        {
+            var list = new List<DataListModel>(table.Rows.Count);
+
+            foreach (DataRow row in table.Rows)
             {
-                // Cash book
-                if (dataTable.TableName == Tables.Book.ToString())
+                long bookId = row.Field<long>("BookID");
+                decimal amount = row.Field<decimal>("Amount");
+
+                list.Add(new DataListModel
                 {
-                    //DataListModelList = CreatePostingTable(PostType);
-
-                    foreach (DataRow Row in dataTable.Rows)
-                    {
-                        var Row1 = Source.RemoveNullValues(Row);
-
-                        long ID = Row1.Field<long>("ID");
-                        long BookID = Row1.Field<long>("BookID");
-
-                        var _DataList = new DataListModel();
-                        _DataList.ID = ID;
-                        _DataList.Vou_No = Row1.Field<string>("Vou_No") ?? string.Empty;
-                        _DataList.Vou_Date = Row1.Field<DateTime>("Vou_Date");
-                        _DataList.Title = Source.SeekTitle(Tables.COA, BookID);
-                        _DataList.DR = Row1.Field<decimal>("Amount") <= 0 ? Row1.Field<decimal>("Amount") : 0.0M;
-                        _DataList.CR = Row1.Field<decimal>("Amount") > 0 ? Row1.Field<decimal>("Amount") : 0.0M;
-                        _DataList.Status = Row1.Field<string>("Status") ?? "Submitted";
-                        _DataList.Selected = false;
-
-                        _List.Add(_DataList);
-
-                    }
-                }
-
-            }
-            catch (Exception ex)
-            {
-                MsgClass.Critical(ex.Message);
-                throw;
+                    ID = row.Field<long>("ID"),
+                    Vou_No = row.Field<string>("Vou_No") ?? "",
+                    Vou_Date = row.Field<DateTime>("Vou_Date"),
+                    Title = _coaCache.TryGetValue(bookId, out var title) ? title : "",
+                    DR = amount <= 0 ? amount : 0,
+                    CR = amount > 0 ? amount : 0,
+                    Status = row.Field<string>("Status") ?? "Submitted",
+                    Selected = false
+                });
             }
 
-            
-            return [.. _List.OrderBy(e => e.Vou_Date).ThenBy(e => e.Vou_No)];
-
+            return list;
         }
 
-        
         #endregion
-
 
         #region Voucher Posting
 
-        public async Task DoVoucherPosting(long _VouID, PostingViewModel PostingModel)
+        public async Task DoVoucherPosting(long vouId, PostingViewModel model)
         {
-            if (PostingModel.PostingType == 0) { return; }         // Return if type not assigned.
+            if (model.PostingType == 0) return;
 
-            // Cash Book Posting
-            if (PostingModel.PostingType == PostingTypes.CashBook)
+            var postingModel = new VoucherPostingModel
             {
-                VoucherPostingModel postingModel = new();
+                MasterTable = Source.GetTable(Tables.Book, $"ID={vouId}"),
+                DetailTable = Source.GetTable(Tables.Book2, $"TranID={vouId}")
+            };
 
-                postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
-                postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
+            MsgClass.ClearMessages();
 
-                MsgClass.ClearMessages();                            // Clear all previous messages. 
-                CashBook postCashBook = new(Source, postingModel);
-                await postCashBook.DoCashPosting();                  // Cash Posting main method.
-                if (postCashBook.PostSuccessful)
-                {
-                    MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
-                    LoadData(PostingModel);                    // Refresh display Data afger save voucher.
-                }
-                else
-                {
-                    MsgClass = postCashBook.MsgClass;
-                }
+            var post = new CashBook(Source, postingModel);
+
+            switch (model.PostingType)
+            {
+                case PostingTypes.CashBook:
+                    await post.DoCashPosting();
+                    break;
+
+                case PostingTypes.BankBook:
+                    await post.DoBankPosting();
+                    break;
+
+                default:
+                    return;
             }
 
-            // Bank Book Posting
-            if (PostingModel.PostingType == PostingTypes.BankBook)
+            if (post.PostSuccessful)
             {
-                VoucherPostingModel postingModel = new();
-
-                postingModel.MasterTable = Source.GetTable(AppliedDB.Enums.Tables.Book, $"ID={_VouID}");
-                postingModel.DetailTable = Source.GetTable(AppliedDB.Enums.Tables.Book2, $"TranID={_VouID}");
-
-                MsgClass.ClearMessages();                           // Clear all previous messages. 
-                CashBook postBankBook = new(Source, postingModel);
-                await postBankBook.DoBankPosting();                  // Bank Posting main method.
-                if (postBankBook.PostSuccessful)
-                {
-                    MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
-                    LoadData(PostingModel);              // Refresh display Data afger save voucher.
-                }
-                else
-                {
-                    MsgClass = postBankBook.MsgClass;
-                }
+                MsgClass.Success(Messages.Save);
+                await LoadData(model); // ✅ FIXED
             }
-
-            // Bill Receivable Posting  
-            if (PostingModel.PostingType == PostingTypes.BillReceivable)
+            else
             {
-                return;
+                MsgClass = post.MsgClass;
             }
-            return;
         }
 
         #endregion
 
-
-        #region Model  razor page view in Table Tax
+        #region Model
 
         public class DataListModel
         {
             public long ID { get; set; }
             public string Vou_No { get; set; }
             public DateTime Vou_Date { get; set; }
-
             public string Title { get; set; }
             public decimal DR { get; set; }
             public decimal CR { get; set; }
-            public decimal Amount { get; set; }
-
             public string Status { get; set; }
-            public bool Active { get; set; }
             public bool Selected { get; set; }
-
         }
 
-
         #endregion
-
-        
     }
 }

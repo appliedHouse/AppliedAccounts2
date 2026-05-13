@@ -3,16 +3,16 @@
 @layout PageLayout;
 @attribute [Authorize];
 
-@using AppliedAccounts.Component;
-@using AppliedAccounts.Libs;
-@using AppliedAccounts.Models;
-@using AppliedAccounts.Data;
+@using AppliedAccounts.Component
+@using AppliedAccounts.Libs
+@using AppliedAccounts.Models
+@using AppliedAccounts.Data
 @using AppliedAccounts.Services
 @using AppliedDB
 @using System.Data
 
 @inject GlobalService AppGlobal
-@inject ToastService Toaster
+@inject IToastService Toaster
 
 @code {
     private string UserRoll;

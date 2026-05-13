@@ -83,7 +83,7 @@ namespace AppliedAccounts.Pages.Accounts
 
             if (IsSaved)
             {
-                ToastService.ShowToast(ToastClass.SaveToast, $"Save | {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
+                ToastService.ShowSuccess($"Successfully saved {MyModel.MyVoucher.Master.Vou_No}");
                 NavManager.NavigateTo($"/Accounts/Receipt/{MyModel.MyVoucher.Master.ID1}");
             }
         }
@@ -106,7 +106,7 @@ namespace AppliedAccounts.Pages.Accounts
             }
             catch (Exception ex)
             {
-                ToastService.ShowToast(ToastClass.ErrorToast, ex.Message);
+                ToastService.ShowError(ex.Message);
             }
         }
     }

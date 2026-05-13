@@ -3,13 +3,22 @@
 
 @inject GlobalService AppGlobal
 
+@inject IToastService ToastService
+
 @code {
-    [Parameter] public string TableName { get; set; }
+    [Parameter] public string? TableName { get; set; }
 
     private string SubHeadingTitle { get; set; } = "Stock Sub Heading";
     protected override void OnInitialized()
     {
-        LoadData(TableName);
+        if (!string.IsNullOrEmpty(TableName))
+        {
+            LoadData(TableName);
+        }
+        else
+        {
+            MsgClass.Critical("No Directory Name Found");
+        }
 
     }
 }
@@ -17,32 +26,84 @@
 <PageHeading Text="@SubHeadingTitle" />
 <ShowMessages MsgClass="MsgClass"></ShowMessages>
 
-@if (StockDirectoryList.Count > 0)
+@if (!EditMode)
 {
-    <div class="container">
-        <table class="table-list">
-            <thead>
-                <tr>
-                    <th style="width:20%">Code</th>
-                    <th style="width:60%">Title</th>
-                    <th style="width:20%"><button id="btnAdd" class="btn-Add" @onclick="Add"><i class="bi bi-plus-circle-fill"></i></button></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in StockDirectoryList)
-                {
+    @if (StockDirectoryList.Count > 0)
+    {
+        <div class="container">
+            <table class="table-list">
+                <thead>
                     <tr>
-                        <td>@item.Code</td>
-                        <td>@item.Title</td>
-                        <td clas class="tb-col-left" s="td-btn">
-                            <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(() => Edit((long)item.ID))"><i class="bi bi-pencil-fill"></i></button>
-                            <label style="padding-left:5px; padding-right:5px;"> | </label>
-                            <button id="btnDel" type="submit" class="btn-Del" @onclick="(() => Delete((long)item.ID))"><i class="bi bi-trash-fill"></i></button>
-                        </td>
-                        
+                        <th style="width:20%">Code</th>
+                        <th style="width:60%">Title</th>
+                        <th style="width:20%"><button id="btnAdd" class="btn-Add" @onclick="Add"><i class="bi bi-plus-circle-fill"></i></button></th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    @foreach (var item in StockDirectoryList)
+                    {
+                        @if (item.ID == 0)  { continue; }
+
+                        <tr>
+                            <td>@item.Code</td>
+                            <td>@item.Title</td>
+                            <td clas class="tb-col-left" s="td-btn">
+                                <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(() => Edit((long)item.ID))"><i class="bi bi-pencil-fill"></i></button>
+                                <label style="padding-left:5px; padding-right:5px;"> | </label>
+                                <button id="btnDel" type="submit" class="btn-Del" @onclick="(() => Delete((long)item.ID))"><i class="bi bi-trash-fill"></i></button>
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 }
+else
+{
+    <EditForm Model="MyModel">
+        <input @bind-value="MyModel.ID" hidden />
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <InputText class="form-control" id="txtCode" placeholder="Code" @bind-Value="MyModel.Code"></InputText>
+                        <label for="txtCode">Code</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <InputText class="form-control" id="txtTitle" placeholder="Title" @bind-Value="MyModel.Title"></InputText>
+                        <label for="txtTitle">Code</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="filter">
+                    <!-- Control Buttons-->
+                    <div class="container mt-2 mb-2">
+                        <div class="row">
+                            <div class="col d-flex justify-content-between align-items-center">
+                                <div class="d-flex gap-2">
+                                    <Btn_Save @onclick="Save" />
+                                    
+                                </div>
+                                <button class="btn btn-link btn-sm" title="Back" @onclick="BackPage">
+                                    <i class="bi bi-arrow-left-circle"></i>
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+    </EditForm>
+}
+

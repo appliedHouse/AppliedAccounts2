@@ -13,7 +13,7 @@
 @inject AuthenticationStateProvider authorized
 @inject NavigationManager NavManager
 @inject IJSRuntime js
-@inject ToastService ToastService
+@inject IToastService ToastService
 @inject PrintService ReportService
 @inject GlobalService AppGlobal
 @inject MessagesService MsgService
@@ -31,7 +31,6 @@
     {
         UserProfile = ((UserAuthenticationStateProvider)authorized).AppUser;
         Start();
-        Toast = new();
         MyModel.MsgClass = MsgService.MsgClass;
     }
 
@@ -432,13 +431,13 @@ else
             </div>
         </EditForm>
 
-        <!-- Toast -->
+        @* <!-- Toast -->
         <div class="toast-container position-fixed @Toast.GetPosition()">
             @if (Toast.ShowToast)
             {
                 <ShowToastMessage toastClass="@Toast"></ShowToastMessage>
             }
-        </div>
+        </div> *@
 
     }
     else

@@ -5,7 +5,7 @@
 @using AppliedAccounts.Services
 
 @inject GlobalService AppGlobal
-@inject ToastService ToastService
+@inject IToastService ToastService
 
 @code {
     private string[] BrowseList = { "Class", "Nature", "Notes" };
@@ -162,15 +162,7 @@
             </table>
         </div>
     </EditForm>
-
-    <!-- Toast -->
-        <div class="toast-container position-fixed @ToastService.Toasters.GetPosition()">
-            @if (ToastService.Toasters.ShowToast)
-            {
-                <ShowToastMessage toastClass="@ToastService.Toasters"></ShowToastMessage>
-            }
-        </div>
-
+      
 }
 else
 {

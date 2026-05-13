@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using Microsoft.Data.Sqlite;
+using System.Data;
+using System.Data.Common;
 using static AppMessages.Enums;
 
 namespace AppMessages
@@ -14,20 +16,22 @@ namespace AppMessages
         public int Count => MessageList.Count + Errors.Count;
         public int CountError => Errors.Count;
         public int CountMessages => MessageList.Count;
+        public SqliteConnection MsgConnection { get; set; }
+        public long LanguageID { get; set; }
 
-        public object AppliedDB { get; }
+        //public object AppliedDB { get; }
         #endregion
 
         #region Constructor
         public MessageClass()
         {
-            
+            LanguageID = 1;             // Default Language English, Id = 1
         }
-        public MessageClass(DataTable _Table)
-        {
-            MessagesTable = _Table;
-            
-        }
+        //public MessageClass(SqliteConnection _Connection)
+        //{
+        //    LanguageID = 1;             // Default Language English, Id = 1
+        //    MsgConnection = _Connection;
+        //}
         #endregion
 
 
@@ -133,26 +137,31 @@ namespace AppMessages
         #region Get Single message or error
         public Message GetMessage(Messages _Code, Class _Class)
         {
-            var _Message = new Message(); ;
-            if (MessagesTable is not null)
+            var _Message = new Message();
+
+            if (MsgConnection != null)
             {
-                if (MessagesTable.Rows.Count > 0)
+                if (MsgConnection.State != ConnectionState.Open) { MsgConnection.Open(); }                   
+
+                var _Query = @"SELECT [ID],[Code],[MessageText],[Class] FROM [Messages] WHERE [Code] = @Code AND [Language] = @Language";
+
+                using var _Command = new SqliteCommand(_Query, MsgConnection);
+
+                _Command.Parameters.AddWithValue("@Code", _Code.ToString());
+                _Command.Parameters.AddWithValue("@Language", LanguageID);
+
+                using var reader = _Command.ExecuteReader();
+
+                if (reader.Read())
                 {
-                    _Message.Code = _Code.ToString() ?? "---";
-                    MessagesTable.DefaultView.RowFilter = $"Code='{_Message.Code}'";
-                    if (MessagesTable.DefaultView.Count == 1)
-                    {
-                        DataRow _Row = MessagesTable.DefaultView[0].Row;
-                        _Message.MessageID = (int)_Row["ID"];
-                        _Message.MessageText = (string)_Row["MessageText"];
-                        _Message.MessageClass = _Class;
-                        _Message.MessageDate = DateTime.Now;
-                        return _Message;
-                    }
+                    _Message.Code = reader["Code"]?.ToString() ?? "";
+                    _Message.MessageText = reader["MessageText"]?.ToString() ?? "";
+                    _Message.MessageClass = (Class)Convert.ToInt64(reader["Class"]);
+                    _Message.MessageID = Convert.ToInt64(reader["ID"]);
                 }
             }
-            _Message.MessageText += " " + _Code.ToString();
-            return _Message; ;
+
+            return _Message;
         }
 
         public Message GetMessage(Messages _Code)

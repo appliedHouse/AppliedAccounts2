@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Authentication;
+using AppliedAccounts.Data;
 using AppliedAccounts.Middleware;
 using AppliedDB;
 using Microsoft.Data.Sqlite;
@@ -32,7 +33,7 @@ namespace AppliedAccounts.Pages.Users
                 {
                     var _newGUID = Guid.NewGuid();
                     var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
-                    var _UserData = new UserSession();
+                    var _UserData = new UserSession(); ;
 
                     _UserData.UserName = AppUser.Profile.UserID;
                     _UserData.Role = AppUser.Profile.Role;
@@ -96,17 +97,28 @@ namespace AppliedAccounts.Pages.Users
                     {
                         return false;
                     }
-                        
 
-                    // Try opening a connection
-                    using var conn = new SqliteConnection($"Data Source={dbPath}");
-                    conn.Open(); // Will throw if invalid/corrupt
+                    try
+                    {
+                        // Try opening a connection
+                        using var conn = new SqliteConnection($"Data Source={dbPath}");
+                        conn.Open(); // Will throw if invalid/corrupt
+
+                        CreateDatabase _DB = new CreateDatabase(AppGlobal.AppPaths);
+                        Database_Patches _DBPatches = new(new DataSource(AppGlobal.AppPaths));
+                    
+                    }
+                    catch (Exception error)
+                    {
+                        ErrorMessage = error.Message;
+                        return false;
+                    }
                     return true;
-
                 }
             }
-            catch
+            catch (Exception error)
             {
+                ErrorMessage = error.Message;
                 return false;
             }
         }
