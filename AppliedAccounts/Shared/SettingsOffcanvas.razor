@@ -1,0 +1,101 @@
+﻿
+
+@code {
+    [Inject] NavigationManager Nav { get; set; } = default!;
+    [Inject] GlobalService Globals { get; set; } = default!;
+    [Inject] ISQLiteDBBackupService BackupService { get; set; } = default!;
+
+    void GoSetup()
+    {
+        Nav.NavigateTo("/Setup");
+    }
+
+    void GoBackup()
+    {
+        var _Stop = Globals.DBFile;
+
+        BackupService.CreateBackupAsync(Globals.DBFile);
+    }
+
+ 
+    private void OnFolderSelected(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            Console.WriteLine(file.Name);
+            Console.WriteLine(Path.GetFullPath(file.Name)); // contains folder structure
+        }
+    }
+
+    
+}
+
+
+<div class="offcanvas offcanvas-end"
+     tabindex="-1"
+     id="offcanvasRight"
+     aria-labelledby="offcanvasRightLabel">
+
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasRightLabel">
+            Settings
+        </h5>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close">
+        </button>
+    </div>
+
+    <div class="offcanvas-body">
+
+        <button class="btn btn-outline-primary w-100 mb-2"
+                @onclick="GoSetup">
+            Setup
+        </button>
+
+        <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#backupModal">
+            Launch demo modal
+        </button>
+
+
+        <button class="btn btn-outline-secondary w-100"
+                @onclick="GoBackup">
+            Backup Data
+        </button>
+
+    </div>
+</div>
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="backupModal" tabindex="-1" aria-labelledby="backupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Backup Database</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="formFile" class="form-label">Default file input example</label>
+                    <input class="form-control" type="file" id="formFile">
+                </div>
+
+                <input type="file"
+                       webkitdirectory
+                       directory
+                       multiple
+                       onchange="(e)=>OnFolderSelected(e)" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" @onclick="GoBackup">Backup</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -46,6 +46,7 @@ namespace AppliedAccounts.Pages.Users
                     _UserData.SessionGuid = _newGUID;
                     _UserData.LanguageID = LanguageID;
 
+
                     bool IsDBFileValid = false;
                     await userAuthStateProvider.UpdateAuthenticateState(_UserData);
                     IsDBFileValid = await UserDatabaseFileValidateAsync(AppUser.Profile.DataFile);
