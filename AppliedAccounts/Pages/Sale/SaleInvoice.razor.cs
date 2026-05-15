@@ -1,5 +1,4 @@
 ﻿using AppliedAccounts.Models;
-using AppliedAccounts.Services;
 using AppReports;
 using Format = AppliedGlobals.AppValues.Format;
 
@@ -126,10 +125,7 @@ namespace AppliedAccounts.Pages.Sale
             NavManager.NavigateTo("/Sale/SaleInvoiceList");
         }
 
-        public void TestRecord()
-        {
-            MyModel.TestData();
-        }
+       
 
         #endregion
 

@@ -286,6 +286,7 @@
 
                         @if (MyModel.MyVoucher.Master.Vou_No.ToUpper() != "NEW")
                         {
+                            <ReportingButtons ReturnValue="Print" ID="@MyModel.MyVoucher.Master.ID1" />
                             <div class="btn-group" role="group" aria-label="Navigation Buttons" id="printBtns">
                                 <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Print);})">
                                     <i class="bi bi-printer"></i>
@@ -322,9 +323,7 @@
                     <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="BackPage">
                         <i class="bi bi-arrow-left-circle-fill"></i>
                     </button>
-                    <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="TestRecord">
-                        <i class="bi bi-body-text"></i>
-                    </button>
+                   
                 </div>
             </div>
 

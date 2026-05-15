@@ -495,6 +495,7 @@ namespace AppliedAccounts.Models
                 masterRow["Vou_Date"] = MyVoucher.Master.Vou_Date;
                 masterRow["Company"] = MyVoucher.Master.Company;
                 masterRow["Employee"] = MyVoucher.Master.Employee;
+                masterRow["Ref_No"] = MyVoucher.Master.Ref_No;
                 masterRow["Inv_No"] = MyVoucher.Master.Inv_No;
                 masterRow["Inv_Date"] = MyVoucher.Master.Inv_Date;
                 masterRow["Pay_Date"] = MyVoucher.Master.Pay_Date;
@@ -722,41 +723,7 @@ namespace AppliedAccounts.Models
 
         #endregion
 
-        #region Test Voucher Data
-        public void TestData()
-        {
-            MyVoucher.Master.ID1 = 0;
-            MyVoucher.Master.Vou_No = "New";
-            MyVoucher.Master.Inv_No = "SRB-001";
-            MyVoucher.Master.Vou_Date = new DateTime(2024,10,23);
-            MyVoucher.Master.Company = 2;
-            MyVoucher.Master.Employee = 2;
-            MyVoucher.Master.Vou_Date = new DateTime(2024, 10, 23);
-            MyVoucher.Master.Pay_Date = new DateTime(2024, 10, 23);
-            MyVoucher.Master.Ref_No = "Test";
-            MyVoucher.Master.Remarks = "D-Type Rubber Fender";
-            MyVoucher.Master.Comments = "Damaged Ship Side Rubber Fender Length 200 Meters, Renewed with MS Channel & Stainless Steel (Marine Grade 316L) & Nuts, Bolts, Washers, conform to marine standard complete with fitting accessories.";
-
-            MyVoucher.Detail.Sr_No = 1;
-            MyVoucher.Detail.TranID = 0;
-            MyVoucher.Detail.ID2 = 0;
-            MyVoucher.Detail.Inventory = 4;
-            MyVoucher.Detail.Project = 1;
-            MyVoucher.Detail.Unit = 11;
-            MyVoucher.Detail.Qty = 1;
-            MyVoucher.Detail.Rate = 3750000;
-            MyVoucher.Detail.TaxID = 0;
-            MyVoucher.Detail.TaxRate = 15;
-            MyVoucher.Detail.Batch = "#01";
-
-            MyVoucher.Detail.Description = "D-Type Rubber Fender";
-
-            MyVoucher.Details.Add(MyVoucher.Detail);
-        }
-
-
-        #endregion
-
+       
 
 
         #region Model
