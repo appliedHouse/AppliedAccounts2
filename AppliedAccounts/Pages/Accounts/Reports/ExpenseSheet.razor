@@ -1,4 +1,481 @@
 ﻿@page "/Accounts/Reports/ExpenseSheet"
+
+@using AppliedAccounts.Libs
+@using System.Data
+
+@inject IToastService ToastService
+@inject PrintService ReportService
+@inject GlobalService AppGlobal
+
+<div class="expense-page">
+
+    <div class="container-fluid mt-3">
+
+        <!-- TITLE -->
+
+        <div class="expense-title">
+
+            Expense Sheet List
+
+        </div>
+        <!-- TOP BAR -->
+
+        <div class="expense-toolbar">
+
+            <!-- LEFT -->
+
+            <div class="toolbar-side">
+
+                <div class="expense-info-item">
+
+                    <span class="expense-info-label">
+                        Sheet No :
+                    </span>
+
+                    <select class="form-select expense-sheet-select"
+                            value="@SelectedSheetNo"
+                            @onchange="OnSheetChanged">
+
+                        @if (SheetTable != null && SheetTable.Rows.Count > 0)
+                        {
+                            foreach (DataRow row in SheetTable.Rows)
+                            {
+                                <option value="@row["SheetNo"]">
+                                    @row["SheetNo"]
+                                </option>
+                            }
+                        }
+
+                    </select>
+
+                </div>
+
+                <div class="expense-report-group">
+
+                    <span class="expense-inline-heading">
+                        Print Sheet -
+                    </span>
+
+                    <ReportingButtons ReturnValue="Print" ID="1" />
+
+                </div>
+
+            </div>
+
+            <!-- CENTER -->
+
+            <div class="toolbar-center">
+
+                <input type="text"
+                       class="form-control expense-search-input"
+                       placeholder="Type here to search"
+                       @bind="SearchText" />
+
+                <button class="btn btn-secondary expense-clear-btn"
+                        @onclick="ClearSearch">
+
+                    Clear
+
+                </button>
+
+            </div>
+
+            <!-- RIGHT -->
+
+            <div class="toolbar-side right-side">
+
+                <div class="expense-company-text">
+
+                    Company : Applied Software House
+
+                </div>
+
+                <div class="expense-report-group">
+
+                    <span class="expense-inline-heading">
+                        Summary -
+                    </span>
+
+                    <ReportingButtons ReturnValue="PrintSummary" ID="2" />
+
+                </div>
+
+            </div>
+
+        </div>        <!-- TABLE -->
+
+        <div class="table-responsive">
+
+            <table class="expense-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Sr. No.</th>
+                        <th>Voucher</th>
+                        <th>Ref No</th>
+                        <th>Date</th>
+                        <th>Account</th>
+                        <th>Company / Customer</th>
+                        <th>Debit</th>
+                        <th>Credit</th>
+                        <th>Description</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @{
+
+                        DataRow[] Rows;
+
+                        if (string.IsNullOrWhiteSpace(SearchText))
+                        {
+                            Rows = ExpenseTable.Select();
+                        }
+                        else
+                        {
+                            Rows = ExpenseTable.Select($@"
+
+                                Vou_No LIKE '%{SearchText}%'
+                                OR Ref_No LIKE '%{SearchText}%'
+                                OR TitleCOA LIKE '%{SearchText}%'
+                                OR TitleCompany LIKE '%{SearchText}%'
+                                OR Description LIKE '%{SearchText}%'
+
+                            ");
+                        }
+
+                        decimal SearchDR = 0;
+                        decimal SearchCR = 0;
+
+                        int sr = 1;
+
+                        foreach (var item in Rows)
+                        {
+                            SearchDR += Convert.ToDecimal(item["DR"]);
+                            SearchCR += Convert.ToDecimal(item["CR"]);
+                        }
+
+                    }
+
+                    @foreach (var row in Rows)
+                    {
+
+                        <tr>
+
+                            <td>@sr</td>
+
+                            <td class="voucher-text">
+                                @row["Vou_No"]
+                            </td>
+
+                            <td>
+                                @row["Ref_No"]
+                            </td>
+
+                            <td>
+                                @Convert.ToDateTime(row["Vou_Date"]).ToString("dd-MM-yy")
+                            </td>
+
+                            <td>
+                                @row["TitleCOA"]
+                            </td>
+
+                            <td>
+                                @row["TitleCompany"]
+                            </td>
+
+                            <td class="debit-text">
+                                @Convert.ToDecimal(row["DR"]).ToString("N2")
+                            </td>
+
+                            <td class="credit-text">
+                                @Convert.ToDecimal(row["CR"]).ToString("N2")
+                            </td>
+
+                            <td>
+                                @row["Description"]
+                            </td>
+
+                        </tr>
+
+                        sr++;
+                    }
+
+                </tbody>
+
+                <tfoot>
+
+                    <tr>
+
+                        <th colspan="6">
+                            TOTAL
+                        </th>
+
+                        <th class="text-end">
+                            @SearchDR.ToString("N2")
+                        </th>
+
+                        <th class="text-end">
+                            @SearchCR.ToString("N2")
+                        </th>
+
+                        <th></th>
+
+                    </tr>
+
+                </tfoot>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
 @code {
+
+    public string SearchText = "";
+
+    public string SelectedSheetNo = "";
+
+    public DataTable ExpenseTable = new();
+
+    public DataTable SheetTable = new();
+
+    public ReportActionClass RptBtn { get; set; }
+
+    protected override void OnInitialized()
+    {
+        RptBtn = new()
+        {
+            PrintType = AppReports.ReportType.Preview,
+            VoucherID = 1
+        };
+
+        LoadSheets();
+    }
+
+    private void LoadSheets()
+    {
+        try
+        {
+
+            string SheetQuery = @"
+
+                SELECT DISTINCT SheetNo
+
+                FROM view_Book
+
+                WHERE SheetNo IS NOT NULL
+                AND SheetNo <> ''
+
+                ORDER BY SheetNo
+
+            ";
+
+            SheetTable = AppGlobal.Source.GetTable(SheetQuery);
+
+            if (SheetTable.Rows.Count > 0)
+            {
+                SelectedSheetNo = SheetTable.Rows[0]["SheetNo"].ToString();
+
+                LoadExpenseSheet();
+            }
+
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private void OnSheetChanged(ChangeEventArgs e)
+    {
+        SelectedSheetNo = e.Value?.ToString();
+
+        LoadExpenseSheet();
+    }
+
+    private void LoadExpenseSheet()
+    {
+        try
+        {
+
+            string Query = $@"
+
+                SELECT
+
+                    Sr_No,
+                    Vou_No,
+                    Ref_No,
+                    Vou_Date,
+
+                    TitleCOA,
+                    TitleCompany,
+
+                    Description,
+
+                    DR,
+                    CR,
+
+                    SheetNo
+
+                FROM view_Book
+
+                WHERE SheetNo = '{SelectedSheetNo}'
+
+                ORDER BY Vou_Date, Vou_No
+
+            ";
+
+            ExpenseTable = AppGlobal.Source.GetTable(Query);
+
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private void ClearSearch()
+    {
+        SearchText = "";
+    }
+
+    public void Print(ReportActionClass PrintAction)
+    {
+        try
+        {
+
+            ReportService = new(AppGlobal);
+
+            ReportService.ReportType = PrintAction.PrintType;
+
+            CreateReportModel().Wait();
+
+            ReportService.Print();
+
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    public async void PrintSummary(ReportActionClass PrintAction)
+    {
+        try
+        {
+            ReportService = new(AppGlobal);
+
+            ReportService.ReportType = PrintAction.PrintType;
+
+            await CreateSummaryReportModel();
+
+            ReportService.Print();
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    public async Task CreateReportModel()
+    {
+        try
+        {
+
+            DataTable ReportTable = ExpenseTable.Copy();
+
+            ReportService.Data.DataSetName = "ds_ExpenseSheet";
+
+            ReportService.Data.ReportTable = ReportTable;
+
+            ReportService.Model.InputReport.FileName = "ExpenseSheet.rdl";
+
+            ReportService.Model.OutputReport.FileName = "ExpenseSheet";
+
+            ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
+
+            ReportService.Model.AddReportParameter(
+                "Heading1",
+                "Expense Sheet Report"
+            );
+
+            ReportService.Model.AddReportParameter(
+                "Heading2",
+                $"Sheet No : {SelectedSheetNo}"
+            );
+
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(ex.Message);
+        }
+    }
+    public async Task CreateSummaryReportModel()
+    {
+        try
+        {
+            string Query = $@"
+
+            SELECT
+
+                COA,
+
+                TitleCOA,
+
+                SUM(DR) AS DR,
+
+                SUM(CR) AS CR
+
+            FROM View_Book
+
+            WHERE SheetNo = '{SelectedSheetNo}'
+
+            GROUP BY
+                COA,
+                TitleCOA
+
+            ORDER BY
+                COA,
+                TitleCOA
+
+        ";
+
+            DataTable SummaryTable = AppGlobal.Source.GetTable(Query);
+
+            ReportService.Data.DataSetName = "ds_ExpenseGroup";
+
+            ReportService.Data.ReportTable = SummaryTable;
+
+            ReportService.Model.InputReport.FileName = "ExpenseSheetGroup.rdl";
+
+            ReportService.Model.OutputReport.FileName = "ExpenseSheetSummary";
+
+            ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
+
+            ReportService.Model.AddReportParameter(
+                "Heading1",
+                "PROJECT SUMMARY EXPENSES SHEET"
+            );
+
+            ReportService.Model.AddReportParameter(
+                "Heading2",
+                $"Project Sheet # {SelectedSheetNo}"
+            );
+
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(ex.Message);
+        }
+    }
 
 }
