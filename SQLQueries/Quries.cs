@@ -462,10 +462,27 @@ namespace SQLQueries
 
             return Text.ToString();
         }
+
+        public static string TBProject(long _Project, string _Filter, string _OrderBy)
+        {
+            var Text = new StringBuilder();
+            Text.AppendLine("SELECT * FROM (");
+            Text.AppendLine("SELECT [Ledger].[COA], [COA].[Code], [COA].[Title], ");
+            Text.AppendLine("SUM([Ledger].[DR]) AS [DR], ");
+            Text.AppendLine("SUM([Ledger].[CR]) AS [CR], ");
+            Text.AppendLine("SUM([Ledger].[DR] - [Ledger].[CR]) AS [BAL] ");
+            Text.AppendLine($"FROM (SELECT * FROM [Ledger] WHERE {_Filter}) AS [Ledger] ");
+            Text.AppendLine("LEFT JOIN [COA] ON [COA].[ID] = [Ledger].[COA] ");
+            Text.AppendLine("GROUP BY  [Ledger].[COA],[Ledger].[Project] ");
+            Text.AppendLine($") WHERE  [Ledger].[Project] = {_Project} ");
+            if (_OrderBy.Length > 0) { Text.AppendLine($" ORDER BY {_OrderBy}"); }
+
+            return Text.ToString();
+        }
         #endregion
 
         #region Cash and Bank Account in List
-        
+
         public static string  GetCashAccounts()
         {
             var _Text = new StringBuilder();

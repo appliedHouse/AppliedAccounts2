@@ -12,6 +12,9 @@
 	
 }
 
+<PageHeading Text="Trial Balance"/>
+
+
 @if (IsPrinting)
 {
 	<div class="alert alert-primary d-flex align-items-center" role="alert">
@@ -22,7 +25,6 @@
 	</div>
 }
 
-
 @if (MsgClass.Count > 0)
 {
 	<PageErrors Messages="@MsgClass" />
@@ -30,30 +32,39 @@
 
 @if (!IsPageValidae)
 {
-	<EditForm Model="MyModel">
+	<EditForm Model="MyModel" OnValidSubmit="DisplayList">
 		<div class="container">
 			<div class="row flex-md-row">
+				
 				<div class="col-md-3">
 					<div class="form-floating">
-						<InputDate id="DateFrom" class="form-control" @bind-Value="MyModel.TB_From"></InputDate>
+						<InputDate id="DateFrom" class="form-control" @bind-Value="MyModel.TB_From" @bind-Value:after="DisplayList"></InputDate>
 						<label for="DateFrom">From</label>
 					</div>
 				</div>
 				<div class="col-md-3">
 					<div class="form-floating">
-						<InputDate id="DateTo" class="form-control" @bind-Value="MyModel.TB_To"></InputDate>
+						<InputDate id="DateTo" class="form-control" @bind-Value="MyModel.TB_To" @bind-Value:after="DisplayList"></InputDate>
 						<label for="DateFrom">To</label>
 					</div>
 				</div>
 				<div class="col-md-2">
-					<select @bind="MyModel.TB_Option" class="form-select">
+					<select @bind="MyModel.TB_Option" @bind:after="DisplayList"  class="form-select">
 						@foreach (var option in MyModel.OptionTypes)
 						{
 							<option value="@option.Key">@option.Value</option>
 						}
 					</select>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-2">
+					<select class="form-select" @bind="MyModel.TB_Type" @bind:after="DisplayList">
+						<option value="1">Trial Balance</option>
+						<option value="2">Project Balances</option>
+						<option value="3">Company Balances</option>
+						<option value="4">Employee Balances</option>
+					</select>
+				</div>
+				<div class="col-md-2">
 					<div style="display: flex; justify-content: flex-end;">
 						@if (!IsPrinting)
 						{
@@ -65,5 +76,35 @@
 		</div>
 	</EditForm>
 
+	<div class="container mt-2">
+		<table class="table-list">
+			<thead>
+				<tr>
+					<th>Code</th>
+					<th>Title</th>
+					<th>Debit</th>
+					<th>Credit</th>
+					<th>Amount</th>
+					<th>Ledger</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (TBListModel Account in AccList)
+				{
+					<tr>
+						<td>@Account.Code</td>
+						<td>@Account.Title</td>
+						<td>@Account.DR.Display()</td>
+						<td>@Account.CR.Display()</td>
+						<td>@Account.Amount.Display()</td>
+						<td>
+							<button class="btn-print" @onclick="PrintLedger"></button>
+						</td>
+					</tr>
+				}
+			</tbody>
+			<tfoot></tfoot>
+		</table>
+	</div>
 
 }

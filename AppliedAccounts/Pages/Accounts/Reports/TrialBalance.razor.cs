@@ -2,9 +2,10 @@
 using AppliedDB;
 using AppMessages;
 using AppReports;
+using Microsoft.AspNetCore.Components.Forms;
 using System.Data;
-using static AppliedGlobals.AppValues;
 using static AppliedGlobals.AppErums;
+using static AppliedGlobals.AppValues;
 
 
 namespace AppliedAccounts.Pages.Accounts.Reports
@@ -13,7 +14,9 @@ namespace AppliedAccounts.Pages.Accounts.Reports
     {
         public string DBFile { get; set; }
         public TBModel MyModel { get; set; }
+        public List<TBListModel> AccList { get; set; }
         public DataSource Source { get; set; }
+        private EditContext? EditContext;
 
         public MessageClass MsgClass { get; set; } = new MessageClass();
 
@@ -22,20 +25,56 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
         }
 
-        protected override void OnInitialized()
+        protected override async Task  OnInitializedAsync()
         {
+            MyModel = new();
+            EditContext = new EditContext(MyModel);
+            EditContext.OnFieldChanged += async (sender, e) => await DisplayList();
             Source = new(AppGlobal.AppPaths);
             DBFile = AppGlobal.DBFile;
 
-            MyModel = new();
             GetKeys();
+            await DisplayList();
         }
+
+        #region Display List
+
+        private async Task DisplayList()
+        {
+            DataTable reportTable = MyModel.TB_Option switch
+            {
+                1 => await TB_All(),
+                2 => TB_Dates(MyModel.TB_From, MyModel.TB_To),
+                3 => TBOB_Data(),
+                _ => new DataTable()
+            };
+
+            if (reportTable == null || reportTable.Rows.Count == 0)
+            {
+                AccList = new List<TBListModel>();
+                return;
+            }
+
+            AccList = reportTable.AsEnumerable()
+                .Select(row => new TBListModel
+                {
+                    ID = row.Field<long>("ID"),
+                    Code = row.Field<string>("Code") ?? "",
+                    Title = row.Field<string>("Title") ?? "",
+                    DR = row.Field<decimal>("DR"),
+                    CR = row.Field<decimal>("CR")
+                })
+                .ToList();
+
+            await InvokeAsync(StateHasChanged);
+        }
+        #endregion
 
         #region Print Trial Balance
         public async void Print(ReportActionClass PrintAction)
         {
             MsgClass = new();           // Clear all previous messages - refresh
-            IsPrinting = true; 
+            IsPrinting = true;
             await InvokeAsync(StateHasChanged); await Task.Delay(100);
 
             try
@@ -49,7 +88,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                     ReportService.Print();
                     MsgClass = ReportService.MsgClass;
                 }
-                
+
             }
             catch (Exception error)
             {
@@ -76,9 +115,14 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             _Result.DataSetName = "dset_TB";
             _Result.ReportTable = _ReportTable;
 
+
             ReportService.Data = _Result;
             return _Result;
         }
+
+
+       
+
 
         public async Task CreateReportModel()
         {
@@ -136,22 +180,28 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
         #endregion
 
-
         #region Set and Get Keys
         public void SetKeys()
         {
-            AppRegistry.SetKey(DBFile, "TrialBalance", MyModel.TB_From, KeyTypes.From, "Trial Balance");
-            AppRegistry.SetKey(DBFile, "TrialBalance", MyModel.TB_To, KeyTypes.To);
-            AppRegistry.SetKey(DBFile, "TrialBalance", MyModel.TB_Option, KeyTypes.Number);
+            Source.SetKey("TB", MyModel.TB_From, KeyTypes.From, "Trial Balance");
+            Source.SetKey("TB", MyModel.TB_To, KeyTypes.To);
+            Source.SetKey("TB_Option", MyModel.TB_Option, KeyTypes.Number);
+            Source.SetKey("Tb_Type", MyModel.TB_Type, KeyTypes.Number);
         }
 
         public void GetKeys()
         {
-            MyModel.TB_From = AppRegistry.GetFrom(DBFile, "TrialBalance");
-            MyModel.TB_To = AppRegistry.GetTo(DBFile, "TrialBalance");
-            MyModel.TB_Option = AppRegistry.GetNumber(DBFile, "TrialBalance");
+            MyModel.TB_From = Source.GetFrom("TB");
+            MyModel.TB_To = Source.GetTo("TB");
+            MyModel.TB_Option = Source.GetNumber("TB_Option");
+            MyModel.TB_Option = Source.GetNumber("TB_Type");
         }
         #endregion
+
+        public void PrintLedger()
+        {
+            MsgClass.Add("Printing of Ledger is being generated...");
+        }
     }
 
     public class TBModel
@@ -160,6 +210,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         public DateTime TB_From { get; set; }
         public DateTime TB_To { get; set; }
         public int TB_Option { get; set; }
+        public int TB_Type { get; set; }
         public Dictionary<int, string> OptionTypes { get; set; } = new Dictionary<int, string>
         {
             { 1, "All" },
@@ -169,6 +220,16 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
         public ReportActionClass MyReportClass { get; set; }
 
+    }
+
+    public class TBListModel
+    {
+        public long ID { get; set; }
+        public string Code { get; set; }
+        public string Title { get; set; }
+        public decimal DR { get; set; }
+        public decimal CR { get; set; }
+        public decimal Amount => DR - CR;
 
     }
 }
