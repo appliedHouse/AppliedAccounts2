@@ -515,12 +515,10 @@ namespace AppliedDB
 
             if (_DataRow != null)
             {
-                _TaxRate = (decimal)_DataRow["Rate"];
+                _TaxRate = _DataRow.Field<decimal>("Rate");
             }
-
-
+            
             return _TaxRate;
-
         }
         #endregion
 

@@ -35,7 +35,7 @@
 }
 <PageHeading Text="Sale Invoice" />
 
-@if(MyModel.MsgClass.Count > 0)
+@if (MyModel.MsgClass.Count > 0)
 {
     <PageErrors Messages="@MyModel.MsgClass"></PageErrors>
 }
@@ -97,9 +97,16 @@
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
                                 <InputSelect id="ddSaleman" class="form-select" TValue="long" Value="@MyModel.MyVoucher.Master.Employee" ValueExpression="@(() => MyModel.MyVoucher.Master.Employee)" ValueChanged="@((e) => EmployeeChanged(e))">
-                                    @foreach (CodeTitle _CodeTitle in MyModel.Employees)
+                                    @if (MyModel.Employees != null)
                                     {
-                                        <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                        @foreach (CodeTitle _CodeTitle in MyModel.Employees)
+                                        {
+                                            <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value=0>No Employee</option>
                                     }
                                 </InputSelect>
                                 <label for="ddSaleman">Saleman</label>
@@ -112,9 +119,16 @@
                                              Value="@MyModel.MyVoucher.Master.Company"
                                              ValueExpression="@(() => MyModel.MyVoucher.Master.Company)"
                                              ValueChanged="@((e) => CompanyChanged(e))">
-                                    @foreach (CodeTitle _CodeTitle in MyModel.Companies)
+                                    @if (MyModel.Companies != null)
                                     {
-                                        <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                        @foreach (CodeTitle _CodeTitle in MyModel.Companies)
+                                        {
+                                            <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value=0>No Client / Customer</option>
                                     }
                                 </InputSelect>
                                 <label for="ddSaleman">Client / Customer</label>
@@ -151,9 +165,16 @@
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
                                 <InputSelect id="ddInventory" class="form-select" TValue="long" Value="@MyModel.MyVoucher.Detail.Inventory" ValueExpression="@(() => MyModel.MyVoucher.Detail.Inventory)" ValueChanged="@((e) => InventoryChanged(e))">
-                                    @foreach (CodeTitle _CodeTitle in MyModel.Inventory)
+                                    @if (MyModel.Inventory != null)
                                     {
-                                        <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                        @foreach (CodeTitle _CodeTitle in MyModel.Inventory)
+                                        {
+                                            <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value=0>No Stock</option>
                                     }
                                 </InputSelect>
                                 <label for="ddSaleman">Stock</label>
@@ -172,9 +193,16 @@
                                              Value="@MyModel.MyVoucher.Detail.Unit"
                                              ValueExpression="@(() => MyModel.MyVoucher.Detail.Unit)"
                                              ValueChanged="@((e) => UnitChanged(e))">
-                                    @foreach (CodeTitle _CodeTitle in MyModel.Units)
+                                    @if (MyModel.Units != null)
                                     {
-                                        <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                        @foreach (CodeTitle _CodeTitle in MyModel.Units)
+                                        {
+                                            <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value=0>No Unit</option>
                                     }
                                 </InputSelect>
                                 <label for="ddUnits">Unit of Measure</label>
@@ -199,7 +227,7 @@
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
                                 @* <FormatedInputNumber Value="@MyModel.GetGross()" /> *@
-                                <InputNumber id="txtAmount" class="form-control right" readonly Value="@MyModel.MyVoucher.Detail.Gross" ValueExpression="(()=> MyModel.MyVoucher.Detail.Gross)" placeholder="Sale Price" />
+                                <InputNumber id="txtAmount" class="form-control right" readonly Value="@MyModel.MyVoucher.Detail.Gross" ValueExpression="(() => MyModel.MyVoucher.Detail.Gross)" placeholder="Sale Price" />
                                 <label for="txtAmount">Amount</label>
                             </div>
                         </div>
@@ -210,10 +238,19 @@
                                              Value="@MyModel.MyVoucher.Detail.Project"
                                              ValueExpression="@(() => MyModel.MyVoucher.Detail.Project)"
                                              ValueChanged="@((e) => ProjectChanged(e))">
-                                    @foreach (CodeTitle _CodeTitle in MyModel.Projects)
+                                    @if (MyModel.Projects != null)
                                     {
-                                        <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                        @foreach (CodeTitle _CodeTitle in MyModel.Projects)
+                                        {
+                                            <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                        }
                                     }
+                                    else
+                                    {
+                                        <option value=0>No Project</option>
+                                    }
+                                    )
+
                                 </InputSelect>
                                 <label for="ddProject">Projects</label>
                             </div>
@@ -224,10 +261,18 @@
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
                                 <InputSelect id="ddTaxID" class="form-select" TValue="long" Value="@MyModel.MyVoucher.Detail.TaxID" ValueExpression="@(() => MyModel.MyVoucher.Detail.TaxID)" ValueChanged="@((e) => TaxChanged(e))">
-                                    @foreach (CodeTitle _CodeTitle in MyModel.Taxes)
+                                    @if (MyModel.Taxes != null)
                                     {
-                                        <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                        @foreach (CodeTitle _CodeTitle in MyModel.Taxes)
+                                        {
+                                            <option value=@_CodeTitle.ID>@_CodeTitle.Title</option>
+                                        }
                                     }
+                                    else
+                                    {
+                                        <option value=0>No Tax</option>
+                                    }
+
                                 </InputSelect>
                                 <label for="ddTaxID">Tax Category</label>
                             </div>
@@ -242,13 +287,13 @@
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
 
-                                <InputNumber id="txtTaxAmount" class="form-control" readonly Value="@MyModel.MyVoucher.Detail.TaxAmount" ValueExpression="(()=> MyModel.MyVoucher.Detail.TaxAmount)" placeholder="Tax Amount" />
+                                <InputNumber id="txtTaxAmount" class="form-control" readonly Value="@MyModel.MyVoucher.Detail.TaxAmount" ValueExpression="(() => MyModel.MyVoucher.Detail.TaxAmount)" placeholder="Tax Amount" />
                                 <label for="txtTaxAmount">Tax Amount</label>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-1">
-                                <InputNumber id="txtNetAmount" class="form-control" readonly Value="@MyModel.MyVoucher.Detail.NetAmount" ValueExpression="(()=> MyModel.MyVoucher.Detail.NetAmount)" placeholder="Net Amount" />
+                                <InputNumber id="txtNetAmount" class="form-control" readonly Value="@MyModel.MyVoucher.Detail.NetAmount" ValueExpression="(() => MyModel.MyVoucher.Detail.NetAmount)" placeholder="Net Amount" />
                                 <label for="txtNetAmount">Net Amount</label>
                             </div>
                         </div>
@@ -269,11 +314,11 @@
                 <div class="grid gap-0 column-gap-3 ctrl-gap">
                     <button @onclick="MyModel.New" class="btn ctrl ctrl-new"><i class="bi bi-file-plus"></i></button>
                     <button @onclick="MyModel.Save" class="btn ctrl ctrl-edit"><i class="bi bi-floppy"></i></button>
-                    
+
                     
                     @if (MyModel.Count > 0)
                     {
-                       
+
                         //<button @onclick="MyModel.Remove" class="btn ctrl ctrl-del"><i class="bi bi-trash"></i></button>
 
                         
@@ -288,26 +333,26 @@
                         {
                             <ReportingButtons ReturnValue="Print" ID="@MyModel.MyVoucher.Master.ID1" />
                             <div class="btn-group" role="group" aria-label="Navigation Buttons" id="printBtns">
-                                <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Print);})">
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="(() => { Print(ReportType.Print); })">
                                     <i class="bi bi-printer"></i>
                                 </button>
 
-                                <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Preview);})">
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="(() => { Print(ReportType.Preview); })">
                                     <i class="bi bi-search"></i>
                                 </button>
-                                <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.PDF);})">
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="(() => { Print(ReportType.PDF); })">
                                     <i class="bi bi-file-pdf"></i>
                                 </button>
-                                <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Excel);})">
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="(() => { Print(ReportType.Excel); })">
                                     <i class="bi bi-file-earmark-excel"></i>
                                 </button>
-                                <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Word);})">
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="(() => { Print(ReportType.Word); })">
                                     <i class="bi bi-file-earmark-word"></i>
                                 </button>
-                                <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.HTML);})">
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="(() => { Print(ReportType.HTML); })">
                                     <i class="bi bi-filetype-html"></i>
                                 </button>
-                                <button type="button" class="btn ctrl ctrl-print" @onclick="(()=>{Print(ReportType.Image);})">
+                                <button type="button" class="btn ctrl ctrl-print" @onclick="(() => { Print(ReportType.Image); })">
                                     <i class="bi bi-file-earmark-image"></i>
                                 </button>
                             </div>
@@ -323,7 +368,8 @@
                     <button type="submit" class=" btn ctrl ctrl-backPage" @onclick="BackPage">
                         <i class="bi bi-arrow-left-circle-fill"></i>
                     </button>
-                   
+                    <button @onclick="Test" class="btn ctrl ctrl-edit"><i class="bi bi-floppy"></i></button>
+
                 </div>
             </div>
 
@@ -369,7 +415,7 @@
                                     <td class="amount-blue">@MyModel.ToAmount(@SaleRecord.TaxAmount)</td>
                                     <td class="amount-blue">@MyModel.ToAmount(@SaleRecord.NetAmount)</td>
                                     <td style="text-align:center">
-                                        <button type="button" id="si_btn_edit" class="btn btn-link btn-edit" title="Edit" @onclick="()=>MyModel.Edit(SaleRecord.ID2)">
+                                        <button type="button" id="si_btn_edit" class="btn btn-link btn-edit" title="Edit" @onclick="() => MyModel.Edit(SaleRecord.ID2)">
                                             <i class="bi bi-pencil-fill"></i>
                                         </button>
                                         <button class="btn btn-Del" @onclick="(() => MyModel.Remove(SaleRecord.Sr_No))"><i class="fa fa-trash-can"></i></button>
@@ -393,7 +439,7 @@
                                     <td class="amount-blue">@MyModel.ToAmount(@SaleRecord.TaxAmount)</td>
                                     <td class="amount-blue">@MyModel.ToAmount(@SaleRecord.NetAmount)</td>
                                     <td style="text-align:center">
-                                        <button type="button" id="si_btn_edit" class="btn btn-link btn-UnDel" title="UnDelete" @onclick="()=>Delete(SaleRecord.Sr_No)">
+                                        <button type="button" id="si_btn_edit" class="btn btn-link btn-UnDel" title="UnDelete" @onclick="() => Delete(SaleRecord.Sr_No)">
                                             <i class="bi bi-recycle"></i>
                                         </button>
                                     </td>

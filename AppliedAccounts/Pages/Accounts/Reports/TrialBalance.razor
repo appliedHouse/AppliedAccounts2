@@ -6,105 +6,213 @@
 
 @code {
 
-	bool IsPageValidae = false;
-	bool IsPrinting = false;
-
+	
 	
 }
 
-<PageHeading Text="Trial Balance"/>
+<PageHeading Text="Trial Balance" />
 
 
 @if (IsPrinting)
 {
-	<div class="alert alert-primary d-flex align-items-center" role="alert">
-		<div class="spinner-border text-primary me-2" role="status" aria-hidden="true"></div>
-		<div>
-			Loading printing data, please wait...
-		</div>
-	</div>
+    <div class="alert alert-primary d-flex align-items-center" role="alert">
+        <div class="spinner-border text-primary me-2" role="status" aria-hidden="true"></div>
+        <div>
+            Loading printing data, please wait...
+        </div>
+    </div>
 }
 
 @if (MsgClass.Count > 0)
 {
-	<PageErrors Messages="@MsgClass" />
+    <PageErrors Messages="@MsgClass" />
 }
 
-@if (!IsPageValidae)
+
+    <EditForm Model="MyModel">
+        <div class="container">
+            <div class="row flex-md-row">
+
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <InputDate id="DateFrom" class="form-control" @bind-Value="MyModel.TB_From"></InputDate>
+                        <label for="DateFrom">From</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <InputDate id="DateTo" class="form-control" @bind-Value="MyModel.TB_To"></InputDate>
+                        <label for="DateFrom">To</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" @bind="MyModel.TB_Type" @bind:after="DisplayList">
+                        @foreach (var option in OptionTypes)
+                        {
+                            <option value="@option.Key">@option.Value</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" @bind="MyModel.TB_Option" @bind:after="DisplayList">
+                        @foreach (var option in TB_Options)
+                        {
+                            <option value="@option.Key">@option.Value</option>
+                        }
+
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <div style="display: flex; justify-content: flex-end;">
+                        @if (!IsPrinting)
+                        {
+                            <ReportingButtons ReturnValue="Print" />
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @if (MyModel.TB_Option > 1)
+            {
+                <div class="row flex-md-row">
+
+                    @if (MyModel.TB_Option == 2)
+                    {
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <InputSelect id="ddProject" class="form-control item-height" TValue="long" Value="@MyModel.ProjectID" ValueExpression="@(() => @MyModel.ProjectID)" ValueChanged="@((e) => ProjectIDChanged(e))">
+                                    @if (MyModel.Projects.Any())
+                                    {
+                                        @foreach (var item in MyModel.Projects)
+                                        {
+                                            <option value="@item.ID">@item.Title</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value="0">No Records - Project</option>
+                                    }
+
+                                </InputSelect>
+                                <label for="ddProject">Project</label>
+                            </div>
+                        </div>
+
+                    }
+                    else if (MyModel.TB_Option == 3)
+                    {
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <InputSelect id="ddCompany" class="form-control item-height" TValue="long" Value="@MyModel.CompanyID" ValueExpression="@(() => @MyModel.CompanyID)" ValueChanged="@((e) => CompanyIDChanged(e))">
+                                    @if (MyModel.Companies.Any())
+                                    {
+                                        @foreach (var item in MyModel.Companies)
+                                        {
+                                            <option value="@item.ID">@item.Title</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value="0">No Records -  Company</option>
+                                    }
+
+                                </InputSelect>
+                                <label for="ddCompany">Company / Customer / Sub Account</label>
+                            </div>
+                        </div>
+
+                    }
+                    else if (MyModel.TB_Option == 4)
+                    {
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <InputSelect id="ddEmployee" class="form-control item-height" TValue="long" Value="@MyModel.EmployeeID" ValueExpression="@(() => @MyModel.EmployeeID)" ValueChanged="@((e) => EmployeeIDChanged(e))">
+                                    @if (MyModel.Employees.Any())
+                                    {
+                                        @foreach (var item in MyModel.Employees)
+                                        {
+                                            <option value="@item.ID">@item.Title</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value="0">No Records - Employee</option>
+                                    }
+
+                                </InputSelect>
+                                <label for="ddEmployee">Employee</label>
+                            </div>
+                        </div>
+                    }
+
+
+                </div>
+            }
+
+        </div>
+    </EditForm>
+
+@if (IsPageValidate)
 {
-	<EditForm Model="MyModel" OnValidSubmit="DisplayList">
-		<div class="container">
-			<div class="row flex-md-row">
-				
-				<div class="col-md-3">
-					<div class="form-floating">
-						<InputDate id="DateFrom" class="form-control" @bind-Value="MyModel.TB_From" @bind-Value:after="DisplayList"></InputDate>
-						<label for="DateFrom">From</label>
-					</div>
-				</div>
-				<div class="col-md-3">
-					<div class="form-floating">
-						<InputDate id="DateTo" class="form-control" @bind-Value="MyModel.TB_To" @bind-Value:after="DisplayList"></InputDate>
-						<label for="DateFrom">To</label>
-					</div>
-				</div>
-				<div class="col-md-2">
-					<select @bind="MyModel.TB_Option" @bind:after="DisplayList"  class="form-select">
-						@foreach (var option in MyModel.OptionTypes)
-						{
-							<option value="@option.Key">@option.Value</option>
-						}
-					</select>
-				</div>
-				<div class="col-md-2">
-					<select class="form-select" @bind="MyModel.TB_Type" @bind:after="DisplayList">
-						<option value="1">Trial Balance</option>
-						<option value="2">Project Balances</option>
-						<option value="3">Company Balances</option>
-						<option value="4">Employee Balances</option>
-					</select>
-				</div>
-				<div class="col-md-2">
-					<div style="display: flex; justify-content: flex-end;">
-						@if (!IsPrinting)
-						{
-							<ReportingButtons ReturnValue="Print"/>
-						}
-					</div>
-				</div>
-			</div>
-		</div>
-	</EditForm>
-
-	<div class="container mt-2">
-		<table class="table-list">
-			<thead>
-				<tr>
-					<th>Code</th>
-					<th>Title</th>
-					<th>Debit</th>
-					<th>Credit</th>
-					<th>Amount</th>
-					<th>Ledger</th>
-				</tr>
-			</thead>
-			<tbody>
-				@foreach (TBListModel Account in AccList)
-				{
-					<tr>
-						<td>@Account.Code</td>
-						<td>@Account.Title</td>
-						<td>@Account.DR.Display()</td>
-						<td>@Account.CR.Display()</td>
-						<td>@Account.Amount.Display()</td>
-						<td>
-							<button class="btn-print" @onclick="PrintLedger"></button>
-						</td>
-					</tr>
-				}
-			</tbody>
-			<tfoot></tfoot>
-		</table>
-	</div>
+    @if (AccList != null && AccList.Any())
+    {
+        <div class="container mt-2">
+            <table class="table-list">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Title</th>
+                        <th>Debit</th>
+                        <th>Credit</th>
+                        <th>Amount</th>
+                        <th>Ledger</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (TBListModel Account in AccList)
+                    {
+                        <tr>
+                            <td>@Account.Code</td>
+                            <td class="left">@Account.Title</td>
+                            <td class="right">@Account.DR.Display()</td>
+                            <td class="right">@Account.CR.Display()</td>
+                            <td class="right @(Account.Amount >= 0 ? "dr-color" : "cr-color")">@Account.Amount.DR_CR()</td>
+                            <td>
+                                <button class="btn-print" @onclick="PrintLedger">
+                                    <i class="bi bi-printer"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot></tfoot>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info" role="alert">
+            No accounts found for the selected criteria.
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        Page is not valid to display any contents.
+    </div>
 
 }
+
+
+<style>
+    .dr-color {
+        color: #1e7e34; /* #28a745; /* Green for DR */
+        font-weight: 500;
+    }
+
+    .cr-color {
+        color: #007bff; /* Blue for CR */
+        font-weight: 500;
+    }
+</style>

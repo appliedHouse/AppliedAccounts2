@@ -156,6 +156,13 @@ namespace AppliedAccounts.Data
             return _decimal.ToString("N2", CultureInfo.CurrentCulture);
         }
 
+        public static string DR_CR(this decimal _decimal)
+        {
+            // Show Display decimal as 123,456,789.99 DR or 123,456,789.99 CR
+            string formattedNumber = Math.Abs(_decimal).ToString("N2", CultureInfo.CurrentCulture);
+            string suffix = _decimal < 0 ? "CR" : "DR";
+            return $"{formattedNumber} {suffix}";
+        }
     }
 
 

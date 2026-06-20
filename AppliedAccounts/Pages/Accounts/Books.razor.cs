@@ -1,6 +1,5 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
-using AppliedAccounts.Services;
 using Microsoft.AspNetCore.Components;
 using System.Data;
 

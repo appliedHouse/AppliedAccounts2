@@ -449,12 +449,12 @@ namespace SQLQueries
         {
             var Text = new StringBuilder();
             Text.AppendLine("SELECT * FROM (");
-            Text.AppendLine("SELECT [Ledger].[COA], [COA].[Code], [COA].[Title], ");
+            Text.AppendLine("SELECT [COA].[ID],[Ledger].[COA], [COA].[Code], [COA].[Title], ");
             Text.AppendLine("SUM([Ledger].[DR]) AS [DR], ");
             Text.AppendLine("SUM([Ledger].[CR]) AS [CR], ");
             Text.AppendLine("SUM([Ledger].[DR] - [Ledger].[CR]) AS [BAL] ");
             Text.AppendLine("FROM [Ledger] ");
-            Text.AppendLine("LEFT JOIN[COA] ON[COA].[ID] = [Ledger].[COA] ");
+            Text.AppendLine("LEFT JOIN [COA] ON[COA].[ID] = [Ledger].[COA] ");
             if (_Filter.Length > 0) { Text.AppendLine($" WHERE {_Filter} "); }
             Text.AppendLine("GROUP BY [COA] ");
             Text.AppendLine(") WHERE BAL <> 0 ");
@@ -467,7 +467,7 @@ namespace SQLQueries
         {
             var Text = new StringBuilder();
             Text.AppendLine("SELECT * FROM (");
-            Text.AppendLine("SELECT [Ledger].[COA], [COA].[Code], [COA].[Title], ");
+            Text.AppendLine("SELECT [COA].[ID],[Ledger].[COA], [COA].[Code], [COA].[Title], ");
             Text.AppendLine("SUM([Ledger].[DR]) AS [DR], ");
             Text.AppendLine("SUM([Ledger].[CR]) AS [CR], ");
             Text.AppendLine("SUM([Ledger].[DR] - [Ledger].[CR]) AS [BAL] ");

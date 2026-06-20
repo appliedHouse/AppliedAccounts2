@@ -246,14 +246,24 @@ namespace AppliedAccounts.Models
         #region Get & Set Keys
         internal void SetKeys()
         {
-            if (!string.IsNullOrEmpty(Source.DBFile))
+            if(Source != null)
             {
-                AppRegistry.SetKey(Source.DBFile, "BkNatureID", BookNatureID, KeyType.Number);
-                AppRegistry.SetKey(Source.DBFile, "BkBook", BookID, KeyType.Number, "Cash / Bank BooK");
-                AppRegistry.SetKey(Source.DBFile, "BkBook", DT_Start, KeyType.From);
-                AppRegistry.SetKey(Source.DBFile, "BkBook", DT_End, KeyType.To);
-                AppRegistry.SetKey(Source.DBFile, "BkBook", SearchText, KeyType.Text);
+                Source.SetKey("BkNatureID", BookNatureID, KeyType.Number);
+                Source.SetKey("BkBook", BookID, KeyType.Number);
+                Source.SetKey("BkBook", DT_Start, KeyType.From);
+                Source.SetKey("BkBook", DT_End, KeyType.To);
+                Source.SetKey("BkBook", SearchText, KeyType.Text);
             }
+
+
+            //if (!string.IsNullOrEmpty(Source.DBFile))
+            //{
+            //    AppRegistry.SetKey(Source.DBFile, "BkNatureID", BookNatureID, KeyType.Number);
+            //    AppRegistry.SetKey(Source.DBFile, "BkBook", BookID, KeyType.Number, "Cash / Bank BooK");
+            //    AppRegistry.SetKey(Source.DBFile, "BkBook", DT_Start, KeyType.From);
+            //    AppRegistry.SetKey(Source.DBFile, "BkBook", DT_End, KeyType.To);
+            //    AppRegistry.SetKey(Source.DBFile, "BkBook", SearchText, KeyType.Text);
+            //}
         }
 
         internal void GetKeys()
