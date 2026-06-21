@@ -126,7 +126,7 @@ namespace AppliedAccounts.Pages.Sale
             NavManager.NavigateTo("/Sale/SaleInvoiceList");
         }
 
-       
+
 
         #endregion
 
@@ -149,15 +149,15 @@ namespace AppliedAccounts.Pages.Sale
         #region Test
         public void Test()
         {
-            MyModel = new(AppGlobal);
-            MyModel.Source ??= new(AppGlobal.AppPaths);
+            if (MyModel == null) { return; }
+            if (MyModel.Source == null) { return; }
 
             MyModel.MyVoucher.Master.ID1 = 0;
             MyModel.MyVoucher.Master.Inv_Date = new DateTime(2026, 08, 12);
             MyModel.MyVoucher.Master.Pay_Date = new DateTime(2026, 08, 12);
             MyModel.MyVoucher.Master.Vou_Date = new DateTime(2026, 08, 12);
             MyModel.MyVoucher.Master.Vou_No = "New";
-            MyModel.MyVoucher.Master.Employee = 0;
+            MyModel.MyVoucher.Master.Employee = 2;
             MyModel.MyVoucher.Master.Company = 3;
             MyModel.MyVoucher.Master.Ref_No = "FBR-001";
             MyModel.MyVoucher.Master.Inv_No = "FBR-001";
@@ -166,7 +166,7 @@ namespace AppliedAccounts.Pages.Sale
             MyModel.MyVoucher.Master.Comments = "FBR Invoice 001";
             MyModel.MyVoucher.Master.Status = VoucherTypeClass.VoucherStatus.Submitted.ToString();
             MyModel.MyVoucher.Master.TitleCompany = MyModel.Source.SeekTitle(Enums.Tables.Customers, 3);
-            MyModel.MyVoucher.Master.TitleEmployee = "";
+            MyModel.MyVoucher.Master.TitleEmployee = MyModel.Source.SeekTitle(Enums.Tables.Customers, 2);
 
             MyModel.MyVoucher.Detail.ID2 = 0;
             MyModel.MyVoucher.Detail.TranID = 0;
@@ -180,9 +180,6 @@ namespace AppliedAccounts.Pages.Sale
             MyModel.MyVoucher.Detail.TaxRate = 18.00M;
             MyModel.MyVoucher.Detail.Description = "FBR Invoice 001";
             MyModel.MyVoucher.Detail.Project = 0;
-
-
-
         }
         #endregion
 

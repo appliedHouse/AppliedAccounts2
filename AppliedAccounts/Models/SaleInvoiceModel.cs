@@ -475,23 +475,17 @@ namespace AppliedAccounts.Models
             MsgClass = new();
             bool isSaved = true;
 
-
-            // =============================
-            // BEGIN TRANSACTION
-            // =============================
-            Source.BeginTransaction();
-
             try
             {
+                Source.BeginTransaction();
+
                 // Generate Voucher No if NEW
                 if (MyVoucher.Master.Vou_No?.ToUpper() == "NEW")
                 {
                     MyVoucher.Master.Vou_No = NewVoucherNo.GetNewVoucherNo(Source.DBFile, Tables.BillReceivable, "BR");
                 }
 
-                // =============================
-                // 1️⃣ CREATE MASTER ROW
-                // =============================
+                // CREATE MASTER ROW
                 DataRow masterRow = Source.GetNewRow(Tables.BillReceivable);
 
                 masterRow["ID"] = MyVoucher.Master.ID1;
@@ -506,7 +500,7 @@ namespace AppliedAccounts.Models
                 masterRow["Amount"] = CalculateNetAmount();
                 masterRow["Description"] = MyVoucher.Master.Remarks;
                 masterRow["Comments"] = MyVoucher.Master.Comments;
-                masterRow["Status"] = Submitted.ToString();
+                masterRow["Status"] =   Submitted.ToString();
 
                 if (!Validate_Master(masterRow))
                 {
@@ -516,9 +510,7 @@ namespace AppliedAccounts.Models
                 }
 
 
-                // =============================
-                // 2️⃣ SAVE MASTER
-                // =============================
+                // SAVE MASTER
                 CommandClass masterCommand = new(masterRow, Source.MyConnection, Source.DBtransaction!);
 
                 if (!masterCommand.SaveChanges())
@@ -536,9 +528,7 @@ namespace AppliedAccounts.Models
 
                 long saleInvoiceID = MyVoucher.Master.ID1;
 
-                // =============================
-                // 3️⃣ DELETE REMOVED DETAILS
-                // =============================
+                // DELETE REMOVED DETAILS
                 if (isSaved && Deleted != null && Deleted.Count > 0)
                 {
                     foreach (var item in Deleted)
@@ -567,9 +557,7 @@ namespace AppliedAccounts.Models
                     }
                 }
 
-                // =============================
-                // 4️⃣ SAVE DETAILS
-                // =============================
+                // SAVE DETAILS
                 if (isSaved)
                 {
                     foreach (var item in MyVoucher.Details)
@@ -607,17 +595,13 @@ namespace AppliedAccounts.Models
                     }
                 }
 
-                // =============================
-                // 5️⃣ COMMIT / ROLLBACK
-                // =============================
+                // COMMIT / ROLLBACK
                 if (isSaved)
                     Source.CommitTransaction();
                 else
                     Source.RollbackTransaction();
 
-                // =============================
-                // 6️⃣ REFRESH DATA
-                // =============================
+                // REFRESH DATA
                 if (isSaved)
                 {
                     CalculateTotal();
@@ -681,7 +665,7 @@ namespace AppliedAccounts.Models
             if (_PayDate < _InvDate) { MsgClass.Add(MESSAGE.Row_LessPay_Date); _return = false; }
 
             if (rowMaster.Field<long>("Company") == 0) { MsgClass.Add(MESSAGE.Row_CompanyIDZero); _return = false; }
-            //if (rowMaster.Field<long>("Employee") == 0) { MyVoucher.Master.Employee = DBNull.Value; _return = false; }
+            if (rowMaster.Field<long>("Employee") == 0) { MsgClass.Add(MESSAGE.Row_EmployeeIDZero); _return = false; }
             if (string.IsNullOrEmpty(rowMaster.Field<string>("Ref_No"))) { MsgClass.Add(MESSAGE.RefNoIsNull); _return = false; }
             if (rowMaster.Field<decimal>("Amount") == 0) { MsgClass.Add(MESSAGE.VoucherAmountIsZero); _return = false; }
             if (rowMaster.Field<string>("Description") == null) { MsgClass.Add(MESSAGE.Row_NoRemarks); _return = false; }

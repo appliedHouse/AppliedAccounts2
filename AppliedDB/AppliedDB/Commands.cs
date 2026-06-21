@@ -142,10 +142,10 @@ namespace AppliedDB
                 }
                 catch (Exception ex)
                 {
-                    if (CommandInsert.Transaction != null)
-                    {
-                        try { CommandInsert.Transaction.Rollback(); } catch { }
-                    }
+                    //if (CommandInsert.Transaction != null)
+                    //{
+                    //    try { CommandInsert.Transaction.Rollback(); } catch { }
+                    //}
                     MyMessages.Danger(ex.Message);
                     return false;
                 }
