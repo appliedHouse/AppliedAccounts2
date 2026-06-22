@@ -146,6 +146,17 @@ namespace AppliedAccounts.Pages.Sale
         #endregion
 
 
+        public void CopyVouDate()
+        {
+            MyModel.MyVoucher.Master.Inv_Date = MyModel.MyVoucher.Master.Vou_Date;
+            
+        }
+
+        public void CopyInvDate()
+        {
+            MyModel.MyVoucher.Master.Pay_Date = MyModel.MyVoucher.Master.Inv_Date;
+        }
+
         #region Test
         public void Test()
         {
@@ -153,32 +164,32 @@ namespace AppliedAccounts.Pages.Sale
             if (MyModel.Source == null) { return; }
 
             MyModel.MyVoucher.Master.ID1 = 0;
-            MyModel.MyVoucher.Master.Inv_Date = new DateTime(2026, 08, 12);
-            MyModel.MyVoucher.Master.Pay_Date = new DateTime(2026, 08, 12);
-            MyModel.MyVoucher.Master.Vou_Date = new DateTime(2026, 08, 12);
+            MyModel.MyVoucher.Master.Inv_Date = new DateTime(2025, 08, 28);
+            MyModel.MyVoucher.Master.Pay_Date = new DateTime(2025, 08, 28);
+            MyModel.MyVoucher.Master.Vou_Date = new DateTime(2025, 12, 31);
             MyModel.MyVoucher.Master.Vou_No = "New";
             MyModel.MyVoucher.Master.Employee = 2;
             MyModel.MyVoucher.Master.Company = 3;
-            MyModel.MyVoucher.Master.Ref_No = "FBR-001";
-            MyModel.MyVoucher.Master.Inv_No = "FBR-001";
+            MyModel.MyVoucher.Master.Ref_No = "FBR-003";
+            MyModel.MyVoucher.Master.Inv_No = "FBR-003";
             MyModel.MyVoucher.Master.Amount = 0;
-            MyModel.MyVoucher.Master.Remarks = "FBR Invoice 001";
-            MyModel.MyVoucher.Master.Comments = "FBR Invoice 001";
+            MyModel.MyVoucher.Master.Remarks = "FBR Invoice 003";
+            MyModel.MyVoucher.Master.Comments = "FBR Invoice 003";
             MyModel.MyVoucher.Master.Status = VoucherTypeClass.VoucherStatus.Submitted.ToString();
             MyModel.MyVoucher.Master.TitleCompany = MyModel.Source.SeekTitle(Enums.Tables.Customers, 3);
-            MyModel.MyVoucher.Master.TitleEmployee = MyModel.Source.SeekTitle(Enums.Tables.Customers, 2);
+            MyModel.MyVoucher.Master.TitleEmployee = MyModel.Source.SeekTitle(Enums.Tables.Employees, 2);
 
             MyModel.MyVoucher.Detail.ID2 = 0;
             MyModel.MyVoucher.Detail.TranID = 0;
             MyModel.MyVoucher.Detail.Sr_No = 1;
             MyModel.MyVoucher.Detail.Inventory = 7;
             MyModel.MyVoucher.Detail.Batch = "FBR-May2026";
-            MyModel.MyVoucher.Detail.Qty = 1;
-            MyModel.MyVoucher.Detail.Rate = 561000.00M;
+            MyModel.MyVoucher.Detail.Qty = 4;
+            MyModel.MyVoucher.Detail.Rate = 7068887.75M;
             MyModel.MyVoucher.Detail.Unit = 2;
             MyModel.MyVoucher.Detail.TaxID = 2;
             MyModel.MyVoucher.Detail.TaxRate = 18.00M;
-            MyModel.MyVoucher.Detail.Description = "FBR Invoice 001";
+            MyModel.MyVoucher.Detail.Description = "FBR Invoice 003";
             MyModel.MyVoucher.Detail.Project = 0;
         }
         #endregion

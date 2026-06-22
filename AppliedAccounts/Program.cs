@@ -30,7 +30,7 @@ builder.Services.AddScoped<MessagesService>();
 builder.Services.AddScoped<GlobalService>();
 builder.Services.AddToastNotification(options =>
 {
-    options.DefaultDuration = 3000;
+    options.DefaultDuration = 8000;
     options.DefaultPosition = ToastPosition.BottomEnd;
 });
 

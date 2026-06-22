@@ -48,8 +48,8 @@ function showAcordion() {
 // Show Toast Notification
 window.showBlazorToast = () => {
     var toastEl = document.getElementById('blazorToast');
-    toastEl.style.display = "block"; // Ensure it's visible
-    var toast = new bootstrap.Toast(toastEl, { delay: 5000 }); // Auto-hide after 5 seconds
+    toastEl.style.display = "block";
+    var toast = new bootstrap.Toast(toastEl, { delay: 100000 });
     toast.show();
 };
 

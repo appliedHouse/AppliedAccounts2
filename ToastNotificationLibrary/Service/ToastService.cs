@@ -8,6 +8,7 @@ public class ToastService : IToastService, IDisposable
 {
     public event Action<ToastMessage>? OnShow;
     public event Action? OnHide;
+    public int DefaultTime = 8000;
 
     private CancellationTokenSource? _cancellationTokenSource;
     private ToastMessage? _currentToast;
@@ -18,22 +19,22 @@ public class ToastService : IToastService, IDisposable
         _options = serviceProvider.GetService(typeof(ToastOptions)) as ToastOptions;
     }
 
-    public void ShowSuccess(string message, int duration = 3000)
+    public void ShowSuccess(string message, int duration = 8000)
         => Show(new ToastMessage(message, ToastLevel.Success, GetEffectiveDuration(duration)));
 
-    public void ShowError(string message, int duration = 3000)
+    public void ShowError(string message, int duration = 8000)
         => Show(new ToastMessage(message, ToastLevel.Error, GetEffectiveDuration(duration)));
 
-    public void ShowWarning(string message, int duration = 3000)
+    public void ShowWarning(string message, int duration = 8000)
         => Show(new ToastMessage(message, ToastLevel.Warning, GetEffectiveDuration(duration)));
 
-    public void ShowInfo(string message, int duration = 3000)
+    public void ShowInfo(string message, int duration = 8000)
         => Show(new ToastMessage(message, ToastLevel.Info, GetEffectiveDuration(duration)));
 
     private int GetEffectiveDuration(int duration)
     {
-        // If options provided and caller used the library default (3000), prefer configured DefaultDuration
-        if (_options != null && duration == 3000)
+        // If options provided and caller used the library default (8000), prefer configured DefaultDuration
+        if (_options != null && duration == DefaultTime)
         {
             return _options.DefaultDuration;
         }

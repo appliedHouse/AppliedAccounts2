@@ -6,6 +6,7 @@ using AppMessages;
 using AppReports;
 using Microsoft.AspNetCore.Components;
 using SQLQueries;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using static AppliedAccounts.Data.AppRegistry;
 using static AppliedDB.Enums.Status;
@@ -17,6 +18,7 @@ namespace AppliedAccounts.Models
 {
     public class SaleInvoiceModel : IVoucher
     {
+
         #region Variables
         public long SaleInvoiceID { get; set; }
         public DataSource Source { get; set; }
@@ -267,12 +269,13 @@ namespace AppliedAccounts.Models
             if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgClass.Add(MESSAGE.VouDateLess); }
             if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgClass.Add(MESSAGE.VouDateMore); }
             if (MyVoucher.Master.Company == 0) { MsgClass.Add(MESSAGE.Row_CompanyIDZero); }
-            //if (MyVoucher.Master.Employee == 0) { MsgClass.Add(MESSAGE.Row_EmployeeIDZero); }
+            if (MyVoucher.Master.Employee == 0) { MsgClass.Add(MESSAGE.Row_EmployeeIDZero); }
             if (MyVoucher.Master.Remarks.Length == 0) { MsgClass.Add(MESSAGE.Row_NoRemarks); }
             if (MyVoucher.Master.Status.Length == 0) { MsgClass.Add(MESSAGE.Row_NoStatus); }
 
             if (MyVoucher.Detail.Sr_No == 0) { MsgClass.Add(MESSAGE.SerialNoIsZero); }
             if (MyVoucher.Detail.Inventory == 0) { MsgClass.Add(MESSAGE.Row_InventoryIDZero); }
+            if (MyVoucher.Detail.Project == 0) { MsgClass.Add(MESSAGE.Row_ProjectIDZero); }
 
             if (MyVoucher.Detail.Unit == 0) { MsgClass.Add(MESSAGE.Row_UnitIDZero); }
             if (MyVoucher.Detail.Qty == 0) { MsgClass.Add(MESSAGE.Row_QtyZero); }
@@ -474,6 +477,7 @@ namespace AppliedAccounts.Models
             IsWaiting = true;
             MsgClass = new();
             bool isSaved = true;
+            string CurrentVoucherNo = MyVoucher.Master.Vou_No;
 
             try
             {
@@ -500,7 +504,7 @@ namespace AppliedAccounts.Models
                 masterRow["Amount"] = CalculateNetAmount();
                 masterRow["Description"] = MyVoucher.Master.Remarks;
                 masterRow["Comments"] = MyVoucher.Master.Comments;
-                masterRow["Status"] =   Submitted.ToString();
+                masterRow["Status"] = Submitted.ToString();
 
                 if (!Validate_Master(masterRow))
                 {
@@ -515,7 +519,7 @@ namespace AppliedAccounts.Models
 
                 if (!masterCommand.SaveChanges())
                 {
-                    MsgClass.Add(MESSAGE.RowNotUpdated);
+                    MsgClass.AddReange(masterCommand.MyMessages);
                     Source.RollbackTransaction();
                     isSaved = false;
                     return false;
@@ -588,7 +592,8 @@ namespace AppliedAccounts.Models
 
                         if (!detailCommand.SaveChanges())
                         {
-                            MsgClass.Add(MESSAGE.RowNotUpdated);
+
+                            MsgClass.AddReange(detailCommand.MyMessages);
                             isSaved = false;
                             break;
                         }
@@ -596,10 +601,13 @@ namespace AppliedAccounts.Models
                 }
 
                 // COMMIT / ROLLBACK
-                if (isSaved)
-                    Source.CommitTransaction();
+                if (isSaved) { Source.CommitTransaction(); }
                 else
+                {
+                    MyVoucher.Master.Vou_No = CurrentVoucherNo; 
                     Source.RollbackTransaction();
+                }
+
 
                 // REFRESH DATA
                 if (isSaved)
@@ -637,14 +645,15 @@ namespace AppliedAccounts.Models
             if (rowDetail["Qty"] == DBNull.Value) { MsgClass.Add(MESSAGE.Row_BatchIsNull); _return = false; }
             if (rowDetail["Rate"] == DBNull.Value) { MsgClass.Add(MESSAGE.Row_BatchIsNull); _return = false; }
 
-            if (rowDetail.Field<long>("Sr_No") == 0) { MsgClass.Add(MESSAGE.Row_SrNoIsZero); _return = false; }
+            if (rowDetail.Field<int>("Sr_No") == 0) { MsgClass.Add(MESSAGE.Row_SrNoIsZero); _return = false; }
             if (rowDetail.Field<long>("Inventory") == 0) { MsgClass.Add(MESSAGE.Row_InventoryIDZero); _return = false; }
+            if (rowDetail.Field<long>("Project") == 0) { MsgClass.Add(MESSAGE.Row_ProjectIDZero); _return = false; }
             if (rowDetail.Field<long>("TranID") == 0) { MsgClass.Add(MESSAGE.Row_TranIDIsZero); _return = false; }
             if (rowDetail.Field<long>("Unit") == 0) { MsgClass.Add(MESSAGE.Row_UnitIDZero); _return = false; }
             if (rowDetail.Field<long>("Tax") == 0) { MsgClass.Add(MESSAGE.Row_TaxIDZero); _return = false; }
-            
+
             if (string.IsNullOrEmpty(rowDetail.Field<string>("Description"))) { MsgClass.Add(MESSAGE.Row_NoDescription); _return = false; }
-            
+
 
             return _return;
 
@@ -770,15 +779,23 @@ namespace AppliedAccounts.Models
         {
             public Master() { }
             public long ID1 { get; set; }
+
+            [Required]
             public string Vou_No { get; set; } = string.Empty;
             public DateTime Vou_Date { get; set; }
+
+            [Range(1, long.MaxValue, ErrorMessage = "Company must be greater than zero.")]
             public long Company { get; set; }
+
+            [Range(1, long.MaxValue, ErrorMessage = "Employee must be greater than zero.")]
             public long Employee { get; set; }
             public string Ref_No { get; set; } = string.Empty;
             public string Inv_No { get; set; } = string.Empty;
             public DateTime Inv_Date { get; set; }
             public DateTime Pay_Date { get; set; }
             public decimal Amount { get; set; }
+
+            [Required(ErrorMessage = "Remarks is required.")]
             public string Remarks { get; set; } = string.Empty;
             public string Comments { get; set; } = string.Empty;
             public string Status { get; set; } = string.Empty;
@@ -787,6 +804,7 @@ namespace AppliedAccounts.Models
 
             public string TitleCompany { get; set; } = string.Empty;
             public string TitleEmployee { get; set; } = string.Empty;
+
 
         }
         public class Detail

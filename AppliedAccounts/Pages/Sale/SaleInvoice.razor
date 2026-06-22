@@ -5,9 +5,7 @@
 
 @using AppReports
 @using AppliedDB;
-@using AppliedAccounts.Data;
 @using AppliedAccounts.Component;
-@using AppliedAccounts.Models;
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Services;
 
@@ -70,13 +68,21 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-1 txt">
-                                <InputDate @bind-Value="@MyModel.MyVoucher.Master.Inv_Date" class="form-control" id="txtInvDate" placeholder="Invoice Date" />
+                                <InputDate @bind-Value="@MyModel.MyVoucher.Master.Inv_Date" @ondblclick="CopyVouDate"
+                                         class="form-control" 
+                                         id="txtInvDate" 
+                                         placeholder="Invoice Date" 
+                                         title="Double click to copy date from Voucher Date"/>
                                 <label for="txtInvNo">Invoice Date</label>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-1 txt">
-                                <InputDate @bind-Value="@MyModel.MyVoucher.Master.Pay_Date" class="form-control" id="txtPayDate" placeholder="Payment Date" />
+                                <InputDate @bind-Value="@MyModel.MyVoucher.Master.Pay_Date" @ondblclick="CopyInvDate" 
+                                        class="form-control" 
+                                        id="txtPayDate" 
+                                        placeholder="Payment Date" 
+                                        title="Double click to copy date from Invoice Date"/>
                                 <label for="txtPayNo">Payment Date</label>
                             </div>
                         </div>
