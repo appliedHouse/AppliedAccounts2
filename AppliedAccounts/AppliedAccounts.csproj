@@ -62,6 +62,7 @@
     <ProjectReference Include="..\AppliedReports\AppReports\AppReports.csproj" />
     <ProjectReference Include="..\Menus\Menus.csproj" />
     <ProjectReference Include="..\SQLQueries\SQLQueries.csproj" />
+    <ProjectReference Include="..\ToastNotificationLibrary\ToastNotificationLibrary.csproj" />
     <ProjectReference Include="..\VoucherPosting\VoucherPosting.csproj" />
   </ItemGroup>
 

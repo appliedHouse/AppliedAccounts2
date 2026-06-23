@@ -1,0 +1,184 @@
+/* Toast Notification Styles for .NET 9 */
+.toast-notification-container {
+    z-index: 1080;
+}
+
+.toast {
+    min-width: 320px;
+    max-width: 450px;
+    backdrop-filter: blur(10px);
+    animation: slideInRight 0.3s ease-out;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: none;
+}
+
+.toast-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border-left: 4px solid #155724;
+}
+
+.toast-error {
+    background: linear-gradient(135deg, #dc3545, #f86c6b);
+    border-left: 4px solid #721c24;
+}
+
+.toast-warning {
+    background: linear-gradient(135deg, #ffc107, #ffdb6b);
+    border-left: 4px solid #856404;
+}
+
+.toast-info {
+    background: linear-gradient(135deg, #17a2b8, #5bc0de);
+    border-left: 4px solid #0c5460;
+}
+
+.toast-header {
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom: none;
+    padding: 12px 16px;
+}
+
+.toast-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-weight: bold;
+    color: white;
+}
+
+    .toast-icon.toast-success {
+        background: #28a745;
+    }
+
+    .toast-icon.toast-error {
+        background: #dc3545;
+    }
+
+    .toast-icon.toast-warning {
+        background: #ffc107;
+        color: #856404;
+    }
+
+    .toast-icon.toast-info {
+        background: #17a2b8;
+    }
+
+.toast-body {
+    padding: 16px;
+    color: white;
+    font-weight: 500;
+}
+
+.toast-progress {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.7);
+    animation: progress linear forwards;
+    transform-origin: left;
+}
+
+/* Animations */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes progress {
+    from {
+        transform: scaleX(1);
+    }
+
+    to {
+        transform: scaleX(0);
+    }
+}
+
+/* Position-specific animations */
+.toast-notification-container.top-0.end-0 .toast {
+    animation-name: slideInRight;
+}
+
+.toast-notification-container.top-0.start-0 .toast {
+    animation-name: slideInLeft;
+}
+
+.toast-notification-container.bottom-0.end-0 .toast {
+    animation-name: slideInUp;
+}
+
+.toast-notification-container.bottom-0.start-0 .toast {
+    animation-name: slideInUp;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 576px) {
+    .toast-notification-container {
+        padding: 0.5rem !important;
+    }
+
+    .toast {
+        min-width: auto;
+        width: calc(100vw - 1rem);
+        max-width: none;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .toast-header {
+        background: rgba(33, 37, 41, 0.95);
+        color: #fff;
+    }
+
+    .btn-close-white {
+        filter: invert(1);
+    }
+}

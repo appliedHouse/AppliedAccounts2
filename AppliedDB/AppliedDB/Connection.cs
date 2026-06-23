@@ -27,10 +27,7 @@ namespace AppliedDB
         public static string DB_System = "System.db";
         public static string DB_Client { get; set; } = string.Empty;
         public static string DB_Session { get; set; } = string.Empty;
-
         public static AppUserModel AppUserProfile { get; set; }
-
-
 
         public Connections() { }
         public Connections(AppValues.AppPath _AppPaths)
@@ -101,21 +98,11 @@ namespace AppliedDB
         {
             var DBFile = Path.Combine(AppPath, "wwwroot", "SqliteDB", DB_Users);
             return GetSqliteConnection(DBFile);
-            //if (File.Exists(DBFile))
-            //{
-            //    return GetClientConnection(DBFile);
-            //}
-            //return null;
         }
         public static SqliteConnection? GetMessagesConnection()
         {
             var DBFile = Path.Combine(AppPath, "wwwroot", "Messages", DB_Message);
             return GetSqliteConnection(DBFile);
-            //if (File.Exists(DBFile))
-            //{
-            //    return GetClientConnection(DBFile);
-            //}
-            //return null;
         }
         public static SqliteConnection? GetLanguageConnection()
         {

@@ -44,7 +44,7 @@ namespace AppliedAccounts.Pages.Stock
             {
                 ShowList = true;
                 ShowForm = false;
-                await Toaster.ShowToastAsync(ToastClass.DeleteToast);
+                Toaster.ShowSuccess($"Successfully deleted {MyModel.Record.Title}");
                 MyModel.LoadData();
             }
         }
@@ -54,7 +54,7 @@ namespace AppliedAccounts.Pages.Stock
             {
                 ShowList = true;
                 ShowForm = false;
-                await Toaster.ShowToastAsync(ToastClass.SaveToast);
+                Toaster.ShowSuccess($"Successfully saved {MyModel.Record.Title}");
             }
             MyModel.LoadData();
 

@@ -1,0 +1,104 @@
+﻿@page "/Sales/SaleCDC"
+@inject NavigationManager NavManager
+
+@using AppliedAccounts.Models
+@using AppliedAccounts.Component
+
+@code {
+
+    private void CustomerList() { NavManager.NavigateTo("/CustomerList", true); }
+    private void LoadExcel() { NavManager.NavigateTo("/ImportData/ImportSalesInvoice", true); }
+    private void SaleInvoices() { NavManager.NavigateTo("/Sale/SaleInvoiceList", true); }
+    private void StockList() { NavManager.NavigateTo("/Stock/StockList", true); }
+
+    private Mnu_CardModel CardCustomer { get; set; }
+    private Mnu_CardModel CardServices { get; set; }
+    private Mnu_CardModel CardDataImport { get; set; }
+    private Mnu_CardModel CardInvoices { get; set; }
+
+    protected override void OnInitialized()
+    {
+        CardCustomer = new()
+        {
+            Heading = "Customer",
+            PictureUrl = "/Images/Card/COA.jpg",
+            CardIcon = "bi bi-person-badge",
+            CardTitle = "Cusotmer List",
+            Description = "Click below to explore your client list and make updates in just a few clicks.",
+            BtnText = "Click"
+        };
+
+        CardServices = new()
+        {
+            Heading = "Services",
+            PictureUrl = "/Images/Card/COA.jpg",
+            CardIcon = "bi bi-tools",
+            CardTitle = "Services List",
+            Description = "Great service is invisible when perfect, but unforgettable when personalized.",
+            BtnText = "Click"
+        };
+
+        CardDataImport = new()
+        {
+            Heading = "Data Import",
+            PictureUrl = "/Images/Card/COA.jpg",
+            CardIcon = "bi bi-filetype-xls",
+            CardTitle = "Excel Data Imports",
+            Description = "A seamless Excel import bridges the gap between manual entry and automated efficiency.",
+            BtnText = "Click"
+        };
+
+        CardInvoices = new()
+        {
+            Heading = "Invoices",
+            PictureUrl = "/Images/Card/COA.jpg",
+            CardIcon = "bi bi-printer",
+            CardTitle = "Sales Invoices",
+            Description = "A well-managed sales invoice system keeps customers accountable and businesses solvent.",
+            BtnText = "Click"
+        };
+    }
+
+
+}
+
+<style>
+    .container1 {
+        margin: 10px;
+        padding: 10px
+    }
+
+    .btn-go {
+        width: 40px;
+        height: 40px;
+    }
+
+        .btn-go :hover {
+            transform:
+        }
+
+    .btn-print1::before {
+        content: "\f02f"; /* Unicode for the 'bi bi-printer' icon */
+        font-family: 'Bootstrap Icons';
+        margin-right: 8px; /* Add some space between the icon and text */
+    }
+</style>
+
+
+<div class="container-fluid container1 text-center">
+    <div class="d-flex flex-wrap justify-content-center">
+        <div class="m-2" style="width: 300px;">
+            <Mnu_Card @onclick="CustomerList" Card="CardCustomer" />
+        </div>
+        <div class="m-2" style="width: 300px;">
+            <Mnu_Card @onclick="StockList" Card="CardServices" />
+        </div>
+        <div class="m-2" style="width: 300px;">
+            <Mnu_Card @onclick="LoadExcel" Card="CardDataImport" />
+        </div>
+        <div class="m-2" style="width: 300px;">
+            <Mnu_Card @onclick="SaleInvoices" Card="CardInvoices" />
+        </div>
+    </div>
+</div>
+

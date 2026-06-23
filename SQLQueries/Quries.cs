@@ -96,6 +96,49 @@ namespace SQLQueries
         }
         #endregion
 
+        #region Sale Invoice / Bill Receivable
+        public static string PurchaseInvoice(long _ID)
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("SELECT * FROM (");
+            _Text.AppendLine("SELECT [B2].[TranID],");
+            _Text.AppendLine("[B1].[Vou_No],");
+            _Text.AppendLine("[B1].[Vou_Date],");
+            _Text.AppendLine("[C].[Title] AS[Company],");
+            _Text.AppendLine("[E].[Title] AS[Employee],");
+            _Text.AppendLine("[P].[Title] AS[Project],");
+            _Text.AppendLine("[B1].[Ref_No],");
+            _Text.AppendLine("[B1].[Inv_No],");
+            _Text.AppendLine("[B1].[Inv_Date],");
+            _Text.AppendLine("[B1].[Pay_Date],");
+            _Text.AppendLine("[B1].[Description],");
+            _Text.AppendLine("[B2].[Sr_No],");
+            _Text.AppendLine("[I].[Title] AS[Inventory],");
+            _Text.AppendLine("[B2].[Batch],");
+            _Text.AppendLine("[B2].[Unit],");
+            _Text.AppendLine("[U].[Title] AS [UnitTitle],");
+            _Text.AppendLine("[B2].[Qty] AS [Qty],");
+            _Text.AppendLine("[B2].[Rate],");
+            _Text.AppendLine("[B2].[Qty] * [B2].[Rate] AS[Amount],");
+            _Text.AppendLine("[T].[Rate] AS[Tax_Rate],");
+            _Text.AppendLine("([B2].[Qty] * [B2].[Rate]) * [T].[Rate] AS[Tax_Amount],");
+            _Text.AppendLine("([B2].[Qty] * [B2].[Rate]) + (([B2].[Qty] * [B2].[Rate]) * [T].[Rate]) AS[Net_Amount],");
+            _Text.AppendLine("[B2].[Description] AS[Remarks], [C].[Address1], [C].[Address2], [C].[City] || ' ' || [C].[State] || ' ' || [C].[Country] AS[Address3], ");
+            _Text.AppendLine("[C].[Phone]");
+            _Text.AppendLine("FROM [BillPayable] [B1] ");
+            _Text.AppendLine("LEFT JOIN [BillPayable2] [B2] ON [B2].[TranID] = [B1].[ID] ");
+            _Text.AppendLine("LEFT JOIN [Customers]        [C] ON [C].[ID]      = [B1].[Company] ");
+            _Text.AppendLine("LEFT JOIN [Employees]        [E] ON [E].[ID]      = [B1].[Employee] ");
+            _Text.AppendLine("LEFT JOIN [Inv_UOM]          [U] ON [U].[ID]      = [B2].[Unit] ");
+            _Text.AppendLine("LEFT JOIN [Project]          [P] ON [P].[ID]      = [B2].[Project] ");
+            _Text.AppendLine("LEFT JOIN [Inventory]        [I] ON [I].[ID]      = [B2].[Inventory] ");
+            _Text.AppendLine("LEFT JOIN [Taxes]            [T] ON [T].[ID]      = [B2].[Tax]");
+            _Text.AppendLine(") AS [PurchaseInvoice] ");
+            _Text.AppendLine($"WHERE [TranID] = {_ID}");
+            return _Text.ToString();
+        }
+        #endregion
+
         #region View of Purchased Invoice
         public static string ViewPurchaseInvoice(string _Filter)
         {
@@ -406,12 +449,12 @@ namespace SQLQueries
         {
             var Text = new StringBuilder();
             Text.AppendLine("SELECT * FROM (");
-            Text.AppendLine("SELECT [Ledger].[COA], [COA].[Code], [COA].[Title], ");
+            Text.AppendLine("SELECT [COA].[ID],[Ledger].[COA], [COA].[Code], [COA].[Title], ");
             Text.AppendLine("SUM([Ledger].[DR]) AS [DR], ");
             Text.AppendLine("SUM([Ledger].[CR]) AS [CR], ");
             Text.AppendLine("SUM([Ledger].[DR] - [Ledger].[CR]) AS [BAL] ");
             Text.AppendLine("FROM [Ledger] ");
-            Text.AppendLine("LEFT JOIN[COA] ON[COA].[ID] = [Ledger].[COA] ");
+            Text.AppendLine("LEFT JOIN [COA] ON[COA].[ID] = [Ledger].[COA] ");
             if (_Filter.Length > 0) { Text.AppendLine($" WHERE {_Filter} "); }
             Text.AppendLine("GROUP BY [COA] ");
             Text.AppendLine(") WHERE BAL <> 0 ");
@@ -419,10 +462,27 @@ namespace SQLQueries
 
             return Text.ToString();
         }
+
+        public static string TBProject(long _Project, string _Filter, string _OrderBy)
+        {
+            var Text = new StringBuilder();
+            Text.AppendLine("SELECT * FROM (");
+            Text.AppendLine("SELECT [COA].[ID],[Ledger].[COA], [COA].[Code], [COA].[Title], ");
+            Text.AppendLine("SUM([Ledger].[DR]) AS [DR], ");
+            Text.AppendLine("SUM([Ledger].[CR]) AS [CR], ");
+            Text.AppendLine("SUM([Ledger].[DR] - [Ledger].[CR]) AS [BAL] ");
+            Text.AppendLine($"FROM (SELECT * FROM [Ledger] WHERE {_Filter}) AS [Ledger] ");
+            Text.AppendLine("LEFT JOIN [COA] ON [COA].[ID] = [Ledger].[COA] ");
+            Text.AppendLine("GROUP BY  [Ledger].[COA],[Ledger].[Project] ");
+            Text.AppendLine($") WHERE  [Ledger].[Project] = {_Project} ");
+            if (_OrderBy.Length > 0) { Text.AppendLine($" ORDER BY {_OrderBy}"); }
+
+            return Text.ToString();
+        }
         #endregion
 
         #region Cash and Bank Account in List
-        
+
         public static string  GetCashAccounts()
         {
             var _Text = new StringBuilder();
@@ -511,6 +571,60 @@ namespace SQLQueries
 
             
 
+            return _Text.ToString();
+        }
+
+        public static string BillPayable(string Filter)
+        {
+          
+            var _Text = new StringBuilder();
+            _Text.AppendLine("SELECT* FROM(");
+            _Text.AppendLine("SELECT ");
+            _Text.AppendLine("[B1].[ID] AS[ID],");
+            _Text.AppendLine("[B1].[ID] AS[ID1],");
+            _Text.AppendLine("[B1].[Vou_No],");
+            _Text.AppendLine("[B1].[Vou_Date],");
+            _Text.AppendLine("[B1].[Company],");
+            _Text.AppendLine("[B1].[Employee],");
+            _Text.AppendLine("[B1].[Ref_No],");
+            _Text.AppendLine("[B1].[Inv_No],");
+            _Text.AppendLine("[B1].[Inv_Date],");
+            _Text.AppendLine("[B1].[Pay_Date],");
+            _Text.AppendLine("[B1].[Amount],");
+            _Text.AppendLine("[B1].[Description] AS [Remarks],");
+            _Text.AppendLine("[B1].[Comments],");
+            _Text.AppendLine("[B1].[Status],");
+            _Text.AppendLine("[B2].[ID] AS[ID2],");
+            _Text.AppendLine("[B2].[Sr_No],");
+            _Text.AppendLine("[B2].[TranID],");
+            _Text.AppendLine("[B2].[Inventory],");
+            _Text.AppendLine("[B2].[Batch],");
+            _Text.AppendLine("[B2].[Unit],");
+            _Text.AppendLine("[B2].[Qty],");
+            _Text.AppendLine("[B2].[Rate],");
+            _Text.AppendLine("[B2].[Tax],");
+            _Text.AppendLine("[B2].[Tax_Rate],");
+            _Text.AppendLine("[B2].[Description] AS [Description],");
+            _Text.AppendLine("[B2].[Project],");
+            _Text.AppendLine("[C].[Title] AS [TitleSupplier],");
+            _Text.AppendLine("[E].[Title] AS [TitleEmployee],");
+            _Text.AppendLine("[I].[Title] AS [TitleStock],");
+            _Text.AppendLine("[U].[Title] AS [TitleUnit],");
+            _Text.AppendLine("[P].[Title] As [TitleProject],");
+            _Text.AppendLine("[T].[Title] As [TitleTax]");
+            _Text.AppendLine("FROM [BillPayable] [B1]");
+            _Text.AppendLine("LEFT JOIN [BillPayable2][B2]    ON [B1].[ID] = [B2].[TranID]");
+            _Text.AppendLine("LEFT JOIN [Customers]      [C]  ON  [C].[ID] = [B1].[Company]");
+            _Text.AppendLine("LEFT JOIN [Employees]      [E]  ON  [E].[ID] = [B1].[Employee]");
+            _Text.AppendLine("LEFT JOIN [Inventory]      [I]  ON  [I].[ID] = [B2].[Inventory]");
+            _Text.AppendLine("LEFT JOIN [Inv_UOM]        [U]  ON  [U].[ID] = [B2].[Unit]");
+            _Text.AppendLine("LEFT JOIN [Project]        [P]  ON  [P].[ID] = [B2].[Project]");
+            _Text.AppendLine("LEFT JOIN [Taxes]          [T]  ON  [T].[ID] = [B2].[Tax]");
+            _Text.AppendLine(") AS [PurchaseInvoice]");
+            if (Filter.Length > 0)
+            {
+                _Text.AppendLine($"WHERE {Filter}");
+            }
             return _Text.ToString();
         }
 

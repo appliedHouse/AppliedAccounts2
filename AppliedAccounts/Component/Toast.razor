@@ -1,0 +1,96 @@
+﻿<!-- Components/Toast.razor -->
+@using ToastNotificationLibrary.Services
+@using ToastNotificationLibrary.Models
+@implements IDisposable
+
+@inject IToastService ToastService
+
+@if (CurrentMessage != null && CurrentMessage.IsVisible)
+{
+    <div class="toast-notification-container position-fixed @CurrentMessage.GetPositionClass() p-3" style="z-index: 1080">
+        <div class="toast show @CurrentMessage.GetCssClass()" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <div class="toast-icon @CurrentMessage.GetCssClass()">@CurrentMessage.GetIcon()</div>
+                <strong class="me-auto">@GetTitle()</strong>
+                <small>@GetTimeAgo()</small>
+                <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="HideToast"></button>
+            </div>
+            <div class="toast-body">
+                @CurrentMessage.Message
+            </div>
+            <div class="toast-progress" style="animation-duration: @(CurrentMessage.Duration)ms"></div>
+        </div>
+    </div>
+}
+
+@code {
+    private ToastMessage? CurrentMessage { get; set; }
+    private CancellationTokenSource? _cancellationTokenSource;
+
+    protected override void OnInitialized()
+    {
+        ToastService.OnShow += OnToastShow;
+        ToastService.OnHide += OnToastHide;
+    }
+
+    private void OnToastShow(ToastMessage message)
+    {
+        CurrentMessage = message;
+        InvokeAsync(StateHasChanged);
+
+        if (message.Duration > 0)
+        {
+            _cancellationTokenSource = new CancellationTokenSource();
+            _ = Task.Delay(message.Duration, _cancellationTokenSource.Token)
+                .ContinueWith(task =>
+                {
+                    if (!task.IsCanceled)
+                    {
+                        HideToast();
+                    }
+                }, TaskScheduler.Default);
+        }
+    }
+
+    private void OnToastHide()
+    {
+        HideToast();
+    }
+
+    private void HideToast()
+    {
+        // _cancellationTokenSource?.Cancel();
+        // _cancellationTokenSource?.Dispose();
+        // _cancellationTokenSource = null;
+
+        if (CurrentMessage != null)
+        {
+            CurrentMessage.IsVisible = false;
+            CurrentMessage = null;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private string GetTitle() => CurrentMessage?.Level switch
+    {
+        ToastLevel.Success => "Success",
+        ToastLevel.Error => "Error",
+        ToastLevel.Warning => "Warning",
+        ToastLevel.Info => "Information",
+        _ => "Notification"
+    };
+
+    private string GetTimeAgo()
+    {
+        if (CurrentMessage == null) return string.Empty;
+        var diff = DateTime.UtcNow - CurrentMessage.CreatedAt;
+        return diff.TotalSeconds < 60 ? "Just now" : $"{diff.TotalMinutes:F0}m ago";
+    }
+
+    public void Dispose()
+    {
+        ToastService.OnShow -= OnToastShow;
+        ToastService.OnHide -= OnToastHide;
+        _cancellationTokenSource?.Dispose();
+    }
+}

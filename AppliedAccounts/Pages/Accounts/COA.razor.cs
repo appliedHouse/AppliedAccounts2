@@ -46,11 +46,11 @@ namespace AppliedAccounts.Pages.Accounts
             if(IsSaved)
             {
                 MyModel.MsgClass.Success(AppMessages.Enums.Messages.Save);
-                ToastService.ShowToast(ToastClass.SaveToast);
+                ToastService.ShowSuccess($"Successfully saved {MyModel.Record.Title}");
             }
             else
             {
-                ToastService.ShowToast(ToastClass.NotSaveToast);
+                ToastService.ShowError($"Failed to save {MyModel.Record.Title}");
             }
         }
 

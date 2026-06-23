@@ -14,16 +14,7 @@ namespace AppliedAccounts.Pages.ImportData
         public ImportExcelFile ImportCOAModel { get; set; }
         public bool ShowSpinner { get; set; } = false;
         public string SpinnerMessage { get; set; } = "Loading... Please wait...";
-       
-        public ToastClass Toast { get; set; } = new();
-
-
-
-        public ImportCOA()
-        {
-
-        }
-
+        
         public async Task GetExcelFile(InputFileChangeEventArgs e)
         {
             ShowSpinner = true;

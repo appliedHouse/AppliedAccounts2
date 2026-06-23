@@ -12,18 +12,7 @@
 @code {
     private bool IsPageValid = true;
 
-    protected override void OnInitialized()
-    {
-        try
-        {
-            { MyModel = new(AppGlobal); }
-        }
-        catch (Exception)
-        {
-            IsPageValid = false;
-        }
-
-    }
+    
 }
 
 
@@ -129,7 +118,7 @@
 else
 {
     <div class="alert alert-danger">
-        <h4>Purcahe List Page</h4>
-        <p>Sorry, the page has some error. Contact to Adminstrator</p>
+        <h4>Purchase List Page</h4>
+        <p>Sorry, the page has some error. Contact to Administrator</p>
     </div>
 }

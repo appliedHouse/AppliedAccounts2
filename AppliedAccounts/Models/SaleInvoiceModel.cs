@@ -6,6 +6,7 @@ using AppMessages;
 using AppReports;
 using Microsoft.AspNetCore.Components;
 using SQLQueries;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using static AppliedAccounts.Data.AppRegistry;
 using static AppliedDB.Enums.Status;
@@ -17,6 +18,7 @@ namespace AppliedAccounts.Models
 {
     public class SaleInvoiceModel : IVoucher
     {
+
         #region Variables
         public long SaleInvoiceID { get; set; }
         public DataSource Source { get; set; }
@@ -45,7 +47,6 @@ namespace AppliedAccounts.Models
         public int ListType { get; set; }               // List type for display in View Table at page
         public GlobalService AppGlobal { get; set; }
 
-
         #endregion
 
         #region Constructor
@@ -62,7 +63,6 @@ namespace AppliedAccounts.Models
             SaleInvoiceID = _SaleInvoiceID;
             Source = new DataSource(AppGlobal.AppPaths);
             Start(SaleInvoiceID);
-
         }
         #endregion
 
@@ -74,7 +74,7 @@ namespace AppliedAccounts.Models
                 if (AppGlobal is null) { return; }
                 Source ??= new(AppGlobal.AppPaths);
 
-                MsgClass = new(Msg.GetMessages());
+                MsgClass = new();
                 MyVoucher = new();
                 LastVoucherDate = GetDate(Source.DBFile, "SInvDate");           // Sale Invoice Date
 
@@ -137,13 +137,6 @@ namespace AppliedAccounts.Models
 
             return _MyVoucher;
         }
-        #endregion
-
-        #region Get Report table
-        //public DataTable GetReportTable()
-        //{
-        //    return Source.GetTable(AppliedDB.Enums.Query.SaleInvoice, InvoiceID);
-        //}
         #endregion
 
         #region Convert decimal to String Text
@@ -262,7 +255,7 @@ namespace AppliedAccounts.Models
         public bool IsTransValidated()
         {
             bool IsValid = true;
-            MsgClass ??= new(Msg.GetMessages());
+            MsgClass ??= new();
             MsgClass.ClearMessages();
 
             if (MyVoucher.Master == null) { MsgClass.Add(MESSAGE.MasterRecordisNull); return false; }
@@ -276,12 +269,13 @@ namespace AppliedAccounts.Models
             if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgClass.Add(MESSAGE.VouDateLess); }
             if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgClass.Add(MESSAGE.VouDateMore); }
             if (MyVoucher.Master.Company == 0) { MsgClass.Add(MESSAGE.Row_CompanyIDZero); }
-            //if (MyVoucher.Master.Employee == 0) { MsgClass.Add(MESSAGE.Row_EmployeeIDZero); }
+            if (MyVoucher.Master.Employee == 0) { MsgClass.Add(MESSAGE.Row_EmployeeIDZero); }
             if (MyVoucher.Master.Remarks.Length == 0) { MsgClass.Add(MESSAGE.Row_NoRemarks); }
             if (MyVoucher.Master.Status.Length == 0) { MsgClass.Add(MESSAGE.Row_NoStatus); }
 
             if (MyVoucher.Detail.Sr_No == 0) { MsgClass.Add(MESSAGE.SerialNoIsZero); }
             if (MyVoucher.Detail.Inventory == 0) { MsgClass.Add(MESSAGE.Row_InventoryIDZero); }
+            if (MyVoucher.Detail.Project == 0) { MsgClass.Add(MESSAGE.Row_ProjectIDZero); }
 
             if (MyVoucher.Detail.Unit == 0) { MsgClass.Add(MESSAGE.Row_UnitIDZero); }
             if (MyVoucher.Detail.Qty == 0) { MsgClass.Add(MESSAGE.Row_QtyZero); }
@@ -478,23 +472,24 @@ namespace AppliedAccounts.Models
         public async Task<bool> SaveAllAsync()
         {
             if (IsWaiting) { return false; }
-                
+
 
             IsWaiting = true;
             MsgClass = new();
             bool isSaved = true;
+            string CurrentVoucherNo = MyVoucher.Master.Vou_No;
 
             try
             {
+                Source.BeginTransaction();
+
                 // Generate Voucher No if NEW
                 if (MyVoucher.Master.Vou_No?.ToUpper() == "NEW")
                 {
                     MyVoucher.Master.Vou_No = NewVoucherNo.GetNewVoucherNo(Source.DBFile, Tables.BillReceivable, "BR");
                 }
 
-                // =============================
-                // 1️⃣ CREATE MASTER ROW
-                // =============================
+                // CREATE MASTER ROW
                 DataRow masterRow = Source.GetNewRow(Tables.BillReceivable);
 
                 masterRow["ID"] = MyVoucher.Master.ID1;
@@ -502,6 +497,7 @@ namespace AppliedAccounts.Models
                 masterRow["Vou_Date"] = MyVoucher.Master.Vou_Date;
                 masterRow["Company"] = MyVoucher.Master.Company;
                 masterRow["Employee"] = MyVoucher.Master.Employee;
+                masterRow["Ref_No"] = MyVoucher.Master.Ref_No;
                 masterRow["Inv_No"] = MyVoucher.Master.Inv_No;
                 masterRow["Inv_Date"] = MyVoucher.Master.Inv_Date;
                 masterRow["Pay_Date"] = MyVoucher.Master.Pay_Date;
@@ -512,24 +508,21 @@ namespace AppliedAccounts.Models
 
                 if (!Validate_Master(masterRow))
                 {
+                    Source.RollbackTransaction();
                     MsgClass.Add(MESSAGE.RecordNotValidated);
                     return false;
                 }
 
-                // =============================
-                // BEGIN TRANSACTION
-                // =============================
-                Source.BeginTransaction();
 
-                // =============================
-                // 2️⃣ SAVE MASTER
-                // =============================
+                // SAVE MASTER
                 CommandClass masterCommand = new(masterRow, Source.MyConnection, Source.DBtransaction!);
 
                 if (!masterCommand.SaveChanges())
                 {
-                    MsgClass.Add(MESSAGE.RowNotUpdated);
+                    MsgClass.AddReange(masterCommand.MyMessages);
+                    Source.RollbackTransaction();
                     isSaved = false;
+                    return false;
                 }
 
                 if (isSaved && MyVoucher.Master.ID1 == 0)
@@ -539,9 +532,7 @@ namespace AppliedAccounts.Models
 
                 long saleInvoiceID = MyVoucher.Master.ID1;
 
-                // =============================
-                // 3️⃣ DELETE REMOVED DETAILS
-                // =============================
+                // DELETE REMOVED DETAILS
                 if (isSaved && Deleted != null && Deleted.Count > 0)
                 {
                     foreach (var item in Deleted)
@@ -570,9 +561,7 @@ namespace AppliedAccounts.Models
                     }
                 }
 
-                // =============================
-                // 4️⃣ SAVE DETAILS
-                // =============================
+                // SAVE DETAILS
                 if (isSaved)
                 {
                     foreach (var item in MyVoucher.Details)
@@ -603,24 +592,24 @@ namespace AppliedAccounts.Models
 
                         if (!detailCommand.SaveChanges())
                         {
-                            MsgClass.Add(MESSAGE.RowNotUpdated);
+
+                            MsgClass.AddReange(detailCommand.MyMessages);
                             isSaved = false;
                             break;
                         }
                     }
                 }
 
-                // =============================
-                // 5️⃣ COMMIT / ROLLBACK
-                // =============================
-                if (isSaved)
-                    Source.CommitTransaction();
+                // COMMIT / ROLLBACK
+                if (isSaved) { Source.CommitTransaction(); }
                 else
+                {
+                    MyVoucher.Master.Vou_No = CurrentVoucherNo; 
                     Source.RollbackTransaction();
+                }
 
-                // =============================
-                // 6️⃣ REFRESH DATA
-                // =============================
+
+                // REFRESH DATA
                 if (isSaved)
                 {
                     CalculateTotal();
@@ -646,12 +635,52 @@ namespace AppliedAccounts.Models
         #region Validation
         private bool Validate_Detail(DataRow rowDetail)
         {
-            return true;
+            var _return = true;
+            MsgClass ??= new();
+
+            if (rowDetail["Sr_No"] == DBNull.Value) { MsgClass.Add(MESSAGE.Row_SrNoIsNull); _return = false; }
+            if (rowDetail["TranID"] == DBNull.Value) { MsgClass.Add(MESSAGE.Row_TranIDIsNull); _return = false; }
+            if (rowDetail["Inventory"] == DBNull.Value) { MsgClass.Add(MESSAGE.Row_InventoryIsNull); _return = false; }
+            if (rowDetail["Batch"] == DBNull.Value) { MsgClass.Add(MESSAGE.Row_BatchIsNull); _return = false; }
+            if (rowDetail["Qty"] == DBNull.Value) { MsgClass.Add(MESSAGE.Row_BatchIsNull); _return = false; }
+            if (rowDetail["Rate"] == DBNull.Value) { MsgClass.Add(MESSAGE.Row_BatchIsNull); _return = false; }
+
+            if (rowDetail.Field<int>("Sr_No") == 0) { MsgClass.Add(MESSAGE.Row_SrNoIsZero); _return = false; }
+            if (rowDetail.Field<long>("Inventory") == 0) { MsgClass.Add(MESSAGE.Row_InventoryIDZero); _return = false; }
+            if (rowDetail.Field<long>("Project") == 0) { MsgClass.Add(MESSAGE.Row_ProjectIDZero); _return = false; }
+            if (rowDetail.Field<long>("TranID") == 0) { MsgClass.Add(MESSAGE.Row_TranIDIsZero); _return = false; }
+            if (rowDetail.Field<long>("Unit") == 0) { MsgClass.Add(MESSAGE.Row_UnitIDZero); _return = false; }
+            if (rowDetail.Field<long>("Tax") == 0) { MsgClass.Add(MESSAGE.Row_TaxIDZero); _return = false; }
+
+            if (string.IsNullOrEmpty(rowDetail.Field<string>("Description"))) { MsgClass.Add(MESSAGE.Row_NoDescription); _return = false; }
+
+
+            return _return;
+
         }
 
-        private bool Validate_Master(DataRow newRow1)
+        private bool Validate_Master(DataRow rowMaster)
         {
-            return true;
+            MsgClass = new();
+            var _return = true;
+            var _FiscalStart = Source.GetDate("FiscalStart");
+            var _FiscalEnd = Source.GetDate("FiscalEnd");
+            var _VouDate = rowMaster.Field<DateTime>("Vou_Date");
+            var _InvDate = rowMaster.Field<DateTime>("Inv_Date");
+            var _PayDate = rowMaster.Field<DateTime>("Pay_Date");
+
+            if (_VouDate < _FiscalStart && _VouDate > _FiscalEnd) { MsgClass.Add(MESSAGE.VouDateNotAllowed); _return = false; }
+            if (_InvDate > _VouDate) { MsgClass.Add(MESSAGE.Row_LessInv_Date); _return = false; }
+            if (_PayDate < _InvDate) { MsgClass.Add(MESSAGE.Row_LessPay_Date); _return = false; }
+
+            if (rowMaster.Field<long>("Company") == 0) { MsgClass.Add(MESSAGE.Row_CompanyIDZero); _return = false; }
+            if (rowMaster.Field<long>("Employee") == 0) { MsgClass.Add(MESSAGE.Row_EmployeeIDZero); _return = false; }
+            if (string.IsNullOrEmpty(rowMaster.Field<string>("Ref_No"))) { MsgClass.Add(MESSAGE.RefNoIsNull); _return = false; }
+            if (rowMaster.Field<decimal>("Amount") == 0) { MsgClass.Add(MESSAGE.VoucherAmountIsZero); _return = false; }
+            if (rowMaster.Field<string>("Description") == null) { MsgClass.Add(MESSAGE.Row_NoRemarks); _return = false; }
+            if (rowMaster.Field<string>("Status") == null) { MsgClass.Add(MESSAGE.Row_NoStatus); _return = false; }
+
+            return _return;
         }
         #endregion
 
@@ -729,40 +758,6 @@ namespace AppliedAccounts.Models
 
         #endregion
 
-        #region Test Voucher Data
-        public void TestData()
-        {
-            MyVoucher.Master.ID1 = 0;
-            MyVoucher.Master.Vou_No = "New";
-            MyVoucher.Master.Inv_No = "SRB-001";
-            MyVoucher.Master.Vou_Date = new DateTime(2024,10,23);
-            MyVoucher.Master.Company = 2;
-            MyVoucher.Master.Employee = 2;
-            MyVoucher.Master.Vou_Date = new DateTime(2024, 10, 23);
-            MyVoucher.Master.Pay_Date = new DateTime(2024, 10, 23);
-            MyVoucher.Master.Ref_No = "Test";
-            MyVoucher.Master.Remarks = "D-Type Rubber Fender";
-            MyVoucher.Master.Comments = "Damaged Ship Side Rubber Fender Length 200 Meters, Renewed with MS Channel & Stainless Steel (Marine Grade 316L) & Nuts, Bolts, Washers, conform to marine standard complete with fitting accessories.";
-
-            MyVoucher.Detail.Sr_No = 1;
-            MyVoucher.Detail.TranID = 0;
-            MyVoucher.Detail.ID2 = 0;
-            MyVoucher.Detail.Inventory = 4;
-            MyVoucher.Detail.Project = 1;
-            MyVoucher.Detail.Unit = 11;
-            MyVoucher.Detail.Qty = 1;
-            MyVoucher.Detail.Rate = 3750000;
-            MyVoucher.Detail.TaxID = 0;
-            MyVoucher.Detail.TaxRate = 15;
-            MyVoucher.Detail.Batch = "#01";
-
-            MyVoucher.Detail.Description = "D-Type Rubber Fender";
-
-            MyVoucher.Details.Add(MyVoucher.Detail);
-        }
-
-
-        #endregion
 
 
 
@@ -784,15 +779,23 @@ namespace AppliedAccounts.Models
         {
             public Master() { }
             public long ID1 { get; set; }
+
+            [Required]
             public string Vou_No { get; set; } = string.Empty;
             public DateTime Vou_Date { get; set; }
+
+            [Range(1, long.MaxValue, ErrorMessage = "Company must be greater than zero.")]
             public long Company { get; set; }
+
+            [Range(1, long.MaxValue, ErrorMessage = "Employee must be greater than zero.")]
             public long Employee { get; set; }
             public string Ref_No { get; set; } = string.Empty;
             public string Inv_No { get; set; } = string.Empty;
             public DateTime Inv_Date { get; set; }
             public DateTime Pay_Date { get; set; }
             public decimal Amount { get; set; }
+
+            [Required(ErrorMessage = "Remarks is required.")]
             public string Remarks { get; set; } = string.Empty;
             public string Comments { get; set; } = string.Empty;
             public string Status { get; set; } = string.Empty;
@@ -801,6 +804,7 @@ namespace AppliedAccounts.Models
 
             public string TitleCompany { get; set; } = string.Empty;
             public string TitleEmployee { get; set; } = string.Empty;
+
 
         }
         public class Detail
@@ -849,7 +853,7 @@ namespace AppliedAccounts.Models
         #endregion
 
 
-       
+
 
     }
 }

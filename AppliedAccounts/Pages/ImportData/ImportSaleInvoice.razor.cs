@@ -615,7 +615,7 @@ namespace AppliedAccounts.Pages.ImportData
 
                             MsgClass.Add($"{DateTime.Now} Serial # {Row["Sr_No"]} is saved ---> {IsSaved} ");
 
-                            ToastService.ShowToast(ToastClass.SaveToast, $"Save | {master["Vou_No"]}"); // show the toast
+                            ToastService.ShowSuccess($"Successfully saved {master["Vou_No"]}"); // show the toast
                         }
                     }
                     else

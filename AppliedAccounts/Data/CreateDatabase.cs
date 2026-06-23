@@ -1,15 +1,15 @@
 ﻿using AppliedAccounts.Pages.Accounts;
-using AppliedAccounts.Pages.Menu;
 using AppliedDB;
 using AppliedGlobals;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Logging;
 using System.Data;
-using System.Runtime.Serialization;
 using System.Text;
 using static AppliedDB.Enums;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
+
+// Updated on 27-Mar-2026 by Aamir Jahangir
 
 namespace AppliedAccounts.Data
 {
@@ -20,7 +20,6 @@ namespace AppliedAccounts.Data
         public List<DataRow> TableList { get; set; }
         public AppValues.AppPath AppPaths { get; set; }
         public AppUserModel UserModel { get; set; }
-        private string TableName { get; set; }
         private string UserName { get; set; }
         private string DBFile { get; set; }
         private List<string> MyMessages { get; set; }
@@ -46,9 +45,9 @@ namespace AppliedAccounts.Data
             if (!string.IsNullOrEmpty(MyConnection.ConnectionString))
             {
                 var tableNames = new List<string>();
-                if (MyConnection.State != System.Data.ConnectionState.Open) { MyConnection.Open(); }
+                if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
                 var CommandText = "SELECT name FROM Sqlite_master WHERE type='table' AND name NOT LIKE 'Sqlite_%';";
-                var _Table = AppliedDB.DataSource.GetQueryTable(CommandText, MyConnection);
+                var _Table = DataSource.GetQueryTable(CommandText, MyConnection);
                 TableList = _Table.AsEnumerable().ToList();
             }
         }
@@ -162,7 +161,7 @@ namespace AppliedAccounts.Data
                     break;
                 case Tables.JVList:
                     break;
-              
+
                 case Tables.Customers:
                     break;
                 case Tables.City:
@@ -170,12 +169,12 @@ namespace AppliedAccounts.Data
                 case Tables.Country:
                     break;
                 case Tables.Project:
+                    _CommandText = ProjectsDB();
                     break;
                 case Tables.Employees:
                     break;
                 case Tables.Directories:
                     _CommandText = Directories();
-                    _CommandText = DirectoriesINSERT();
                     break;
                 case Tables.Inventory:
                     break;
@@ -303,7 +302,18 @@ namespace AppliedAccounts.Data
 
         }
 
-        private string View_Ledger()
+        private static string ProjectsDB()          // 27-Mar-2026
+        {
+            var _Text = new StringBuilder();
+            _Text.AppendLine("CREATE TABLE [Project] (");
+            _Text.AppendLine("[ID] INT64 PRIMARY KEY NOT NULL UNIQUE, ");
+            _Text.AppendLine("[Code] NVARCHAR(6) NOT NULL UNIQUE, ");
+            _Text.AppendLine("[Title] NVARCHAR(100) NOT NULL UNIQUE, ");
+            _Text.AppendLine("[Comments] NVARCHAR(500));");
+            return _Text.ToString();
+        }
+
+        private static string View_Ledger()
         {
             var _Text = new StringBuilder();
 
@@ -460,24 +470,7 @@ namespace AppliedAccounts.Data
 
         }
 
-        public string DirectoriesINSERT()
-        {
-            //DataTableClass _TableClass = new DataTableClass(UserName, Tables.Directories);
-            //SqliteCommand _Command = new(ConnectionClass.AppConnection(UserName));
-            //string[] Queries = new string[4];
-
-            //Queries[0] = "INSERT INTO [Directories] VALUES (1, 'CompanyStatus', 1, 'Customer')";
-            //Queries[1] = "INSERT INTO [Directories] VALUES (2, 'CompanyStatus', 2, 'Supplier');";
-            //Queries[2] = "INSERT INTO [Directories] VALUES (3, 'CompanyStatus', 3, 'Vendor');";
-            //Queries[3] = "INSERT INTO [Directories] VALUES (4, 'CompanyStatus', 4, 'Customer / Vendor');";
-
-            //foreach (string Query in Queries)
-            //{
-            //    _Command.CommandText = Query;
-            //    _Command.ExecuteNonQuery();
-            //}
-            return "";
-        }
+        
 
         #endregion
 
@@ -609,18 +602,6 @@ namespace AppliedAccounts.Data
             return Text.ToString();
         }
 
-        #endregion
-
-        #region Accounts (COA)
-        private string COA_Map()
-        {
-            var Text = new StringBuilder();
-            Text.AppendLine("CREATE TABLE [COA_Map] (");
-            Text.AppendLine("[ID] INT PRIMARY KEY NOT NULL UNIQUE,");
-            Text.AppendLine("[COA] INT NOT NULL UNIQUE REFERENCES [COA] ([ID]), ");
-            Text.AppendLine("[Stock] INT NOT NULL REFERENCES [Inventory] ([ID]));");
-            return Text.ToString();
-        }
         #endregion
 
         #region Stock in Hand
@@ -788,7 +769,7 @@ namespace AppliedAccounts.Data
         }
         #endregion
 
-        
+
         #region ID Generator Table
         private string IdGenerator()
         {
