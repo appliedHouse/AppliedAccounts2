@@ -55,4 +55,29 @@ app.UseUserDatabaseValidation();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
+
+// Backup SQLite Database to local computer as Backup..
+app.MapGet("/api/backup/{fileName}", async (
+    string fileName,
+    ISQLiteDBBackupService backupService,
+    IWebHostEnvironment env) =>
+{
+    var dbPath = Path.Combine(
+        env.WebRootPath,
+        "SQLiteDB",
+        fileName
+    );
+
+    try
+    {
+        var (data, name) = await backupService.CreateBackupAsync(dbPath);
+        return Results.File(data, "application/octet-stream", name);
+    }
+    catch (FileNotFoundException)
+    {
+        return Results.NotFound("Database not found");
+    }
+});
+
+
 app.Run();
