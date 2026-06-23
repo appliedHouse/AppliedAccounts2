@@ -8,8 +8,12 @@ namespace AppliedAccounts.Pages.Menu
     public partial class MainMenu
     {
         //[Parameter] public MenusClass MenuClass { get; set; }
+        [Inject] private IConfiguration Configuration { get; set; } = default!;
 
-        private string buildNum { get; set; } = "2606-21.001";
+        private string buildLabel => Configuration["Build:Label"] ?? "Applied Accounts build";
+        private string buildNum => Configuration["Build:Number"] ?? "";
+
+        //private string buildNum { get; set; } = "2606-21.001";
         private bool SubMenu { get; set; } = false;
         public async Task Beep() { await js.InvokeVoidAsync("playBeep"); }
 
