@@ -1,7 +1,7 @@
 ﻿
 :root {
-    --control-bg: #F1EFEC;
-    --control-btn-bg: #EBE5C2
+    --control-bg: #fff1f1;
+    --control-btn-bg: transparent
 }
 
 
@@ -22,8 +22,8 @@
 }
 
     .btn-print:disabled {
-        color: gray; 
-        cursor: not-allowed; 
+        color: gray;
+        cursor: not-allowed;
     }
 
 
@@ -83,11 +83,15 @@
     cursor: pointer;
 }
 
+.btn-Save, .btn-Delete, .btn-Back, .btn-trash, .btn-pencil, .btn-post {
+    width: 45px;
+    height: 16px;
+}
+
+
 .btn-Save {
     background-color: forestgreen;
     color: white;
-    width: 45px;
-    height: 28px;
     border: none;
     border-radius: 4px;
     display: flex;
@@ -101,32 +105,24 @@
     font-size: 1rem;
     color: ghostwhite;
     background-color: red;
-    width: 45px;
-    height: 16px;
 }
 
 
 .btn-Back {
     color: red;
     background-color: gold;
-    width: 45px;
-    height: 16px;
 }
 
 .btn-trash {
     color: red;
     background-color: transparent;
     border: none;
-    width: 45px;
-    height: 16px;
 }
 
 .btn-pencil {
     color: blue;
     background-color: transparent;
     border: none;
-    width: 45px;
-    height: 16px;
 }
 
 .btn-post {
@@ -134,9 +130,9 @@
     color: green;
     border: none;
     background-color: transparent;
-    width: 45px;
-    height: 16px;
 }
+
+
 
 .btn-center {
     margin: 0;
@@ -147,12 +143,21 @@
 }
 
 
+/*/ Control Button Style     /*/
 
+@media (max-width: 600px) {
+    .control-buttons .ctrl {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+}
 
 .control-buttons {
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 3px; /* Instead of margin on children */
     padding: 3px;
     background-color: var(--control-bg);
 }
@@ -166,7 +171,6 @@
         border: 0px;
         width: 26px;
         height: 26px;
-        margin: 3px;
     }
 
     .control-buttons .ctrl-new {
@@ -202,12 +206,17 @@
     }
 
     .control-buttons .ctrl-back {
-        color: royalblue;
+        color: purple;
         background-color: var(--control-btn-bg);
     }
 
     .control-buttons .ctrl-last {
         color: royalblue;
+        background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-save {
+        color: limegreen;
         background-color: var(--control-btn-bg);
     }
 
@@ -219,4 +228,9 @@
     .control-buttons .ctrl-backPage {
         color: #A5158C;
         background-color: var(--control-btn-bg);
+    }
+
+    .control-buttons .ctrl-save:hover, .ctrl-new:hover, ctrl-back:hover {
+        transform: scale(1.2);
+        filter: brightness(0.9);
     }

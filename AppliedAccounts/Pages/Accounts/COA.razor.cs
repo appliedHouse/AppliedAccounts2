@@ -54,6 +54,45 @@ namespace AppliedAccounts.Pages.Accounts
             }
         }
 
+        public async void Delete(long ID)
+        {
+            var IsDeleted = MyModel.Delete(ID);
+            if (IsDeleted)
+            {
+                MyModel.MsgClass.Success(AppMessages.Enums.Messages.Delete);
+                ToastService.ShowSuccess($"{MyModel.Record.Title} has been deleted.");
+                
+                MyModel.LoadData();
+                MyModel.GetFirstRecord();
+            }
+            else
+            {
+                ToastService.ShowError($"{MyModel.Record.Title} fail to delete.");
+            }
+        }
+
+
+        #region DropDown Changes
+        public void ClassChanged(long _NewValue)
+        {
+            MyModel.Record.Class = _NewValue;
+            MyModel.Record.TitleClass = MyModel.ClassList.First(e => e.ID == _NewValue).Title ?? "";
+        }
+
+        public void NatureChanged(long _NewValue)
+        {
+            MyModel.Record.Nature = _NewValue;
+            MyModel.Record.TitleNature = MyModel.NatureList.First(e => e.ID == _NewValue).Title ?? "";
+        }
+
+        public void NotesChanged(long _NewValue)
+        {
+            MyModel.Record.Notes = _NewValue;
+            MyModel.Record.TitleNote = MyModel.NotesList.First(e => e.ID == _NewValue).Title ?? "";
+        }
+        #endregion
+
+
     }
 }
 

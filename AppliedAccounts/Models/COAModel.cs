@@ -1,6 +1,9 @@
-﻿using AppliedAccounts.Services;
+﻿using AppliedAccounts.Component;
+using AppliedAccounts.Data.Mapping;
+using AppliedAccounts.Services;
 using AppliedDB;
 using System.Data;
+using System.Runtime.CompilerServices;
 using static AppliedDB.Enums;
 using MESSAGES = AppMessages.Enums.Messages;
 
@@ -18,6 +21,7 @@ namespace AppliedAccounts.Models
 
         public int CountRecord => Records.Count;
         public int Count => Data.Count;
+        private DataRow NewDataRow => Data.FirstOrDefault() ?? throw new InvalidOperationException("No data available.");
 
         public List<CodeTitle> ClassList { get; set; } = new();
         public List<CodeTitle> NatureList { get; set; } = new();
@@ -38,23 +42,38 @@ namespace AppliedAccounts.Models
         {
             AppGlobal = _AppGlobal;
             Source = new(AppGlobal.AppPaths);
-            Data = Source.GetTable(SQLQueries.Quries.COA()).AsEnumerable().ToList();
-            Records = GetFilterRecords();
 
-            ClassList = Source.GetAccClass();
-            NatureList = Source.GetAccNature();
-            NotesList = Source.GetAccNotes();
-
-            if (Count > 0) { Record = Records.First(); } else { Record = new COARecord(); }
+            LoadData();
+            GetFirstRecord();
+            
 
             // = MessageClass.Messages;
         }
+
+        public void LoadData()
+        {
+            Data = Source!.GetTable(SQLQueries.Quries.COA()).AsEnumerable().ToList();
+            Records = GetFilterRecords();
+
+            ClassList = Source!.GetAccClass();
+            NatureList = Source.GetAccNature();
+            NotesList = Source.GetAccNotes();
+
+        }
+
+        public void GetFirstRecord()
+        {
+            if (Count > 0) { Record = GetRecord(Data.FirstOrDefault()!); } else { Record = new COARecord(); }
+        }
+
+
         #endregion
 
         #region Get Record and DataRow
         private COARecord GetRecord(DataRow _Row)
         {
-            _Row = AppliedDB.Functions.RemoveNull(_Row);
+            _Row = Functions.RemoveNull(_Row);
+
             COARecord _Record = new();
             {
                 _Record.ID = (long)_Row["ID"];
@@ -71,27 +90,24 @@ namespace AppliedAccounts.Models
             return _Record;
         }
 
-        public COARecord GetRecord(long _ID)
+        public void GetRecord(long _ID)
         {
-            var _Record = new COARecord();
-
-            if (_ID == 0) { if (Records.Count > 0) { Record = Records.First(); } }
-            else
+            if(_ID > 0)
             {
-                foreach (COARecord _Item in Records)
-                {
-                    if (_Item.ID == _ID)
-                    {
-                        _Record = _Item;
-                    }
-                }
+                Record = Records.FirstOrDefault(e => e.ID == _ID)!;
             }
-            Record = _Record;
-            return _Record;
+
+            if(_ID == 0)
+            {
+                Record = new();
+            }
         }
 
         private DataRow GetDataRow(COARecord _Record)
         {
+
+            var _Datarow = _Record.ToDataRow(NewDataRow);    // Test only.
+
             DataRow _DataRow;
             if (Data.Count == 0)
             {
@@ -136,44 +152,41 @@ namespace AppliedAccounts.Models
         #region Delete
         public bool Delete(long _ID)
         {
-            //MyMessages = MessageClass.Messages;
-            var _DeleteRow = DataSource.GetNewRow(DBFile, Tables.COA);
+            MsgClass.ClearMessages();
+            var _DeleteRow = Source!.GetDataRow(Tables.COA, _ID);
 
             if (_DeleteRow is not null)
             {
-                _DeleteRow["ID"] = Record.ID;
-                _DeleteRow["Code"] = Record.Code;
-                _DeleteRow["Title"] = Record.Title;
-                _DeleteRow["Class"] = Record.Class;
-                _DeleteRow["Nature"] = Record.Nature;
-                _DeleteRow["Notes"] = Record.Notes;
 
-                var _Commands = new CommandClass(_DeleteRow, DBFile);
-                return _Commands.DeleteRow();
+                return Source.Delete(_DeleteRow);
+
             }
-
             return false;
+            
         }
         #endregion
 
         #region Save
         internal bool Save()
         {
+            MsgClass = new();
             var _NewRow = Source!.GetNewRow(Tables.COA);
 
-            _NewRow["ID"] = Record.ID;
-            _NewRow["Code"] = Record.Code;
-            _NewRow["Title"] = Record.Title;
-            _NewRow["Class"] = Record.Class;
-            _NewRow["Nature"] = Record.Nature;
-            _NewRow["Notes"] = Record.Notes;
-            _NewRow["OPENING_BALANCE"] = Record.OBal;
+            _NewRow = Record.ToDataRow(_NewRow) ?? _NewRow;
+
+            //_NewRow["ID"] = Record.ID;
+            //_NewRow["Code"] = Record.Code;
+            //_NewRow["Title"] = Record.Title;
+            //_NewRow["Class"] = Record.Class;
+            //_NewRow["Nature"] = Record.Nature;
+            //_NewRow["Notes"] = Record.Notes;
+            //_NewRow["OPENING_BALANCE"] = Record.OBal;
 
             if (Validate(_NewRow))
             {
                 Source.Save(_NewRow);
                 MsgClass = Source.MyCommands.MyMessages;
-                Data = [.. Source.GetTable(SQLQueries.Quries.COA()).AsEnumerable()];
+                LoadData();
                 Records = GetFilterRecords();
                 return Source.IsSaved;
             }
@@ -191,7 +204,9 @@ namespace AppliedAccounts.Models
         #region Edit
         public void Edit(long _ID)
         {
-            Record = GetRecord(_ID);
+            GetRecord(_ID);
+
+
         }
         #endregion
 
@@ -250,6 +265,10 @@ namespace AppliedAccounts.Models
         public virtual string? TitleNote { get; set; }
 
 
+
+
     }
+
+
 
 }
