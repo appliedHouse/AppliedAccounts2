@@ -19,6 +19,11 @@ public class ToastService : IToastService, IDisposable
         _options = serviceProvider.GetService(typeof(ToastOptions)) as ToastOptions;
     }
 
+    public void ShowSuccess(string message) => ShowSuccess(message, DefaultTime);
+    public void ShowError(string message) => ShowError(message, DefaultTime);
+    public void ShowWarning(string message) => ShowWarning(message, DefaultTime);
+    public void ShowInfo(string message) => ShowInfo(message, DefaultTime);
+
     public void ShowSuccess(string message, int duration = 8000)
         => Show(new ToastMessage(message, ToastLevel.Success, GetEffectiveDuration(duration)));
 

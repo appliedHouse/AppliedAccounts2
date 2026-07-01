@@ -1,9 +1,7 @@
-﻿using AppliedAccounts.Component;
-using AppliedAccounts.Data.Mapping;
+﻿using AppliedAccounts.Data.Mapping;
 using AppliedAccounts.Services;
 using AppliedDB;
 using System.Data;
-using System.Runtime.CompilerServices;
 using static AppliedDB.Enums;
 using MESSAGES = AppMessages.Enums.Messages;
 
@@ -46,7 +44,6 @@ namespace AppliedAccounts.Models
             LoadData();
             GetFirstRecord();
             
-
             // = MessageClass.Messages;
         }
 
@@ -137,7 +134,7 @@ namespace AppliedAccounts.Models
             var OIC = StringComparison.OrdinalIgnoreCase;
             var filteredData = Data.AsEnumerable()
                 .Where(row =>
-                    (row.Field<string>("Code")?.Contains(SearchText, OIC) ?? false)
+                     (row.Field<string>("Code")?.Contains(SearchText, OIC) ?? false)
                   || (row.Field<string>("Title")?.Contains(SearchText, OIC) ?? false)
                   || (row.Field<string>("TitleClass")?.Contains(SearchText, OIC) ?? false)
                   || (row.Field<string>("TitleNature")?.Contains(SearchText, OIC) ?? false)
@@ -173,14 +170,6 @@ namespace AppliedAccounts.Models
             var _NewRow = Source!.GetNewRow(Tables.COA);
 
             _NewRow = Record.ToDataRow(_NewRow) ?? _NewRow;
-
-            //_NewRow["ID"] = Record.ID;
-            //_NewRow["Code"] = Record.Code;
-            //_NewRow["Title"] = Record.Title;
-            //_NewRow["Class"] = Record.Class;
-            //_NewRow["Nature"] = Record.Nature;
-            //_NewRow["Notes"] = Record.Notes;
-            //_NewRow["OPENING_BALANCE"] = Record.OBal;
 
             if (Validate(_NewRow))
             {

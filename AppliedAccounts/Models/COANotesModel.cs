@@ -10,7 +10,7 @@ namespace AppliedAccounts.Models
     {
         public GlobalService AppGlobal { get; set; }
         public DataSource? Source { get; set; }
-        public string DBFile { get; set; } = string.Empty;
+        public string DBFile => Source!.DBFile;
         public COANotesRecord Record { get; set; } = new();
         public List<COANotesRecord> Records { get; set; } = new();
         public List<DataRow> Data { get; set; } = new();
@@ -20,15 +20,13 @@ namespace AppliedAccounts.Models
         public AppMessages.MessageClass MsgClass { get; set; } = new();
         public string SearchText { get; set; } = string.Empty;
         public bool IsDeleted { get; set; } = false;
+        public string MyMessage { get; set; } = "No Message";
 
         #region Constructor
         public COANotesModel() { }
         public COANotesModel(GlobalService _AppGlobal)
         {
             AppGlobal = _AppGlobal;
-            //AppUser = _UserProfile;
-            //MyMessages = MessageClass.Messages;
-            //DBFile = AppUser.DataFile;
             Source = new(AppGlobal.AppPaths);
             Data = Source.GetList(Query.COANotesList);
             Records = GetFilterRecords(string.Empty);
@@ -69,24 +67,20 @@ namespace AppliedAccounts.Models
             }
             return _Record;
         }
-        public COANotesRecord GetRecord(long _ID)
+        public void GetRecord(long _ID)
         {
-            var _Record = new COANotesRecord();
-
-            if (_ID == 0) { if (Records.Count > 0) { Record = Records.First(); } }
-            else
+            if (Records.Count > 0)
             {
-
-                foreach (COANotesRecord _Item in Records)
+                Record = Records.FirstOrDefault(e => e.ID == _ID)!;
+                if (Record == null)
                 {
-                    if (_Item.ID == _ID)
-                    {
-                        _Record = _Item;
-                    }
+                    Record = Records.First();
                 }
             }
-            Record = _Record;
-            return _Record;
+            else
+            {
+                Record = new();
+            }
         }
         private DataRow GetDataRow(COANotesRecord _Record)
         {
@@ -126,13 +120,6 @@ namespace AppliedAccounts.Models
         public bool Delete(long _ID)
         {
             GetRecord(_ID);
-            IsDeleted = true;
-            return true;
-        }
-
-        public bool DeleteRow(long _ID)
-        {
-            GetRecord(_ID);
             IsDeleted = false;
             //MyMessages = MessageClass.Messages;
             var _DeleteRow = DataSource.GetNewRow(DBFile, Tables.COA_Notes);
@@ -147,15 +134,20 @@ namespace AppliedAccounts.Models
                 var _result = _Commands.DeleteRow();
                 if (_result)
                 {
+                    MyMessage = $"Record {Record.Title} has been deleted sucessfully.";
+
                     // Refrest data from database table.
-                    Data = Source.GetList(Query.COANotesList);
+                    Data = Source!.GetList(Query.COANotesList);
                     Records = GetFilterRecords(string.Empty);
                     GetRecord(0);
                     return _result;
                 }
             }
+            MyMessage = $"Record {Record.Title} failed to be deleted.";
             return false;
         }
+
+        
 
         #endregion
 
@@ -172,8 +164,9 @@ namespace AppliedAccounts.Models
                     if (_result)
                     {
                         // Refresh Data
-                        Data = Source.GetList(Query.COANotesList);
+                        Data = Source!.GetList(Query.COANotesList);
                         Records = GetFilterRecords(string.Empty);
+                        return true;
                     }
                 }
                 else

@@ -17,5 +17,13 @@ namespace AppliedAccounts.Data.Mapping
             row["OPENING_BALANCE"] = rec.OBal;
             return row;
         }
+
+        public static DataRow ToDataRow(this COANatureRecord rec, DataRow row)
+        {
+            row["Id"] =    rec.ID;
+            row["Code"] =  rec.Code;
+            row["Title"] = rec.Title;
+            return row;
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Services;
+using AppliedAccounts.Data.Mapping;
 using AppliedDB;
 using System.Data;
 using static AppliedDB.Enums;
@@ -10,7 +11,7 @@ namespace AppliedAccounts.Models
     {
         public GlobalService AppGlobal { get; set; }
         public DataSource? Source { get; set; }
-        public string DBFile { get; set; } = string.Empty;
+        public string DBFile => Source!.DBFile ?? "" ;
         public COANatureRecord Record { get; set; } = new();
         public List<COANatureRecord> Records { get; set; } = new();
         public List<DataRow> Data { get; set; } = new();
@@ -26,8 +27,6 @@ namespace AppliedAccounts.Models
         public COANatureModel(GlobalService _AppGlobal)
         {
             AppGlobal = _AppGlobal;
-            //AppUser = _UserProfile;
-            //DBFile = AppUser.DataFile;
             Source = new(AppGlobal.AppPaths);
             Data = Source.GetList(Query.COANatureList);
             Records = GetFilterRecords(string.Empty);
@@ -59,6 +58,8 @@ namespace AppliedAccounts.Models
         #region Set Record and Data Row
         private COANatureRecord GetRecord(DataRow _Row)
         {
+
+
             COANatureRecord _Record = new();
             {
                 _Record.ID = (long)_Row["ID"];
@@ -68,24 +69,20 @@ namespace AppliedAccounts.Models
             }
             return _Record;
         }
-        public COANatureRecord GetRecord(long _ID)
+        public void GetRecord(long _ID)
         {
-            var _Record = new COANatureRecord();
-
-            if (_ID == 0) { if (Records.Count > 0) { Record = Records.First(); } }
-            else
+            if (Records.Count > 0)
             {
-
-                foreach (COANatureRecord _Item in Records)
+                Record = Records.FirstOrDefault(e => e.ID == _ID)!;
+                if (Record == null)
                 {
-                    if (_Item.ID == _ID)
-                    {
-                        _Record = _Item;
-                    }
+                    Record = Records.First();
                 }
             }
-            Record = _Record;
-            return _Record;
+            else
+            {
+                Record = new();
+            }
         }
         private DataRow GetDataRow(COANatureRecord _Record)
         {
@@ -99,10 +96,7 @@ namespace AppliedAccounts.Models
                 _DataRow = Data.First();
             }
 
-            _DataRow["Id"] = _Record.ID;
-            _DataRow["Code"] = _Record.Code;
-            _DataRow["Title"] = _Record.Title;
-            return _DataRow;
+            return _Record.ToDataRow(_DataRow);
 
         }
         #endregion
@@ -123,13 +117,6 @@ namespace AppliedAccounts.Models
 
         #region Delete
         public bool Delete(long _ID)
-        {
-            GetRecord(_ID);
-            IsDeleted = true;
-            return true;
-        }
-
-        public bool DeleteRow(long _ID)
         {
             GetRecord(_ID);
             IsDeleted = false;
@@ -154,7 +141,10 @@ namespace AppliedAccounts.Models
                 }
             }
             return false;
+
         }
+
+       
 
         #endregion
 
@@ -173,6 +163,7 @@ namespace AppliedAccounts.Models
                         // Refresh Data
                         Data = Source!.GetList(Query.COANatureList);
                         Records = GetFilterRecords(string.Empty);
+                        return true;
                     }
                 }
                 else
