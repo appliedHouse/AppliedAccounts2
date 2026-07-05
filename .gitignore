@@ -372,3 +372,4 @@ FodyWeavers.xsd
 /AppliedAccounts/wwwroot/ExcelFiles/2025-04 - April CDC.xlsx
 /AppliedAccounts/wwwroot/ExcelFiles/2025-05 - May CDC.xlsx
 *.zip
+/AppliedAccounts/wwwroot/Messages/Messages.db
