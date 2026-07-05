@@ -7,7 +7,7 @@
 
             NoMessage,
             Default = 1,
-            Save = 2,
+            Saved = 2,
             NotSave = 3,
             Delete = 4,
             NotDelete = 5,

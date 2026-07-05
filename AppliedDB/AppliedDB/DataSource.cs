@@ -1,6 +1,7 @@
 ﻿using AppliedGlobals;
 using AppMessages;
 using Microsoft.Data.Sqlite;
+using System.Configuration;
 using System.Data;
 using System.Text;
 using static AppliedDB.Enums;
@@ -36,6 +37,14 @@ namespace AppliedDB
             if (MyConnection is not null)
             {
                 MyCommand = new SqliteCommand("", MyConnection);
+            }
+
+            var FilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", AppPaths.MessagesPath, "Messages.db");
+
+            if(!string.IsNullOrEmpty(FilePath))
+            {
+                var _ConnectionString = $"Data Source={FilePath}";
+                MsgClass.MsgConnection = new SqliteConnection(_ConnectionString);
             }
         }
 
@@ -1112,7 +1121,7 @@ namespace AppliedDB
             var result = MyCommands.SaveChanges();
             if (result)
             {
-                MsgClass.Success(AppMessages.Enums.Messages.Save);
+                MsgClass.Success(AppMessages.Enums.Messages.Saved);
                 IsSaved = true;
             }
             else

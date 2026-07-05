@@ -6,9 +6,6 @@
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Services
 
-@inject AuthenticationStateProvider authorized
-@inject NavigationManager NavManager
-@inject IJSRuntime js
 @inject IToastService ToastService
 @inject PrintService ReportService
 @inject GlobalService AppGlobal
@@ -21,11 +18,9 @@
 
     public bool IsVisible { get; set; }
     public string? Message { get; set; }
-    //public string ToastCssClass { get; set; } = string.Empty;
 
     protected override void OnInitialized()
     {
-        UserProfile = ((UserAuthenticationStateProvider)authorized).AppUser;
         Start();
         MyModel.MsgClass = MsgService.MsgClass;
     }
@@ -364,14 +359,6 @@ else
                 </div>
             </div>
         </EditForm>
-
-        @* <!-- Toast -->
-        <div class="toast-container position-fixed @Toast.GetPosition()">
-            @if (Toast.ShowToast)
-            {
-                <ShowToastMessage toastClass="@Toast"></ShowToastMessage>
-            }
-        </div> *@
 
     }
     else

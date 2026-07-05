@@ -48,7 +48,7 @@ namespace AppliedAccounts.Pages.Accounts
             if(IsSaved)
             {
                 await InvokeAsync(StateHasChanged);
-                MyModel.MsgClass.Success(AppMessages.Enums.Messages.Save);
+                MyModel.MsgClass.Success(AppMessages.Enums.Messages.Saved);
                 ToastService.ShowSuccess($"Successfully saved {MyModel.Record.Title}");
             }
             else

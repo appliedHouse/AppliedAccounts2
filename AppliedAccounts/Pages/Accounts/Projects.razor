@@ -9,6 +9,7 @@
 
 @inject GlobalService AppGlobal
 @inject MessagesService MsgService
+@inject IToastService ToastService
 
 
 @code {
@@ -56,50 +57,18 @@
 
             <div class="row">
                 <div class="col-md-4">
-                    <div class="form-floating">
-                        <InputSelect id="ddCompany" class="form-control item-height" 
-                            TValue="long" 
-                            Value="@MyModel.Client" 
-                            ValueExpression="@(() => @MyModel.Client)" 
-                            ValueChanged="@((e) => CompanyIDChanged(e))">
-                            @if (Clients.Any())
-                            {
-                                @foreach (var item in Clients)
-                                {
-                                    <option value="@item.ID">@item.Title</option>
-                                }
-                            }
-                            else
-                            {
-                                <option value="0">No Records -  Clients</option>
-                            }
-
-                        </InputSelect>
-                        <label for="ddCompany">Clients</label>
-                    </div>
+                    <MyDropDown Id="ddClient"
+                                Label="Client / Customer / Sub Account"
+                                Value="@MyModel.Client"
+                                ValueChanged="@CompanyIDChanged"
+                                Items="@Clients" />
                 </div>
                 <div class="col-md-4">
-                    <div class="form-floating">
-                        <InputSelect id="ddEmployee" class="form-control item-height" 
-                            TValue="long" 
-                            Value="@MyModel.ProjectManager" 
-                            ValueExpression="@(() => @MyModel.ProjectManager)" 
-                            ValueChanged="@((e) => EmployeeIDChanged(e))">
-                            @if (Employees.Any())
-                            {
-                                @foreach (var item in Employees)
-                                {
-                                    <option value="@item.ID">@item.Title</option>
-                                }
-                            }
-                            else
-                            {
-                                <option value="0">No Records -  Employee</option>
-                            }
-
-                        </InputSelect>
-                        <label for="ddEmployee">Project Manager</label>
-                    </div>
+                    <MyDropDown Id="ddEmployee"
+                                Label="Project Manager"
+                                Value="@MyModel.ProjectManager"
+                                ValueChanged="@EmployeeIDChanged"
+                                Items="@Employees" />
                 </div>
             </div>
 
