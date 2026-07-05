@@ -28,6 +28,14 @@ namespace AppliedAccounts.Models
         {
             AppGlobal = _AppGlobal;
             Source = new(AppGlobal.AppPaths);
+            LoadData();
+        }
+        #endregion
+
+        #region Load Data
+        public void LoadData()
+        {
+            Source ??= new(AppGlobal.AppPaths);
             Data = Source.GetList(Query.COANotesList);
             Records = GetFilterRecords(string.Empty);
             if (Records.Count > 0) { Record = Records.First(); } else { Record = new COANotesRecord(); }
@@ -38,21 +46,29 @@ namespace AppliedAccounts.Models
         #region Filter List
         private List<COANotesRecord> GetFilterRecords(string _Filter)
         {
-            List<COANotesRecord> _FilterRecords = new();
+            List<COANotesRecord> _FilterRecords = [];
+            string searchLower = SearchText?.ToLower() ?? string.Empty;
+
             foreach (DataRow _Row in Data)
             {
-                if (SearchText.Length == 0)
+                if (string.IsNullOrEmpty(searchLower))
                 {
                     _FilterRecords.Add(GetRecord(_Row));
                 }
                 else
                 {
-                    if (_Row["Code"].ToString()!.Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                    if (_Row["Title"].ToString()!.Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
+                    string code = _Row["Code"]?.ToString()?.ToLower() ?? string.Empty;
+                    string title = _Row["Title"]?.ToString()?.ToLower() ?? string.Empty;
+
+                    if (code.Contains(searchLower) || title.Contains(searchLower))
+                    {
+                        _FilterRecords.Add(GetRecord(_Row));
+                    }
                 }
             }
             return _FilterRecords;
         }
+
         #endregion
 
         #region Set Record and Data Row
@@ -71,15 +87,11 @@ namespace AppliedAccounts.Models
         {
             if (Records.Count > 0)
             {
-                Record = Records.FirstOrDefault(e => e.ID == _ID)!;
-                if (Record == null)
-                {
-                    Record = Records.First();
-                }
+                Record = Records.FirstOrDefault(e => e.ID == _ID) ?? Records.First();
             }
             else
             {
-                Record = new();
+                Record = new COANotesRecord();
             }
         }
         private DataRow GetDataRow(COANotesRecord _Record)
@@ -119,39 +131,27 @@ namespace AppliedAccounts.Models
         #region Delete
         public bool Delete(long _ID)
         {
-            GetRecord(_ID);
-            IsDeleted = false;
-            //MyMessages = MessageClass.Messages;
-            var _DeleteRow = DataSource.GetNewRow(DBFile, Tables.COA_Notes);
+            MsgClass.ClearMessages();
+            var _DeleteRow = Source!.GetDataRow(Tables.COA_Notes, _ID);
 
             if (_DeleteRow is not null)
             {
-                _DeleteRow["ID"] = Record.ID;
-                _DeleteRow["Code"] = Record.Code;
-                _DeleteRow["Title"] = Record.Title;
-
-                var _Commands = new CommandClass(_DeleteRow, DBFile);
-                var _result = _Commands.DeleteRow();
-                if (_result)
-                {
-                    MyMessage = $"Record {Record.Title} has been deleted sucessfully.";
-
-                    // Refrest data from database table.
-                    Data = Source!.GetList(Query.COANotesList);
-                    Records = GetFilterRecords(string.Empty);
-                    GetRecord(0);
-                    return _result;
-                }
+                var _result = Source.Delete(_DeleteRow);
+                LoadData();
+                MyMessage = $"Record {_DeleteRow["Title"]} has been deleted sucessfully.";
+                return _result;
+                
             }
-            MyMessage = $"Record {Record.Title} failed to be deleted.";
+            MyMessage = $"Record {_DeleteRow!["Title"]} failed to be deleted.";
             return false;
         }
 
-        
+
 
         #endregion
 
         #region Save
+
         internal bool Save()
         {
             var _NewRow = GetDataRow(Record);
@@ -182,14 +182,37 @@ namespace AppliedAccounts.Models
         #region Validate
         private bool Validate(DataRow _Row)
         {
-            var _Validated = true;
-            if (_Row["ID"] is null) { _Validated = false; MsgClass.Add(MESSAGE.IDIsNull); }
-            if (_Row["Code"] is null) { _Validated = false; MsgClass.Add(MESSAGE.CodeIsNull); }
-            if (_Row["Title"] is null) { _Validated = false; MsgClass.Add(MESSAGE.ColumnIsNull); }
+            if (_Row["ID"] is null)
+            {
+                MsgClass.Add(MESSAGE.IDIsNull);
+                return false;
+            }
 
-            if (_Row["Code"].ToString()!.Length == 0) { _Validated = false; MsgClass.Add(MESSAGE.CodeIsZero); }
-            if (_Row["Title"].ToString()!.Length == 0) { _Validated = false; MsgClass.Add(MESSAGE.TitleIsZero); }
-            return _Validated;
+            if (_Row["Code"] is null)
+            {
+                MsgClass.Add(MESSAGE.CodeIsNull);
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(_Row["Code"].ToString()))
+            {
+                MsgClass.Add(MESSAGE.CodeIsZero);
+                return false;
+            }
+
+            if (_Row["Title"] is null)
+            {
+                MsgClass.Add(MESSAGE.ColumnIsNull);
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(_Row["Title"].ToString()))
+            {
+                MsgClass.Add(MESSAGE.TitleIsZero);
+                return false;
+            }
+
+            return true;
         }
         #endregion
 

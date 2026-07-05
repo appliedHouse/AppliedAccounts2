@@ -31,6 +31,7 @@ namespace AppliedAccounts.Models
         public string SearchText { get; set; } = string.Empty;
         public AppMessages.MessageClass MsgClass { get; set; } = new();
         public BrowseModel BrowseClass { get; set; } = new();
+        public string MyMessage { get; private set; }
 
         #endregion
 
@@ -49,7 +50,9 @@ namespace AppliedAccounts.Models
 
         public void LoadData()
         {
-            Data = Source!.GetTable(SQLQueries.Quries.COA()).AsEnumerable().ToList();
+            MsgClass.ClearMessages();
+            Data = [..Source!.GetTable(SQLQueries.Quries.COA()).AsEnumerable()];
+            SearchText = string.Empty;
             Records = GetFilterRecords();
 
             ClassList = Source!.GetAccClass();
@@ -154,30 +157,33 @@ namespace AppliedAccounts.Models
 
             if (_DeleteRow is not null)
             {
-
+                MyMessage = $"Record {Record.Title} has been deleted sucessfully.";
                 return Source.Delete(_DeleteRow);
 
             }
+            MyMessage = $"Record {Record.Title} failed to be deleted.";
             return false;
             
         }
         #endregion
 
         #region Save
-        internal bool Save()
+        
+        public bool Save()
         {
-            MsgClass = new();
+            MsgClass.ClearMessages();
             var _NewRow = Source!.GetNewRow(Tables.COA);
 
             _NewRow = Record.ToDataRow(_NewRow) ?? _NewRow;
 
             if (Validate(_NewRow))
             {
-                Source.Save(_NewRow);
+                var IsSaved = Source.SaveAsync(_NewRow).Result;
                 MsgClass = Source.MyCommands.MyMessages;
                 LoadData();
                 Records = GetFilterRecords();
-                return Source.IsSaved;
+                
+                return IsSaved;
             }
             return false;
         }
@@ -186,6 +192,8 @@ namespace AppliedAccounts.Models
         #region Add
         public void Add()
         {
+
+            MsgClass.ClearMessages();
             Record = new COARecord();
         }
         #endregion
@@ -193,20 +201,21 @@ namespace AppliedAccounts.Models
         #region Edit
         public void Edit(long _ID)
         {
+            MsgClass.ClearMessages();
             GetRecord(_ID);
-
-
         }
         #endregion
 
         #region Search
         public void Search()
         {
+            MsgClass.ClearMessages();
             Records = GetFilterRecords();
         }
 
         public void ClearText()
         {
+            MsgClass.ClearMessages();
             SearchText = string.Empty;
             Records = GetFilterRecords();
         }

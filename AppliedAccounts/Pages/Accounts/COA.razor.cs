@@ -47,6 +47,7 @@ namespace AppliedAccounts.Pages.Accounts
             var IsSaved = await Task.Run(()=> MyModel.Save());
             if(IsSaved)
             {
+                await InvokeAsync(StateHasChanged);
                 MyModel.MsgClass.Success(AppMessages.Enums.Messages.Save);
                 ToastService.ShowSuccess($"Successfully saved {MyModel.Record.Title}");
             }
@@ -62,14 +63,14 @@ namespace AppliedAccounts.Pages.Accounts
             if (IsDeleted)
             {
                 MyModel.MsgClass.Success(AppMessages.Enums.Messages.Delete);
-                ToastService.ShowSuccess($"{MyModel.Record.Title} has been deleted.");
+                ToastService.ShowSuccess(MyModel.MyMessage);
                 
                 MyModel.LoadData();
                 MyModel.GetFirstRecord();
             }
             else
             {
-                ToastService.ShowError($"{MyModel.Record.Title} fail to delete.");
+                ToastService.ShowError(MyModel.MyMessage);
             }
         }
 

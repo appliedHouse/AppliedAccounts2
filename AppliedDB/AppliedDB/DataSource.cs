@@ -869,31 +869,6 @@ namespace AppliedDB
         #endregion
 
         #region Delete Row
-        //public bool Delete(Tables _Table, DataRow _Row)
-        //{
-        //    var _DataTable = GetTable(_Table);
-        //    var _NewRow = _DataTable.NewRow();
-        //    var _RowArray = _Row.ItemArray;
-
-        //    _NewRow.ItemArray = _RowArray;
-
-        //    MyCommands = new(_NewRow, MyConnection);
-        //    return MyCommands.DeleteRow();
-        //}
-
-        //public bool Delete(DataRow _Row)
-        //{
-        //    if (MyCommands.CommandDelete != null) { MyCommands.CommandDelete.Transaction = _transaction; }
-
-        //    var IsDeleted = false;
-        //    MyCommands = new(_Row, MyConnection);
-        //    var result = MyCommands.DeleteRow();
-        //    if (result)
-        //    {
-        //        IsDeleted = true;
-        //    }
-        //    return IsDeleted;
-        //}
 
         public bool Delete(DataRow _Row)
         {
@@ -1112,6 +1087,15 @@ namespace AppliedDB
         #endregion
 
         #region Save
+        public async Task<bool> SaveAsync(DataRow newRow)
+        {
+            return await Task.Run(() =>
+            {
+                Save(newRow);
+                return IsSaved;
+            });
+        }
+
         public void Save(DataRow newRow)
         {
             IsSaved = false;

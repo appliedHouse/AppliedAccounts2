@@ -25,7 +25,7 @@ namespace AppliedAccounts.Pages.Accounts
             MyModel = new ProjectsViewModel();
             LoadData();
 
-            MsgService.Success(Messages.NoMessage);
+            //MsgService.Success(Messages.NoMessage);
 
         }
 
@@ -98,7 +98,7 @@ namespace AppliedAccounts.Pages.Accounts
             EditMode = false;
         }
 
-        public void New()
+        public void Add()
         {
             EditMode = true;
             //DataRow _Row = Source.GetNewRow(Enums.Tables.Project);
@@ -195,7 +195,7 @@ namespace AppliedAccounts.Pages.Accounts
             return _Result;
         }
 
-        public void BackPage()
+        public void Back()
         {
             AppGlobal.NavManager.NavigateTo("Accounts/Projects", true);
         }

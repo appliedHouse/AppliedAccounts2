@@ -13,11 +13,11 @@ namespace AppliedAccounts.Pages.Accounts
 
             if (IsSaved) 
             {
-                ToastService.ShowSuccess($"Record {MyModel.Record.Title} has been saved Save");
+                ToastService.ShowSuccess(MyModel.MyMessage);
             }
             else
             {
-                ToastService.ShowWarning($"Record {MyModel.Record.Title} failed to  Save");
+                ToastService.ShowWarning(MyModel.MyMessage);
             }
         }
 
@@ -30,13 +30,12 @@ namespace AppliedAccounts.Pages.Accounts
         {
             if(MyModel.Delete(ID))
             {
-                ToastService.ShowSuccess($"Record {MyModel.Record.Title} has been deleted successfully");
-                
-
+                ToastService.ShowSuccess(MyModel.MyMessage);
+                MyModel.LoadData();
             }
             else
             {
-                ToastService.ShowWarning($"Record {MyModel.Record.Title} failed to Delete");
+                ToastService.ShowWarning(MyModel.MyMessage);
             }
         }
 
