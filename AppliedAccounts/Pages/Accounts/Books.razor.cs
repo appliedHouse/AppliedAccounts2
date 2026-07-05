@@ -1,6 +1,5 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
-using AppliedAccounts.Services;
 using Microsoft.AspNetCore.Components;
 using System.Data;
 
@@ -116,7 +115,7 @@ namespace AppliedAccounts.Pages.Accounts
         #endregion
 
         #region BackPage
-        public void BackPage() { NavManager.NavigateTo("/Accounts/BooksList"); }
+        public void BackPage() { AppGlobal.NavManager.NavigateTo("/Accounts/BooksList"); }
         #endregion
 
         #region Print

@@ -1,9 +1,6 @@
 ﻿using AppliedAccounts.Services;
 using System.IO.Compression;
 
-// Backup Service that copy all DB file from applied.com.pk to jahangir.com
-
-
 public class DatabaseBackupService : BackgroundService
 {
     private readonly ILogger<DatabaseBackupService> _logger;

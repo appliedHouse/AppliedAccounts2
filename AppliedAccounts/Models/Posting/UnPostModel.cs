@@ -200,7 +200,7 @@ namespace AppliedAccounts.Models.Posting
                 await postCashBook.DoCashUnPost();                  // Cash Posting main method.
                 if (postCashBook.UnPostSuccessful)
                 {
-                    MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
+                    MsgClass.Success(Messages.Saved);        // add message after Save selected Vouchers.
                     await LoadData();              // Refresh display Data afger save voucher.
                 }
                 else
@@ -223,7 +223,7 @@ namespace AppliedAccounts.Models.Posting
                 await postBankBook.DoCashUnPost();                   
                 if (postBankBook.PostSuccessful)
                 {
-                    MsgClass.Success(Messages.Save);        // add message after Save selected Vouchers.
+                    MsgClass.Success(Messages.Saved);        // add message after Save selected Vouchers.
                     await LoadData();              // Refresh display Data afger save voucher.
                 }
                 else

@@ -1,4 +1,5 @@
-﻿using AppliedAccounts.Services;
+﻿using AppliedAccounts.Data.Mapping;
+using AppliedAccounts.Services;
 using AppliedDB;
 using System.Data;
 using static AppliedDB.Enums;
@@ -18,6 +19,7 @@ namespace AppliedAccounts.Models
 
         public int CountRecord => Records.Count;
         public int Count => Data.Count;
+        private DataRow NewDataRow => Data.FirstOrDefault() ?? throw new InvalidOperationException("No data available.");
 
         public List<CodeTitle> ClassList { get; set; } = new();
         public List<CodeTitle> NatureList { get; set; } = new();
@@ -29,6 +31,7 @@ namespace AppliedAccounts.Models
         public string SearchText { get; set; } = string.Empty;
         public AppMessages.MessageClass MsgClass { get; set; } = new();
         public BrowseModel BrowseClass { get; set; } = new();
+        public string MyMessage { get; private set; }
 
         #endregion
 
@@ -38,23 +41,39 @@ namespace AppliedAccounts.Models
         {
             AppGlobal = _AppGlobal;
             Source = new(AppGlobal.AppPaths);
-            Data = Source.GetTable(SQLQueries.Quries.COA()).AsEnumerable().ToList();
+
+            LoadData();
+            GetFirstRecord();
+            
+            // = MessageClass.Messages;
+        }
+
+        public void LoadData()
+        {
+            MsgClass.ClearMessages();
+            Data = [..Source!.GetTable(SQLQueries.Quries.COA()).AsEnumerable()];
+            SearchText = string.Empty;
             Records = GetFilterRecords();
 
-            ClassList = Source.GetAccClass();
+            ClassList = Source!.GetAccClass();
             NatureList = Source.GetAccNature();
             NotesList = Source.GetAccNotes();
 
-            if (Count > 0) { Record = Records.First(); } else { Record = new COARecord(); }
-
-            // = MessageClass.Messages;
         }
+
+        public void GetFirstRecord()
+        {
+            if (Count > 0) { Record = GetRecord(Data.FirstOrDefault()!); } else { Record = new COARecord(); }
+        }
+
+
         #endregion
 
         #region Get Record and DataRow
         private COARecord GetRecord(DataRow _Row)
         {
-            _Row = AppliedDB.Functions.RemoveNull(_Row);
+            _Row = Functions.RemoveNull(_Row);
+
             COARecord _Record = new();
             {
                 _Record.ID = (long)_Row["ID"];
@@ -71,27 +90,24 @@ namespace AppliedAccounts.Models
             return _Record;
         }
 
-        public COARecord GetRecord(long _ID)
+        public void GetRecord(long _ID)
         {
-            var _Record = new COARecord();
-
-            if (_ID == 0) { if (Records.Count > 0) { Record = Records.First(); } }
-            else
+            if(_ID > 0)
             {
-                foreach (COARecord _Item in Records)
-                {
-                    if (_Item.ID == _ID)
-                    {
-                        _Record = _Item;
-                    }
-                }
+                Record = Records.FirstOrDefault(e => e.ID == _ID)!;
             }
-            Record = _Record;
-            return _Record;
+
+            if(_ID == 0)
+            {
+                Record = new();
+            }
         }
 
         private DataRow GetDataRow(COARecord _Record)
         {
+
+            var _Datarow = _Record.ToDataRow(NewDataRow);    // Test only.
+
             DataRow _DataRow;
             if (Data.Count == 0)
             {
@@ -121,7 +137,7 @@ namespace AppliedAccounts.Models
             var OIC = StringComparison.OrdinalIgnoreCase;
             var filteredData = Data.AsEnumerable()
                 .Where(row =>
-                    (row.Field<string>("Code")?.Contains(SearchText, OIC) ?? false)
+                     (row.Field<string>("Code")?.Contains(SearchText, OIC) ?? false)
                   || (row.Field<string>("Title")?.Contains(SearchText, OIC) ?? false)
                   || (row.Field<string>("TitleClass")?.Contains(SearchText, OIC) ?? false)
                   || (row.Field<string>("TitleNature")?.Contains(SearchText, OIC) ?? false)
@@ -136,46 +152,38 @@ namespace AppliedAccounts.Models
         #region Delete
         public bool Delete(long _ID)
         {
-            //MyMessages = MessageClass.Messages;
-            var _DeleteRow = DataSource.GetNewRow(DBFile, Tables.COA);
+            MsgClass.ClearMessages();
+            var _DeleteRow = Source!.GetDataRow(Tables.COA, _ID);
 
             if (_DeleteRow is not null)
             {
-                _DeleteRow["ID"] = Record.ID;
-                _DeleteRow["Code"] = Record.Code;
-                _DeleteRow["Title"] = Record.Title;
-                _DeleteRow["Class"] = Record.Class;
-                _DeleteRow["Nature"] = Record.Nature;
-                _DeleteRow["Notes"] = Record.Notes;
+                MyMessage = $"Record {Record.Title} has been deleted sucessfully.";
+                return Source.Delete(_DeleteRow);
 
-                var _Commands = new CommandClass(_DeleteRow, DBFile);
-                return _Commands.DeleteRow();
             }
-
+            MyMessage = $"Record {Record.Title} failed to be deleted.";
             return false;
+            
         }
         #endregion
 
         #region Save
-        internal bool Save()
+        
+        public bool Save()
         {
+            MsgClass.ClearMessages();
             var _NewRow = Source!.GetNewRow(Tables.COA);
 
-            _NewRow["ID"] = Record.ID;
-            _NewRow["Code"] = Record.Code;
-            _NewRow["Title"] = Record.Title;
-            _NewRow["Class"] = Record.Class;
-            _NewRow["Nature"] = Record.Nature;
-            _NewRow["Notes"] = Record.Notes;
-            _NewRow["OPENING_BALANCE"] = Record.OBal;
+            _NewRow = Record.ToDataRow(_NewRow) ?? _NewRow;
 
             if (Validate(_NewRow))
             {
-                Source.Save(_NewRow);
+                var IsSaved = Source.SaveAsync(_NewRow).Result;
                 MsgClass = Source.MyCommands.MyMessages;
-                Data = [.. Source.GetTable(SQLQueries.Quries.COA()).AsEnumerable()];
+                LoadData();
                 Records = GetFilterRecords();
-                return Source.IsSaved;
+                
+                return IsSaved;
             }
             return false;
         }
@@ -184,6 +192,8 @@ namespace AppliedAccounts.Models
         #region Add
         public void Add()
         {
+
+            MsgClass.ClearMessages();
             Record = new COARecord();
         }
         #endregion
@@ -191,18 +201,21 @@ namespace AppliedAccounts.Models
         #region Edit
         public void Edit(long _ID)
         {
-            Record = GetRecord(_ID);
+            MsgClass.ClearMessages();
+            GetRecord(_ID);
         }
         #endregion
 
         #region Search
         public void Search()
         {
+            MsgClass.ClearMessages();
             Records = GetFilterRecords();
         }
 
         public void ClearText()
         {
+            MsgClass.ClearMessages();
             SearchText = string.Empty;
             Records = GetFilterRecords();
         }
@@ -250,6 +263,10 @@ namespace AppliedAccounts.Models
         public virtual string? TitleNote { get; set; }
 
 
+
+
     }
+
+
 
 }

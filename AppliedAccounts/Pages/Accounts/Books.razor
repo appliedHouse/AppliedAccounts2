@@ -4,15 +4,8 @@
 @attribute [Authorize]
 
 @using AppliedAccounts.Libs;
-@using AppliedAccounts.Models;
-@using AppliedAccounts.Data;
 @using AppliedAccounts.Services
-@using AppliedDB
-@using System.Data
 
-@inject AuthenticationStateProvider authorized
-@inject NavigationManager NavManager
-@inject IJSRuntime js
 @inject IToastService ToastService
 @inject PrintService ReportService
 @inject GlobalService AppGlobal
@@ -25,11 +18,9 @@
 
     public bool IsVisible { get; set; }
     public string? Message { get; set; }
-    //public string ToastCssClass { get; set; } = string.Empty;
 
     protected override void OnInitialized()
     {
-        UserProfile = ((UserAuthenticationStateProvider)authorized).AppUser;
         Start();
         MyModel.MsgClass = MsgService.MsgClass;
     }
@@ -44,8 +35,8 @@
 }
 
 <style>
-    
 
+    
     .itemRemove {
         color: darkgray;
     }
@@ -77,30 +68,14 @@ else
 
                 <div class="row g-md-2 mb-2 my-2">
                     <div class="col-md-4">
+                        <MyDropDown Id="ddbook"
+                                    Label="Book"
+                                    Value="@MyModel.MyVoucher.Master.BookID"
+                                    ValueChanged="@BookIDChanged"
+                                    Items="@MyModel.BookList" />
 
-                        <div class="form-floating">
-                            <InputSelect id="ddBook"
-                                         class="form-control item-height" 
-                                         TValue="long" 
-                                         Value="@MyModel.MyVoucher.Master.BookID" 
-                                         ValueExpression="@(() => @MyModel.MyVoucher.Master.BookID)" 
-                                         ValueChanged="@((e) => BookIDChanged(e))">
-                                @if (MyModel.BookList.Any())
-                                {
-                                    @foreach (var item in MyModel.BookList)
-                                    {
-                                        <option value="@item.ID">@item.Title</option>
-                                    }
-                                }
-                                else
-                                {
-                                    <option value="0">No Records</option>
-                                }
-
-                            </InputSelect>
-                            <label for="ddBook">@MyModel.BookNatureTitle</label>
-                        </div>
                     </div>
+
                     <div class="col-md-4">
                         <div class="form-floating">
                             <InputText class="form-control" id="txtVouNo" placeholder="Voucher No" @bind-Value="MyModel.MyVoucher.Master.Vou_No" disable>
@@ -150,82 +125,38 @@ else
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating">
-                            <InputSelect id="ddAccounts" class="form-control item-height" TValue="long" Value="@MyModel.MyVoucher.Detail.COA" ValueExpression="@(() => @MyModel.MyVoucher.Detail.COA)" ValueChanged="@((e) => AccountIDChanged(e))">
-                                @if (MyModel.Accounts.Any())
-                                {
-                                    @foreach (var item in MyModel.Accounts)
-                                    {
-                                        <option value="@item.ID">@item.Title</option>
-                                    }
-                                }
-                                else
-                                {
-                                    <option value="0">No Records - Accounts</option>
-                                }
+                        <MyDropDown Id="ddAccount"
+                                    Label="Accounts"
+                                    Value="@MyModel.MyVoucher.Detail.COA"
+                                    ValueChanged="@AccountIDChanged"
+                                    Items="@MyModel.Accounts" />
 
-                            </InputSelect>
-                            <label for="ddAccounts">Account</label>
-                        </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating">
-                            <InputSelect id="ddCompany" class="form-control item-height" TValue="long" Value="@MyModel.MyVoucher.Detail.Company" ValueExpression="@(() => @MyModel.MyVoucher.Detail.Company)" ValueChanged="@((e) => CompanyIDChanged(e))">
-                                @if (MyModel.Companies.Any())
-                                {
-                                    @foreach (var item in MyModel.Companies)
-                                    {
-                                        <option value="@item.ID">@item.Title</option>
-                                    }
-                                }
-                                else
-                                {
-                                    <option value="0">No Records -  Company</option>
-                                }
-
-                            </InputSelect>
-                            <label for="ddCompany">Company / Customer / Sub Account</label>
-                        </div>
+                        <MyDropDown Id="ddCompany"
+                                    Label="Client / Customer / Sub Account"
+                                    Value="@MyModel.MyVoucher.Detail.Company"
+                                    ValueChanged="@CompanyIDChanged"
+                                    Items="@MyModel.Companies" />
                     </div>
                 </div>
                 <div class="row g-md-2 mb-2">
-                    <div class="col-md-4">
-                        <div class="form-floating">
-                            <InputSelect id="ddEmployee" class="form-control item-height" TValue="long" Value="@MyModel.MyVoucher.Detail.Employee" ValueExpression="@(() => @MyModel.MyVoucher.Detail.Employee)" ValueChanged="@((e) => EmployeeIDChanged(e))">
-                                @if (MyModel.Employees.Any())
-                                {
-                                    @foreach (var item in MyModel.Employees)
-                                    {
-                                        <option value="@item.ID">@item.Title</option>
-                                    }
-                                }
-                                else
-                                {
-                                    <option value="0">No Records - Employee</option>
-                                }
 
-                            </InputSelect>
-                            <label for="ddEmployee">Employee</label>
-                        </div>
+                    <div class="col-md-4">
+                        <MyDropDown Id="ddEmployee"
+                                    Label="Employee"
+                                    Value="@MyModel.MyVoucher.Detail.Employee"
+                                    ValueChanged="@EmployeeIDChanged"
+                                    Items="@MyModel.Employees" />
+
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating">
-                            <InputSelect id="ddProject" class="form-control item-height" TValue="long" Value="@MyModel.MyVoucher.Detail.Project" ValueExpression="@(() => @MyModel.MyVoucher.Detail.Project)" ValueChanged="@((e) => ProjectIDChanged(e))">
-                                @if (MyModel.Projects.Any())
-                                {
-                                    @foreach (var item in MyModel.Projects)
-                                    {
-                                        <option value="@item.ID">@item.Title</option>
-                                    }
-                                }
-                                else
-                                {
-                                    <option value="0">No Records - Project</option>
-                                }
+                        <MyDropDown Id="ddProject"
+                                    Label="Project"
+                                    Value="@MyModel.MyVoucher.Detail.Project"
+                                    ValueChanged="@ProjectIDChanged"
+                                    Items="@MyModel.Projects" />
 
-                            </InputSelect>
-                            <label for="ddProject">Project</label>
-                        </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating">
@@ -276,7 +207,7 @@ else
                     <div class="p-2">
                         <button type="button" class="btn btn-sm w1 btn-success" title="Save" data-bs-toggle="modal" data-bs-target="#SaveVoucher">
                             <i class="bi bi-floppy2-fill"></i>
-                            </button>
+                        </button>
                     </div>
 
                     @if (MyModel.MyVoucher != null && MyModel.MyVoucher.Details.Count > 1)
@@ -300,7 +231,7 @@ else
                         </div>
                         <div><ReportingButtons ReturnValue="Print" ID="@MyModel.MyVoucher!.Master.ID1" /></div>
                     }
-                    
+
                     <!-- Float Back Button to the Right -->
                     <div class="p-2 ms-auto">
                         <button type="button" class="btn btn-sm w1 btn-warning" title="Back" @onclick="BackPage"><i class="bi bi-arrow-left-circle"></i></button>
@@ -396,8 +327,6 @@ else
 
             }
 
-
-
             <!-- Modal -->
             <div class="modal fade" id="SaveVoucher" tabindex="-1" aria-labelledby="SaveVoucherLabel" aria-hidden="true">
                 <div class="modal-dialog">
@@ -430,14 +359,6 @@ else
                 </div>
             </div>
         </EditForm>
-
-        @* <!-- Toast -->
-        <div class="toast-container position-fixed @Toast.GetPosition()">
-            @if (Toast.ShowToast)
-            {
-                <ShowToastMessage toastClass="@Toast"></ShowToastMessage>
-            }
-        </div> *@
 
     }
     else

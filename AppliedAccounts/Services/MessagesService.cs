@@ -111,6 +111,10 @@ namespace AppliedAccounts.Services
         {
             MsgClass.MessageList.Add(MsgClass.GetMessage(_text, Class.Alert));
         }
+
+        public void Clear() => MsgClass.ClearMessages();
+        public int Count() => MsgClass.Count;
+
     }
 
     public interface IMessagesService
@@ -135,5 +139,8 @@ namespace AppliedAccounts.Services
 
         void Alert(Messages code);
         void Alert(string text);
+
+        void Clear();
+        int Count();
     }
 }

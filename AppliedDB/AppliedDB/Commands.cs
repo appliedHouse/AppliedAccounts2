@@ -93,7 +93,7 @@ namespace AppliedDB
 
                     if (Effected > 0)
                     {
-                        MyMessages.Add(Messages.Save);
+                        MyMessages.Add(Messages.Saved);
                         return true;
                     }
 
@@ -137,15 +137,15 @@ namespace AppliedDB
                     if (savePoint != null) { CommandInsert.Transaction!.Release(savePoint); }
 
 
-                    MyMessages.Success(Messages.Save);
+                    MyMessages.Success(Messages.Saved);
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    if (CommandInsert.Transaction != null)
-                    {
-                        try { CommandInsert.Transaction.Rollback(); } catch { }
-                    }
+                    //if (CommandInsert.Transaction != null)
+                    //{
+                    //    try { CommandInsert.Transaction.Rollback(); } catch { }
+                    //}
                     MyMessages.Danger(ex.Message);
                     return false;
                 }

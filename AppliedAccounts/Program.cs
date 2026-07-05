@@ -11,7 +11,7 @@ using ToastNotificationLibrary.Models;
 
 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
-var builder = WebApplication.CreateBuilder(args);
+ var builder = WebApplication.CreateBuilder(args);
 
 Batteries.Init();                       // Start SQLite Engine.
 
@@ -30,7 +30,7 @@ builder.Services.AddScoped<MessagesService>();
 builder.Services.AddScoped<GlobalService>();
 builder.Services.AddToastNotification(options =>
 {
-    options.DefaultDuration = 3000;
+    options.DefaultDuration = 8000;
     options.DefaultPosition = ToastPosition.BottomEnd;
 });
 
@@ -54,30 +54,5 @@ app.UseUserDatabaseValidation();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
-
-
-// Backup SQLite Database to local computer as Backup..
-app.MapGet("/api/backup/{fileName}", async (
-    string fileName,
-    ISQLiteDBBackupService backupService,
-    IWebHostEnvironment env) =>
-{
-    var dbPath = Path.Combine(
-        env.WebRootPath,
-        "SQLiteDB",
-        fileName
-    );
-
-    try
-    {
-        var (data, name) = await backupService.CreateBackupAsync(dbPath);
-        return Results.File(data, "application/octet-stream", name);
-    }
-    catch (FileNotFoundException)
-    {
-        return Results.NotFound("Database not found");
-    }
-});
-
 
 app.Run();

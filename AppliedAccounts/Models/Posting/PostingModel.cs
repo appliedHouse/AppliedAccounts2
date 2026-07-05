@@ -182,7 +182,7 @@ namespace AppliedAccounts.Models.Posting
 
             if (post.PostSuccessful)
             {
-                MsgClass.Success(Messages.Save);
+                MsgClass.Success(Messages.Saved);
                 await LoadData(model); // ✅ FIXED
             }
             else
