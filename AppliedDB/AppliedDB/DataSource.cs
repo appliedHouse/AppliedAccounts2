@@ -881,7 +881,7 @@ namespace AppliedDB
 
         public bool Delete(DataRow _Row)
         {
-            // Create commands FIRST
+            MsgClass.ClearMessages();
             MyCommands = new(_Row, MyConnection);
 
             // THEN attach the transaction
@@ -890,7 +890,16 @@ namespace AppliedDB
                 MyCommands.CommandDelete.Transaction = DBtransaction;
             }
 
-            return MyCommands.DeleteRow();
+            var IsDeleted = MyCommands.DeleteRow();
+            if(IsDeleted)
+            {
+                MsgClass.Warning(AppMessages.Enums.Messages.Delete);
+            }
+            else
+            {
+                MsgClass.Danger(AppMessages.Enums.Messages.NotDelete);
+            }
+            return IsDeleted;
         }
 
 
