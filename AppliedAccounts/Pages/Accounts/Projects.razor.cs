@@ -178,6 +178,7 @@ namespace AppliedAccounts.Pages.Accounts
                         if (DelValidaded(_ID))
                         {
                             Source.Delete(_Row);
+                            MsgService.AddRange(Source.MsgClass);
                             LoadData();
                             ToastService.ShowSuccess($"Project {_Row["Title"]} deleted successfully.");
                         }
