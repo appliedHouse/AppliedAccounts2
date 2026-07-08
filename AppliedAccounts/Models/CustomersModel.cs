@@ -12,13 +12,14 @@ namespace AppliedAccounts.Models
         public GlobalService AppGlobal { get; set; }
         public DataSource Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
-        public CustomerRecord Record { get; set; } = new();
-        public List<CustomerRecord> Records { get; set; } = [];
+        public CustomerVM Record { get; set; } = new();
+        public List<CustomerVM> Records { get; set; } = [];
         public List<DataRow> Data { get; set; } = new();
         public DataRow? MyDataRow { get; set; }
         public MessageClass MsgClass { get; set; }
         public bool RecordNotFound { get; set; } = false;
         public string SearchText { get; set; } = string.Empty;
+        public List<DataRow> CustomerList { get; set; }
 
 
         #region Constructor
@@ -30,12 +31,13 @@ namespace AppliedAccounts.Models
             MsgClass = new();
             Source = new(AppGlobal.AppPaths);
             Data = Source.GetList(Query.CustomersList);
+            CustomerList = [..Data.AsEnumerable()];
             MyDataRow = Source.Seek(Tables.Customers, 0);
 
             if (Data is not null) { Records = GetFilterRecords(""); }
 
 
-            if (MyDataRow is null) { RecordNotFound = true; Record = new CustomerRecord(); }
+            if (MyDataRow is null) { RecordNotFound = true; Record = new CustomerVM(); }
             else
             {
                 Record = GetRecord(MyDataRow);
@@ -44,8 +46,6 @@ namespace AppliedAccounts.Models
         public CustomersModel(GlobalService _AppGlobal, int ID)
         {
             AppGlobal = _AppGlobal;
-            //AppUser = UserProfile;
-            //DBFile = AppUser.DataFile;
             Source = new(AppGlobal.AppPaths);
             MyDataRow = Source.Seek(Tables.Customers, ID);
             Record = GetRecord(MyDataRow);
@@ -53,10 +53,10 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Get Record and DataRow
-        private CustomerRecord GetRecord(DataRow _Row)
+        private CustomerVM GetRecord(DataRow _Row)
         {
             _Row = AppliedDB.Functions.RemoveNull(_Row);
-            CustomerRecord _Record = new();
+            CustomerVM _Record = new();
             {
                 _Record.ID = (int)_Row.Field<long>("ID");
                 _Record.Code = (string)_Row["Code"];
@@ -76,10 +76,10 @@ namespace AppliedAccounts.Models
             return _Record;
         }
 
-        public CustomerRecord GetRecord(long _ID)
+        public CustomerVM GetRecord(long _ID)
         {
 
-            foreach (CustomerRecord _Record in Records)
+            foreach (CustomerVM _Record in Records)
             {
                 if (_Record.ID == _ID)
                 {
@@ -90,7 +90,7 @@ namespace AppliedAccounts.Models
             return new();
         }
 
-        private DataRow GetDataRow(CustomerRecord _Record)
+        private DataRow GetDataRow(CustomerVM _Record)
         {
             try
             {
@@ -130,9 +130,9 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Filter List
-        private List<CustomerRecord> GetFilterRecords(string _Filter)
+        private List<CustomerVM> GetFilterRecords(string _Filter)
         {
-            List<CustomerRecord> _FilterRecords = new List<CustomerRecord>();
+            List<CustomerVM> _FilterRecords = new List<CustomerVM>();
             foreach (DataRow _Row in Data)
             {
                 if (SearchText.Length == 0)
@@ -160,20 +160,22 @@ namespace AppliedAccounts.Models
         #region Delete
         public bool Delete(long _ID)
         {
-            //MyMessages = MessageClass.Messages;
-            MyDataRow = Source!.Seek(Tables.Customers, _ID);
-            if (MyDataRow is not null)
+            if (_ID > 0)
             {
-                if ((int)MyDataRow["ID"] == _ID)
+                MyDataRow = Source!.Seek(Tables.Customers, _ID);
+                if (MyDataRow is not null)
                 {
-                    var _Commands = new CommandClass(MyDataRow, Source.DBFile);
-                    _Commands.DeleteRow();
-                    if (_Commands.Effected > 0)
+                    if ((long)MyDataRow["ID"] == _ID)
                     {
-                        MsgClass = _Commands.MyMessages;
-                        Data = Source.GetList(Query.CustomersList);
-                        if (Data is not null) { Records = GetFilterRecords(""); }
-                        return true;
+                        Source ??= new(AppGlobal.AppPaths);
+
+                        if (Source.Delete(MyDataRow))
+                        {
+                            Data = Source.GetList(Query.CustomersList);
+                            if (Data is not null)
+                            { Records = GetFilterRecords(""); }
+                            return true;
+                        }
                     }
                 }
             }
@@ -182,18 +184,13 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Save
-        internal bool Save()
+        public bool Save()
         {
             var _NewRow = GetDataRow(Record);
             if (Validate(_NewRow))
             {
                 Source ??= new(AppGlobal.AppPaths);
                 Source.Save(_NewRow);
-
-                //var _Commands = new CommandClass(_NewRow, DBFile);
-
-
-
                 return true;
             }
             return false;
@@ -201,23 +198,26 @@ namespace AppliedAccounts.Models
 
         private bool Validate(DataRow _Row)
         {
-            if (_Row["ID"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.IDIsNull); }
-            if (_Row["Code"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.CodeIsNull); }
-            if (_Row["Title"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.TitleIsNull); }
-            if (_Row["City"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.CityIsZero); }
+            bool _result = true;
+            MsgClass = new();
 
-            if (((string)_Row["Code"]).Length == 0) { MsgClass.Alert(AppMessages.Enums.Messages.CodeIsZero); }
-            if (((string)_Row["Title"]).Length == 0) { MsgClass.Alert(AppMessages.Enums.Messages.TitleIsZero); }
-            if (((string)_Row["City"]).Length == 0) { MsgClass.Alert(AppMessages.Enums.Messages.CityIsZero); }
+            if (_Row["ID"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.IDIsNull); _result = false; }
+            if (_Row["Code"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.CodeIsNull); _result = false; }
+            if (_Row["Title"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.TitleIsNull); _result = false; }
+            if (_Row["City"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.CityIsZero); _result = false; }
 
-            return true;
+            if (((string)_Row["Code"]).Length == 0) { MsgClass.Alert(AppMessages.Enums.Messages.CodeIsZero); _result = false; }
+            if (((string)_Row["Title"]).Length == 0) { MsgClass.Alert(AppMessages.Enums.Messages.TitleIsZero); _result = false; }
+            if (((string)_Row["City"]).Length == 0) { MsgClass.Alert(AppMessages.Enums.Messages.CityIsZero); _result = false; }
+
+            return _result;
         }
         #endregion
 
         #region Add
         public void Add()
         {
-            Record = new CustomerRecord();
+            Record = new CustomerVM();
         }
         #endregion
 
@@ -237,7 +237,7 @@ namespace AppliedAccounts.Models
         #endregion
     }
 
-    public class CustomerRecord
+    public class CustomerVM
     {
         [Required]
         public int ID { get; set; }
@@ -251,6 +251,7 @@ namespace AppliedAccounts.Models
         public string Address3 { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
         public string State { get; set; } = string.Empty;
+        public string ContactTo { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;
         [Phone]
         public string Phone { get; set; } = string.Empty;
@@ -261,6 +262,7 @@ namespace AppliedAccounts.Models
         public string NTN { get; set; } = string.Empty;
         public string CNIC { get; set; } = string.Empty;
         public string Notes { get; set; } = string.Empty;
+        public long Status { get; set; } = 0;
 
     }
 

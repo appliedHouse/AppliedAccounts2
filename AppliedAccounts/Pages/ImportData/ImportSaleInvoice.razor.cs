@@ -5,6 +5,7 @@ using AppliedDB;
 using AppMessages;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using SQLitePCL;
 using System.Data;
 using System.Diagnostics;
 using Format = AppliedGlobals.AppValues.Format;
@@ -40,7 +41,11 @@ namespace AppliedAccounts.Pages.ImportData
         public bool Step3 { get; set; } = false; // Step 3: Display Excel file data
         public bool Step4 { get; set; } = false; // Step 4: Post / Save invoices to Database
 
-
+        public List<CodeTitle> ClientList { get; set; }
+        public List<CodeTitle> EmployeeList { get; set; }
+        public List<CodeTitle> InventoryList { get; set; }
+        public List<DataRow> TaxList { get; set; }
+        public List<CodeTitle> ProjectList { get; set; }
 
 
         DateTime Inv_Date = DateTime.Now;
@@ -52,7 +57,6 @@ namespace AppliedAccounts.Pages.ImportData
         int Error = 0;
         int Skip = 0;
 
-
         #endregion
 
         #region Constructor
@@ -62,8 +66,20 @@ namespace AppliedAccounts.Pages.ImportData
         {
             AppGlobal = _AppGlobal;
             MyModel = new();
+            Source = new(AppGlobal.AppPaths);
             MyModel.IsClientUpdate = true;             // true if client info update in DB
 
+            ClientList = Source.GetCustomers();
+            EmployeeList = Source.GetEmployees();
+            InventoryList = Source.GetInventory();
+            ProjectList = Source.GetProjects();
+            TaxList = Source.GetTable(Tables.Taxes).AsEnumerable().ToList();
+
+            if (ClientList.Count == 0 || EmployeeList.Count == 0 || InventoryList.Count == 0 || ProjectList.Count == 0 || TaxList.Count == 0)
+            {
+                MyModel.IsError = true;
+                MyModel.ErrorMessage = "Required data is missing in database. Please check Customers, Employees, Inventory, Projects and Taxes data.";
+            }
 
         }
         #endregion
@@ -230,8 +246,8 @@ namespace AppliedAccounts.Pages.ImportData
                 if (ClientData != null && Source != null)
                 {
                     MyModel.SpinnerMessage = "Sales invoice data is being Process... Customer Data Updating..";
-                    var tb_Client = Source.GetTable(Tables.Customers);
-                    var tb_ClientList = tb_Client.AsEnumerable().ToList();
+                    //var tb_Client = Source.GetTable(Tables.Customers);
+                    //var tb_ClientList = tb_Client.AsEnumerable().ToList();
                     var ExcelColumn = "BP Name";
                     var DataColumn = "Title";
 
@@ -241,19 +257,23 @@ namespace AppliedAccounts.Pages.ImportData
                     foreach (DataRow Row in ClientData.Rows)
                     {
 
+                        //if ((int)Row["ID"]==0) { continue; }
+                        if (string.IsNullOrEmpty((string)Row["BP CODE"])) { continue; }
+                        if (string.IsNullOrEmpty((string)Row["BP Name"])) { continue; }
+
                         var _Title = Row[ExcelColumn].ToString()?.Trim() ?? "";
-                        var _RowID = tb_ClientList.Where(row => _Title == row.Field<string>(DataColumn)).Select(row => row.Field<long>("ID")).FirstOrDefault();
+                        var _RowID = ClientList.Where(e => e.Code == (string)Row["BP CODE"]).Select(row => row.ID).FirstOrDefault();
+
+                        //var _RowID = tb_ClientList.Where(row => _Title == row.Field<string>(DataColumn)).Select(row => row.Field<long>("ID")).FirstOrDefault();
 
                         if (_RowID == 0)
                         {
-
                             Log.Add(_Title, false);
                         }
                         else
                         {
                             Log.Add(_Title, true);
                         }
-
 
                         // Process Bar Calculation
                         MyModel.Counter++;
@@ -381,12 +401,15 @@ namespace AppliedAccounts.Pages.ImportData
 
                 if (string.IsNullOrEmpty(Row["Code"].ToString())) { Error++; continue; }
                 if ((string)Row["Active"] != "1") { Skip++; continue; }
-                //if (MyModel.Counter == 0) { continue; }     // Skip record of Heading in Excel File. 
 
 
                 DataRow _Row1 = Sale1.NewRow();
-                long _CompanyID = AppliedDB.Functions.Code2long(AppGlobal.DBFile, Tables.Customers, (string)Row["Code"]);
-                long _EmployeeID = AppliedDB.Functions.Code2long(AppGlobal.DBFile, Tables.Employees, (string)Row["Employee"]);
+                //long _CompanyID = AppliedDB.Functions.Code2long(AppGlobal.DBFile, Tables.Customers, (string)Row["Code"]);
+                //long _EmployeeID = AppliedDB.Functions.Code2long(AppGlobal.DBFile, Tables.Employees, (string)Row["Employee"]);
+
+                long _CompanyID = ClientList.Where(e => e.Code == Row.Field<string>("Code")).Select(e => e.ID).FirstOrDefault();
+                long _EmployeeID = EmployeeList.Where(e => e.Code == Row.Field<string>("Code")).Select(e => e.ID).FirstOrDefault();
+
                 decimal _Total = Conversion.ToDecimal(Row["Total"]);
 
                 if (_Total > 0)     // if Invoice amount is zero, skip this...
@@ -465,52 +488,57 @@ namespace AppliedAccounts.Pages.ImportData
                 MsgClass.Add($"{DateTime.Now} Working of Sale Invoice details.");
                 var Counter2 = 0;
                 var Sr_No = 0;
-                if (SalesSchema is not null)
+
+                if (SalesSchema is null) return;
+
+                foreach (DataRow Scheme in SalesSchema.Rows)
                 {
-                    foreach (DataRow Scheme in SalesSchema.Rows)
+
+                    if ((string)Scheme["Code"] == "0") continue;
+
+                    decimal _Amount = Conversion.ToDecimal(Row[(string)Scheme["Amount"]]);
+                    if (_Amount == 0) { continue; }          // Skip if amount is zero.
+
+                    Counter2++; 
+                    Sr_No++;
+
+                    DataRow _Row2 = Sale2.NewRow();
+                    _Row2["ID"] = Counter2;
+                    _Row2["Sr_No"] = Sr_No;
+                    _Row2["TranID"] = MyModel.Counter;
+                    _Row2["Batch"] = Batch;
+
+                    long _Inventory = InventoryList.Where(e => e.Code == Scheme.Field<string>("Code")).Select(e => e.ID).FirstOrDefault();
+                    _Row2["Inventory"] = _Inventory;
+
+                    switch ((string)Scheme["Entry ID"])
                     {
+                        case "A":
+                            _Row2["Qty"] = 1;
+                            _Row2["Rate"] = _Amount;
+                            break;
 
-                        if ((string)Scheme["Code"] != "0")
-                        {
-                            decimal _Amount = Conversion.ToDecimal(Row[(string)Scheme["Amount"]]);
-                            if (_Amount == 0) { continue; }          // Skip if amount is zero.
-
-                            Counter2++; Sr_No++;
-                            DataRow _Row2 = Sale2.NewRow();
-                            _Row2["ID"] = Counter2;
-                            _Row2["Sr_No"] = Sr_No;
-                            _Row2["TranID"] = MyModel.Counter;
-                            _Row2["Batch"] = Batch;
-
-                            long _Inventory = AppliedDB.Functions.Code2long(AppGlobal.DBFile, Tables.Inventory, (string)Scheme["Code"]);
-                            _Row2["Inventory"] = _Inventory;
-                            //_Row2["Batch"] = Batch;
-
-                            if ((string)Scheme["Entry ID"] == "A")          // Amount only
-                            {
-                                _Row2["Qty"] = 1;
-                                _Row2["Rate"] = _Amount;
-                            }
-                            if ((string)Scheme["Entry ID"] == "Q")          // Quantity and Rate = Amount
-                            {
-                                _Row2["Qty"] = Conversion.ToDecimal(Row[(string)Scheme["Qty"]]);
-                                _Row2["Rate"] = Conversion.ToDecimal(Row[(string)Scheme["Rate"]]);
-                            }
-
-                            decimal _TaxID = AppliedDB.Functions.Code2long(AppGlobal.DBFile, Tables.Taxes, (string)Scheme["STax"]);
-                            _Row2["Tax"] = _TaxID;
-                            _Row2["Tax_Rate"] = AppliedDB.Functions.Code2Rate(AppGlobal.DBFile, (long)_Row2["Tax"]);
-                            _Row2["Description"] = Row[(string)Scheme["Remarks Code"]];
-                            long.TryParse(Row["Project"].ToString(), out long _projectID);
-                            _Row2["Project"] = _projectID;
-
-                            Sale2.Rows.Add(_Row2);
-                            MyModel.SaleDetailsList.Add(_Row2);
-                        }
+                        case "Q":
+                            _Row2["Qty"] = Conversion.ToDecimal(Row[(string)Scheme["Qty"]]);
+                            _Row2["Rate"] = Conversion.ToDecimal(Row[(string)Scheme["Rate"]]);
+                            break;
                     }
+
+
+                    var taxItem = TaxList.FirstOrDefault(r => r.Field<string>("Code") == Scheme.Field<string>("STax"));
+
+                    //long _taxID = TaxList.FirstOrDefault(r => r.Field<string>("Code") == Scheme.Field<string>("STax"))?.Field<long>("ID") ?? 0;
+                    //decimal _taxRate = TaxList.FirstOrDefault(r => r.Field<string>("Code") == Scheme.Field<string>("STax"))?.Field<decimal>("Rate") ?? 0m;
+                    _Row2["Tax"] = taxItem?.Field<long>("ID") ?? 0;
+                    _Row2["Tax_Rate"] = taxItem?.Field<decimal>("Rate") ?? 0m;
+
+                    _Row2["Description"] = Row[(string)Scheme["Remarks Code"]];
+                    _Row2["Project"] = long.TryParse(Row["Project"]?.ToString(), out long _projectID) ? _projectID : 0;
+
+                    Sale2.Rows.Add(_Row2);
+                    MyModel.SaleDetailsList.Add(_Row2);
                 }
             });
-
         }
         #endregion
         #endregion
@@ -558,7 +586,7 @@ namespace AppliedAccounts.Pages.ImportData
                 Source = new(AppGlobal.AppPaths);
                 var BillRec1 = Source.GetTable(Tables.BillReceivable);
                 var BillRec2 = Source.GetTable(Tables.BillReceivable2);
-                
+
                 //var MaxID1 = Source.GetMaxID(Tables.BillReceivable);
                 //var MaxID2 = Source.GetMaxID(Tables.BillReceivable2);
 

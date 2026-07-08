@@ -1,29 +1,42 @@
 ﻿using AppliedAccounts.Authentication;
 using AppliedAccounts.Models;
 using AppliedAccounts.Services;
+using Microsoft.AspNetCore.Components;
+using System.Collections.Immutable;
 
 namespace AppliedAccounts.Pages.Accounts
 {
     public partial class Customers
     {
-        public CustomersModel MyModel { get; set; } = new();
+        [Parameter]
+        public long ID { get; set; }
+
+        [Parameter]
+        public bool IsDelete { get; set; } = false;
+
+        public CustomersModel MyModel { get; set; }
 
         public Customers() { }
 
         protected override void OnInitialized()
         {
-            var AppUserProfile = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
-
-            if (ID < 0) { IsDelete = true; ID = Math.Abs(ID); }
-
-            if (AppUserProfile != null) { MyModel = new(AppGlobal, ID); }
-            else { MyModel = new(); }
+            MyModel = new(AppGlobal);
+            MyModel.Record = MyModel.GetRecord(ID);
         }
 
 
-        public void Delete(long ID)
+        public void Delete()
         {
-            if (MyModel.Delete(ID)) { AppGlobal.NavManager.NavigateTo("/CustomerList"); }
+            ID = MyModel.Record.ID;
+            if (MyModel.Delete(ID))
+            {
+                ToastService.ShowSuccess($"Successfully deleted {MyModel.Record.Title}");
+                AppGlobal.NavManager.NavigateTo("/CustomerList");
+            }
+            else
+            {
+                ToastService.ShowError($"Fail to be deleted {MyModel.Record.Title}");
+            }
         }
 
         public void Save()
@@ -34,7 +47,7 @@ namespace AppliedAccounts.Pages.Accounts
             }
             else
             {
-                ToastService.ShowError($"Failed to save {MyModel.Record.Title}");
+                ToastService.ShowError($"Fail to be saved {MyModel.Record.Title}");
             }
         }
     }

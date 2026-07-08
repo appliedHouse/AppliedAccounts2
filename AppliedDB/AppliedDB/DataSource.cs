@@ -405,6 +405,11 @@ namespace AppliedDB
             return new();
         }
 
+        public async Task<List<DataRow>> GetListAsync(Query Query)
+        {
+            return await Task.Run(()=> GetList(Query));
+        }
+
         public List<DataRow> GetList(Query Query)
         {
             if (AppPaths is not null)

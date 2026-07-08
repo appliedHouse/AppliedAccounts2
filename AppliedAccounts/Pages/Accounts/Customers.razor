@@ -1,19 +1,16 @@
 ﻿@page "/Pages/Customers"
-@page "/Customer/{ID:int}"
+@page "/Customer/{ID:long}"
+@page "/Customer/{ID:long}/{IsDelete:bool}"
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
-@using AppliedAccounts.Models;
 @using AppliedAccounts.Services;
 
-@inject AuthenticationStateProvider authStateProvider;
-@inject GlobalService AppGlobal;
+@inject GlobalService AppGlobal
 @inject IToastService ToastService
 
 @code {
 
-    [Parameter]
-    public int ID { get; set; }
-    public bool IsDelete { get; set; } = false;
+   
 
 
 }
@@ -144,7 +141,7 @@
             <div class="p-2">
                  @if (IsDelete)
                     {
-                        <Btn_Delete onclick="()=>Delete(MyModel.Record.ID)"/>
+                        <Btn_Delete onclick="()=>Delete()"/>
                     }
             </div>
             <div class="p-2 ms-auto">
