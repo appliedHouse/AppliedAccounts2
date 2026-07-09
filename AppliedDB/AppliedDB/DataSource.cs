@@ -886,6 +886,12 @@ namespace AppliedDB
 
         public bool Delete(DataRow _Row)
         {
+            if ((long)_Row["ID"] == 0) 
+            {
+                MsgClass.Alert(AppMessages.Enums.Messages.IDIsZero);
+                return false; 
+            }
+
             MsgClass.ClearMessages();
             MyCommands = new(_Row, MyConnection);
 
