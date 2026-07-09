@@ -6,11 +6,10 @@
 
 
 @code {
-    public Menus.MenusClass MenusClass { get; set; }
+    public Menus.MenusClass MenusClass { get; set; } = new();
 
     protected override void OnInitialized()
     {
-        MenusClass = new();
         var _StockMenu = MenusClass.GetMenu(MenuEnum.Menus.Stock);
         MenusClass.TopSelected(_StockMenu!, true);
     }
