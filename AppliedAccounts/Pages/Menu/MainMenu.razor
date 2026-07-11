@@ -1,20 +1,40 @@
-﻿@using Menus;
+﻿@using AppliedAccounts.Services.Menus
+@using Menus;
 @inject IJSRuntime js
 @inject NavigationManager NavManager
 @inject AuthenticationStateProvider AuthState
+@inject IMenuService MenuService
 
 @code {
-    [Parameter] public MenusClass MenuClass { get; set; }
 
-    //private string buildNum { get; set; } = "2.0.12";
-    //private bool SubMenu { get; set; } = false;
-    //private async Task Beep() { await js.InvokeVoidAsync("playBeep"); }
-  
 
     protected override void OnInitialized()
     {
-        MenuClass ??= new();
+        LoadMenus();
     }
+
+    private void LoadMenus()
+    {
+        try
+        {
+            // Get menus from database using MenuService
+            var allMenus = MenuService.GetMenus();
+            MainMenus = allMenus.Where(m => m.Level == 1 && m.ParentID == 0).ToList();
+
+            foreach (var menu in MainMenus)
+            {
+                if (!_selectedTopMenus.ContainsKey(menu.ID))
+                    _selectedTopMenus[menu.ID] = false;
+            }
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading menus: {ex.Message}");
+        }
+    }
+
 }
 
 <div class="sidebar">
