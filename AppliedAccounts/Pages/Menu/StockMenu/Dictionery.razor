@@ -4,12 +4,12 @@
 
 
 @code {
-    public Menus.MenusClass MenusClass { get; set; } = new();
+    public Menus.MenusClass MenusClass { get; set; }
 
     protected override void OnInitialized()
     {
-        //MenusClass = new();
-        MenusClass.SecondLevel(MenusClass.GetMenu(Menus.MenuEnum.Menus.StockDirectory)!);
+        MenusClass = new();
+        MenusClass.SecondLevel(MenusClass.GetMenu(41)!);
     }
 }
 

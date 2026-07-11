@@ -1,4 +1,4 @@
-﻿@page "/Stock/Directory/{TableName}" 
+﻿@page "/Menu/Stock/Directory/{TableName}"
 @using AppliedAccounts.Libs
 
 @inject GlobalService AppGlobal
@@ -6,8 +6,8 @@
 @inject IToastService ToastService
 
 @code {
+    [Parameter] public string? TableName { get; set; }
 
-   
     private string SubHeadingTitle { get; set; } = "Stock Sub Heading";
     protected override void OnInitialized()
     {
@@ -42,15 +42,15 @@
                 <tbody>
                     @foreach (var item in StockDirectoryList)
                     {
-                        @if (item.ID == 0) { continue; }
+                        @if (item.ID == 0)  { continue; }
 
                         <tr>
                             <td>@item.Code</td>
                             <td>@item.Title</td>
                             <td clas class="tb-col-left" s="td-btn">
-                                <button id="btnEdit" type="submit" class="btn-Edit" @onclick="() => EditForm((long)item.ID, false)"><i class="bi bi-pencil-fill"></i></button>
+                                <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(() => Edit((long)item.ID))"><i class="bi bi-pencil-fill"></i></button>
                                 <label style="padding-left:5px; padding-right:5px;"> | </label>
-                                <button id="btnDel" type="submit" class="btn-Del" @onclick="() => EditForm((long)item.ID, true)"><i class="bi bi-trash-fill"></i></button>
+                                <button id="btnDel" type="submit" class="btn-Del" @onclick="(() => Delete((long)item.ID))"><i class="bi bi-trash-fill"></i></button>
                             </td>
 
                         </tr>
@@ -89,17 +89,8 @@ else
                         <div class="row">
                             <div class="col d-flex justify-content-between align-items-center">
                                 <div class="d-flex gap-2">
-
-                                    @if (IsDelete)
-                                    {
-                                        <Btn_Delete OnClick="Delete" />
-                                    }
-                                    else
-                                    {
-                                        <Btn_Save OnClick="Save"/>
-                                        
-                                    }
-
+                                    <Btn_Save @onclick="Save" />
+                                    
                                 </div>
                                 <button class="btn btn-link btn-sm" title="Back" @onclick="BackPage">
                                     <i class="bi bi-arrow-left-circle"></i>

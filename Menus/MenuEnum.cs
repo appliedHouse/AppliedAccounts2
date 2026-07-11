@@ -10,11 +10,7 @@
             Stock = 4,
             HR = 5,
             Admin = 6,
-            Logout = 7,
-
-            StockDirectory = 41,
-
-
+            Logout = 7
         }
     }
 }
