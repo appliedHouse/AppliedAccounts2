@@ -2,6 +2,7 @@
 using AppliedDB;
 using AppliedGlobals;
 using AppMessages;
+using AppReports;
 using System.Data;
 
 namespace AppliedAccounts.Pages.Accounts
@@ -30,28 +31,7 @@ namespace AppliedAccounts.Pages.Accounts
         {
             try
             {
-                Source ??= new DataSource(AppGlobal.AppPaths);
-
-                //// Build base filter (without ORDER BY / LIMIT)
-                //var baseFilter = new System.Text.StringBuilder();
-                //baseFilter.AppendLine($"Vou_Type='{VoucherTypeClass.VoucherType.JV}' AND ");
-                //baseFilter.AppendLine($"Vou_Date >= '{MyModel.Date1:yyyy-MM-dd}' AND");
-                //baseFilter.AppendLine($"Vou_Date <= '{MyModel.Date2:yyyy-MM-dd}'");
-                //if (MyModel.IsSearch)
-                //{
-                //    baseFilter.AppendLine($" AND (Vou_No LIKE '%{MyModel.SearchText}%' OR Description LIKE '%{MyModel.SearchText}%') ");
-                //}
-
-                //// Get full (unpaged) set to calculate total records for paging
-                //string fullQuery = SQLQueries.Quries.JournalVoucherList(baseFilter.ToString());
-                //var fullTable = Source.GetTable(fullQuery);
-                //int totalRecords = fullTable?.Rows.Count ?? 0;
-
-                //// Refresh paging model
-                //Pages.Refresh(totalRecords);
-
-                //// Build paged query by appending ORDER BY and LIMIT/OFFSET after the base query
-                //string pagedQuery = fullQuery + $" ORDER BY [Vou_Date], [Vou_No] LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
+                Source ??= new (AppGlobal.AppPaths);
                 DataTable _Table = Source.GetTable(GetFilter());
 
                 if (_Table != null && _Table.Rows.Count > 0)
@@ -59,6 +39,7 @@ namespace AppliedAccounts.Pages.Accounts
                     JVItems = [.. (from DataRow _Row in _Table.Rows
                            select new JVListDataModel()
                            {
+                               ID = _Row.Field<long>("ID"),
                                Vou_No = _Row.Field<string>("Vou_No") ?? "",
                                Vou_Date = _Row.Field<DateTime?>("Vou_Date") ?? DateTime.MinValue,
                                Vou_Type = _Row.Field<string>("Vou_Type") ?? "",
@@ -79,11 +60,18 @@ namespace AppliedAccounts.Pages.Accounts
 
         private string GetFilter()
         {
+            if (MyModel.Date1 > MyModel.Date2)
+            {
+                // Correct Date Order if it is dis-order.
+                (MyModel.Date2, MyModel.Date1) = (MyModel.Date1, MyModel.Date2);
+            }
+
+
             // Build base filter (without ORDER BY / LIMIT)
             var baseFilter = new System.Text.StringBuilder();
             baseFilter.AppendLine($"Vou_Type='{VoucherTypeClass.VoucherType.JV}' AND ");
-            baseFilter.AppendLine($"Vou_Date >= '{MyModel.Date1:yyyy-MM-dd}' AND");
-            baseFilter.AppendLine($"Vou_Date <= '{MyModel.Date2:yyyy-MM-dd}'");
+            baseFilter.AppendLine($"Vou_Date >= '{MyModel.Date1.QueryDate()}' AND");
+            baseFilter.AppendLine($"Vou_Date <= '{MyModel.Date2.QueryDate()}'");
             if (MyModel.IsSearch)
             {
                 baseFilter.AppendLine($" AND (Vou_No LIKE '%{MyModel.SearchText}%' OR Description LIKE '%{MyModel.SearchText}%') ");
@@ -106,12 +94,19 @@ namespace AppliedAccounts.Pages.Accounts
         #endregion
 
         #region Refresh Page
-        public async void Refresh()
+        public async Task Refresh()
         {
             SetKeys();                           // Save the current page setting in Registry 
-            Pages = new();                       // Reset the page model
+            LoadData();
             await InvokeAsync(StateHasChanged);
         }
+
+        public async Task Clear()
+        {
+            MyModel.SearchText = string.Empty;
+            await Refresh();
+        }
+
         #endregion
 
         #region New Voucher
@@ -131,8 +126,8 @@ namespace AppliedAccounts.Pages.Accounts
 
             try
             {
-                //MyModel.VoucherID = reportAction.VoucherID;
-                //await Task.Run(() => { MyModel.Print(reportAction.PrintType); });
+                MyModel.VoucherID = reportAction.VoucherID;
+                await Task.Run(() => { MyModel.Print(reportAction.PrintType); });
             }
             catch (Exception)
             {
@@ -171,6 +166,12 @@ namespace AppliedAccounts.Pages.Accounts
 
         public bool IsSearch => SearchText.Length > 0;
 
+        public long VoucherID { get; internal set; }
+
+        internal void Print(ReportType printType)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class JVListDataModel

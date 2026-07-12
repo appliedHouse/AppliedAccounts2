@@ -150,6 +150,11 @@ namespace AppliedAccounts.Data
             return _Date.ToString("yyyy-MM-dd");
         }
 
+        public static string DisplayDate(this DateTime _Date)
+        {
+            return _Date.ToString("dd-MMM-yyyy");
+        }
+
         public static string Display (this decimal _decimal)
         {
             // Show Display decimal as 123,456,789.99
