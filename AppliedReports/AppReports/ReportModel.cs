@@ -39,8 +39,8 @@ namespace AppReports
 
             Messages.Add($"{DateTimeNow}: Report Class Started.");
 
-            InputReport.BasePath = Directory.GetCurrentDirectory();
-            OutputReport.BasePath = Directory.GetCurrentDirectory();
+            //InputReport.BasePath = Directory.GetCurrentDirectory();
+            //OutputReport.BasePath = Directory.GetCurrentDirectory();
 
             Messages.Add($"{DateTimeNow}: InputReport.BasePath {InputReport.BasePath}");
             Messages.Add($"{DateTimeNow}: OutputReport.BasePath {OutputReport.ReportUrl}");

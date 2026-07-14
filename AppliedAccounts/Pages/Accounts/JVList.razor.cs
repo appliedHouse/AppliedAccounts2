@@ -1,4 +1,6 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Pages.Accounts.Reports;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppliedGlobals;
 using AppMessages;
@@ -14,6 +16,7 @@ namespace AppliedAccounts.Pages.Accounts
         public List<JVListDataModel> JVItems { get; set; } = new();
         public MessageClass MsgClass { get; set; } = new();
         public PageModel Pages { get; set; } = new();
+
 
         public JVList()
         {
@@ -31,7 +34,7 @@ namespace AppliedAccounts.Pages.Accounts
         {
             try
             {
-                Source ??= new (AppGlobal.AppPaths);
+                Source ??= new(AppGlobal.AppPaths);
                 DataTable _Table = Source.GetTable(GetFilter());
 
                 if (_Table != null && _Table.Rows.Count > 0)
@@ -121,23 +124,40 @@ namespace AppliedAccounts.Pages.Accounts
         public async Task Print(ReportActionClass reportAction)
         {
             MyModel.IsWaiting = true;
+
             await InvokeAsync(StateHasChanged);
-            await Task.Delay(100);                  // Delay for show the message and 
 
             try
             {
-                MyModel.VoucherID = reportAction.VoucherID;
-                await Task.Run(() => { MyModel.Print(reportAction.PrintType); });
+                MyModel.VoucherNo = (string)Source.SeekValue(AppliedDB.Enums.Tables.Ledger, reportAction.VoucherID, "Vou_No")!;
+                if (!string.IsNullOrEmpty(MyModel.VoucherNo))
+                {
+                    VoucherPrint PrintClass = new(AppGlobal, reportAction.PrintType, MyModel.VoucherNo);
+                    if (!PrintClass.IsError)
+                    {
+                        await PrintClass.Print();
+                    }
+                }
+                else
+                {
+                    MsgClass.Warning(AppMessages.Enums.Messages.VoucherNotFound);
+                }
+
+
             }
             catch (Exception)
             {
-                //MyModel.MsgClass.Add(AppMessages.Enums.Messages.prtReportError);
+                MsgClass.Add(AppMessages.Enums.Messages.prtReportError);
             }
 
             MyModel.IsWaiting = false;
             await InvokeAsync(StateHasChanged);
             await Task.Delay(100);                  // Delay for show the message and 
         }
+
+
+
+
         #endregion
 
         #region Keys
@@ -163,15 +183,9 @@ namespace AppliedAccounts.Pages.Accounts
         public DateTime Date2 { get; set; }
         public string SearchText { get; set; } = string.Empty;
         public bool IsWaiting { get; set; }
-
         public bool IsSearch => SearchText.Length > 0;
-
         public long VoucherID { get; internal set; }
-
-        internal void Print(ReportType printType)
-        {
-            throw new NotImplementedException();
-        }
+        public string VoucherNo { get; internal set; }
     }
 
     public class JVListDataModel

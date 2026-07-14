@@ -9,7 +9,7 @@
 
     public class InputReport : IInputReport
     {
-        public string FilePath { get; set; } = string.Empty;            // Path after wwwroot
+        public string FilePath { get; set; } = "Reports";            // Path after wwwroot
         public string FileName { get; set; } = string.Empty;            // File name
         public string BasePath { get; set; } = Directory.GetCurrentDirectory();
         public string RootPath { get; set; } = "wwwroot";
