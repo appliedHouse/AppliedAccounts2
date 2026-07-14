@@ -215,19 +215,18 @@ namespace AppliedAccounts.Data
             string SQLAction;
 
             TB_Registry.DefaultView.RowFilter = string.Concat("Code='", Key, "'");
-            if (TB_Registry.DefaultView.Count == 1)
+            if (TB_Registry.DefaultView.Count > 0)
             {
                 SQLAction = "Update";
                 CurrentRow = TB_Registry.DefaultView[0].Row;
                 CurrentRow.AcceptChanges();
             }
             else
-            {
-                SQLAction = "Insert";
-                CurrentRow = TB_Registry.NewRow();
-                CurrentRow["ID"] = 0;
-            }
-
+                {
+                    SQLAction = "Insert";
+                    CurrentRow = TB_Registry.NewRow();
+                    CurrentRow["ID"] = DBNull.Value;
+                }
             CurrentRow["Code"] = Key;
             CurrentRow["Title"] = _Title;
             CurrentRow["UserName"] = DataFile;
