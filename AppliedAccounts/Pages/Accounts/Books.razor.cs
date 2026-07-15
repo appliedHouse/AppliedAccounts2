@@ -43,7 +43,6 @@ namespace AppliedAccounts.Pages.Accounts
             BookID = _BookID;
             MyModel.MyVoucher.Master.BookID = BookID;
         }
-
         private void AccountIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.COA = _ID;
@@ -52,7 +51,6 @@ namespace AppliedAccounts.Pages.Accounts
                 .Select(e => e.Title)
                 .First() ?? "";
         }
-
         private void CompanyIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Company = _ID;
