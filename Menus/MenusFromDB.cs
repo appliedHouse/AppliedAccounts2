@@ -5,12 +5,20 @@ namespace Menus
 {
     public class MenusFromDB
     {
-        internal static List<MenuItem> Get()
+        public static List<MenuItem> Get()
         {
             try
             {
                 var _Menus = new List<MenuItem>();
-                var _ConnectionString = "Data Source=./wwwroot/System/MenusDB.db";
+                var _dbPath = $"{Directory.GetCurrentDirectory()}/wwwroot/System/MenusDB.db";
+                var _ConnectionString = $"Data Source={_dbPath}";
+
+                if(!File.Exists(_dbPath))
+                {
+                    CreateMenuDB _CreateMenuDB = new(_dbPath);
+                    _CreateMenuDB.EnsureDatabaseExists();
+                }
+
                 var _Connection = new SqliteConnection(_ConnectionString); _Connection.Open();
 
                 var _CommandText = "SELECT * FROM Menus";
@@ -19,18 +27,20 @@ namespace Menus
                 var _DataTable = new DataTable();
                 _DataTable.Load(_reader);
 
+                var _Menu1 = new MenuItem();
+
                 foreach (DataRow _Row in _DataTable.Rows)
                 {
-                    _Menus.Add(new MenuItem
-                    {
-                        ID = _Row.Field<int>("ID"),
-                        Title = _Row.Field<string>("Title") ?? "",
-                        Active = _Row.Field<bool>("Active"),
-                        Icon = _Row.Field<string>("Icon") ?? "",
-                        Level = _Row.Field<int>("Level"),
-                        ParentID = _Row.Field<int>("ParentID"),
-                        NavigateTo = _Row.Field<string>("NavigateTo") ?? ""
-                    });
+                    _Menu1 = new MenuItem(); ;
+                    _Menu1.ID = (int)_Row.Field<long>("ID");
+                    _Menu1.Title = _Row.Field<string>("Title") ?? "";
+                    _Menu1.Active = _Row.Field<long>("Active") == 1;
+                    _Menu1.Icon = _Row.Field<string>("Icon") ?? "";
+                    _Menu1.Level = (int)_Row.Field<long>("Level");
+                    _Menu1.ParentID = (int)_Row.Field<long>("ParentID");
+                    _Menu1.NavigateTo = _Row.Field<string>("NavigateTo") ?? "";
+
+                    _Menus.Add(_Menu1);
                 }
 
                 return _Menus;
@@ -44,7 +54,7 @@ namespace Menus
             
         }
 
-        internal static List<MenuItem> Get2()
+        public static List<MenuItem> Get2()
         {
             var _Menus = new List<MenuItem>(); ;
 
@@ -115,8 +125,8 @@ namespace Menus
             _Menus.Add(new MenuItem { ID = 2303, Title = "Expense Sheet", Active = true, Icon = "bi bi-file-spreadsheet", Level = 3, ParentID = 23, NavigateTo = "/Accounts/Reports/ExpenseSheet" });
             _Menus.Add(new MenuItem { ID = 2304, Title = "Receivable", Active = true, Icon = "bi bi-file-text", Level = 3, ParentID = 23, NavigateTo = "/Accounts/Reports/ReceivablePayable/1" });
             _Menus.Add(new MenuItem { ID = 2305, Title = "Payable", Active = true, Icon = "bi bi-file-earmark-post", Level = 3, ParentID = 23, NavigateTo = "/Accounts/Reports/ReceivablePayable/2" });
-            _Menus.Add(new MenuItem { ID = 2305, Title = "Profit & Loss", Active = true, Icon = "bi bi-coin", Level = 3, ParentID = 23, NavigateTo = "/Accounts/Reports/ProfitnLoss" });
-            _Menus.Add(new MenuItem { ID = 2305, Title = "Balanse Sheet", Active = true, Icon = "bi bi-grid-1x2", Level = 3, ParentID = 23, NavigateTo = "/Accounts/Reports/BalanceSheet" });
+            _Menus.Add(new MenuItem { ID = 2306, Title = "Profit & Loss", Active = true, Icon = "bi bi-coin", Level = 3, ParentID = 23, NavigateTo = "/Accounts/Reports/ProfitnLoss" });
+            _Menus.Add(new MenuItem { ID = 2307, Title = "Balance Sheet", Active = true, Icon = "bi bi-grid-1x2", Level = 3, ParentID = 23, NavigateTo = "/Accounts/Reports/BalanceSheet" });
 
 
             // Sale - Transaction
@@ -124,12 +134,11 @@ namespace Menus
 
 
             // Stock - Dictionery
-            _Menus.Add(new MenuItem { ID = 4101, Title = "Inventory", Active = true, Icon = "bi bi-stack", Level = 3, ParentID = 41, NavigateTo = "/Stock/Directory/Inv_Category" });
-            _Menus.Add(new MenuItem { ID = 4102, Title = "Category", Active = true, Icon = "bi bi-stack", Level = 3, ParentID = 41, NavigateTo = "/Stock/Directory/Inv_Category" });
-            _Menus.Add(new MenuItem { ID = 4103, Title = "Sub Category", Active = true, Icon = "bi bi-subtract", Level = 3, ParentID = 41, NavigateTo = "/Stock/Directory/Inv_SubCategory" });
-            _Menus.Add(new MenuItem { ID = 4104, Title = "Packing", Active = true, Icon = "bi bi-box", Level = 3, ParentID = 41, NavigateTo = "/Stock/Directory/Inv_Packing" });
-            _Menus.Add(new MenuItem { ID = 4105, Title = "Size", Active = true, Icon = "bi bi-measuring-cup", Level = 3, ParentID = 41, NavigateTo = "/Stock/Directory/Inv_Size" });
-            _Menus.Add(new MenuItem { ID = 4106, Title = "Measurement", Active = true, Icon = "bi bi-chevron-bar-contract", Level = 3, ParentID = 41, NavigateTo = "/Stock/Directory/Inv_UOM" });
+            _Menus.Add(new MenuItem { ID = 4101, Title = "Category", Active = true, Icon = "bi bi-stack", Level = 3, ParentID = 41, NavigateTo = "/Menu/Stock/Directory/Inv_Category" });
+            _Menus.Add(new MenuItem { ID = 4102, Title = "Sub Category", Active = true, Icon = "bi bi-subtract", Level = 3, ParentID = 41, NavigateTo = "/Menu/Stock/Directory/Inv_SubCategory" });
+            _Menus.Add(new MenuItem { ID = 4103, Title = "Packing", Active = true, Icon = "bi bi-box", Level = 3, ParentID = 41, NavigateTo = "/Menu/Stock/Directory/Inv_Packing" });
+            _Menus.Add(new MenuItem { ID = 4104, Title = "Size", Active = true, Icon = "bi bi-measuring-cup", Level = 3, ParentID = 41, NavigateTo = "/Menu/Stock/Directory/Inv_Size" });
+            _Menus.Add(new MenuItem { ID = 4105, Title = "Measurement", Active = true, Icon = "bi bi-chevron-bar-contract", Level = 3, ParentID = 41, NavigateTo = "/Menu/Stock/Directory/Inv_UOM" });
 
 
             return _Menus;

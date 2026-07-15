@@ -18,7 +18,6 @@
         public string FilePath { get; set; } = string.Empty;            // file path after wwwroot
         public string FileName { get; set; } = string.Empty;            // file Name
 
-
         public ReportType ReportType { get; set; } = ReportType.Preview;
         public string MimeType { get; set; } = string.Empty;
         public FileStream FileStream { get; set; }
@@ -27,7 +26,7 @@
         public string FileFullName { get => GetFullName(); }
         public string OutputFileName { get => GetFileName(); }
         public string FileExt { get => ReportExtention.Get(ReportType); }       // File Extention get dynamically
-        public string FileLink { get => GetFileLink(); }                         // Create a lick to display file         
+        public string FileLink { get => GetFileLink(); }                        // Create a link to display file         
 
         #region Constructor
         public OutputReport() { }
@@ -50,7 +49,6 @@
             }
             return string.Empty;
         }
-
         private string GetFileName()
         {
             var _Extention = ReportExtention.Get(ReportType);
@@ -73,14 +71,9 @@
             }
             return _FileFolder;
         }
-
         public string GetFileLink()
         {
             return $"{ReportUrl}/{FilePath}/{FileName}";
         }
-
-
-
-
     }
 }

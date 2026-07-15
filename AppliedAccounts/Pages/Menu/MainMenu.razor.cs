@@ -10,18 +10,20 @@ namespace AppliedAccounts.Pages.Menu
         //[Parameter] public MenusClass MenuClass { get; set; }
         [Inject] private IConfiguration Configuration { get; set; } = default!;
 
-        private string buildLabel => Configuration["Build:Label"] ?? "Applied Accounts build";
-        private string buildNum => Configuration["Build:Number"] ?? "";
 
-        //private string buildNum { get; set; } = "2606-21.001";
+        private List<MenuItem> MainMenus = new();
+        private Dictionary<int, bool> _selectedTopMenus = new();
+        private Dictionary<int, bool> _selectedSubMenus = new();
+
+        [Parameter]
+        public MenusClass MenuClass { get; set; } = new MenusClass();
+        private string buildNum => Configuration["Build:Number"] ?? "";
         private bool SubMenu { get; set; } = false;
         public async Task Beep() { await js.InvokeVoidAsync("playBeep"); }
 
         private async Task MenuClick(int MenuID)
         {
-            //await js.InvokeVoidAsync("playBeep"); await Task.Delay(100);
             await Beep();
-
 
             var _SelectedMenu = MenuClass.GetMenu(MenuID);
             if (_SelectedMenu == null) { return; }
@@ -61,53 +63,6 @@ namespace AppliedAccounts.Pages.Menu
             {
                 NavManager.NavigateTo(_SelectedMenu.NavigateTo);
             }
-
         }
-        //private async Task MenuClick(int MenuID)
-        //{
-        //    await Beep(); await Task.Delay(100);
-
-        //    var _SelectedMenu = MenuClass.GetMenu(MenuID);
-        //    if (_SelectedMenu == null) { return; }
-
-        //    #region Logout User
-        //    if (MenuID == (int)MenuEnum.Menus.Logout)
-        //    {
-        //        var UserService = (UserAuthenticationStateProvider)AuthState;
-        //        await UserService.UpdateAuthenticateState(null);                    // Logout User
-        //        NavManager.NavigateTo("/");
-        //        return;
-        //    }
-        //    #endregion
-
-        //    #region Home Button
-        //    if (MenuID == (int)MenuEnum.Menus.Home)
-        //    {
-        //        NavManager.NavigateTo("/");
-        //        return;
-        //    }
-        //    #endregion
-
-        //    #region Menu button Clieck
-
-        //    if (_SelectedMenu.Level == 1)
-        //    {
-        //        SubMenu = !SubMenu;
-        //        MenuClass.TopSelected(_SelectedMenu, SubMenu);
-        //    }
-        //    if (_SelectedMenu.Level == 2)
-        //    {
-        //        MenuClass.SecondLevel(_SelectedMenu);
-        //    }
-        //    #endregion
-
-        //    if (!string.IsNullOrEmpty(_SelectedMenu.NavigateTo))
-        //    {
-        //        NavManager.NavigateTo(_SelectedMenu.NavigateTo);
-        //    }
-
-        //}
-
-
     }
 }

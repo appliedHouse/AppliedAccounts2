@@ -12,19 +12,16 @@
 
     protected override void OnInitialized()
     {
-     
         MyModel ??= new JVListViewModel();
         Source = new DataSource(AppGlobal.AppPaths);
         GetKeys();
         LoadData();
-
-
     }
 }
 
 
 
-<ShowPageHeading PageTitle="Journal Vouchers (JVs) List" />
+<PageHeading Text="Journal Vouchers (JVs) List" />
 <ShowMessages MsgClass="MsgClass" />
 
 
@@ -57,6 +54,12 @@ else
             </div>
             <div class="p-2">
                 <Btn_Refresh OnClick="Refresh" />
+                
+                @if(MyModel.SearchText.Length>0)
+                {
+                    <Btn_SearchClear OnClick="Clear" />
+                }
+
                 <Btn_Add OnClick="New" />
             </div>
 
@@ -85,8 +88,8 @@ else
                             <td>@Record.Vou_No</td>
                             <td>@Record.Vou_Date.ToString(Format.DDMMMYY)</td>
                             <td class="left">@Record.Ref_No</td>
-                            <td class="amount">@Record.DR</td>
-                            <td class="amount">@Record.CR</td>
+                            <td class="amount">@Record.DR.Display()</td>
+                            <td class="amount">@Record.CR.Display()</td>
                             <td class="left">@Record.Description</td>
                             <td>
                                 <EditButton NavTo=@_NavTo Title="Edit Voucher" />

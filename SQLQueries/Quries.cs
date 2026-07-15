@@ -550,6 +550,7 @@ namespace SQLQueries
 
             _Text.AppendLine("SELECT * FROM (");
             _Text.AppendLine("SELECT");
+            _Text.AppendLine("    ID,");
             _Text.AppendLine("    Vou_No,");
             _Text.AppendLine("    MIN(SR_NO) AS First_SR_NO,");
             _Text.AppendLine("    Vou_Type,");
@@ -568,9 +569,6 @@ namespace SQLQueries
             {
                 _Text.AppendLine($" WHERE {_Filter}");
             }
-
-            
-
             return _Text.ToString();
         }
 

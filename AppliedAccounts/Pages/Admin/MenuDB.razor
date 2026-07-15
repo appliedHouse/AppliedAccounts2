@@ -1,0 +1,83 @@
+﻿@page "/admin/database"
+
+@using AppliedAccounts.Services.Menus
+
+@inject IMenuService MenuService
+@inject IMenuDatabaseInitializer DbInitializer
+
+
+
+<div class="container mt-4">
+    <h3>Database Management</h3>
+
+    <div class="card mb-3">
+        <div class="card-header">Database Status</div>
+        <div class="card-body">
+            <p><strong>Database Path:</strong> @MenuService.DatabasePath</p>
+            <p><strong>Database Exists:</strong> <span class="badge @(MenuService.DatabaseExists ? "bg-success" : "bg-danger")">@(MenuService.DatabaseExists ? "Yes" : "No")</span></p>
+            <p><strong>Menus Loaded:</strong> @(MenuService.IsLoaded ? "Yes" : "No")</p>
+            <p><strong>Last Loaded:</strong> @(MenuService.LastLoaded == DateTime.MinValue ? "Never" : MenuService.LastLoaded.ToString())</p>
+            <p><strong>Total Menus:</strong> @MenuService.GetMenus().Count</p>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn btn-primary" @onclick="RefreshMenus">Refresh Menus</button>
+        <button class="btn btn-warning" @onclick="RecreateDatabase">Recreate Database</button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(_message))
+    {
+        <div class="alert alert-@(_isError ? "danger" : "success") mt-3">
+            @_message
+        </div>
+    }
+
+    <div class="mt-4">
+        <h5>Menu Preview</h5>
+        <ul>
+            @foreach (var menu in MenuService.GetMenus().Where(m => m.Level == 1))
+            {
+                <li>@menu.Title (@menu.ID)</li>
+            }
+        </ul>
+    </div>
+</div>
+
+@code {
+    private string _message = "";
+    private bool _isError;
+
+    private async Task RefreshMenus()
+    {
+        try
+        {
+            await MenuService.RefreshMenusAsync();
+            _message = "Menus refreshed successfully!";
+            _isError = false;
+        }
+        catch (Exception ex)
+        {
+            _message = $"Error: {ex.Message}";
+            _isError = true;
+        }
+    }
+
+    private async Task RecreateDatabase()
+    {
+        try
+        {
+            await Task.Run(() => DbInitializer.RecreateDatabase());
+            _message = "Database recreated successfully!";
+            _isError = false;
+
+            // Refresh menus
+            await RefreshMenus();
+        }
+        catch (Exception ex)
+        {
+            _message = $"Error: {ex.Message}";
+            _isError = true;
+        }
+    }
+}
