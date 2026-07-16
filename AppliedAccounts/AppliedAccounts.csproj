@@ -67,6 +67,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Pages\Menu\Admin\" />
+    <Folder Include="Pages\Menu\HR\" />
     <Folder Include="Pages\Reporting\" />
     <Folder Include="wwwroot\ExcelFiles\" />
     <Folder Include="wwwroot\System\" />
