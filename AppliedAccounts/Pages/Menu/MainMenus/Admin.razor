@@ -1,7 +1,9 @@
-﻿@page "/Menu/Admin"
+﻿@page "/MainMenu/Admin"
+
+@using Menus
+
 @attribute [Authorize]
 @inject GlobalService AppGlobal
-@using Menus;
 
 
 @code {
@@ -9,7 +11,7 @@
 
     protected override void OnInitialized()
     {
-        var _AdminMenu = MenusClass.GetMenu(MenuEnum.Menus.Admin);
+        var _AdminMenu = MenusClass.GetMenu(Menus.MenuID.Admin);
         MenusClass.TopSelected(_AdminMenu!, true);
     }
 }

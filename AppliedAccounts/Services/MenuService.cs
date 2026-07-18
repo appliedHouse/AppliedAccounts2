@@ -3,11 +3,11 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Caching.Memory;
 using Menus;
 
-
 namespace AppliedAccounts.Services.Menus
 {
     public interface IMenuService
     {
+        // Existing methods
         List<MenuItem> GetMenus();
         List<MenuItem> GetMenusByParent(int parentId);
         MenuItem GetMenuById(int id);
@@ -16,6 +16,16 @@ namespace AppliedAccounts.Services.Menus
         DateTime LastLoaded { get; }
         string DatabasePath { get; }
         bool DatabaseExists { get; }
+
+        // New methods with enum support
+        List<MenuItem> GetMenusByParent(MenuID parentMenu);
+        MenuItem GetMenuById(MenuID menuId);
+        List<MenuItem> GetMainMenus();
+        List<MenuItem> GetMainMenusActive();
+        bool IsMainMenu(MenuID menuId);
+        bool IsSubMenu(MenuID menuId);
+        bool IsMenuActive(MenuID menuId);
+        List<MenuItem> GetActiveSubMenus(MenuID parentMenu);
     }
 
     public class MenuService : IMenuService
@@ -36,7 +46,6 @@ namespace AppliedAccounts.Services.Menus
             _logger = logger;
             _dbInitializer = dbInitializer;
 
-            // Ensure database exists on service creation
             EnsureDatabase();
         }
 
@@ -55,7 +64,6 @@ namespace AppliedAccounts.Services.Menus
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to ensure database exists");
-                // Continue with fallback menus
             }
         }
 
@@ -75,17 +83,59 @@ namespace AppliedAccounts.Services.Menus
             return allMenus.Where(m => m.ParentID == parentId).ToList();
         }
 
+        public List<MenuItem> GetMenusByParent(MenuID parentMenu)
+        {
+            return GetMenusByParent((int)parentMenu);
+        }
+
         public MenuItem GetMenuById(int id)
         {
             var allMenus = GetMenus();
             return allMenus.FirstOrDefault(m => m.ID == id)!;
         }
 
+        public MenuItem GetMenuById(MenuID menuId)
+        {
+            return GetMenuById((int)menuId);
+        }
+
+        public List<MenuItem> GetMainMenus()
+        {
+            return GetMenusByParent(0);
+        }
+
+        public List<MenuItem> GetMainMenusActive()
+        {
+            return GetMainMenus().Where(m => m.Active).ToList();
+        }
+
+        public bool IsMainMenu(MenuID menuId)
+        {
+            var menu = GetMenuById(menuId);
+            return menu != null && menu.Level == 1;
+        }
+
+        public bool IsSubMenu(MenuID menuId)
+        {
+            var menu = GetMenuById(menuId);
+            return menu != null && menu.Level > 1;
+        }
+
+        public bool IsMenuActive(MenuID menuId)
+        {
+            var menu = GetMenuById(menuId);
+            return menu?.Active ?? false;
+        }
+
+        public List<MenuItem> GetActiveSubMenus(MenuID parentMenu)
+        {
+            return GetMenusByParent(parentMenu).Where(m => m.Active).ToList();
+        }
+
         public async Task RefreshMenusAsync()
         {
             try
             {
-                // Check if database exists, if not create it
                 _dbInitializer.EnsureDatabaseExists();
 
                 var menus = await Task.Run(() => LoadMenusFromDatabase());
@@ -101,7 +151,6 @@ namespace AppliedAccounts.Services.Menus
 
         private List<MenuItem> LoadMenusFromDatabase()
         {
-            // If database doesn't exist, create and populate it
             if (!_dbInitializer.DatabaseExists())
             {
                 _logger.LogWarning("Database not found during load. Initializing...");
@@ -137,12 +186,11 @@ namespace AppliedAccounts.Services.Menus
 
                 _logger.LogInformation("Loaded {Count} menus from database", menus.Count);
 
-                // If no data in database, populate it
                 if (menus.Count == 0)
                 {
                     _logger.LogWarning("Database has no menu data. Populating...");
                     _dbInitializer.InitializeDatabase();
-                    return LoadMenusFromDatabase(); // Recursive call after population
+                    return LoadMenusFromDatabase();
                 }
 
                 return menus;

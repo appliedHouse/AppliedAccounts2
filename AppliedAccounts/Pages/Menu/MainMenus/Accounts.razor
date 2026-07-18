@@ -1,7 +1,12 @@
-﻿@page "/Menu/Stock"
+﻿@page "/MainMenu/Accounts"
+
+@using Menus;
+
 @attribute [Authorize]
 @inject GlobalService AppGlobal
-@using Menus;
+
+
+
 
 
 @code {
@@ -9,8 +14,8 @@
 
     protected override void OnInitialized()
     {
-        var _StockMenu = MenusClass.GetMenu(MenuEnum.Menus.Stock);
-        MenusClass.TopSelected(_StockMenu!, true);
+        var _AccountMenu = MenusClass.GetMenu(Menus.MenuID.Account);
+        MenusClass.TopSelected(_AccountMenu!, true);
     }
 }
 

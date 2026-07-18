@@ -1,9 +1,7 @@
 ﻿using AppliedAccounts.Authentication;
 using AppliedAccounts.Data;
-using AppliedAccounts.Middleware;
 using AppliedDB;
 using Microsoft.Data.Sqlite;
-using System;
 using System.Data;
 
 namespace AppliedAccounts.Pages.Users

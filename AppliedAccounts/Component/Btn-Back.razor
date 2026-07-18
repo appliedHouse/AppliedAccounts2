@@ -2,7 +2,7 @@
 @inject NavigationManager NavManager;
 
 @code {
-    [Parameter] public string NavTo { get; set; }
+    [Parameter] public string NavTo { get; set; } = "/";
 
     private void HandleClick(MouseEventArgs e)
     {

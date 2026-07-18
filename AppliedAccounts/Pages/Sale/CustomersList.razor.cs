@@ -1,6 +1,7 @@
 ﻿using AppliedAccounts.Models;
+using Menus;
 
-namespace AppliedAccounts.Pages.Accounts
+namespace AppliedAccounts.Pages.Sale
 {
     public partial class CustomersList
     {
@@ -17,10 +18,10 @@ namespace AppliedAccounts.Pages.Accounts
             Model = new(AppGlobal);
         }
 
-        public void Back() { AppGlobal.NavManager.NavigateTo("/Menu/Accounts"); }
-        public void Add1() { AppGlobal.NavManager.NavigateTo("/Customer/0"); }
-        public void Edit(long ID) { AppGlobal.NavManager.NavigateTo($"/Customer/{ID}"); }
-        public void Delete(long ID) { AppGlobal.NavManager.NavigateTo($"/Customer/{ID}/true"); }
+        public void Back() => AppGlobal.NavManager.GoTo(MenuID.SaleDictionery);
+        public void Add1() { AppGlobal.NavManager.NavigateTo(NavigationPaths.Customer()); }
+        public void Edit(long ID) { AppGlobal.NavManager.NavigateTo(NavigationPaths.Customer(ID)); }
+        public void Delete(long ID) { AppGlobal.NavManager.NavigateTo(NavigationPaths.Customer(ID,true)); }
 
         public void Submit() { }
 

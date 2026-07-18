@@ -1,10 +1,7 @@
-﻿using AppliedAccounts.Authentication;
-using AppliedAccounts.Models;
-using AppliedAccounts.Services;
+﻿using AppliedAccounts.Models;
 using Microsoft.AspNetCore.Components;
-using System.Collections.Immutable;
 
-namespace AppliedAccounts.Pages.Accounts
+namespace AppliedAccounts.Pages.Sale
 {
     public partial class Customers
     {
@@ -14,6 +11,8 @@ namespace AppliedAccounts.Pages.Accounts
         [Parameter]
         public bool IsDelete { get; set; } = false;
 
+
+        public string GotoBack = Menus.MenuNavigation.NavTo(Menus.MenuID.ClientList);
         public CustomersModel MyModel { get; set; }
 
         public Customers() { }

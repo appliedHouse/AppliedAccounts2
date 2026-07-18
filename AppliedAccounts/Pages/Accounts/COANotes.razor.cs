@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Models;
+using Menus;
 
 namespace AppliedAccounts.Pages.Accounts
 {
@@ -41,6 +42,11 @@ namespace AppliedAccounts.Pages.Accounts
         public void Edit(long ID)
         {
             MyModel.Edit(ID);
+        }
+        
+        public void Back()
+        {
+            AppGlobal.NavManager.GoTo(MenuID.AccountsDictionery);
         }
     }
 }

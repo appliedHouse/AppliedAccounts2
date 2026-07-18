@@ -1,17 +1,18 @@
-﻿@page "/Menu/Sale"
+﻿@page "/MainMenu/Sale"
+
+@using Menus;
+
 @attribute [Authorize]
 @inject GlobalService AppGlobal
-@using Menus;
 
 
 @code {
-    public Menus.MenusClass MenusClass { get; set; }
+    public Menus.MenusClass MenusClass { get; set; } = new();
 
     protected override void OnInitialized()
     {
-        MenusClass = new();
-        var _AccountMenu = MenusClass.GetMenu(MenuEnum.Menus.Sale);
-        MenusClass.TopSelected(_AccountMenu!, true);
+        var _SaleMenu = MenusClass.GetMenu(Menus.MenuID.Sale);
+        MenusClass.TopSelected(_SaleMenu!, true);
     }
 }
 

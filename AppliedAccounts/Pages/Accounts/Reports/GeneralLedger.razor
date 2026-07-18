@@ -2,38 +2,21 @@
 @attribute [Authorize]
 @layout PageLayout
 
-@using AppReports
-@using AppliedDB;
-@using AppliedAccounts.Data
-@using AppliedAccounts.Models
 @using AppliedAccounts.Libs
 @using AppliedAccounts.Services
-@using System.Data
 
-@inject AuthenticationStateProvider Authorized
 @inject IToastService ToastService
 @inject PrintService ReportService
 @inject GlobalService AppGlobal
 
 @code {
 	decimal LedgerBalance;
-	//decimal TotalDR;
-	//decimal TotalCR;
 
 	protected override void OnInitialized()
 	{
-		var AppUser = ((UserAuthenticationStateProvider)Authorized).AppUser;
-
-		Start(AppUser);
-
+		LoadData();
 		IsPageValid = true;
 		if (Source is null) { IsPageValid = false; IsPageValidMessage += " Source is null"; }
-		//if (ReportService is null) { IsPageValid = false; IsPageValidMessage += " Report Service is null"; }
-
-		// decimal LedgerBalance = 0.00M;
-		// decimal TotalDR = 0.00M;
-		// decimal TotalCR = 0.00M;
-
 	}
 
 	protected override void OnAfterRender(bool firstRender)
@@ -92,10 +75,11 @@
 								</div>
 							</div>
 							<div class="col-6">
-								<ShowBrowseWindow Id="ddAccounts"
-												  Title="Accounts"
-												  @bind-Value="MyModel.COAID"
-												  BrowseList="MyModel.AccountList" />
+								<MyDropDown id="ddAccounts"
+											Label="Accounts"
+											Value="@MyModel.COAID"
+											ValueChanged="@((e) => AccountIDChanged(e))"
+											Items="@MyModel.AccountList" />
 							</div>
 						</div>
 						<div class="row g-2 p1-">
@@ -141,10 +125,11 @@
 								</div>
 							</div>
 							<div class="col-6">
-								<ShowBrowseWindow Id="ddcompany"
-												  Title="company"
-												  @bind-Value="MyModel.CompanyID"
-												  BrowseList="MyModel.CompanyList" />
+                                <MyDropDown id="ddCompany"
+                                            Label="Company"
+                                            Value="@MyModel.CompanyID"
+                                            ValueChanged="@((e) => CompanyIDChanged(e))"
+                                            Items="@MyModel.CompanyList" />
 							</div>
 						</div>
 					</div>
@@ -191,10 +176,11 @@
 								</div>
 							</div>
 							<div class="col-6">
-								<ShowBrowseWindow Id="ddEmployee"
-												  Title="Employee"
-												  @bind-Value="MyModel.EmployeeID"
-												  BrowseList="MyModel.EmployeeList" />
+								<MyDropDown id="ddEmployee"
+                                            Label="Employee"
+                                            Value="@MyModel.EmployeeID"
+                                            ValueChanged="@((e) => EmployeeIDChanged(e))"
+                                            Items="@MyModel.EmployeeList" />
 							</div>
 						</div>
 					</div>
@@ -241,10 +227,11 @@
 								</div>
 							</div>
 							<div class="col-6">
-								<ShowBrowseWindow Id="ddProject"
-												  Title="Project"
-												  @bind-Value="MyModel.ProjectID"
-												  BrowseList="MyModel.ProjectList" />
+								<MyDropDown id="ddProject"
+                                            Label="Project"
+                                            Value="@MyModel.ProjectID"
+                                            ValueChanged="@((e) => ProjectIDChanged(e))"
+                                            Items="@MyModel.ProjectList" />
 							</div>
 						</div>
 					</div>

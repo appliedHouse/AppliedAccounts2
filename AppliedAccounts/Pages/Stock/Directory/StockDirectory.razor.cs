@@ -1,10 +1,8 @@
-﻿using AppliedAccounts.Services;
-using AppliedDB;
+﻿using AppliedDB;
 using AppMessages;
+using Menus;
 using System.Data;
 using static AppliedDB.Enums;
-
-
 
 namespace AppliedAccounts.Pages.Stock.Directory
 {
@@ -18,21 +16,15 @@ namespace AppliedAccounts.Pages.Stock.Directory
         public string Sort { get; set; }
         public bool EditMode { get; set; }
 
-        //public ToastClass MyToastClass { get; set; }
-        //public ToastClass Toast { get; set; }
-
-
-
         public List<CodeTitle> StockDirectoryList { get; set; }
 
-        protected override void OnParametersSet()
-        {
-            if (!string.IsNullOrEmpty(TableName))
-            {
-                LoadData(TableName);
-            }
-        }
-
+        //protected override void OnParametersSet()
+        //{
+        //    if (!string.IsNullOrEmpty(TableName))
+        //    {
+        //        LoadData(TableName);
+        //    }
+        //}
 
         public void LoadData(string _TableName)
         {
@@ -74,7 +66,7 @@ namespace AppliedAccounts.Pages.Stock.Directory
         public bool Edit(long _ID)
         {
             EditMode = true;
-            var _data = StockDirectoryList.Where(e => e.ID == _ID).FirstOrDefault();
+            var _data = StockDirectoryList.FirstOrDefault(e => e.ID == _ID);
             if (_data != null)
             {
                 MyModel.ID = _data.ID;
@@ -103,7 +95,6 @@ namespace AppliedAccounts.Pages.Stock.Directory
                 if (Source.IsSaved)
                 {
                     ToastService.ShowSuccess($"'{MyModel.Title}' has been saved successfully!");
-                    // Show Success Message
                 }
             }
             else
@@ -114,7 +105,7 @@ namespace AppliedAccounts.Pages.Stock.Directory
 
         #endregion
 
-        public void BackPage() { AppGlobal.NavManager.NavigateTo("/Menu/Stock"); }
+        public void BackPage() {  AppGlobal.NavManager.GoTo(MenuID.StockDictionery); }
 
     }
 

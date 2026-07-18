@@ -1,5 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using AppReports;
@@ -13,9 +14,10 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 {
     public partial class GeneralLedger
     {
+
         public DataSource Source { get; set; }
-        public GLModel MyModel { get; set; }
-        public MessageClass MsgClass { get; set; }
+        public GLModel MyModel { get; set; } = new();
+        public MessageClass MsgClass { get; set; } = new();
         public string DBFile { get; set; }
         public bool IsPageValid { get; set; }
         public bool IsPrinting { get; set; }
@@ -24,27 +26,18 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
         public GeneralLedger()
         {
-            MyModel = new();
         }
 
-        public void Start(AppliedGlobals.AppUserModel _UserModel)
+        public void LoadData()
         {
-            if (_UserModel != null)
-            {
-                MsgClass = new();
-                Source = new(AppGlobal.AppPaths);
-                DBFile = AppGlobal.DBFile;
-                MyModel.AccountList = Source.GetAccounts();
-                MyModel.CompanyList = Source.GetCustomers();
-                MyModel.EmployeeList = Source.GetEmployees();
-                MyModel.ProjectList = Source.GetProjects();
-
-            }
-            else
-            {
-                IsPageValid = false;
-                MsgClass.Add(MESSAGES.PageIsNotValid);
-            }
+            MsgClass = new();
+            Source ??= new(AppGlobal.AppPaths);
+               
+            DBFile = AppGlobal.DBFile;
+            MyModel.AccountList = Source.GetAccounts();
+            MyModel.CompanyList = Source.GetCustomers();
+            MyModel.EmployeeList = Source.GetEmployees();
+            MyModel.ProjectList = Source.GetProjects();
 
             GetKeys();
         }
@@ -183,7 +176,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
             MyModel.Ledger = _DisplayTable;
 
-            return _Result; 
+            return _Result;
         }
 
         public async void CreateReportModel()
@@ -208,7 +201,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             MsgClass = new();           // Clear all previous messages - refresh
             IsPrinting = true;
             await InvokeAsync(StateHasChanged);
-            
+
             try
             {
                 SetKeys();
@@ -225,7 +218,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             {
                 MsgClass.Error(error.Message);
             }
-            
+
             IsPrinting = false;
             await InvokeAsync(StateHasChanged);
         }
@@ -279,7 +272,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             var _GroupBy = "[Customer]";
             var _SortBy = "[Vou_date], [Vou_no]";
 
-            if(string.IsNullOrEmpty(_Nature))
+            if (string.IsNullOrEmpty(_Nature))
             {
                 ReportService.IsError = true;
                 MsgClass.Add(MESSAGES.CompanyLedgerAC_Notdefined);
@@ -439,11 +432,12 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             {
                 MsgClass.Error(error.Message);
             }
-            
+
             IsPrinting = false;
             await InvokeAsync(StateHasChanged);
         }
-        private async Task<bool> CreateReportModel_Project() {
+        private async Task<bool> CreateReportModel_Project()
+        {
             var _ProjectName = Source.SeekTitle(AppliedDB.Enums.Tables.Project, MyModel.ProjectID);
             var _Heading1 = $"Project Ledger {_ProjectName}";
             var _Heading2 = $"[{MyModel.DtFrom_Prj.ToString(Format.DDMMMYY)}] to [{MyModel.DtTo_Prj.ToString(Format.DDMMMYY)}] ";
@@ -469,7 +463,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             }
             return true;
         }
-        public async Task<ReportData> GetReportData_Project() 
+        public async Task<ReportData> GetReportData_Project()
         {
             var _Result = new ReportData();
 
@@ -519,6 +513,42 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         }
         #endregion
 
+        #region Drop Down Value changed events
+        private void AccountIDChanged(long _ID)
+        {
+            MyModel.COAID = _ID;
+            MyModel.TitleCOA = MyModel.AccountList
+                .Where(e => e.ID == MyModel.COAID)
+                .Select(e => e.Title)
+                .First() ?? "";
+        }
+        private void CompanyIDChanged(long _ID)
+        {
+            MyModel.CompanyID = _ID;
+            MyModel.TitleCompany = MyModel.CompanyList
+                .Where(e => e.ID == MyModel.CompanyID)
+                .Select(e => e.Title)
+                .First() ?? "";
+        }
+        private void ProjectIDChanged(long _ID)
+        {
+            MyModel.ProjectID = _ID;
+            MyModel.TitleProject = MyModel.ProjectList
+                .Where(e => e.ID == MyModel.ProjectID)
+                .Select(e => e.Title)
+                .First() ?? "";
+
+        }
+        private void EmployeeIDChanged(long _ID)
+        {
+            MyModel.EmployeeID = _ID;
+            MyModel.TitleEmployee = MyModel.EmployeeList
+                .Where(e => e.ID == MyModel.EmployeeID)
+                .Select(e => e.Title)
+                .First() ?? "";
+        }
+        #endregion
+
         public class GLModel
         {
             public long BookID { get; set; }
@@ -534,11 +564,11 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
             public DateTime DtFrom_Com { get; set; }            // Date for (Companies/Clients)
             public DateTime DtTo_Com { get; set; }
-           
+
 
             public DateTime DtFrom_Emp { get; set; }            // Date for (Employees)
             public DateTime DtTo_Emp { get; set; }
-            
+
             public DateTime DtFrom_Prj { get; set; }            // Date for (Projects
             public DateTime DtTo_Prj { get; set; }
 
@@ -554,6 +584,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             public string TitleCOA { get; set; }
             public string TitleCompany { get; set; }
             public string TitleEmployee { get; set; }
+            public string TitleProject { get; set; }
 
         }
     }

@@ -29,17 +29,17 @@ namespace AppliedAccounts.Pages.Menu
             if (_SelectedMenu == null) { return; }
 
             #region Logout User
-            if (MenuID == (int)MenuEnum.Menus.Logout)
+            if (MenuID == (int)Menus.MenuID.Logout)
             {
                 var UserService = (UserAuthenticationStateProvider)AuthState;
-                await UserService.Logout();  //UpdateAuthenticateState(null);                    // Logout User
+                await UserService.LogoutAsync();  //UpdateAuthenticateState(null);                    // Logout User
                 NavManager.NavigateTo("/");
                 return;
             }
             #endregion
 
             #region Home Button
-            if (MenuID == (int)MenuEnum.Menus.Home)
+            if (MenuID == (int)Menus.MenuID.Home)
             {
                 NavManager.NavigateTo("/");
                 return;

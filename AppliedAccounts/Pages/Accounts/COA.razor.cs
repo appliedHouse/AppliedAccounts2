@@ -1,6 +1,6 @@
 ﻿using AppliedAccounts.Models;
-using AppliedAccounts.Services;
 using Microsoft.JSInterop;
+using Menus;
 
 
 
@@ -28,7 +28,7 @@ namespace AppliedAccounts.Pages.Accounts
             if (MyModel.NotesList is null) { _Valid = false; MyModel.MsgClass.Add("Financial Notes List is empty"); }
             return _Valid;
         }
-        protected void Back() { AppGlobal.NavManager.NavigateTo("/Menu/Accounts"); }
+        protected void Back() { AppGlobal.NavManager.GoTo(MenuID.AccountsDictionery); }
         public async void Add()
         {
             MyModel.Add();
@@ -44,7 +44,7 @@ namespace AppliedAccounts.Pages.Accounts
 
         public async void Save()
         {
-            var IsSaved = await Task.Run(()=> MyModel.Save());
+            var IsSaved = await Task.Run(MyModel.Save);
             if(IsSaved)
             {
                 await InvokeAsync(StateHasChanged);

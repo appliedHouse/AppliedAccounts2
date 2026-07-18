@@ -1,0 +1,28 @@
+﻿<h3>Btn1_Back</h3>
+
+@code {
+
+}
+
+
+@using Microsoft.AspNetCore.Components
+
+@code {
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    private async Task HandleClick(MouseEventArgs e)
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(e);
+        }
+    }
+}
+
+
+<div class="p-2">
+    <button id="btn-New" type="button" class="btn btn-sm w1 btn-info" title="New" @onclick="HandleClick">
+        <i class="bi bi-plus-square"></i>
+    </button>
+</div>

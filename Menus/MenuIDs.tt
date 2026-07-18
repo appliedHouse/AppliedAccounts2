@@ -1,0 +1,67 @@
+<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Text.Json" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text.Json" #>
+<#@ output extension=".cs" #>
+
+<#
+    // Since we can't easily reference the Menu assembly at design-time,
+    // we'll use the JSON approach to avoid build dependencies
+    // But we'll read from the same source that MenuData uses
+    
+    var menuItems = new List<(int Id, string Title)>();
+    
+    // Option A: Read from JSON file
+    string jsonPath = Path.Combine(Path.GetDirectoryName(this.Host.ResolvePath("")), 
+                                   "wwwroot", "System", "defaultMenus.json");
+    
+    if (File.Exists(jsonPath))
+    {
+        var json = File.ReadAllText(jsonPath);
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var list = JsonSerializer.Deserialize<List<MenuItemDto>>(json, options);
+        menuItems = list.Select(x => (x.Id, x.Title)).ToList();
+    }
+    else
+    {
+        // Option B: Copy the data here as fallback (but this is the duplication we want to avoid)
+        // Better: throw an error and instruct to build first
+        throw new Exception("defaultMenus.json not found. Please build the project first to generate it.");
+    }
+#>
+namespace Menus
+{
+    public enum MenuID
+    {
+<#
+    foreach (var item in menuItems)
+    {
+        // Clean the title to make it a valid C# identifier
+        string name = item.Title.Replace(" ", "").Replace(".", "").Replace("&", "And").Replace("-", "").Replace("/", "");
+        if (menuItems.Count(m => m.Title == item.Title) > 1)
+            name = $"{name}_{item.Id}";
+#>
+        <#= name #> = <#= item.Id #>,
+<#
+    }
+#>
+    }
+}
+
+<#+
+// DTO for JSON deserialization
+public class MenuItemDto
+{
+    public int Id { get; set; }
+    public string Title { get; set; }
+    public bool Active { get; set; }
+    public string Icon { get; set; }
+    public int Level { get; set; }
+    public int ParentId { get; set; }
+    public string NavigateTo { get; set; }
+}
+#>

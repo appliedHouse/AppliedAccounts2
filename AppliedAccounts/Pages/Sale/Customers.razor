@@ -1,26 +1,12 @@
-﻿@page "/Pages/Customers"
-@page "/Customer/{ID:long}"
-@page "/Customer/{ID:long}/{IsDelete:bool}"
+﻿@page "/Sales/Customers"
+@page "/Sales/Customer/{ID:long}"
+@page "/Sales/Customer/{ID:long}/{IsDelete:bool}"
 @attribute [Authorize];
 @using AppliedAccounts.Libs;
 @using AppliedAccounts.Services;
 
 @inject GlobalService AppGlobal
 @inject IToastService ToastService
-
-@code {
-
-   
-
-
-}
-
-<style>
-    #Main {
-        background-color: bisque;
-    }
-</style>
-
 
 
 <PageHeading Text="Customer / Client Detail" />
@@ -145,7 +131,7 @@
                     }
             </div>
             <div class="p-2 ms-auto">
-                <Btn_Back NavTo="/CustomerList"/>
+                    <Btn_Back NavTo=@Menus.MenuNavigation.NavTo(Menus.MenuID.ClientList) />
             </div>
         </div>
         </div>

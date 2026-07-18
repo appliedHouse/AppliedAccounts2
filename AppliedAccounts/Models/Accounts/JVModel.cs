@@ -108,9 +108,6 @@ namespace AppliedAccounts.Models.Accounts
         {
             try
             {
-
-
-
                 if (string.IsNullOrWhiteSpace(Vou_No))
                 {
                     MsgClass.Alert(Messages.VoucherNumberEmpty);

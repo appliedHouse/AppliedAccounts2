@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-
+﻿
 namespace Menus
 {
     public interface IMenusClass
@@ -99,9 +98,9 @@ namespace Menus
             return FullMenus.FirstOrDefault(mnu => mnu.ID == _MenuID);
         }
 
-        public MenuItem? GetMenu(MenuEnum.Menus _MenuID)
+        public MenuItem? GetMenu(MenuID menuId)
         {
-            return FullMenus.FirstOrDefault(mnu => mnu.ID == (int)_MenuID);
+            return FullMenus.FirstOrDefault(mnu => mnu.ID == (int)menuId);
         }
 
 

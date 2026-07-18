@@ -1,7 +1,7 @@
-﻿@page "/Menu/Accounts"
+﻿@page "/Menu/Accounts/Transaction"
+
 @attribute [Authorize]
 @inject GlobalService AppGlobal
-@using Menus;
 
 
 @code {
@@ -9,8 +9,7 @@
 
     protected override void OnInitialized()
     {
-        var _AccountMenu = MenusClass.GetMenu(MenuEnum.Menus.Accounts);
-        MenusClass.TopSelected(_AccountMenu!, true);
+        MenusClass.SecondLevel(MenusClass.GetMenu(Menus.MenuID.Transaction)!);
     }
 }
 
@@ -22,9 +21,8 @@
         <div class="part-2">
 
             <p>Welcome Applied Accounts V2<a href="#"></a></p>
-            <p>Accounts Page Authorized<a href="#"></a></p>
+            <p>Accounts Dictionery Page Authorized<a href="#"></a></p>
         </div>
     </div>
 </div>
 
-<p>Transaction Menu</p>

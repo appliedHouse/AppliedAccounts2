@@ -1,7 +1,7 @@
 ﻿@page "/Accounts/JV"
 @page "/Accounts/JV/{Vou_No}"
+@using AppliedAccounts.Component.ButtonsDictionery
 @using AppliedAccounts.Libs
-@using AppliedAccounts.Models.Accounts
 @inject GlobalService AppGlobal
 @inject PrintService ReportService
 @inject IToastService ToastService
@@ -9,6 +9,9 @@
 
 @code {
 
+    public bool Stop = true;
+    private string Message { get; set; } = "";
+    private string VoucherNo { get; set; } = "";
 
     public bool ShowBtnSave()
     {
@@ -23,12 +26,15 @@
     protected override void OnInitialized()
     {
         MyModel = new(AppGlobal, Vou_No);
-       
-        // if(Vou_No != null)
-        // {
-        //     MyModel.LoadData(Vou_No);
-        // }
-        
+
+        if (MyModel == null) { IsPageValid = false; }
+        if (MyModel!.Count > 0) { VoucherNo = MyModel.MyVoucher[0].Vou_No; }
+
+        if (!IsPageValid)
+        {
+            Message = "Invalid Voucher Number";
+        }
+
     }
 }
 
@@ -72,99 +78,37 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating d-flex gap-2">
-                            <InputSelect id="ddAccounts" class="form-control item-height" TValue="long" Value="@MyModel.Transaction.COA" ValueExpression="@(() => @MyModel.Transaction.COA)" ValueChanged="@((e) => AccountIDChanged(e))">
+                        <MyDropDown Id="ddAccount"
+                                    Label="Accounts"
+                                    Value="@MyModel.Transaction.COA"
+                                    ValueChanged="@AccountIDChanged"
+                                    Items="@MyModel.Accounts" />
 
-                                @if (MyModel.Accounts.Any())
-                                {
-                                    @foreach (var item in MyModel.Accounts)
-                                    {
-                                        <option value="@item.ID">@item.Title</option>
-                                    }
-                                }
-                                else
-                                {
-                                    <option value="0">No Records - Accounts</option>
-                                }
-
-                            </InputSelect>
-                            <Dropdown_Search @onclick="() => BrowseWindow(1)" />
-                            <label for="ddAccounts">Account</label>
-                        </div>
                     </div>
                 </div>
                 <div class="row g-md-2 mb-2 my-2">
                     <div class="col-md-4">
-                        <div class="form-floating d-flex gap-2">
-                            <InputSelect id="ddCompany" class="form-control item-height"
-                                         TValue="long"
-                                         Value="@MyModel.Transaction.Company"
-                                         ValueExpression="@(() => @MyModel.Transaction.Company)"
-                                         ValueChanged="@((e) => CompanyIDChanged(e))">
-                                @if (MyModel.Companies.Any())
-                                {
-                                    @foreach (var item in MyModel.Companies)
-                                    {
-                                        <option value="@item.ID">@item.Title</option>
-                                    }
-                                }
-                                else
-                                {
-                                    <option value="0">No Records -  Company</option>
-                                }
-
-                            </InputSelect>
-                            <Dropdown_Search @onclick="() => BrowseWindow(2)" />
-                            <label for="ddCompany">Company / Customer / Sub Account</label>
-                        </div>
+                        <MyDropDown id="ddCompany"
+                                    Label="Client / Customer / Sub Account"
+                                    Value="@MyModel.Transaction.Company"
+                                    ValueChanged="@((e) => CompanyIDChanged(e))"
+                                    Items="@MyModel.Companies" />
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating d-flex gap-2">
-                            <InputSelect id="ddEmployee" class="form-control item-height"
-                                         TValue="long"
-                                         Value="@MyModel.Transaction.Employee"
-                                         ValueExpression="@(() => @MyModel.Transaction.Employee)"
-                                         ValueChanged="@((e) => EmployeeIDChanged(e))">
-                                @if (MyModel.Employees.Any())
-                                {
-                                    @foreach (var item in MyModel.Employees)
-                                    {
-                                        <option value="@item.ID">@item.Title</option>
-                                    }
-                                }
-                                else
-                                {
-                                    <option value="0">No Records - Employee</option>
-                                }
+                        <MyDropDown id="ddEmployee"
+                                    Label="Employee"
+                                    Value="@MyModel.Transaction.Employee"
+                                    ValueChanged="@((e) => EmployeeIDChanged(e))"
+                                    Items="@MyModel.Employees" />
 
-                            </InputSelect>
-                            <Dropdown_Search @onclick="() => BrowseWindow(3)" />
-                            <label for="ddEmployee">Employee</label>
-                        </div>
+                        
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating d-flex gap-2">
-                            <InputSelect id="ddProject" class="form-control item-height"
-                                         TValue="long"
-                                         Value="@MyModel.Transaction.Project"
-                                         ValueExpression="@(() => MyModel.Transaction.Project)"
-                                         ValueChanged="@((e) => ProjectIDChanged(e))">
-                                @if (MyModel.Projects.Any())
-                                {
-                                    @foreach (var item in MyModel.Projects)
-                                    {
-                                        <option value="@item.ID">@item.Title</option>
-                                    }
-                                }
-                                else
-                                {
-                                    <option value="0">No Records - Project</option>
-                                }
-
-                            </InputSelect>
-                            <Dropdown_Search @onclick="() => BrowseWindow(4)" />
-                            <label for="ddProject">Project</label>
-                        </div>
+                        <MyDropDown id="ddProject"
+                                    Label="Project"
+                                    Value="@MyModel.Transaction.Project"
+                                    ValueChanged="@((e) => ProjectIDChanged(e))"
+                                    Items="@MyModel.Projects" />
                     </div>
                 </div>
                 <div class="row g-md-2 mb-2 my-2">
@@ -201,22 +145,27 @@
                 <div class="container">
                     <div class="d-flex flex-row mb-3 filter position-relative">
                         <div class="p-2">
-                            <button type="button" class="btn btn-sm w1 btn-info" title="New" @onclick="MyModel.New">
+                            <button id="btn-New" type="button" class="btn btn-sm w1 btn-info" title="New" @onclick="MyModel.New">
                                 <i class="bi bi-plus-square"></i>
                             </button>
                         </div>
+
                         <div class="p-2">
-                            <button type="button" class="btn btn-sm w1 btn-primary" title="Add" @onclick="MyModel.Save">
-                                <i class="bi bi-arrow-bar-down"></i>
-                            </button>
+
+                            <Btn1_Add OnClick="MyModel.Save" />
+
                         </div>
                         <div class="p-2">
-                            <button disabled="@ShowBtnSave()" type="button" class="btn btn-sm w1 btn-success" title="Save" data-bs-toggle="modal" data-bs-target="#SaveVoucher">
+
+                            <Btn1_Save OnClick="MyModel.Save" VoucherNo="@VoucherNo" Visiable="@ShowBtnSave()" />
+
+                            
+                            @*  <button id="btn-save2"  disabled="ShowBtnSave()" type="button" class="btn btn-sm w1 btn-success" title="Save" data-bs-toggle="modal" data-bs-target="#SaveVoucher">
                                 <i class="bi bi-floppy2-fill"></i>
-                            </button>
+                            </button> *@
                         </div>
 
-                        @if (MyModel.MyVoucher != null && MyModel.Count > 1)
+                        @if (MyModel.Count > 1)
                         {
                             <div class="btn-group p-2" role="group" aria-label="Navigation">
                                 <button type="button" class="btn btn-sm w1 btn-light" title="Top" @onclick="MyModel.Top">
@@ -325,37 +274,11 @@
     </div>
 }
 
-<!-- Modal -->
-<div class="modal fade" id="SaveVoucher" tabindex="-1" aria-labelledby="SaveVoucherLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            @if (MyModel.MyVoucher.Count > 0)
-            {
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="SaveVoucherLabel">SAVE @MyModel.MyVoucher[0].Vou_No</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Save Voucher No @MyModel.MyVoucher[0].Vou_No</p>
-                </div>
-            }
-            else
-            {
-                <div>
-                    <p>No transactions found to save</p>
-                </div>
-            }
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                @if (MyModel.MyVoucher.Count > 0)
-                {
-                    <button type="submit" class="btn btn-success btn-sm" data-bs-dismiss="modal" aria-label="Close" title="Save All" @onclick="SaveAll"> Save</button>
-                }
+else
+{
+    <div class="alert alert-danger" role="alert">@Message</div>
 
-            </div>
-        </div>
-    </div>
-</div>
+}
 
 <!-- Browse Windows -->
 <div class="modal fade" id="winBrowse" tabindex="-1" aria-labelledby="browseModalLabel" aria-hidden="true">

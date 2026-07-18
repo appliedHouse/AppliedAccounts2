@@ -45,7 +45,7 @@ namespace Menus
                 PopulateDatabase();
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -62,7 +62,7 @@ namespace Menus
 
                 InitializeDatabase();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -84,7 +84,7 @@ namespace Menus
 
                 return count > 0;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

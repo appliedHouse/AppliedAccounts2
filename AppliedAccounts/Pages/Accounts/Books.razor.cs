@@ -2,6 +2,7 @@
 using AppliedAccounts.Models;
 using Microsoft.AspNetCore.Components;
 using System.Data;
+using AppliedAccounts.Services;
 
 
 namespace AppliedAccounts.Pages.Accounts
@@ -9,9 +10,8 @@ namespace AppliedAccounts.Pages.Accounts
     public partial class Books
     {
         [Parameter] public long ID { get; set; }
-        [Parameter] public long BookID { get; set; }
+        [Parameter] public long BookID { get; set; } = 1;
 
-        public AppliedGlobals.AppUserModel UserProfile { get; set; }
         public BookModel MyModel { get; set; } = new();
 
         public bool IsPageValid { get; set; } = true;
