@@ -884,6 +884,12 @@ namespace AppliedDB
 
         #region Delete Row
 
+        public async Task<bool> DeleteAsync(DataRow _Row)
+        {
+            return await Task.Run(() => Delete(_Row));
+        }
+
+
         public bool Delete(DataRow _Row)
         {
             MsgClass.ClearMessages();

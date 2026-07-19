@@ -59,7 +59,16 @@
                     @if (MyModel.SubCategory != null)
                     {
                         <div class="form-floating d-flex gap-2">
-                            <InputSelect id="ddSubCategory" class="form-control item-height flex-grow-1"
+                            <MyDropDown Id="ddSubCategory"
+                                        Label="Sub Category"
+                                        Value="MyModel.Record.SubCategory"
+                                        ValueChanged="@((e) => SubCategoryChanged(e))"
+                                        Items="MyModel.SubCategory"/>
+
+
+
+
+                            @* <InputSelect id="ddSubCategory" class="form-control item-height flex-grow-1"
                                          TValue="long"
                                          Value="@MyModel.Record.SubCategory"
                                          ValueChanged="@((e) => SubCategoryChanged(e))"
@@ -78,7 +87,7 @@
                             </InputSelect>
                             <Dropdown_Search @onclick="() => BrowseWindow(2)" />
                             <label for="ddSubCategory">Category</label>
-
+ *@
                         </div>
                     }
                 </div>
@@ -86,7 +95,14 @@
                     @if (MyModel.Packing != null)
                     {
                         <div class="form-floating d-flex gap-2">
-                            <InputSelect id="ddSubCategory" class="form-control item-height flex-grow-1"
+                            <MyDropDown Id="ddPacking"
+                                        Label="Packing"
+                                        Value="MyModel.Record.Packing"
+                                        ValueChanged="@((e) => PackingChanged(e))"
+                                        Items="MyModel.Packing" />
+
+
+                            @* <InputSelect id="ddSubCategory" class="form-control item-height flex-grow-1"
                                          TValue="long"
                                          Value="@MyModel.Record.Packing"
                                          ValueChanged="@((e) => PackingChanged(e))"
@@ -104,7 +120,7 @@
                                 }
                             </InputSelect>
                             <Dropdown_Search @onclick="() => BrowseWindow(3)" />
-                            <label for="ddPacking">Packing</label>
+                            <label for="ddPacking">Packing</label> *@
                         </div>
                     }
                 </div>
@@ -112,7 +128,14 @@
                     @if (MyModel.Size != null)
                     {
                         <div class="form-floating d-flex gap-2">
-                            <InputSelect id="ddSubSize" class="form-control item-height flex-grow-1"
+                            <MyDropDown Id="ddSize"
+                                        Label="Size"
+                                        Value="MyModel.Record.Size"
+                                        ValueChanged="@((e) => SizeChanged(e))"
+                                        Items="MyModel.Size" />
+
+
+                            @* <InputSelect id="ddSubSize" class="form-control item-height flex-grow-1"
                                          TValue="long"
                                          Value="@MyModel.Record.Size"
                                          ValueChanged="@((e) => SizeChanged(e))"
@@ -130,7 +153,7 @@
                                 }
                             </InputSelect>
                             <Dropdown_Search @onclick="() => BrowseWindow(3)" />
-                            <label for="ddSize">Size</label>
+                            <label for="ddSize">Size</label> *@
                         </div>
                     }
                 </div>
@@ -138,7 +161,14 @@
                     @if (MyModel.UOM != null)
                     {
                         <div class="form-floating d-flex gap-2">
-                            <InputSelect id="ddSubSize" class="form-control item-height flex-grow-1"
+                            <MyDropDown Id="ddUOM"
+                                        Label="UOM"
+                                        Value="MyModel.Record.UOM"
+                                        ValueChanged="@((e) => UOMChanged(e))"
+                                        Items="MyModel.UOM" />
+
+
+                            @* <InputSelect id="ddSubSize" class="form-control item-height flex-grow-1"
                                          TValue="long"
                                          Value="@MyModel.Record.UOM"
                                          ValueChanged="@((e) => UOMChanged(e))"
@@ -156,7 +186,7 @@
                                 }
                             </InputSelect>
                             <Dropdown_Search @onclick="() => BrowseWindow(1)" />
-                            <label for="ddSize">Unit of Measure</label>
+                            <label for="ddSize">Unit of Measure</label> *@
                         </div>
                     }
                 </div>

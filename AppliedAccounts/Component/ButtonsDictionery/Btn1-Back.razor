@@ -1,28 +1,17 @@
-﻿<h3>Btn1_Back</h3>
+﻿@using Microsoft.AspNetCore.Components
+@inject NavigationManager NavManager;
 
 @code {
+    [Parameter] public string NavTo { get; set; } = "/";
 
-}
-
-
-@using Microsoft.AspNetCore.Components
-
-@code {
-    [Parameter]
-    public EventCallback<MouseEventArgs> OnClick { get; set; }
-
-    private async Task HandleClick(MouseEventArgs e)
+    private void HandleClick(MouseEventArgs e)
     {
-        if (OnClick.HasDelegate)
-        {
-            await OnClick.InvokeAsync(e);
-        }
+        NavManager.NavigateTo(NavTo);
     }
 }
 
 
-<div class="p-2">
-    <button id="btn-New" type="button" class="btn btn-sm w1 btn-info" title="New" @onclick="HandleClick">
-        <i class="bi bi-plus-square"></i>
-    </button>
-</div>
+<button class="btn btn-link btn-sm btn-warning" title="Back" @onclick="HandleClick">
+    <i class="bi bi-arrow-left-circle"></i>
+</button>
+

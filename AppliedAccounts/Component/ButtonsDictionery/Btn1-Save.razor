@@ -1,43 +1,23 @@
-﻿@using Microsoft.AspNetCore.Components
+﻿@code {
+    [Parameter]
+    public EventCallback OnClick { get; set; }
 
-@code {
-    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
-    [Parameter] public bool Visiable { get; set; } = true;
-    [Parameter] public string VoucherNo { get; set; } = string.Empty;
+    private string buttonStyle = "border:2px;";
 
-    private async Task HandleClick(MouseEventArgs e)
+    private async Task HandleClick()
     {
         if (OnClick.HasDelegate)
-        {
-            await OnClick.InvokeAsync(e);
-        }
+            await OnClick.InvokeAsync();
     }
 }
 
-<button id="btn-save2" disabled="@Visiable" type="button" class="btn btn-sm w1 btn-success" title="Save" data-bs-toggle="modal" data-bs-target="#SaveVoucher">
-    <i class="bi bi-floppy2-fill"></i>
+<button id="btn1-Save"
+        type="button"
+        class="btn btn-sm w1 btn-success"
+        style="@buttonStyle"
+        title="Record Save"
+        @onclick="HandleClick"
+        @onmouseover="@(() => buttonStyle = "border:2px solid white; outline:2px solid white;")"
+        @onmouseout="@(() => buttonStyle = "border:2px;")">
+    <i class="bi bi-floppy"></i>
 </button>
-
-
-<!-- Modal -->
-<div class="modal fade" id="SaveVoucher" tabindex="-1" aria-labelledby="SaveVoucherLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="SaveVoucherLabel">SAVE @VoucherNo</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Save Voucher No @VoucherNo</p>
-                </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                @if (VoucherNo.Length > 0)
-                {
-                    <button type="submit" class="btn btn-success btn-sm" data-bs-dismiss="modal" aria-label="Close" title="Save All" @onclick="HandleClick"> Save</button>
-                }
-            </div>
-        </div>
-    </div>
-</div>
-

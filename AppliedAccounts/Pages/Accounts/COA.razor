@@ -1,5 +1,6 @@
 ﻿@page "/Accounts/COA"
 @attribute [Authorize];
+@using AppliedAccounts.Component.ButtonsDictionery
 @using AppliedAccounts.Libs
 @using AppliedAccounts.Models
 @using AppliedAccounts.Services
@@ -142,7 +143,8 @@
                             Opening Balance
                         </th>
                         <th style="Width:10%" class="td-btn">
-                            <button id="btnAdd" class="btn-Add" @onclick="Add"><i class="bi bi-plus-circle-fill"></i></button>
+                            <Btn1_New OnClick="Add" />
+                            @* <button id="btnAdd" class="btn-Add" @onclick="Add"><i class="bi bi-plus-circle-fill"></i></button> *@
                         </th>
                     </tr>
                 </thead>
