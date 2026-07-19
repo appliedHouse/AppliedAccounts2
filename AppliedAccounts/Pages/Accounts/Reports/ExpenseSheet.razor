@@ -1,23 +1,55 @@
 ﻿@page "/Accounts/Reports/ExpenseSheet"
 
-@using AppliedAccounts.Libs
+@using AppliedAccounts.Component.ButtonsDictionery
+@using AppliedAccounts.Component.Libs
 @using System.Data
 
 @inject IToastService ToastService
 @inject PrintService ReportService
 @inject GlobalService AppGlobal
 
+
+
+<PageHeading Text="Expense Sheet List" />
+
+<EditForm Model="MyModel">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-6">
+                <MyDropDownString Id="ddExpenseSheet"
+                                  Label="Expense Sheets"
+                                  Value="@MyModel.SelectedSheetNo"
+                                  ValueChanged="OnSheetChanged"
+                                  Items="SheetTable" />
+            </div>
+
+            <div class="col-md-6">
+                <div class="d-flex justify-content-end align-items-end gap-2">
+
+                    <div class="form-floating" style="width:300px;">
+                        <InputText id="txtSearch"
+                                   class="form-control"
+                                   placeholder="Search"
+                                   @bind-Value="MyModel.SearchText" />
+
+                        <label for="txtSearch">Search</label>
+                    </div>
+
+                    <Btn1_Clear OnClick="ClearSearch" />
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</EditForm>
+
+
 <div class="expense-page">
 
     <div class="container-fluid mt-3">
 
-        <!-- TITLE -->
-
-        <div class="expense-title">
-
-            Expense Sheet List
-
-        </div>
         <!-- TOP BAR -->
 
         <div class="expense-toolbar">
@@ -26,7 +58,7 @@
 
             <div class="toolbar-side">
 
-                <div class="expense-info-item">
+                @* <div class="expense-info-item">
 
                     <span class="expense-info-label">
                         Sheet No :
@@ -36,19 +68,19 @@
                             value="@SelectedSheetNo"
                             @onchange="OnSheetChanged">
 
-                        @if (SheetTable != null && SheetTable.Rows.Count > 0)
+                        @if (SheetTable != null && SheetTable.Count > 0)
                         {
-                            foreach (DataRow row in SheetTable.Rows)
+                            foreach (var item in SheetTable)
                             {
-                                <option value="@row["SheetNo"]">
-                                    @row["SheetNo"]
+                                <option value="@item.Code">
+                                    @item.Title
                                 </option>
                             }
                         }
 
                     </select>
 
-                </div>
+                </div> *@
 
                 <div class="expense-report-group">
 
@@ -106,24 +138,19 @@
 
         <div class="table-responsive">
 
-            <table class="expense-table">
-
+            <table class="table-list">
                 <thead>
-
                     <tr>
-
-                        <th>Sr. No.</th>
-                        <th>Voucher</th>
-                        <th>Ref No</th>
-                        <th>Date</th>
-                        <th>Account</th>
-                        <th>Company / Customer</th>
-                        <th>Debit</th>
-                        <th>Credit</th>
-                        <th>Description</th>
-
+                        <th style="width:5%">Sr. No.</th>
+                        <th style="width:5%">Voucher</th>
+                        <th style="width:5%">Ref No</th>
+                        <th style="width:5%">Date</th>
+                        <th style="width:10%">Account</th>
+                        <th style="width:10%">Company / Customer</th>
+                        <th style="width:8%" class="amount">Debit</th>
+                        <th style="width:8%" class="amount">Credit</th>
+                        <th style="width:20%">Description</th>
                     </tr>
-
                 </thead>
 
                 <tbody>
@@ -168,41 +195,15 @@
                         <tr>
 
                             <td>@sr</td>
-
-                            <td class="voucher-text">
-                                @row["Vou_No"]
-                            </td>
-
-                            <td>
-                                @row["Ref_No"]
-                            </td>
-
-                            <td>
-                                @Convert.ToDateTime(row["Vou_Date"]).ToString("dd-MM-yy")
-                            </td>
-
-                            <td>
-                                @row["TitleCOA"]
-                            </td>
-
-                            <td>
-                                @row["TitleCompany"]
-                            </td>
-
-                            <td class="debit-text">
-                                @Convert.ToDecimal(row["DR"]).ToString("N2")
-                            </td>
-
-                            <td class="credit-text">
-                                @Convert.ToDecimal(row["CR"]).ToString("N2")
-                            </td>
-
-                            <td>
-                                @row["Description"]
-                            </td>
-
+                            <td class="voucher-text">@row["Vou_No"]</td>
+                            <td>@row["Ref_No"]</td>
+                            <td>@((string)((DateTime)row["Vou_Date"]).DisplayDate())</td>
+                            <td>@row["TitleCOA"]</td>
+                            <td>@row["TitleCompany"]</td>
+                            <td class="debit-text right">@Convert.ToDecimal(row["DR"]).ToString("N2")</td>
+                            <td class="credit-text right">@Convert.ToDecimal(row["CR"]).ToString("N2")</td>
+                            <td class="left" sgtyle="margin-left:2px">@row["Description"]</td>
                         </tr>
-
                         sr++;
                     }
 
@@ -240,15 +241,6 @@
 
 @code {
 
-    public string SearchText = "";
-
-    public string SelectedSheetNo = "";
-
-    public DataTable ExpenseTable = new();
-
-    public DataTable SheetTable = new();
-
-    public ReportActionClass RptBtn { get; set; }
 
     protected override void OnInitialized()
     {
@@ -261,221 +253,8 @@
         LoadSheets();
     }
 
-    private void LoadSheets()
-    {
-        try
-        {
 
-            string SheetQuery = @"
+     
 
-                SELECT DISTINCT SheetNo
-
-                FROM view_Book
-
-                WHERE SheetNo IS NOT NULL
-                AND SheetNo <> ''
-
-                ORDER BY SheetNo
-
-            ";
-
-            SheetTable = AppGlobal.Source.GetTable(SheetQuery);
-
-            if (SheetTable.Rows.Count > 0)
-            {
-                SelectedSheetNo = SheetTable.Rows[0]["SheetNo"].ToString();
-
-                LoadExpenseSheet();
-            }
-
-        }
-        catch (Exception ex)
-        {
-            ToastService.ShowError(ex.Message);
-        }
-    }
-
-    private void OnSheetChanged(ChangeEventArgs e)
-    {
-        SelectedSheetNo = e.Value?.ToString();
-
-        LoadExpenseSheet();
-    }
-
-    private void LoadExpenseSheet()
-    {
-        try
-        {
-
-            string Query = $@"
-
-                SELECT
-
-                    Sr_No,
-                    Vou_No,
-                    Ref_No,
-                    Vou_Date,
-
-                    TitleCOA,
-                    TitleCompany,
-
-                    Description,
-
-                    DR,
-                    CR,
-
-                    SheetNo
-
-                FROM view_Book
-
-                WHERE SheetNo = '{SelectedSheetNo}'
-
-                ORDER BY Vou_Date, Vou_No
-
-            ";
-
-            ExpenseTable = AppGlobal.Source.GetTable(Query);
-
-        }
-        catch (Exception ex)
-        {
-            ToastService.ShowError(ex.Message);
-        }
-    }
-
-    private void ClearSearch()
-    {
-        SearchText = "";
-    }
-
-    public void Print(ReportActionClass PrintAction)
-    {
-        try
-        {
-
-            ReportService = new(AppGlobal);
-
-            ReportService.ReportType = PrintAction.PrintType;
-
-            CreateReportModel().Wait();
-
-            ReportService.Print();
-
-        }
-        catch (Exception ex)
-        {
-            ToastService.ShowError(ex.Message);
-        }
-    }
-
-    public async void PrintSummary(ReportActionClass PrintAction)
-    {
-        try
-        {
-            ReportService = new(AppGlobal);
-
-            ReportService.ReportType = PrintAction.PrintType;
-
-            await CreateSummaryReportModel();
-
-            ReportService.Print();
-        }
-        catch (Exception ex)
-        {
-            ToastService.ShowError(ex.Message);
-        }
-    }
-
-    public async Task CreateReportModel()
-    {
-        try
-        {
-
-            DataTable ReportTable = ExpenseTable.Copy();
-
-            ReportService.Data.DataSetName = "ds_ExpenseSheet";
-
-            ReportService.Data.ReportTable = ReportTable;
-
-            ReportService.Model.InputReport.FileName = "ExpenseSheet.rdl";
-
-            ReportService.Model.OutputReport.FileName = "ExpenseSheet";
-
-            ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
-
-            ReportService.Model.AddReportParameter(
-                "Heading1",
-                "Expense Sheet Report"
-            );
-
-            ReportService.Model.AddReportParameter(
-                "Heading2",
-                $"Sheet No : {SelectedSheetNo}"
-            );
-
-        }
-        catch (Exception ex)
-        {
-            ToastService.ShowError(ex.Message);
-        }
-    }
-    public async Task CreateSummaryReportModel()
-    {
-        try
-        {
-            string Query = $@"
-
-            SELECT
-
-                COA,
-
-                TitleCOA,
-
-                SUM(DR) AS DR,
-
-                SUM(CR) AS CR
-
-            FROM View_Book
-
-            WHERE SheetNo = '{SelectedSheetNo}'
-
-            GROUP BY
-                COA,
-                TitleCOA
-
-            ORDER BY
-                COA,
-                TitleCOA
-
-        ";
-
-            DataTable SummaryTable = AppGlobal.Source.GetTable(Query);
-
-            ReportService.Data.DataSetName = "ds_ExpenseGroup";
-
-            ReportService.Data.ReportTable = SummaryTable;
-
-            ReportService.Model.InputReport.FileName = "ExpenseSheetGroup.rdl";
-
-            ReportService.Model.OutputReport.FileName = "ExpenseSheetSummary";
-
-            ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
-
-            ReportService.Model.AddReportParameter(
-                "Heading1",
-                "PROJECT SUMMARY EXPENSES SHEET"
-            );
-
-            ReportService.Model.AddReportParameter(
-                "Heading2",
-                $"Project Sheet # {SelectedSheetNo}"
-            );
-
-        }
-        catch (Exception ex)
-        {
-            ToastService.ShowError(ex.Message);
-        }
-    }
-
+    
 }

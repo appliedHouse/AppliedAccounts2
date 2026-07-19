@@ -1,12 +1,8 @@
 ﻿@layout PageLayout;
 @page "/Accounts/ReceiptList";
 @attribute [Authorize];
-@using AppliedAccounts.Libs;
-@using AppliedAccounts.Models;
-@using AppliedAccounts.Data;
+@using AppliedAccounts.Component.Libs;
 @using AppliedAccounts.Services
-@using AppliedDB
-@using System.Data
 
 @inject AuthenticationStateProvider authorized
 @inject PrintService PrintService

@@ -1,0 +1,134 @@
+﻿@using AppliedDB
+@inject IJSRuntime JS
+
+@code {
+    [Parameter] public string Id { get; set; } = "ddBrowse";
+    [Parameter] public string Label { get; set; } = "Browse";
+
+    // Changed from long to string
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter] public List<CodeTitle>? Items { get; set; }
+
+    // true => click on form-select opens browse modal
+    [Parameter] public bool BrowseOnSelectClick { get; set; } = true;
+
+    private string SearchText { get; set; } = string.Empty;
+    private string ModalId => $"{Id}_browse";
+
+    private IEnumerable<CodeTitle>? FilteredItems =>
+        string.IsNullOrWhiteSpace(SearchText)
+            ? Items
+            : Items?.Where(x =>
+                (x.Title?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (x.Code?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    private Task OnSearchInput(ChangeEventArgs e)
+    {
+        SearchText = e.Value?.ToString() ?? string.Empty;
+        return Task.CompletedTask;
+    }
+
+    private async Task SelectClicked(MouseEventArgs _)
+    {
+        if (BrowseOnSelectClick)
+        {
+            await JS.InvokeVoidAsync("showModol", ModalId);
+        }
+    }
+
+    private async Task SelectItem(string id)
+    {
+        Value = id;
+        await ValueChanged.InvokeAsync(id);
+    }
+}
+
+<div class="form-floating d-flex gap-2">
+    <select id="@Id"
+            class="form-select flex-grow-1"
+            @bind="Value"
+            @bind:event="onchange"
+            @onmousedown="SelectClicked"
+            @onmousedown:preventDefault="BrowseOnSelectClick">
+
+        <option value="">Select...</option>
+
+        @if (Items?.Any() == true)
+        {
+            @foreach (var item in Items)
+            {
+                <option value="@item.ID">@item.Title</option>
+            }
+        }
+    </select>
+
+    <label for="@Id">@Label</label>
+</div>
+
+<div class="modal fade" id="@ModalId" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title fs-5">@Label</h5>
+
+                <InputText @bind-Value="SearchText"
+                           @oninput="OnSearchInput"
+                           placeholder="Search..."
+                           class="form-control w-50" />
+            </div>
+
+            <div class="modal-body">
+                <table class="table-list">
+                    <thead>
+                        <tr>
+                            <th style="width:15%">Code</th>
+                            <th style="width:70%">Title</th>
+                            <th style="width:15%">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (FilteredItems?.Any() == true)
+                        {
+                            @foreach (var item in FilteredItems)
+                            {
+                                <tr>
+                                    <td>@item.Code</td>
+                                    <td>@item.Title</td>
+                                    <td>
+                                        <button type="button"
+                                                class="btn btn-link"
+                                                data-bs-dismiss="modal"
+                                                @onclick="() => SelectItem(item.Code)">
+                                            <i class="bi bi-mouse"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">
+                                    No records found
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

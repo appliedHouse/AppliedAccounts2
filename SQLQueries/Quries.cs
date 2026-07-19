@@ -627,5 +627,76 @@ namespace SQLQueries
         }
 
         #endregion
+
+        #region Expense Sheet List Query
+        public static string ExpenseSheetList()
+        {
+            var _Text = new StringBuilder();
+
+            _Text.AppendLine("SELECT DISTINCT");
+            _Text.AppendLine("    [SheetNo]");
+            _Text.AppendLine("FROM [Book]");
+            _Text.AppendLine("WHERE [SheetNo] IS NOT NULL");
+            _Text.AppendLine("  AND [SheetNo] <> ''");
+            _Text.AppendLine("ORDER BY [SheetNo]");
+
+            return _Text.ToString();
+        }
+
+        public static string ExpenseSheetData(string SheetNo)
+        {
+            if(string.IsNullOrEmpty(SheetNo))
+            {
+                return string.Empty;
+            }
+
+            var _Text = new StringBuilder();
+
+            _Text.AppendLine("SELECT");
+            _Text.AppendLine("    [CB].[SheetNo],");
+            _Text.AppendLine("    [CB].[Vou_No],");
+            _Text.AppendLine("    [CB].[Vou_Date],");
+            _Text.AppendLine("    [CB].[Ref_No],");
+            _Text.AppendLine("    [B2].[COA],");
+            _Text.AppendLine("    [A].[Title] AS [TitleCOA],");
+            _Text.AppendLine("    [B2].[Company],");
+            _Text.AppendLine("    [C].[Title] AS [TitleCompany],");
+            _Text.AppendLine("    [B2].[Employee],");
+            _Text.AppendLine("    [E].[Title] AS [EmployeeName],");
+            _Text.AppendLine("    [B2].[Project],");
+            _Text.AppendLine("    [P].[Title] AS [ProjectName],");
+            _Text.AppendLine("    [B2].[Description],");
+            _Text.AppendLine("    [B2].[DR],");
+            _Text.AppendLine("    [B2].[CR]");
+            _Text.AppendLine("FROM [Book] AS [CB]");
+            _Text.AppendLine("LEFT JOIN [Book2] AS [B2] ON [CB].[ID] = [B2].[TranID]");
+            _Text.AppendLine("LEFT JOIN [COA] AS [A] ON [A].[ID] = [B2].[COA]");
+            _Text.AppendLine("LEFT JOIN [Customers] AS [C] ON [C].[ID] = [B2].[Company]");
+            _Text.AppendLine("LEFT JOIN [Employees] AS [E] ON [E].[ID] = [B2].[Employee]");
+            _Text.AppendLine("LEFT JOIN [Project] AS [P] ON [P].[ID] = [B2].[Project]");
+            _Text.AppendLine($"WHERE [CB].[SheetNo] = '{SheetNo}'");
+
+            return _Text.ToString();
+        }
+
+        public static string ExpenseSheetSummary(string SheetNo)
+        {
+            var _Text = new StringBuilder();
+
+            _Text.AppendLine("SELECT");
+            _Text.AppendLine("    [B2].[COA],");
+            _Text.AppendLine("    SUM([B2].[DR]) AS [TotalDR],");
+            _Text.AppendLine("    SUM([B2].[CR]) AS [TotalCR],");
+            _Text.AppendLine("    SUM([B2].[DR] - [B2].[CR]) AS [TotalBalance]");
+            _Text.AppendLine("FROM [Book] AS [CB]");
+            _Text.AppendLine("INNER JOIN [Book2] AS [B2] ON [CB].[ID] = [B2].[TranID]");
+            _Text.AppendLine($"WHERE [CB].[SheetNo] = '{SheetNo}'");
+            _Text.AppendLine("GROUP BY [B2].[COA]");
+
+            return _Text.ToString();
+        }
+              
+
+        #endregion
     }
 }
