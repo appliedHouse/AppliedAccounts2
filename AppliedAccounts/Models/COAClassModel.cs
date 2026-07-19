@@ -11,7 +11,7 @@ namespace AppliedAccounts.Models
         //public AppliedGlobals.AppUserModel? AppUser { get; set; }
         public GlobalService AppGlobal { get; set; }
         public DataSource? Source { get; set; }
-        public string DBFile { get; set; } = string.Empty;
+        public string DBFile => Source!.DBFile;
         public COAClassRecord Record { get; set; } = new();
         public List<COAClassRecord> Records { get; set; } = new();
         public List<DataRow> Data { get; set; } = new();
@@ -21,6 +21,7 @@ namespace AppliedAccounts.Models
         public AppMessages.MessageClass MsgClass { get; set; } = new();
         public string SearchText { get; set; } = string.Empty;
         public bool IsDeleted { get; set; } = false;
+        public string MyMessage { get; private set; }
 
 
         #region Constructor
@@ -28,30 +29,43 @@ namespace AppliedAccounts.Models
         public COAClassModel(GlobalService _AppGlobal)
         {
             AppGlobal = _AppGlobal;
-            //AppUser = _UserProfile;
-            //MyMessages = MessageClass.Messages;
-            //DBFile = AppUser.DataFile;
             Source = new(AppGlobal.AppPaths);
+            LoadData();
+        }
+        #endregion
+
+        #region Load Data
+        public void LoadData()
+        {
+            Source ??= new(AppGlobal.AppPaths);
             Data = Source.GetList(Query.COAClassList);
             Records = GetFilterRecords(string.Empty);
             if (Records.Count > 0) { Record = Records.First(); } else { Record = new COAClassRecord(); }
         }
         #endregion
 
+
         #region Filter List
         private List<COAClassRecord> GetFilterRecords(string _Filter)
         {
-            List<COAClassRecord> _FilterRecords = new();
+            List<COAClassRecord> _FilterRecords = [];
+            string searchLower = SearchText?.ToLower() ?? string.Empty;
+
             foreach (DataRow _Row in Data)
             {
-                if (SearchText.Length == 0)
+                if (string.IsNullOrEmpty(searchLower))
                 {
                     _FilterRecords.Add(GetRecord(_Row));
                 }
                 else
                 {
-                    if (_Row["Code"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                    if (_Row["Title"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
+                    string code = _Row["Code"]?.ToString()?.ToLower() ?? string.Empty;
+                    string title = _Row["Title"]?.ToString()?.ToLower() ?? string.Empty;
+
+                    if (code.Contains(searchLower) || title.Contains(searchLower))
+                    {
+                        _FilterRecords.Add(GetRecord(_Row));
+                    }
                 }
             }
             return _FilterRecords;
@@ -70,25 +84,18 @@ namespace AppliedAccounts.Models
             }
             return _Record;
         }
-        public COAClassRecord GetRecord(long _ID)
+        public void GetRecord(long _ID)
         {
-            var _Record = new COAClassRecord();
-
-            if (_ID == 0) { if (Records.Count > 0) { Record = Records.First(); } }
+            if (Records.Count > 0)
+            {
+                Record = Records.FirstOrDefault(e => e.ID == _ID) ?? Records.First();
+            }
             else
             {
-
-                foreach (COAClassRecord _Item in Records)
-                {
-                    if (_Item.ID == _ID)
-                    {
-                        _Record = _Item;
-                    }
-                }
+                Record = new COAClassRecord();
             }
-            Record = _Record;
-            return _Record;
         }
+
         private DataRow GetDataRow(COAClassRecord _Record)
         {
             DataRow _DataRow;
@@ -126,37 +133,21 @@ namespace AppliedAccounts.Models
         #region Delete
         public bool Delete(long _ID)
         {
-            GetRecord(_ID);
-            IsDeleted = true;
-            return true;
-        }
-
-        public bool DeleteRow(long _ID)
-        {
-            GetRecord(_ID);
-            IsDeleted = false;
-            //MyMessages = MessageClass.Messages;
-            var _DeleteRow = DataSource.GetNewRow(DBFile, Tables.COA_Class);
+            MsgClass.ClearMessages();
+            var _DeleteRow = Source!.GetDataRow(Tables.COA_Class, _ID);
 
             if (_DeleteRow is not null)
             {
-                _DeleteRow["ID"] = Record.ID;
-                _DeleteRow["Code"] = Record.Code;
-                _DeleteRow["Title"] = Record.Title;
-
-                var _Commands = new CommandClass(_DeleteRow, DBFile);
-                var _result = _Commands.DeleteRow();
-                if (_result)
-                {
-                    // Refrest data from database table.
-                    Data = Source.GetList(Query.COAClassList);
-                    Records = GetFilterRecords(string.Empty);
-                    GetRecord(0);
-                    return _result;
-                }
+                var _result = Source.Delete(_DeleteRow);
+                LoadData();
+                MyMessage = $"Record {_DeleteRow["Title"]} has been deleted sucessfully.";
+                return _result;
             }
+            MyMessage = $"Record {_DeleteRow!["Title"]} failed to be deleted.";
             return false;
         }
+
+
 
         #endregion
 
@@ -173,8 +164,9 @@ namespace AppliedAccounts.Models
                     if (_result)
                     {
                         // Refresh Data
-                        Data = Source.GetList(Query.COAClassList);
+                        Data = Source!.GetList(Query.COAClassList);
                         Records = GetFilterRecords(string.Empty);
+                        return true;
                     }
                 }
                 else
@@ -188,6 +180,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Validate
+
         private bool Validate(DataRow _Row)
         {
             var _Validated = true;

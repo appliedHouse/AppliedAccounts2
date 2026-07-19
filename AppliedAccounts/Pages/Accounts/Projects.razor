@@ -1,13 +1,15 @@
 ﻿@page "/Accounts/Projects"
+
 @namespace AppliedAccounts.Pages.Accounts
+
 @using AppliedAccounts.Libs
 @using AppliedAccounts.Services
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Data
-@using static AppMessages.Enums
 
 @inject GlobalService AppGlobal
 @inject MessagesService MsgService
+@inject IToastService ToastService
 
 
 @code {
@@ -55,50 +57,18 @@
 
             <div class="row">
                 <div class="col-md-4">
-                    <div class="form-floating">
-                        <InputSelect id="ddCompany" class="form-control item-height" 
-                            TValue="long" 
-                            Value="@MyModel.Client" 
-                            ValueExpression="@(() => @MyModel.Client)" 
-                            ValueChanged="@((e) => CompanyIDChanged(e))">
-                            @if (Clients.Any())
-                            {
-                                @foreach (var item in Clients)
-                                {
-                                    <option value="@item.ID">@item.Title</option>
-                                }
-                            }
-                            else
-                            {
-                                <option value="0">No Records -  Clients</option>
-                            }
-
-                        </InputSelect>
-                        <label for="ddCompany">Clients</label>
-                    </div>
+                    <MyDropDown Id="ddClient"
+                                Label="Client / Customer / Sub Account"
+                                Value="@MyModel.Client"
+                                ValueChanged="@CompanyIDChanged"
+                                Items="@Clients" />
                 </div>
                 <div class="col-md-4">
-                    <div class="form-floating">
-                        <InputSelect id="ddEmployee" class="form-control item-height" 
-                            TValue="long" 
-                            Value="@MyModel.ProjectManager" 
-                            ValueExpression="@(() => @MyModel.ProjectManager)" 
-                            ValueChanged="@((e) => EmployeeIDChanged(e))">
-                            @if (Employees.Any())
-                            {
-                                @foreach (var item in Employees)
-                                {
-                                    <option value="@item.ID">@item.Title</option>
-                                }
-                            }
-                            else
-                            {
-                                <option value="0">No Records -  Employee</option>
-                            }
-
-                        </InputSelect>
-                        <label for="ddEmployee">Project Manager</label>
-                    </div>
+                    <MyDropDown Id="ddEmployee"
+                                Label="Project Manager"
+                                Value="@MyModel.ProjectManager"
+                                ValueChanged="@EmployeeIDChanged"
+                                Items="@Employees" />
                 </div>
             </div>
 
@@ -190,23 +160,15 @@
         
         </div>
 
-        <div class="container">
-            <div class="d-flex flex-row mb-3 filter position-relative">
-                <div class="p-2">
-                    <button type="button" class="btn btn-sm w1 btn-info" title="New" @onclick="New">
-                        <i class="bi bi-plus-square"></i>
-                    </button>
-                </div>
-                <div class="p-2">
-                    <button type="button" class="btn btn-sm w1 btn-success" title="Add" @onclick="Save">
-                        <i class="bi bi-floppy-fill"></i>
-                    </button>
-                </div>
-                <div class="p-2 ms-auto">
-                    <button type="button" class="btn btn-sm w1 btn-warning" title="Back" @onclick="BackPage"><i class="bi bi-arrow-left-circle"></i></button>
-                </div>
+        <div class="container mt-2 mb-2 control-buttons">
+        <div class="row ctrl">
+            <div class="col d-flex gap-2">
+                <button type="button" class="ctrl ctrl-save" @onclick="Save"><i class="bi bi-floppy2-fill"></i></button>
+                <button type="button" class="ctrl ctrl-new" @onclick="Add"><i class="bi bi-plus-square-fill"></i></button>
+                <button type="button" class="ctrl ctrl-back" @onclick="Back"><i class="bi bi-arrow-left-circle-fill"></i></button>
             </div>
         </div>
+    </div>
     </EditForm>
 }
 else
@@ -218,7 +180,7 @@ else
                     <th style="width:10%">Code</th>
                     <th style="width:30%">Title</th>
                     <th style="width:50%">Comments</th>
-                    <th style="width:10%" @onclick="New"><i class="bi bi-folder-plus"></i></th>
+                    <th style="width:10%" @onclick="Add"><i class="bi bi-folder-plus"></i></th>
                     
                 </tr>
             </thead>

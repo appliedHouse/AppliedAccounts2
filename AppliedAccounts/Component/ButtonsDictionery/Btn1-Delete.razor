@@ -1,0 +1,20 @@
+﻿@code {
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private async Task HandleClick()
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync();
+        }
+    }
+}
+
+<button id="btn1-Delete"
+        type="button"
+        class="btn btn-sm w1 btn-danger"
+        title="Delete"
+        @onclick="HandleClick">
+    <i class="bi bi-trash"></i>
+</button>

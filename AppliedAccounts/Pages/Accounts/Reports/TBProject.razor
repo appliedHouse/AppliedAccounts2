@@ -1,0 +1,119 @@
+﻿@page "/Accounts/Reports/TBProject"
+@using AppliedAccounts.Libs
+@using Microsoft.AspNetCore.Components.Forms
+
+@inject PrintService ReportService
+@inject GlobalService AppGlobal
+
+
+@code {
+
+
+    protected override void OnInitialized()
+    {
+        MyModel = new();
+        MyModel.DateFrom = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+        MyModel.DateTo = DateTime.Today;
+        MyModel.SelectedOptionType = 1; // "All" as default
+
+        Source = new(AppGlobal.AppPaths);
+        MyModel.Projects = Source.GetProjects();
+        MyModel.Accounts = Source.GetAccounts();
+    }
+
+    private void HandleValidSubmit()
+    {
+        // TODO: Use MyModel.MyReportClass to generate the report
+        // For demo, just show selected values
+        Console.WriteLine($"Project: {MyModel.Project}, Account: {MyModel.Account}");
+        Console.WriteLine($"From: {MyModel.DateFrom:d} To: {MyModel.DateTo:d}");
+        Console.WriteLine($"Option: {MyModel.OptionTypes[MyModel.SelectedOptionType]}");
+        // Call your report service here
+    }
+}
+<PageHeading Text="Trial Balance Project" />
+
+<EditForm Model="@MyModel" OnValidSubmit="@HandleValidSubmit">
+    <div class="container">
+        <div class="row g-3">
+            <!-- Project (numeric) -->
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputSelect id="ddProject" class="form-control item-height" TValue="long" Value="@MyModel.Project" ValueExpression="@(() => @MyModel.Project)" ValueChanged="@((e) => ProjectIDChanged(e))">
+                        @if (MyModel.Projects.Any())
+                        {
+                            @foreach (var item in MyModel.Projects)
+                            {
+                                <option value="@item.ID">@item.Title</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="0">No Records - Project</option>
+                        }
+
+                    </InputSelect>
+                    <label for="ddProject">Project</label>
+                </div>
+            </div>
+
+            <!-- Account (numeric) -->
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputSelect id="ddAccounts" class="form-control item-height" TValue="long" Value="@MyModel.Account" ValueExpression="@(() => @MyModel.Account)" ValueChanged="@((e) => AccountIDChanged(e))">
+                        @if (MyModel.Accounts.Any())
+                        {
+                            @foreach (var item in MyModel.Accounts)
+                            {
+                                <option value="@item.ID">@item.Title</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="0">No Records - Accounts</option>
+                        }
+
+                    </InputSelect>
+                    <label for="ddAccounts">Account</label>
+                </div>
+            </div>
+
+            <!-- Date From -->
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputDate id="dateFrom" class="form-control" @bind-Value="MyModel.DateFrom" />
+                    <label for="dateFrom">Date From</label>
+                </div>
+            </div>
+
+            <!-- Date To -->
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputDate id="dateTo" class="form-control" @bind-Value="MyModel.DateTo" />
+                    <label for="dateTo">Date To</label>
+                </div>
+            </div>
+
+            <!-- Option Type (dropdown) -->
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <select id="optionType" class="form-select" @bind="MyModel.SelectedOptionType">
+                        @foreach (var option in MyModel.OptionTypes)
+                        {
+                            <option value="@option.Key">@option.Value</option>
+                        }
+                    </select>
+                    <label for="optionType">Report Option</label>
+                </div>
+            </div>
+
+            <ReportingButtons ReturnValue="Print"/>
+
+            <!-- Submit button -->
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Generate Report</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+

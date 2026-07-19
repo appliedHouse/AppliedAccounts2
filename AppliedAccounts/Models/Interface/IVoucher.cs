@@ -25,10 +25,7 @@ namespace AppliedAccounts.Models.Interface
 
         bool IsWaiting { get; set; }
 
-
         void CalculateTotal();
-
-
 
         #region Load Data
         bool LoadData();

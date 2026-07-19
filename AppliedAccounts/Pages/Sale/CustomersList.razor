@@ -1,0 +1,202 @@
+﻿@page "/Sales/CustomerList"
+@attribute [Authorize];
+@using AppliedAccounts.Libs;
+@using AppliedAccounts.Services
+
+@inject GlobalService AppGlobal;
+@inject IToastService Toaster;
+
+
+<PageHeading Text="List of Customers, Clients, Vendors" />
+
+<EditForm Model="@Model" OnSubmit="Submit">
+    <div class="container mb-2">
+        <div class="row row-filter align-items-center">
+            <div class="col-4">
+                <InputText @bind-Value="@Model.SearchText" class="form-control input-sm" placeholder="Type here to search" />
+            </div>
+            <div class="col-1">
+                <Btn_Search @onclick="()=>Model.Search()"/>
+            </div>
+            <div class="col-1 ms-auto">
+                <Btn_Back NavTo="/" />
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <table class="table-list">
+            <thead>
+                <tr>
+                    <th style="width:10%; margin-right:2px">Code</th>
+                    <th style="width:35%;">Name</th>
+                    <th style="width:30%">Address</th>
+                    <th style="width:15%">City</th>
+                    <th style="width:10%">
+                        <Btn_Add OnClick="Add1"/>
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var _Record in Model.Records)
+                {
+                    <tr>
+                        <td>@_Record.Code</td>
+                        <td class="left">@_Record.Title</td>
+                        <td class="left">@_Record.Address1</td>
+                        <td class="left">@_Record.City</td>
+
+                        <td>
+                            <Btn_Edit @onclick="() => Edit(_Record.ID)" />
+                            <Btn_Delete @onclick="() => Delete(_Record.ID)" />
+                            <Btn_Search @onclick="() => ViewCustomer(_Record.ID)" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <style>
+        .no-border-bottom {
+    border-bottom: none !important;
+}
+    </style>
+
+</EditForm>
+
+
+
+<!-- Bootstrap Modal -->
+<div class="modal @(isModalVisible ? "show d-block" : "")" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Customer Details - @(SelectedCustomer?.Code ?? "")</h5>
+                <button type="button" class="btn-close" @onclick="CloseModal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if (SelectedCustomer != null)
+                {
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="fw-bold">Code:</label>
+                                <p>@SelectedCustomer.Code</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="fw-bold">Title:</label>
+                                <p>@SelectedCustomer.Title</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="fw-bold">Address:</label>
+                                <p>
+                                    @SelectedCustomer.Address1<br />
+                                    @SelectedCustomer.Address2<br />
+                                    @SelectedCustomer.Address3
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="fw-bold">City:</label>
+                                <p>@SelectedCustomer.City</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="fw-bold">State:</label>
+                                <p>@SelectedCustomer.State</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="fw-bold">Country:</label>
+                                <p>@SelectedCustomer.Country</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="fw-bold">Contact Person:</label>
+                                <p>@SelectedCustomer.ContactTo</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="fw-bold">Phone:</label>
+                                <p>@SelectedCustomer.Phone</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="fw-bold">Mobile:</label>
+                                <p>@SelectedCustomer.Mobile</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="fw-bold">Email:</label>
+                                <p>@SelectedCustomer.Email</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="fw-bold">NTN:</label>
+                                <p>@SelectedCustomer.NTN</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="fw-bold">CNIC:</label>
+                                <p>@SelectedCustomer.CNIC</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="fw-bold">Notes:</label>
+                                <p>@SelectedCustomer.Notes</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="fw-bold">Status:</label>
+                                <p>
+                                    @if (SelectedCustomer.Status == 1)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Inactive</span>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="CloseModal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

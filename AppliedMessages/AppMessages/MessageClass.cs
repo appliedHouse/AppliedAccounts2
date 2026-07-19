@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
 using System.Data;
-using System.Data.Common;
 using static AppMessages.Enums;
 
 namespace AppMessages
@@ -18,6 +17,7 @@ namespace AppMessages
         public int CountMessages => MessageList.Count;
         public SqliteConnection MsgConnection { get; set; }
         public long LanguageID { get; set; }
+        public string FilePath { get; set; }
 
         //public object AppliedDB { get; }
         #endregion
@@ -26,6 +26,8 @@ namespace AppMessages
         public MessageClass()
         {
             LanguageID = 1;             // Default Language English, Id = 1
+
+
         }
         //public MessageClass(SqliteConnection _Connection)
         //{
@@ -141,9 +143,10 @@ namespace AppMessages
 
             if (MsgConnection != null)
             {
-                if (MsgConnection.State != ConnectionState.Open) { MsgConnection.Open(); }                   
+                if (MsgConnection.State != ConnectionState.Open) { MsgConnection.Open(); }
 
-                var _Query = @"SELECT [ID],[Code],[MessageText],[Class] FROM [Messages] WHERE [Code] = @Code AND [Language] = @Language";
+                //SELECT * FROM [LanguageText] WHERE [Key] = 'Save' AND [Language] = 1
+                var _Query = "SELECT * FROM Messages WHERE [Code] = @Code AND [Language] = @Language";
 
                 using var _Command = new SqliteCommand(_Query, MsgConnection);
 
@@ -158,6 +161,13 @@ namespace AppMessages
                     _Message.MessageText = reader["MessageText"]?.ToString() ?? "";
                     _Message.MessageClass = (Class)Convert.ToInt64(reader["Class"]);
                     _Message.MessageID = Convert.ToInt64(reader["ID"]);
+                }
+                else
+                {
+                    _Message.Code = _Code.ToString();
+                    _Message.MessageText = $"{_Code} : Not Found in Message List";
+                    _Message.MessageClass = Class.Error;
+                    _Message.MessageID = -1;
                 }
             }
 
@@ -222,6 +232,16 @@ namespace AppMessages
             }
         }
 
+        public void AddReange(MessageClass messageClass)
+        {
+            if (messageClass.MessageList.Count > 0)
+            {
+                foreach (Message message in messageClass.MessageList)
+                {
+                    MessageList.Add(message);
+                }
+            }
+        }
 
         #endregion
     }

@@ -1,5 +1,4 @@
 ﻿using AppliedDB;
-using AppMessages;
 using System.Data;
 using Enums = AppliedDB.Enums;
 using Messages = AppMessages.Enums.Messages;
@@ -14,8 +13,6 @@ namespace AppliedAccounts.Pages.Accounts
         public DataTable ProjectList { get; set; }
         public List<CodeTitle> Clients { get; set; }
         public List<CodeTitle> Employees { get; set; }
-        //public MessageClass MsgClass { get; set; }
-
         public DataSource Source { get; set; }
 
 
@@ -24,9 +21,6 @@ namespace AppliedAccounts.Pages.Accounts
             Source ??= new(AppGlobal.AppPaths);
             MyModel = new ProjectsViewModel();
             LoadData();
-
-            MsgService.Success(Messages.NoMessage);
-
         }
 
         private async Task HandleValidSubmit()
@@ -66,39 +60,56 @@ namespace AppliedAccounts.Pages.Accounts
                 .First() ?? "";
         }
 
-        public void Save()
+        public async Task Save()
         {
-            DataRow? _Row = Source.GetDataRow(Enums.Tables.Project, MyModel.ID);
-            if (_Row == null)
+            MsgService.Clear();
+
+            try
             {
-                _Row = Source.GetNewRow(Enums.Tables.Project);
-                _Row["ID"] = 0;
+                DataRow? _Row = Source.GetDataRow(Enums.Tables.Project, MyModel.ID);
+                if (_Row == null)
+                {
+                    _Row = Source.GetNewRow(Enums.Tables.Project);
+                    _Row["ID"] = 0;
+                }
+
+                var _Terms = string.IsNullOrEmpty(MyModel.Terms) ? DBNull.Value : (object)MyModel.Terms;
+                var _Location = string.IsNullOrEmpty(MyModel.Location) ? DBNull.Value : (object)MyModel.Location;
+
+                _Row["Code"] = MyModel.Code;
+                _Row["Title"] = MyModel.Title;
+                _Row["Comments"] = MyModel.Comments;
+                _Row["Location"] = _Location;
+                _Row["Client"] = MyModel.Client;
+                _Row["ProjectManager"] = MyModel.ProjectManager;
+                _Row["StartDate"] = MyModel.StartDate;
+                _Row["EndDate"] = MyModel.EndDate;
+                _Row["ActualCost"] = MyModel.ActualCost;
+                _Row["Budget"] = MyModel.Budget;
+                _Row["IsActive"] = MyModel.IsActive;
+                _Row["IsCompleted"] = MyModel.IsCompleted;
+                _Row["Terms"] = _Terms;
+
+                var IsSaved = await Source.SaveAsync(_Row);
+                if (IsSaved)
+                {
+                    ToastService.ShowSuccess($"Project {MyModel.Title} saved successfully.");
+                    MsgService.Success(Messages.Saved);
+                    LoadData();
+                    EditMode = false;
+                }
+                else
+                {
+                    ToastService.ShowError($"Project {MyModel.Title} failed to save.");
+                }
             }
-
-            var _Terms = string.IsNullOrEmpty(MyModel.Terms) ? DBNull.Value : (object)MyModel.Terms;
-            var _Location = string.IsNullOrEmpty(MyModel.Location) ? DBNull.Value : (object)MyModel.Location;
-
-            _Row["Code"] = MyModel.Code;
-            _Row["Title"] = MyModel.Title;
-            _Row["Comments"] = MyModel.Comments;
-            _Row["Location"] = _Location;
-            _Row["Client"] = MyModel.Client;
-            _Row["ProjectManager"] = MyModel.ProjectManager;
-            _Row["StartDate"] = MyModel.StartDate;
-            _Row["EndDate"] = MyModel.EndDate;
-            _Row["ActualCost"] = MyModel.ActualCost;
-            _Row["Budget"] = MyModel.Budget;
-            _Row["IsActive"] = MyModel.IsActive;
-            _Row["IsCompleted"] = MyModel.IsCompleted;
-            _Row["Terms"] = _Terms;
-
-            Source.Save(_Row);
-            MsgService.MsgClass = Source.MsgClass;
-            LoadData();
-            EditMode = false;
+            catch (Exception error)
+            {
+                MsgService.MsgClass.Add(error.Message);
+            }
         }
 
-        public void New()
+        public void Add()
         {
             EditMode = true;
             //DataRow _Row = Source.GetNewRow(Enums.Tables.Project);
@@ -149,33 +160,45 @@ namespace AppliedAccounts.Pages.Accounts
                 }
                 else
                 {
-                    MsgService.Alert($"Projct Id {_ID} not found to edit.");
+                    ToastService.ShowWarning($"Projct Id {_ID} not found to edit.");
                 }
             }
         }
 
         public void Delete(long _ID)
         {
-            if (_ID > 0)
+            try
             {
-
-                DataRow? _Row = Source.GetDataRow(Enums.Tables.Project, _ID);
-                if (_Row != null)
+                if (_ID > 0)
                 {
-                    if (DelValidaded(_ID))
+
+                    DataRow? _Row = Source.GetDataRow(Enums.Tables.Project, _ID);
+                    if (_Row != null)
                     {
-                        Source.Delete(_Row);
-                        LoadData();
-                    }
-                    else
-                    {
-                        MsgService.Warning(Messages.RecordCanNotDelete);
+                        if (DelValidaded(_ID))
+                        {
+                            Source.Delete(_Row);
+                            MsgService.AddRange(Source.MsgClass);
+                            LoadData();
+                            ToastService.ShowSuccess($"Project {_Row["Title"]} deleted successfully.");
+                        }
+                        else
+                        {
+                            ToastService.ShowWarning($"Project {_Row["Title"]} cannot be deleted because it is referenced in other records.");
+
+                        }
                     }
                 }
+                else
+                {
+                    ToastService.ShowWarning($"Project Id {_ID} not found to delete.");
+
+                }
             }
-            else
+            catch (Exception error)
             {
-                MsgService.Alert(Messages.NoRecordFound);
+                MsgService.MsgClass.AddReange(Source.MsgClass);
+                MsgService.MsgClass.Add(error.Message);
             }
         }
 
@@ -195,7 +218,7 @@ namespace AppliedAccounts.Pages.Accounts
             return _Result;
         }
 
-        public void BackPage()
+        public void Back()
         {
             AppGlobal.NavManager.NavigateTo("Accounts/Projects", true);
         }

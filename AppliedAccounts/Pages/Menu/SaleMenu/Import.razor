@@ -1,0 +1,20 @@
+﻿@page "/Menu/Sale/Import"
+@namespace AppliedAccounts.Pages.Menu
+
+@using AppliedAccounts.Services
+
+@attribute [Authorize]
+@inject GlobalService AppGlobal
+
+@code {
+
+    public void ImportAccounts()
+    {
+        AppGlobal.NavManager.NavigateTo("/ImportCOA", true);
+    }
+}
+
+
+<div class="list-group">
+    <button class="list-group-item list-group-item-action" @onclick="ImportAccounts">Import - Accounts</button>
+</div>

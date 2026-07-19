@@ -92,7 +92,7 @@ namespace AppliedAccounts.Models
                     BookNature = 1;         // Default value;
 
                     var result = Source.SeekValue(Tables.COA, BookID, "Nature") ?? 0;
-                    if (result.GetType() != typeof(long))
+                    if (result.GetType() == typeof(long))
                     {
                         long.TryParse(result.ToString(), out long val);
                         BookNature = val;

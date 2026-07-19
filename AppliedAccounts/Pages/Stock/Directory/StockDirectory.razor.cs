@@ -1,10 +1,9 @@
-﻿using AppliedAccounts.Services;
-using AppliedDB;
+﻿using AppliedDB;
 using AppMessages;
+using Menus;
 using System.Data;
+using AppliedAccounts.Models;
 using static AppliedDB.Enums;
-
-
 
 namespace AppliedAccounts.Pages.Stock.Directory
 {
@@ -16,65 +15,56 @@ namespace AppliedAccounts.Pages.Stock.Directory
         public DataSource Source { get; set; }
         public string Filter { get; set; }
         public string Sort { get; set; }
-        public bool EditMode { get; set; }
-
-        //public ToastClass MyToastClass { get; set; }
-        //public ToastClass Toast { get; set; }
-
-
+        public bool EditMode { get; set; } 
+        public bool IsDeleted { get; set; } 
 
         public List<CodeTitle> StockDirectoryList { get; set; }
 
-        protected override void OnParametersSet()
+        private readonly Dictionary<string, (Tables Table, string Title)> _tableMap = new()
         {
-            if (!string.IsNullOrEmpty(TableName))
-            {
-                LoadData(TableName);
-            }
+            ["Inv_Category"] = (Tables.Inv_Category, "Stock Category"),
+            ["Inv_SubCategory"] = (Tables.Inv_SubCategory, "Stock Sub Category"),
+            ["Inv_Packing"] = (Tables.Inv_Packing, "Stock Packing"),
+            ["Inv_Size"] = (Tables.Inv_Size, "Stock Item Size"),
+            ["Inv_UOM"] = (Tables.Inv_UOM, "Stock Unit of Measurement")
+        };
+
+        private async Task GetBackPath() 
+        {
+            EditMode = false;
+            IsDeleted = false;
+            AppGlobal.NavManager.NavigateTo($"/Stock/Directory/{TableName}");
+            await Task.CompletedTask;
         }
 
-
-        public void LoadData(string _TableName)
+        public void LoadData(string tableName)
         {
-            var _Sort = "Title";
+            
             Source ??= new(AppGlobal.AppPaths);
 
-            switch (_TableName)
+            if (_tableMap.TryGetValue(tableName, out var mapping))
             {
-                case "Inv_Category":
-                    StockDirectoryList = Source.GetCodeTitle(Tables.Inv_Category, _Sort);
-                    SubHeadingTitle = "Stock Category";
-                    break;
-                case "Inv_SubCategory":
-                    StockDirectoryList = Source.GetCodeTitle(Tables.Inv_SubCategory, _Sort);
-                    SubHeadingTitle = "Stock Sub Category";
-                    break;
-                case "Inv_Packing":
-                    StockDirectoryList = Source.GetCodeTitle(Tables.Inv_Packing, _Sort);
-                    SubHeadingTitle = "Stock Packing";
-                    break;
-                case "Inv_Size":
-                    StockDirectoryList = Source.GetCodeTitle(Tables.Inv_Size, _Sort);
-                    SubHeadingTitle = "Stock Item Size";
-                    break;
-                case "Inv_UOM":
-                    StockDirectoryList = Source.GetCodeTitle(Tables.Inv_UOM, _Sort);
-                    SubHeadingTitle = "Stock Unit of Measurement";
-                    break;
-                default:
-                    break;
+                StockDirectoryList = Source.GetCodeTitle(mapping.Table, "Title");
+                SubHeadingTitle = mapping.Title;
             }
         }
 
-        public void Add()
-        {
-
-        }
-
-        public bool Edit(long _ID)
+        public async Task New()
         {
             EditMode = true;
-            var _data = StockDirectoryList.Where(e => e.ID == _ID).FirstOrDefault();
+            MyModel = new CodeTitleModel()
+            {
+                ID = 0,
+                Code = string.Empty,
+                Title = string.Empty
+            };
+            await InvokeAsync(StateHasChanged);
+        }
+        public async Task Edit(long _ID, bool? isDelete = false)
+        {
+            EditMode = true;
+            IsDeleted = isDelete ?? false;
+            var _data = StockDirectoryList.FirstOrDefault(e => e.ID == _ID);
             if (_data != null)
             {
                 MyModel.ID = _data.ID;
@@ -82,9 +72,34 @@ namespace AppliedAccounts.Pages.Stock.Directory
                 MyModel.Title = _data.Title;
             }
 
-            return true;
+            await InvokeAsync(StateHasChanged);
         }
-        public bool Delete(long _ID) { EditMode = true; return true; }
+        public async Task Delete(long _ID)
+        {
+            
+            var _ExistingRow = GetExistingRow(_ID);
+            if (_ExistingRow != null)
+            {
+                IsDeleted = await Source.DeleteAsync(_ExistingRow);   // if delete is successful, IsDeleted will be false, otherwise true
+                if (IsDeleted) 
+                {
+                    LoadData(TableName!);
+                    IsDeleted = false;
+                    EditMode = false;
+                }
+            }
+        }
+
+        private DataRow? GetExistingRow(long _ID)
+        {
+            if (MyModel.ID > 0)
+            {
+                string _Query = $"SELECT * FROM {TableName} WHERE ID = {_ID}";
+                var Row = Source.GetDataRow(_Query);
+                return Row;
+            }
+            return null;
+        }
 
         #region Save Methods
         public void Save()
@@ -102,8 +117,8 @@ namespace AppliedAccounts.Pages.Stock.Directory
                 Source.Save(_Row);
                 if (Source.IsSaved)
                 {
+                    LoadData(TableName);
                     ToastService.ShowSuccess($"'{MyModel.Title}' has been saved successfully!");
-                    // Show Success Message
                 }
             }
             else
@@ -114,18 +129,9 @@ namespace AppliedAccounts.Pages.Stock.Directory
 
         #endregion
 
-        public void BackPage() { AppGlobal.NavManager.NavigateTo("/Menu/Stock"); }
+        
 
     }
-
-    public class CodeTitleModel
-    {
-        public long ID { set; get; }
-        public string Code { set; get; }
-        public string Title { set; get; }
-    }
-
-
 }
 
 

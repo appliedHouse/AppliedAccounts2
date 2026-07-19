@@ -1,0 +1,26 @@
+﻿@page "/MainMenus/Logout"
+
+@inject NavigationManager NavManager
+@inject AuthenticationStateProvider authStateProvider
+@inject GlobalService AppGlobal
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
+
+        await userAuthStateProvider.LogoutAsync();
+
+        NavManager.NavigateTo("/login");
+    }
+
+
+
+}
+
+<div class="container">
+    <div class="alert alert-info">
+        You have been logged out successfully.
+    </div>
+</div>

@@ -1,5 +1,6 @@
 ﻿@page "/Accounts/COA"
 @attribute [Authorize];
+@using AppliedAccounts.Component.ButtonsDictionery
 @using AppliedAccounts.Libs
 @using AppliedAccounts.Models
 @using AppliedAccounts.Services
@@ -67,37 +68,42 @@
                         <!-- Class, Nature and Notes Dropdown-->
                         <div class="row mt-2">
                             <div class="col-md-4">
-
-                                <ShowBrowseWindow Id="ddClass"
-                                                  Title="Class"
-                                                  @bind-Value="@MyModel.Record.Class"
-                                                  BrowseList="@MyModel.ClassList" />
+                                <MyDropDown Id="ddClass" 
+                                            Label="Class"
+                                            Value="@MyModel.Record.Class"
+                                            Items="@MyModel.ClassList" 
+                                            ValueChanged="@ClassChanged"/>
+                               
                             </div>
                             <div class="col-md-4">
-                               <ShowBrowseWindow Id="ddNature"
-                                                  Title="Nature"
-                                                  @bind-Value="@MyModel.Record.Nature"
-                                                  BrowseList="@MyModel.NatureList" />
+                                <MyDropDown Id="ddNature"
+                                            Label="Nature"
+                                            Value="@MyModel.Record.Nature"
+                                            Items="@MyModel.NatureList"
+                                            ValueChanged="@NatureChanged" />
                             </div>
                             <div class="col-md-4">
-                                <ShowBrowseWindow Id="ddNotes"
-                                                  Title="Notes"
-                                                  @bind-Value="@MyModel.Record.Notes"
-                                                  BrowseList="@MyModel.NotesList" />
+                                <MyDropDown Id="ddNotes"
+                                            Label="Notes"
+                                            Value="@MyModel.Record.Notes"
+                                            Items="@MyModel.NotesList"
+                                            ValueChanged="@NotesChanged" />
                             </div>
                             
                         </div>
                       
+                        
                         <!-- Control Buttons-->
-                        <div class="container mt-2 mb-2">
-                            <div class="row">
-                                <div class="col">
-                                    <button type="button" class="btn btn-Save" title="Save" @onclick="()=>Save()"><i class="bi bi-floppy2-fill"></i></button>
-                                    <button type="button" class="btn btn-New" title="New" @onclick="()=>MyModel.Add()"><i class="bi bi-plus-square-fill"></i></button>
-                                    <button type="button" class="btn btn-Back" title="Back" @onclick="Back"><i class="bi bi-arrow-left-circle-fill"></i></button>
+                        <div class="container mt-2 mb-2 control-buttons">
+                            <div class="row ctrl">
+                                <div class="col d-flex gap-2">
+                                    <button type="button" class="ctrl ctrl-save" title="Save" @onclick="Save"><i class="bi bi-floppy2-fill"></i></button>
+                                    <button type="button" class="ctrl ctrl-new" title="New" @onclick="Add"><i class="bi bi-plus-square-fill"></i></button>
+                                    <button type="button" class="ctrl ctrl-back ms-auto" title="Back" @onclick="Back"><i class="bi bi-arrow-left-circle-fill"></i></button>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -137,7 +143,8 @@
                             Opening Balance
                         </th>
                         <th style="Width:10%" class="td-btn">
-                            <button id="btnAdd" class="btn-Add" @onclick="Add"><i class="bi bi-plus-circle-fill"></i></button>
+                            <Btn1_New OnClick="Add" />
+                            @* <button id="btnAdd" class="btn-Add" @onclick="Add"><i class="bi bi-plus-circle-fill"></i></button> *@
                         </th>
                     </tr>
                 </thead>
@@ -154,7 +161,7 @@
                             <td clas class="tb-col-left" s="td-btn">
                                 <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(()=> Edit((long)_Record.ID))"><i class="bi bi-pencil-fill"></i></button>
                                 <label style="padding-left:5px; padding-right:5px;"> | </label>
-                                <button id="btnDel" type="submit" class="btn-Del" @onclick="(()=> MyModel.Delete((long)_Record.ID))"><i class="bi bi-trash-fill"></i></button>
+                                <button id="btnDel" type="submit" class="btn-Del" @onclick="(()=> Delete((long)_Record.ID))"><i class="bi bi-trash-fill"></i></button>
                             </td>
                         </tr>
                     }

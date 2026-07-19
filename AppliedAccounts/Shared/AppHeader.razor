@@ -1,7 +1,4 @@
-﻿@using AppliedAccounts.Data;
-@using System.Security.Claims;
-@inject NavigationManager NavManager;
-
+﻿@inject NavigationManager NavManager;
 @inject AuthenticationStateProvider Authorized;
 
 @code {
@@ -33,11 +30,6 @@
     private void ChangeLanguage(string lang)
     {
         SelectedLanguage = lang;
-
-        // TODO later:
-        // - Save to localStorage
-        // - Notify localization service
-        // - Reload UI direction (RTL for Arabic/Urdu)
     }
 
     private string GetLanguageName() => SelectedLanguage switch

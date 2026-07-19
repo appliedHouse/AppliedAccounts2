@@ -1,4 +1,5 @@
-﻿@page "/Menu/Stock/Directory/{TableName}"
+﻿@page "/Stock/Directory/{TableName}"
+@using AppliedAccounts.Component.ButtonsDictionery
 @using AppliedAccounts.Libs
 
 @inject GlobalService AppGlobal
@@ -26,43 +27,9 @@
 <PageHeading Text="@SubHeadingTitle" />
 <ShowMessages MsgClass="MsgClass"></ShowMessages>
 
-@if (!EditMode)
-{
-    @if (StockDirectoryList.Count > 0)
+<EditForm Model="MyModel">
+    @if (EditMode)
     {
-        <div class="container">
-            <table class="table-list">
-                <thead>
-                    <tr>
-                        <th style="width:20%">Code</th>
-                        <th style="width:60%">Title</th>
-                        <th style="width:20%"><button id="btnAdd" class="btn-Add" @onclick="Add"><i class="bi bi-plus-circle-fill"></i></button></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in StockDirectoryList)
-                    {
-                        @if (item.ID == 0)  { continue; }
-
-                        <tr>
-                            <td>@item.Code</td>
-                            <td>@item.Title</td>
-                            <td clas class="tb-col-left" s="td-btn">
-                                <button id="btnEdit" type="submit" class="btn-Edit" @onclick="(() => Edit((long)item.ID))"><i class="bi bi-pencil-fill"></i></button>
-                                <label style="padding-left:5px; padding-right:5px;"> | </label>
-                                <button id="btnDel" type="submit" class="btn-Del" @onclick="(() => Delete((long)item.ID))"><i class="bi bi-trash-fill"></i></button>
-                            </td>
-
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-}
-else
-{
-    <EditForm Model="MyModel">
         <input @bind-value="MyModel.ID" hidden />
 
         <div class="container">
@@ -76,7 +43,7 @@ else
                 <div class="col-md-4">
                     <div class="form-floating">
                         <InputText class="form-control" id="txtTitle" placeholder="Title" @bind-Value="MyModel.Title"></InputText>
-                        <label for="txtTitle">Code</label>
+                        <label for="txtTitle">Title</label>
                     </div>
                 </div>
             </div>
@@ -88,22 +55,61 @@ else
                     <div class="container mt-2 mb-2">
                         <div class="row">
                             <div class="col d-flex justify-content-between align-items-center">
-                                <div class="d-flex gap-2">
-                                    <Btn_Save @onclick="Save" />
-                                    
-                                </div>
-                                <button class="btn btn-link btn-sm" title="Back" @onclick="BackPage">
-                                    <i class="bi bi-arrow-left-circle"></i>
-                                </button>
+                                @if(!IsDeleted)
+                                {
+                                    <Btn1_Save OnClick="Save"/>
+                                }
+                                else
+                                {
+                                    <Btn1_Delete OnClick="(async () => await Delete(MyModel.ID))" />
+                                }
 
+                                <Btn1_Back OnClick="(async () => await GetBackPath())" />
                             </div>
                         </div>
                     </div>
                 </div>
 
-                
+
             </div>
         </div>
-    </EditForm>
-}
+    }
+    else
+    {
+        @if (StockDirectoryList.Count > 0)
+        {
+            <div class="container">
+                <table class="table-list">
+                    <thead>
+                        <tr>
+                            <th style="width:20%">Code</th>
+                            <th style="width:60%">Title</th>
+                            <th style="width:100px"><Btn1_New OnClick="New"/></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in StockDirectoryList)
+                        {
+                            @if (item.ID == 0) { continue; }
 
+                            <tr>
+                                <td>@item.Code</td>
+                                <td>@item.Title</td>
+                                <td clas class="tb-col-left" s="td-btn">
+                                    <Btn_Edit OnClick="(async () => await Edit((long)item.ID))" />
+                                    <Btn_Delete OnClick="(async () => await Edit((long)item.ID, true))" />
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info" role="alert">No records found.</div>
+        }
+
+    }
+</EditForm>

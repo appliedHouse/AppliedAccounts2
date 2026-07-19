@@ -1,14 +1,10 @@
 ﻿@layout LoginLayout
 @page "/Users/Login"
-@using AppliedAccounts.Data;
 @using AppliedAccounts.Services;
-@using AppliedDB;
-@using Microsoft.Data.Sqlite;
-@using System.Data;
 
-@inject NavigationManager NavManager;
-@inject AuthenticationStateProvider authStateProvider;
-@inject GlobalService AppGlobal;
+@inject NavigationManager NavManager
+@inject AuthenticationStateProvider authStateProvider
+@inject GlobalService AppGlobal
 
 
 @code {

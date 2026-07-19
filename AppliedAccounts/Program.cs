@@ -1,6 +1,7 @@
 using AppliedAccounts.Authentication;
 using AppliedAccounts.Middleware;
 using AppliedAccounts.Services;
+using AppliedAccounts.Services.Menus;
 using AppliedDB;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
@@ -11,7 +12,7 @@ using ToastNotificationLibrary.Models;
 
 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
-var builder = WebApplication.CreateBuilder(args);
+ var builder = WebApplication.CreateBuilder(args);
 
 Batteries.Init();                       // Start SQLite Engine.
 
@@ -28,9 +29,11 @@ builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateP
 builder.Services.AddScoped<PrintService>();
 builder.Services.AddScoped<MessagesService>();
 builder.Services.AddScoped<GlobalService>();
+builder.Services.AddScoped<IMenuDatabaseInitializer, MenuDatabaseInitializer>();
+builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddToastNotification(options =>
 {
-    options.DefaultDuration = 3000;
+    options.DefaultDuration = 8000;
     options.DefaultPosition = ToastPosition.BottomEnd;
 });
 

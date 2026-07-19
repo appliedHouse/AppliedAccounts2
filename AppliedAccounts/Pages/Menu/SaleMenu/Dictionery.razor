@@ -4,12 +4,11 @@
 
 
 @code {
-    public Menus.MenusClass MenusClass { get; set; }
+    public Menus.MenusClass MenusClass { get; set; } = new();
 
     protected override void OnInitialized()
     {
-        MenusClass = new();
-        MenusClass.SecondLevel(MenusClass.GetMenu(31)!);
+        MenusClass.SecondLevel(MenusClass.GetMenu(Menus.MenuID.SaleDictionery)!);
     }
 }
 

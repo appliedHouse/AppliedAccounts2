@@ -1,8 +1,8 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
-using AppliedAccounts.Services;
 using Microsoft.AspNetCore.Components;
 using System.Data;
+using AppliedAccounts.Services;
 
 
 namespace AppliedAccounts.Pages.Accounts
@@ -10,9 +10,8 @@ namespace AppliedAccounts.Pages.Accounts
     public partial class Books
     {
         [Parameter] public long ID { get; set; }
-        [Parameter] public long BookID { get; set; }
+        [Parameter] public long BookID { get; set; } = 1;
 
-        public AppliedGlobals.AppUserModel UserProfile { get; set; }
         public BookModel MyModel { get; set; } = new();
 
         public bool IsPageValid { get; set; } = true;
@@ -44,7 +43,6 @@ namespace AppliedAccounts.Pages.Accounts
             BookID = _BookID;
             MyModel.MyVoucher.Master.BookID = BookID;
         }
-
         private void AccountIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.COA = _ID;
@@ -53,7 +51,6 @@ namespace AppliedAccounts.Pages.Accounts
                 .Select(e => e.Title)
                 .First() ?? "";
         }
-
         private void CompanyIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Company = _ID;
@@ -116,7 +113,7 @@ namespace AppliedAccounts.Pages.Accounts
         #endregion
 
         #region BackPage
-        public void BackPage() { NavManager.NavigateTo("/Accounts/BooksList"); }
+        public void BackPage() { AppGlobal.NavManager.NavigateTo("/Accounts/BooksList"); }
         #endregion
 
         #region Print

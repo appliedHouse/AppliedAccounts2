@@ -26,6 +26,6 @@ public static class ServiceCollectionExtensions
 
 public class ToastOptions
 {
-    public int DefaultDuration { get; set; } = 3000;
+    public int DefaultDuration { get; set; } = 8000;
     public ToastPosition DefaultPosition { get; set; } = ToastPosition.BottomEnd;
 }

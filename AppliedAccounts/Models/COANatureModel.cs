@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Services;
+using AppliedAccounts.Data.Mapping;
 using AppliedDB;
 using System.Data;
 using static AppliedDB.Enums;
@@ -10,7 +11,7 @@ namespace AppliedAccounts.Models
     {
         public GlobalService AppGlobal { get; set; }
         public DataSource? Source { get; set; }
-        public string DBFile { get; set; } = string.Empty;
+        public string DBFile => Source!.DBFile ?? "" ;
         public COANatureRecord Record { get; set; } = new();
         public List<COANatureRecord> Records { get; set; } = new();
         public List<DataRow> Data { get; set; } = new();
@@ -20,36 +21,53 @@ namespace AppliedAccounts.Models
         public AppMessages.MessageClass MsgClass { get; set; } = new();
         public string SearchText { get; set; } = string.Empty;
         public bool IsDeleted { get; set; } = false;
+        public string MyMessage { get; private set; }
 
         #region Constructor
         public COANatureModel() { }
         public COANatureModel(GlobalService _AppGlobal)
         {
             AppGlobal = _AppGlobal;
-            //AppUser = _UserProfile;
-            //DBFile = AppUser.DataFile;
             Source = new(AppGlobal.AppPaths);
-            Data = Source.GetList(Query.COANatureList);
-            Records = GetFilterRecords(string.Empty);
-            if (Records.Count > 0) { Record = Records.First(); } else { Record = new COANatureRecord(); }
+            LoadData();
+           
 
         }
         #endregion
 
+        #region Load Data
+        public void LoadData()
+        {
+            Source ??= new(AppGlobal.AppPaths);
+            Data = Source.GetList(Query.COANatureList);
+            Records = GetFilterRecords(string.Empty);
+            if (Records.Count > 0) { Record = Records.First(); } else { Record = new COANatureRecord(); }
+        }
+        #endregion
+
+
+
         #region Filter List
         private List<COANatureRecord> GetFilterRecords(string _Filter)
         {
-            List<COANatureRecord> _FilterRecords = new();
+            List<COANatureRecord> _FilterRecords = [];
+            string searchLower = SearchText?.ToLower() ?? string.Empty;
+
             foreach (DataRow _Row in Data)
             {
-                if (SearchText.Length == 0)
+                if (string.IsNullOrEmpty(searchLower))
                 {
                     _FilterRecords.Add(GetRecord(_Row));
                 }
                 else
                 {
-                    if (_Row["Code"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
-                    if (_Row["Title"].ToString().Contains(SearchText)) { _FilterRecords.Add(GetRecord(_Row)); }
+                    string code = _Row["Code"]?.ToString()?.ToLower() ?? string.Empty;
+                    string title = _Row["Title"]?.ToString()?.ToLower() ?? string.Empty;
+
+                    if (code.Contains(searchLower) || title.Contains(searchLower))
+                    {
+                        _FilterRecords.Add(GetRecord(_Row));
+                    }
                 }
             }
             return _FilterRecords;
@@ -59,6 +77,8 @@ namespace AppliedAccounts.Models
         #region Set Record and Data Row
         private COANatureRecord GetRecord(DataRow _Row)
         {
+
+
             COANatureRecord _Record = new();
             {
                 _Record.ID = (long)_Row["ID"];
@@ -68,24 +88,16 @@ namespace AppliedAccounts.Models
             }
             return _Record;
         }
-        public COANatureRecord GetRecord(long _ID)
+        public void GetRecord(long _ID)
         {
-            var _Record = new COANatureRecord();
-
-            if (_ID == 0) { if (Records.Count > 0) { Record = Records.First(); } }
+            if (Records.Count > 0)
+            {
+                Record = Records.FirstOrDefault(e => e.ID == _ID) ?? Records.First();
+            }
             else
             {
-
-                foreach (COANatureRecord _Item in Records)
-                {
-                    if (_Item.ID == _ID)
-                    {
-                        _Record = _Item;
-                    }
-                }
+                Record = new COANatureRecord();
             }
-            Record = _Record;
-            return _Record;
         }
         private DataRow GetDataRow(COANatureRecord _Record)
         {
@@ -99,10 +111,7 @@ namespace AppliedAccounts.Models
                 _DataRow = Data.First();
             }
 
-            _DataRow["Id"] = _Record.ID;
-            _DataRow["Code"] = _Record.Code;
-            _DataRow["Title"] = _Record.Title;
-            return _DataRow;
+            return _Record.ToDataRow(_DataRow);
 
         }
         #endregion
@@ -124,37 +133,22 @@ namespace AppliedAccounts.Models
         #region Delete
         public bool Delete(long _ID)
         {
-            GetRecord(_ID);
-            IsDeleted = true;
-            return true;
-        }
-
-        public bool DeleteRow(long _ID)
-        {
-            GetRecord(_ID);
-            IsDeleted = false;
-            //MyMessages = MessageClass.Messages;
-            var _DeleteRow = DataSource.GetNewRow(DBFile, Tables.COA_Nature);
+            MsgClass.ClearMessages();
+            var _DeleteRow = Source!.GetDataRow(Tables.COA_Nature, _ID);
 
             if (_DeleteRow is not null)
             {
-                _DeleteRow["ID"] = Record.ID;
-                _DeleteRow["Code"] = Record.Code;
-                _DeleteRow["Title"] = Record.Title;
-
-                var _Commands = new CommandClass(_DeleteRow, DBFile);
-                var _result = _Commands.DeleteRow();
-                if (_result)
-                {
-                    // Refrest data from database table.
-                    Data = Source!.GetList(Query.COANatureList);
-                    Records = GetFilterRecords(string.Empty);
-                    GetRecord(0);
-                    return _result;
-                }
+                var _result = Source.Delete(_DeleteRow);
+                LoadData();
+                MyMessage = $"Record {_DeleteRow["Title"]} has been deleted sucessfully.";
+                return _result;
             }
+            MyMessage = $"Record {_DeleteRow!["Title"]} failed to be deleted.";
             return false;
+
         }
+
+       
 
         #endregion
 
@@ -173,6 +167,8 @@ namespace AppliedAccounts.Models
                         // Refresh Data
                         Data = Source!.GetList(Query.COANatureList);
                         Records = GetFilterRecords(string.Empty);
+                        MyMessage = $"Record {Record.Title} has been saved successfully";
+                        return true;
                     }
                 }
                 else

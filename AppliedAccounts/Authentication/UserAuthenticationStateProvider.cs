@@ -138,7 +138,7 @@ namespace AppliedAccounts.Authentication
             };
         }
 
-        public async Task Logout()
+        public async Task LogoutAsync()
         {
             await UpdateAuthenticateState(null);
         }

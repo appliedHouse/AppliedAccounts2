@@ -1,6 +1,7 @@
 ﻿using AppliedGlobals;
 using AppMessages;
 using Microsoft.Data.Sqlite;
+using System.Configuration;
 using System.Data;
 using System.Text;
 using static AppliedDB.Enums;
@@ -36,6 +37,14 @@ namespace AppliedDB
             if (MyConnection is not null)
             {
                 MyCommand = new SqliteCommand("", MyConnection);
+            }
+
+            var FilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", AppPaths.MessagesPath, "Messages.db");
+
+            if(!string.IsNullOrEmpty(FilePath))
+            {
+                var _ConnectionString = $"Data Source={FilePath}";
+                MsgClass.MsgConnection = new SqliteConnection(_ConnectionString);
             }
         }
 
@@ -396,6 +405,11 @@ namespace AppliedDB
             return new();
         }
 
+        public async Task<List<DataRow>> GetListAsync(Query Query)
+        {
+            return await Task.Run(()=> GetList(Query));
+        }
+
         public List<DataRow> GetList(Query Query)
         {
             if (AppPaths is not null)
@@ -515,12 +529,10 @@ namespace AppliedDB
 
             if (_DataRow != null)
             {
-                _TaxRate = (decimal)_DataRow["Rate"];
+                _TaxRate = _DataRow.Field<decimal>("Rate");
             }
-
-
+            
             return _TaxRate;
-
         }
         #endregion
 
@@ -871,35 +883,16 @@ namespace AppliedDB
         #endregion
 
         #region Delete Row
-        //public bool Delete(Tables _Table, DataRow _Row)
-        //{
-        //    var _DataTable = GetTable(_Table);
-        //    var _NewRow = _DataTable.NewRow();
-        //    var _RowArray = _Row.ItemArray;
 
-        //    _NewRow.ItemArray = _RowArray;
+        public async Task<bool> DeleteAsync(DataRow _Row)
+        {
+            return await Task.Run(() => Delete(_Row));
+        }
 
-        //    MyCommands = new(_NewRow, MyConnection);
-        //    return MyCommands.DeleteRow();
-        //}
-
-        //public bool Delete(DataRow _Row)
-        //{
-        //    if (MyCommands.CommandDelete != null) { MyCommands.CommandDelete.Transaction = _transaction; }
-
-        //    var IsDeleted = false;
-        //    MyCommands = new(_Row, MyConnection);
-        //    var result = MyCommands.DeleteRow();
-        //    if (result)
-        //    {
-        //        IsDeleted = true;
-        //    }
-        //    return IsDeleted;
-        //}
 
         public bool Delete(DataRow _Row)
         {
-            // Create commands FIRST
+            MsgClass.ClearMessages();
             MyCommands = new(_Row, MyConnection);
 
             // THEN attach the transaction
@@ -908,7 +901,16 @@ namespace AppliedDB
                 MyCommands.CommandDelete.Transaction = DBtransaction;
             }
 
-            return MyCommands.DeleteRow();
+            var IsDeleted = MyCommands.DeleteRow();
+            if(IsDeleted)
+            {
+                MsgClass.Warning(AppMessages.Enums.Messages.Delete);
+            }
+            else
+            {
+                MsgClass.Danger(AppMessages.Enums.Messages.NotDelete);
+            }
+            return IsDeleted;
         }
 
 
@@ -1114,6 +1116,15 @@ namespace AppliedDB
         #endregion
 
         #region Save
+        public async Task<bool> SaveAsync(DataRow newRow)
+        {
+            return await Task.Run(() =>
+            {
+                Save(newRow);
+                return IsSaved;
+            });
+        }
+
         public void Save(DataRow newRow)
         {
             IsSaved = false;
@@ -1130,7 +1141,7 @@ namespace AppliedDB
             var result = MyCommands.SaveChanges();
             if (result)
             {
-                MsgClass.Success(AppMessages.Enums.Messages.Save);
+                MsgClass.Success(AppMessages.Enums.Messages.Saved);
                 IsSaved = true;
             }
             else
