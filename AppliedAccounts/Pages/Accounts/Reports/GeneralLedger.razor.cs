@@ -479,10 +479,11 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             var _DateTo = MyModel.DtTo_Prj.ToString(Format.YMD);
 
             var _Nature = AppRegistry.GetText(AppGlobal.DBFile, "GLp_Nature");
-            var _FilterOB = $"[Project] = {MyModel.ProjectID} AND  [COA] IN ({_Nature}) AND Date([Vou_Date]) < Date('{_DateFrom}')";
-            var _Filter = $"[Project] = {MyModel.ProjectID} AND  [COA] IN ({_Nature}) AND (Date([Vou_Date]) BETWEEN Date('{_DateFrom}') AND Date('{_DateTo}'))";
-            var _GroupBy = "[Project]";
-            var _SortBy = "[Vou_date], [Vou_no]";
+            var _FilterOB = $"[Project] = {MyModel.ProjectID} AND  Date([Vou_Date]) < Date('{_DateFrom}')";
+            var _Filter = $"[Project] = {MyModel.ProjectID}   AND (Date([Vou_Date]) BETWEEN Date('{_DateFrom}') AND Date('{_DateTo}'))";
+
+            var _GroupBy = "[COA],[Project]";
+            var _SortBy = "[COA], [Vou_date], [Vou_no]";
 
             var _Query = SQLQueries.Quries.Ledger2(_FilterOB, _Filter, _GroupBy, _OBDate, _SortBy);
 
