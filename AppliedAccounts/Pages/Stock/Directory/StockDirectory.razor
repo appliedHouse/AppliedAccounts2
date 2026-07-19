@@ -43,7 +43,7 @@
                 <div class="col-md-4">
                     <div class="form-floating">
                         <InputText class="form-control" id="txtTitle" placeholder="Title" @bind-Value="MyModel.Title"></InputText>
-                        <label for="txtTitle">Code</label>
+                        <label for="txtTitle">Title</label>
                     </div>
                 </div>
             </div>
@@ -64,7 +64,7 @@
                                     <Btn1_Delete OnClick="(async () => await Delete(MyModel.ID))" />
                                 }
 
-                                <Btn1_Back NavTo="@GetBackPath()" />
+                                <Btn1_Back OnClick="(async () => await GetBackPath())" />
                             </div>
                         </div>
                     </div>
@@ -106,9 +106,10 @@
                 </table>
             </div>
         }
+        else
+        {
+            <div class="alert alert-info" role="alert">No records found.</div>
+        }
 
-    
-
-        
     }
 </EditForm>

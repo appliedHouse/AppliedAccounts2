@@ -15,8 +15,8 @@ namespace AppliedAccounts.Pages.Stock.Directory
         public DataSource Source { get; set; }
         public string Filter { get; set; }
         public string Sort { get; set; }
-        public bool EditMode { get; set; } = false;
-        public bool IsDeleted { get; set; } = false;
+        public bool EditMode { get; set; } 
+        public bool IsDeleted { get; set; } 
 
         public List<CodeTitle> StockDirectoryList { get; set; }
 
@@ -29,18 +29,12 @@ namespace AppliedAccounts.Pages.Stock.Directory
             ["Inv_UOM"] = (Tables.Inv_UOM, "Stock Unit of Measurement")
         };
 
-        private string GetBackPath() 
+        private async Task GetBackPath() 
         {
             EditMode = false;
             IsDeleted = false;
-
-            string _result = string.Empty;
-            //if(TableName == "Inv_Category") { _result = NavigationPaths.StockCategory(); }
-            //else if (TableName == "Inv_SubCategory") { _result = NavigationPaths.StockSubCategory(); }
-            //else if (TableName == "Inv_Packing") { _result = NavigationPaths.StockPacking(); }
-            //else if (TableName == "Inv_Size") { _result = NavigationPaths.StockSize(); }
-            //else if (TableName == "Inv_UOM") { _result = NavigationPaths.StockUOM(); }
-            return _result;
+            AppGlobal.NavManager.NavigateTo($"/Stock/Directory/{TableName}");
+            await Task.CompletedTask;
         }
 
         public void LoadData(string tableName)
@@ -82,14 +76,18 @@ namespace AppliedAccounts.Pages.Stock.Directory
         }
         public async Task Delete(long _ID)
         {
-            IsDeleted = true;
-            EditMode = true;
+            
             var _ExistingRow = GetExistingRow(_ID);
             if (_ExistingRow != null)
             {
-                await Source.DeleteAsync(_ExistingRow);
+                IsDeleted = await Source.DeleteAsync(_ExistingRow);   // if delete is successful, IsDeleted will be false, otherwise true
+                if (IsDeleted) 
+                {
+                    LoadData(TableName!);
+                    IsDeleted = false;
+                    EditMode = false;
+                }
             }
-
         }
 
         private DataRow? GetExistingRow(long _ID)
