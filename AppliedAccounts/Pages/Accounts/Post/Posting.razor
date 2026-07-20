@@ -1,13 +1,10 @@
 ﻿@page "/Posting"
-@using System.Data
-@using AppliedAccounts.Models
-@using AppliedAccounts.Models.Posting
-@using static AppliedAccounts.Models.Posting.PostingModel
+@page "/Menu/Accounts/Posting"
+@using AppliedAccounts.Component.Libs
 
 @inject GlobalService AppGlobal
 
-
-<ShowPageHeading PageTitle="VOUCHER POSTING" />
+<PageHeading Text="VOUCHER POSTING" />
 <PageErrors Messages="@MyModel.MsgClass" />
 
 
