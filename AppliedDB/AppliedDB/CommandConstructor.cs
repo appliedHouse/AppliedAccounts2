@@ -10,6 +10,8 @@ namespace AppliedDB
         {
             public static SqliteCommand? Insert(DataRow CurrentRow, SqliteConnection DBConnection)
             {
+                CurrentRow.RemoveDBNull();
+
                 if (CurrentRow.Field<long>("ID") == 0)
                 {
                     DataColumnCollection _Columns = CurrentRow.Table.Columns;
