@@ -7,6 +7,7 @@ using AppMessages;
 using System.Data;
 
 using Messages = AppMessages.Enums.Messages;
+using AppliedAccounts.Data.Mapping;
 
 namespace AppliedAccounts.Models.Accounts
 {
@@ -301,8 +302,8 @@ namespace AppliedAccounts.Models.Accounts
             SetKey();
             try
             {
-                // SELECT * FROM [Ledger] WHERE [Vou_Type]='JV' AND Vou_No='New' 
-                var _Ledger = Source.GetTable(AppliedDB.Enums.Tables.Ledger, $"[Vou_Type]='{VoucherTypeClass.VoucherType.JV}' AND Vou_No='{Vou_No}'");
+                var _Query = $"[Vou_Type]='{VoucherTypeClass.VoucherType.JV}' AND Vou_No='{Vou_No}'";
+                var _Ledger = Source.GetTable(AppliedDB.Enums.Tables.Ledger, _Query);
                 if (_Ledger.Columns.Count > 0)
                 {
                     // Update Voucher date must be same in all voucher list. 
@@ -311,8 +312,6 @@ namespace AppliedAccounts.Models.Accounts
 
                     if (IsVoucherValidated())
                     {
-
-
                         if (Transaction.Vou_No == "New")
                         {
                             Vou_No = NewVoucherNo.GetJournalVoucher(AppGlobal.DBFile, Transaction.Vou_Date);
@@ -361,26 +360,7 @@ namespace AppliedAccounts.Models.Accounts
         private DataRow Convert2Row(JVViewModel _VModel)
         {
             if (CurrentRow == null) { CurrentRow = Source.GetNewRow(AppliedDB.Enums.Tables.Ledger); }
-
-            CurrentRow["ID"] = _VModel.ID;
-            CurrentRow["Vou_No"] = _VModel.Vou_No;
-            CurrentRow["Vou_Date"] = _VModel.Vou_Date;
-            CurrentRow["Vou_Type"] = VoucherTypeClass.VoucherType.JV.ToString();
-            CurrentRow["Sr_No"] = _VModel.Sr_No;
-            CurrentRow["Ref_No"] = _VModel.Ref_No;
-            CurrentRow["BookID"] = DBNull.Value;
-            CurrentRow["COA"] = _VModel.COA;
-            CurrentRow["DR"] = _VModel.DR;
-            CurrentRow["CR"] = _VModel.CR;
-            CurrentRow["Customer"] = _VModel.Company;
-            CurrentRow["Employee"] = _VModel.Employee;
-            CurrentRow["Inventory"] = DBNull.Value;
-            CurrentRow["Project"] = _VModel.Project;
-            CurrentRow["Description"] = _VModel.Description;
-            CurrentRow["Comments"] = DBNull.Value;
-            CurrentRow["Status"] = PostingStatus.Submitted.ToString();
-
-            return CurrentRow;
+            return _VModel.ToDataRow(CurrentRow);
         }
 
         #endregion

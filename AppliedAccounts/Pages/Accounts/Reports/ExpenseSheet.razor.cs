@@ -81,7 +81,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         {
             try
             {
-                ReportService = new(AppGlobal);
+                ReportService = new(AppGlobal); ;
 
                 ReportService.ReportType = PrintAction.PrintType;
 

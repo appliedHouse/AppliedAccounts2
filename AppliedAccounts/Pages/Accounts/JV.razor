@@ -156,13 +156,7 @@
 
                         </div>
                         <div class="p-2">
-
-                            <Btn1_Save1 OnClick="MyModel.Save" VoucherNo="@VoucherNo" Visiable="@ShowBtnSave()" />
-
-                            
-                            @*  <button id="btn-save2"  disabled="ShowBtnSave()" type="button" class="btn btn-sm w1 btn-success" title="Save" data-bs-toggle="modal" data-bs-target="#SaveVoucher">
-                                <i class="bi bi-floppy2-fill"></i>
-                            </button> *@
+                            <Btn1_Save1 OnClick="(async ()=>await MyModel.SaveAllAsync())" VoucherNo="@VoucherNo" Visiable="@ShowBtnSave()" />
                         </div>
 
                         @if (MyModel.Count > 1)
