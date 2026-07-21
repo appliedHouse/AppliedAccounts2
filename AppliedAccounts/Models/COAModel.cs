@@ -72,7 +72,7 @@ namespace AppliedAccounts.Models
         #region Get Record and DataRow
         private COARecord GetRecord(DataRow _Row)
         {
-            _Row = Functions.RemoveNull(_Row);
+            _Row.RemoveDBNull(); // = Functions.RemoveNull(_Row);
 
             COARecord _Record = new();
             {

@@ -140,7 +140,9 @@ namespace AppliedAccounts.Models
         }
         private RecordModel Row2Record(DataRow row)
         {
-            AppliedDB.Functions.RemoveNull(row);
+            row.RemoveDBNull();
+
+            //AppliedDB.Functions.RemoveNull(row);
 
             return new RecordModel
             {

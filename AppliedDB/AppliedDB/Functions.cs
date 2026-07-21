@@ -28,31 +28,31 @@ namespace AppliedDB
 
 
         }
-        public static DataRow RemoveNull(DataRow CurrentRow)
-        {
-            if (CurrentRow != null)
-            {
-                foreach (DataColumn Column in CurrentRow.Table.Columns)
-                {
-                    if (CurrentRow[Column] == DBNull.Value)
-                    {
-                        var _Type = CurrentRow.Table.Columns[Column.ColumnName]?.DataType;
+        //public static DataRow RemoveNull(DataRow CurrentRow)
+        //{
+        //    if (CurrentRow != null)
+        //    {
+        //        foreach (DataColumn Column in CurrentRow.Table.Columns)
+        //        {
+        //            if (CurrentRow[Column] == DBNull.Value)
+        //            {
+        //                var _Type = CurrentRow.Table.Columns[Column.ColumnName]?.DataType;
 
-                        if (_Type is not null)
-                        {
-                            if (_Type == typeof(string)) { CurrentRow[Column] = ""; }
-                            if (_Type == typeof(int)) { CurrentRow[Column] = 0; }
-                            if (_Type == typeof(long)) { CurrentRow[Column] = 0; }
-                            if (_Type == typeof(short)) { CurrentRow[Column] = 0; }
-                            if (_Type == typeof(decimal)) { CurrentRow[Column] = 0.00M; }
-                            if (_Type == typeof(DateTime)) { CurrentRow[Column] = DateTime.Now; }
-                        }
-                    }
-                }
-                return CurrentRow;
-            }
-            return null!;
-        }
+        //                if (_Type is not null)
+        //                {
+        //                    if (_Type == typeof(string)) { CurrentRow[Column] = ""; }
+        //                    if (_Type == typeof(int)) { CurrentRow[Column] = 0; }
+        //                    if (_Type == typeof(long)) { CurrentRow[Column] = 0; }
+        //                    if (_Type == typeof(short)) { CurrentRow[Column] = 0; }
+        //                    if (_Type == typeof(decimal)) { CurrentRow[Column] = 0.00M; }
+        //                    if (_Type == typeof(DateTime)) { CurrentRow[Column] = DateTime.Now; }
+        //                }
+        //            }
+        //        }
+        //        return CurrentRow;
+        //    }
+        //    return null!;
+        //}
         public static DataTable ToDataTable<T>(this IList<T> data)
         {
             PropertyDescriptorCollection props = TypeDescriptor.GetProperties(typeof(T));
@@ -73,15 +73,7 @@ namespace AppliedDB
             }
             return table;
         }
-
-        // Depreciated
-        //public static int MaxID(string DBFile, Tables _Table)
-        //{
-        //    var _DataTable = DataSource.GetDataTable(DBFile, _Table);
-        //    var _MaxID = (int)_DataTable.Compute("MAX(ID)", "");
-        //    _DataTable.Dispose();
-        //    return _MaxID + 1; ;
-        //}
+                
         public static string GetTitle(string DBFile, Tables _Table, long Id)
         {
             if (Id > 0)
@@ -142,6 +134,18 @@ namespace AppliedDB
         public static string GetDateFilter(DateTime[] Dates)
         {
             return $" Date(Vou_Date)>='{Dates[0]:yyyy-MM-dd}' AND Date(Vou_Date)<='{Dates[1]:yyyy-MM-dd}'";
+        }
+
+        public static DataRow RemoveDBNull(this DataRow row)
+        {
+            foreach (DataColumn column in row.Table.Columns)
+            {
+                if (row[column] == DBNull.Value)
+                {
+                    row[column] = null;
+                }
+            }
+            return row;
         }
     }
 }

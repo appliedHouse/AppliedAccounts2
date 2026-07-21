@@ -8,18 +8,8 @@ namespace AppliedAccounts.Data.Mapping
 {
     public static class Mapping
     {
-        public static DataRow RemoveDBNull(this DataRow row)
-        {
-            foreach (DataColumn column in row.Table.Columns)
-            {
-                if (row[column] == DBNull.Value)
-                {
-                    row[column] = null;
-                }
-            }
-            return row;
-        }
-
+        
+        
 
         public static DataRow? ToDataRow(this COARecord rec, DataRow row)
         {

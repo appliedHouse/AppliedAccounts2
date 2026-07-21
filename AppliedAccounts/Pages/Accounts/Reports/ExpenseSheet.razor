@@ -10,18 +10,18 @@
 <PageHeading Text="Expense Sheet List" />
 
 <EditForm Model="MyModel">
-    <div class="container">
+    <div class="container text-md-start">
         <div class="row">
             <div class="col-md-6">
-                <div class="form-group">
-                    <label for="ddExpenseSheet">Expense Sheets</label>
+                <div class="mb-3">
+                    <label for="ddExpenseSheet" class="form-label">Expense Sheets</label>
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
                                 type="button"
                                 id="ddExpenseSheet"
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false">
-                            @(GetSelectedSheetText() ?? "Select an expense sheet")
+                            @(SheetTable?.FirstOrDefault(s => s.Code == MyModel.SelectedSheetNo)?.Title ?? "Select a sheet...")
                         </button>
                         <ul class="dropdown-menu w-100" aria-labelledby="ddExpenseSheet">
                             @if (SheetTable != null && SheetTable.Count > 0)
@@ -60,10 +60,12 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-3">Print Sheet</div>
+            <div class="col-md-3">
                 <ReportingButtons ReturnValue="Print" ID="1" />
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">Print Summary Sheet</div>
+            <div class="col-md-3">
                 <ReportingButtons ReturnValue="PrintSummary" ID="2" />
             </div>
             
@@ -72,45 +74,7 @@
 </EditForm>
 
 <div class="expense-page">
-    <div class="container-fluid mt-3">
-        <!-- TOP BAR -->
-        <div class="expense-toolbar">
-            <!-- LEFT -->
-            <div class="toolbar-side">
-                <div class="expense-report-group">
-                    <span class="expense-inline-heading">
-                        Print Sheet -
-                    </span>
-                    <ReportingButtons ReturnValue="Print" ID="1" />
-                </div>
-            </div>
-
-            <!-- CENTER -->
-           @*  <div class="toolbar-center">
-                <input type="text"
-                       class="form-control expense-search-input"
-                       placeholder="Type here to search"
-                       @bind="SearchText" />
-                <button class="btn btn-secondary expense-clear-btn"
-                        @onclick="ClearSearch">
-                    Clear
-                </button>
-            </div> *@
-
-            <!-- RIGHT -->
-            @* <div class="toolbar-side right-side">
-                <div class="expense-company-text">
-                    Company : Applied Software House
-                </div>
-                <div class="expense-report-group">
-                    <span class="expense-inline-heading">
-                        Summary -
-                    </span>
-                    <ReportingButtons ReturnValue="PrintSummary" ID="2" />
-                </div>
-            </div> *@
-        </div>
-
+    <div class="container mt-3">
         <!-- TABLE -->
         <div class="table-responsive">
             <table class="table-list">

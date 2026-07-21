@@ -55,7 +55,7 @@ namespace AppliedAccounts.Models
         #region Get Record and DataRow
         private CustomerVM GetRecord(DataRow _Row)
         {
-            _Row = AppliedDB.Functions.RemoveNull(_Row);
+            _Row.RemoveDBNull(); // = AppliedDB.Functions.RemoveNull(_Row);
             CustomerVM _Record = new();
             {
                 _Record.ID = (int)_Row.Field<long>("ID");
@@ -90,7 +90,7 @@ namespace AppliedAccounts.Models
             return new();
         }
 
-        private DataRow GetDataRow(CustomerVM _Record)
+        private DataRow? GetDataRow(CustomerVM _Record)
         {
             try
             {
@@ -142,12 +142,12 @@ namespace AppliedAccounts.Models
                 else
                 {
                     var IsSearch = false;
-                    if (_Row["Code"].ToString().Contains(SearchText)) { IsSearch = true; }
-                    if (_Row["Title"].ToString().Contains(SearchText)) { IsSearch = true; }
-                    if (_Row["Address1"].ToString().Contains(SearchText)) { IsSearch = true; }
-                    if (_Row["Address2"].ToString().Contains(SearchText)) { IsSearch = true; }
-                    if (_Row["City"].ToString().Contains(SearchText)) { IsSearch = true; }
-                    if (_Row["Country"].ToString().Contains(SearchText)) { IsSearch = true; }
+                    if (_Row["Code"].ToString()!.Contains(SearchText)) { IsSearch = true; }
+                    if (_Row["Title"].ToString()!.Contains(SearchText)) { IsSearch = true; }
+                    if (_Row["Address1"].ToString()!.Contains(SearchText)) { IsSearch = true; }
+                    if (_Row["Address2"].ToString()!.Contains(SearchText)) { IsSearch = true; }
+                    if (_Row["City"].ToString()!.Contains(SearchText)) { IsSearch = true; }
+                    if (_Row["Country"].ToString()!.Contains(SearchText)) { IsSearch = true; }
 
                     if (IsSearch) { _FilterRecords.Add(GetRecord(_Row)); }
 
@@ -187,7 +187,7 @@ namespace AppliedAccounts.Models
         public bool Save()
         {
             var _NewRow = GetDataRow(Record);
-            if (Validate(_NewRow))
+            if (_NewRow is not null && Validate(_NewRow))
             {
                 Source ??= new(AppGlobal.AppPaths);
                 Source.Save(_NewRow);

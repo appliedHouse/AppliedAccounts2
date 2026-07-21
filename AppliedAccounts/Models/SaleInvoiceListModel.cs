@@ -37,6 +37,7 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Load Data
+        
         public async Task LoadData()
         {
             //Source ??= new(AppGlobal.AppPaths);
@@ -64,7 +65,6 @@ namespace AppliedAccounts.Models
                 Filter = string.Empty;
             }
             
-            //Pages.TotalRecords = Source.RecordCound(Tables.BillReceivable, Filter) + 1;
             Data = Source.GetTable(_Query, Filter, _Sort + Pages.GetLimit());
             Records = Data.AsEnumerable().Select(row => GetRecord(row)).ToList();
             Pages.Refresh(Source.RecordCound(Tables.BillReceivable, Filter));
@@ -75,7 +75,7 @@ namespace AppliedAccounts.Models
         #region Get Records by Row & ID
         private SalesRecord GetRecord(DataRow _Row)
         {
-            _Row = AppliedDB.Functions.RemoveNull(_Row);
+            _Row.RemoveDBNull(); // = AppliedDB.Functions.RemoveNull(_Row);
             SalesRecord _Record = new();
             {
                 _Record.Id = (long)_Row["ID"];
