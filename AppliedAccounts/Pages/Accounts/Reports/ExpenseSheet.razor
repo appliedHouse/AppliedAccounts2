@@ -2,142 +2,117 @@
 
 @using AppliedAccounts.Component.ButtonsDictionery
 @using AppliedAccounts.Component.Libs
-@using System.Data
 
 @inject IToastService ToastService
 @inject PrintService ReportService
 @inject GlobalService AppGlobal
-
-
 
 <PageHeading Text="Expense Sheet List" />
 
 <EditForm Model="MyModel">
     <div class="container">
         <div class="row">
-
             <div class="col-md-6">
-                <MyDropDownString Id="ddExpenseSheet"
-                                  Label="Expense Sheets"
-                                  Value="@MyModel.SelectedSheetNo"
-                                  ValueChanged="OnSheetChanged"
-                                  Items="SheetTable" />
+                <div class="form-group">
+                    <label for="ddExpenseSheet">Expense Sheets</label>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
+                                type="button"
+                                id="ddExpenseSheet"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            @(GetSelectedSheetText() ?? "Select an expense sheet")
+                        </button>
+                        <ul class="dropdown-menu w-100" aria-labelledby="ddExpenseSheet">
+                            @if (SheetTable != null && SheetTable.Count > 0)
+                            {
+                                @foreach (var item in SheetTable)
+                                {
+                                    <li>
+                                        <a class="dropdown-item @(item.Code == MyModel.SelectedSheetNo ? "active" : "")"
+                                           href="#"
+                                           @onclick="() => SelectSheet(item.Code)"
+                                           @onclick:preventDefault="true">
+                                            @item.Title
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li><span class="dropdown-item text-muted">No sheets available</span></li>
+                            }
+                        </ul>
+                    </div>
+                </div>
             </div>
-
             <div class="col-md-6">
                 <div class="d-flex justify-content-end align-items-end gap-2">
-
                     <div class="form-floating" style="width:300px;">
                         <InputText id="txtSearch"
                                    class="form-control"
                                    placeholder="Search"
                                    @bind-Value="MyModel.SearchText" />
-
                         <label for="txtSearch">Search</label>
                     </div>
-
                     <Btn1_Clear OnClick="ClearSearch" />
-
                 </div>
             </div>
-
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <ReportingButtons ReturnValue="Print" ID="1" />
+            </div>
+            <div class="col-md-6">
+                <ReportingButtons ReturnValue="PrintSummary" ID="2" />
+            </div>
+            
         </div>
     </div>
 </EditForm>
 
-
 <div class="expense-page">
-
     <div class="container-fluid mt-3">
-
         <!-- TOP BAR -->
-
         <div class="expense-toolbar">
-
             <!-- LEFT -->
-
             <div class="toolbar-side">
-
-                @* <div class="expense-info-item">
-
-                    <span class="expense-info-label">
-                        Sheet No :
-                    </span>
-
-                    <select class="form-select expense-sheet-select"
-                            value="@SelectedSheetNo"
-                            @onchange="OnSheetChanged">
-
-                        @if (SheetTable != null && SheetTable.Count > 0)
-                        {
-                            foreach (var item in SheetTable)
-                            {
-                                <option value="@item.Code">
-                                    @item.Title
-                                </option>
-                            }
-                        }
-
-                    </select>
-
-                </div> *@
-
                 <div class="expense-report-group">
-
                     <span class="expense-inline-heading">
                         Print Sheet -
                     </span>
-
                     <ReportingButtons ReturnValue="Print" ID="1" />
-
                 </div>
-
             </div>
 
             <!-- CENTER -->
-
-            <div class="toolbar-center">
-
+           @*  <div class="toolbar-center">
                 <input type="text"
                        class="form-control expense-search-input"
                        placeholder="Type here to search"
                        @bind="SearchText" />
-
                 <button class="btn btn-secondary expense-clear-btn"
                         @onclick="ClearSearch">
-
                     Clear
-
                 </button>
-
-            </div>
+            </div> *@
 
             <!-- RIGHT -->
-
-            <div class="toolbar-side right-side">
-
+            @* <div class="toolbar-side right-side">
                 <div class="expense-company-text">
-
                     Company : Applied Software House
-
                 </div>
-
                 <div class="expense-report-group">
-
                     <span class="expense-inline-heading">
                         Summary -
                     </span>
-
                     <ReportingButtons ReturnValue="PrintSummary" ID="2" />
-
                 </div>
+            </div> *@
+        </div>
 
-            </div>
-
-        </div>        <!-- TABLE -->
-
+        <!-- TABLE -->
         <div class="table-responsive">
-
             <table class="table-list">
                 <thead>
                     <tr>
@@ -152,49 +127,13 @@
                         <th style="width:20%">Description</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
-                    @{
-
-                        DataRow[] Rows;
-
-                        if (string.IsNullOrWhiteSpace(SearchText))
-                        {
-                            Rows = ExpenseTable.Select();
-                        }
-                        else
-                        {
-                            Rows = ExpenseTable.Select($@"
-
-                                Vou_No LIKE '%{SearchText}%'
-                                OR Ref_No LIKE '%{SearchText}%'
-                                OR TitleCOA LIKE '%{SearchText}%'
-                                OR TitleCompany LIKE '%{SearchText}%'
-                                OR Description LIKE '%{SearchText}%'
-
-                            ");
-                        }
-
-                        decimal SearchDR = 0;
-                        decimal SearchCR = 0;
-
-                        int sr = 1;
-
-                        foreach (var item in Rows)
-                        {
-                            SearchDR += Convert.ToDecimal(item["DR"]);
-                            SearchCR += Convert.ToDecimal(item["CR"]);
-                        }
-
-                    }
-
-                    @foreach (var row in Rows)
+                    
+                    @foreach (var row in SearchResult())
                     {
-
+                        
                         <tr>
-
-                            <td>@sr</td>
+                            <td>@sr++</td>
                             <td class="voucher-text">@row["Vou_No"]</td>
                             <td>@row["Ref_No"]</td>
                             <td>@((string)((DateTime)row["Vou_Date"]).DisplayDate())</td>
@@ -202,59 +141,44 @@
                             <td>@row["TitleCompany"]</td>
                             <td class="debit-text right">@Convert.ToDecimal(row["DR"]).ToString("N2")</td>
                             <td class="credit-text right">@Convert.ToDecimal(row["CR"]).ToString("N2")</td>
-                            <td class="left" sgtyle="margin-left:2px">@row["Description"]</td>
+                            <td class="left">@row["Description"]</td>
                         </tr>
                         sr++;
                     }
-
                 </tbody>
-
                 <tfoot>
-
                     <tr>
-
-                        <th colspan="6">
-                            TOTAL
-                        </th>
-
-                        <th class="text-end">
-                            @SearchDR.ToString("N2")
-                        </th>
-
-                        <th class="text-end">
-                            @SearchCR.ToString("N2")
-                        </th>
-
+                        <th colspan="6">TOTAL</th>
+                        <th class="text-end">@SearchDR.ToString("N2")</th>
+                        <th class="text-end">@SearchCR.ToString("N2")</th>
                         <th></th>
-
                     </tr>
-
                 </tfoot>
-
             </table>
-
         </div>
-
     </div>
-
 </div>
 
 @code {
-
-
-    protected override void OnInitialized()
+    // Helper method to display selected sheet text
+    private string GetSelectedSheetText()
     {
-        RptBtn = new()
-        {
-            PrintType = AppReports.ReportType.Preview,
-            VoucherID = 1
-        };
+        if (string.IsNullOrEmpty(MyModel?.SelectedSheetNo))
+            return null!;
 
-        LoadSheets();
+        var sheet = SheetTable?.FirstOrDefault(s => s.Code == MyModel.SelectedSheetNo);
+        return sheet?.Title ?? MyModel.SelectedSheetNo;
     }
 
-
-     
-
-    
+    // Method to handle sheet selection
+    private void SelectSheet(string code)
+    {
+        if (!string.IsNullOrEmpty(code))
+        {
+            MyModel.SelectedSheetNo = code;
+            SelectedSheetNo = code;
+            LoadExpenseSheet();
+            StateHasChanged();
+        }
+    }
 }

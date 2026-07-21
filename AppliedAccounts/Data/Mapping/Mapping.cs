@@ -44,6 +44,7 @@ namespace AppliedAccounts.Data.Mapping
 
         public static DataRow ToDataRow(this JVViewModel rec, DataRow row)
         {
+            // Convert to book Data table's Columns
             row["ID"] = rec.ID;
             row["Vou_No"] = rec.Vou_No;
             row["Vou_Date"] = rec.Vou_Date;

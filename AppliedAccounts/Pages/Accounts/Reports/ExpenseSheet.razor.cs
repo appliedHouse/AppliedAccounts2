@@ -15,6 +15,9 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         public string SelectedSheetNo = "";
         public DataTable ExpenseTable { get; set; } = new();
         public List<CodeTitle> SheetTable { get; set; } = new();
+        public int sr { get; set; }
+        private decimal SearchDR = 0;
+        private decimal SearchCR = 0;
 
         internal void LoadSheets()
         {
@@ -58,6 +61,36 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         private void ClearSearch()
         {
             SearchText = "";
+        }
+
+        private DataRow[] SearchResult()
+        {
+            sr = 0;
+            SearchDR = 0;
+            SearchCR = 0;
+            
+            DataRow[] Rows;
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                Rows = ExpenseTable.Select();
+            }
+            else
+            {
+                Rows = ExpenseTable.Select($@"
+                                Vou_No LIKE '%{SearchText}%'
+                                OR Ref_No LIKE '%{SearchText}%'
+                                OR TitleCOA LIKE '%{SearchText}%'
+                                OR TitleCompany LIKE '%{SearchText}%'
+                                OR Description LIKE '%{SearchText}%'
+                            ");
+            }
+
+            foreach (var item in Rows)
+            {
+                SearchDR += Convert.ToDecimal(item["DR"]);
+                SearchCR += Convert.ToDecimal(item["CR"]);
+            }
+            return Rows;
         }
 
         public void Print(ReportActionClass PrintAction)
