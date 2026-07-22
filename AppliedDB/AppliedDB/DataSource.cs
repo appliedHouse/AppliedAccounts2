@@ -48,6 +48,25 @@ namespace AppliedDB
             }
         }
 
+        public DataSource(SqliteConnection _Connection)
+        {
+            MyConnection = _Connection;
+            if (MyConnection is not null)
+            {
+                MyCommand = new SqliteCommand("", MyConnection);
+            }
+            MyConnection2 = _Connection;
+
+            var FilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Messages", "Messages.db");
+
+            if (!string.IsNullOrEmpty(FilePath))
+            {
+                var _ConnectionString = $"Data Source={FilePath}";
+                MsgClass.MsgConnection = new SqliteConnection(_ConnectionString);
+            }
+            
+        }
+
         public DataSource()
         {
         }

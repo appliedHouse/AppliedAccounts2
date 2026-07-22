@@ -1,5 +1,6 @@
 ﻿@page "/Test";
 @using AppliedAccounts.Services
+@using AppliedDB.CreateDB;
 
 
 
@@ -8,15 +9,13 @@
 
 @code {
    
-    public DataBaseClass DBClass; 
+    public CreateClientDB DBClass; 
 
 
     protected override void OnInitialized()
     {
-        //var UserAuthentication = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
-        DBClass = new(AppGlobal);
-        Value1 = MyConfig.GetValue("Paths:DBPath","").ToString();
-        Value2 = MyEnvir.ContentRootPath;
+        
+        
 
     }
 

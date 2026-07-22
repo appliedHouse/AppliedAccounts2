@@ -1,21 +1,19 @@
-﻿using AppliedAccounts.Services;
-using AppliedDB;
-using AppliedGlobals;
+﻿using AppliedGlobals;
+using Microsoft.Data.Sqlite;
 using System.Data;
+using System.Text;
 
-namespace AppliedAccounts.Data
+namespace AppliedDB.CreateDB
 {
-    public class DataMigration
-    {
-        
-        public GlobalService AppGlobal { get; set; }
-        public DataSource Source { get; set; }
-        public DataTable CashBook { get; set; }
-
-        public DataMigration(GlobalService _AppGlobal)
-        {
-            AppGlobal = _AppGlobal;
-            Source = new(AppGlobal.AppPaths);
+	public class DataMigration
+	{
+        private DataSource Source { get; set; }
+        private DataTable CashBook { get; set; }
+        public string DBFile { get; set; }
+        public StringBuilder Log { get; set; } = new StringBuilder();
+        public DataMigration(DataSource source)           
+		{
+            Source = source;
         }
 
         public void Cash2Book()
@@ -34,7 +32,7 @@ namespace AppliedAccounts.Data
 
                     if (!IsExist)
                     {
-                        _Num++; if(_Num > 10000) { break; }
+                        _Num++; if (_Num > 10000) { break; }
 
                         var _NewRow1 = _Book1.NewRow();
                         var _NewRow2 = _Book2.NewRow();

@@ -1,5 +1,4 @@
 ﻿using AppliedAccounts.Authentication;
-using AppliedAccounts.Data;
 using AppliedDB;
 using Microsoft.Data.Sqlite;
 using System.Data;
@@ -74,52 +73,64 @@ namespace AppliedAccounts.Pages.Users
         }
 
 
+        // control threat one at a time for database validation
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+
         private async Task<bool> UserDatabaseFileValidateAsync(string dataFile)
         {
+            if (string.IsNullOrEmpty(dataFile))
+            {
+                ErrorMessage = "User DataFile not assigned.";
+                return false;
+            }
+
+            var dbPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                "SqliteDB",
+                dataFile
+            );
+
+            if (!File.Exists(dbPath))
+            {
+                return false;
+            }
+
+            await _semaphore.WaitAsync();
             try
             {
-                lock (_lock)
-                {
-                    if (string.IsNullOrEmpty(dataFile))
-                        throw new Exception("User DataFile not assigned.");
-
-                    var dbPath = Path.Combine(
-                        Directory.GetCurrentDirectory(),
-                        "wwwroot",
-                        "SqliteDB",
-                        dataFile
-                    );
-
-                    if (!File.Exists(dbPath))
-                    {
-                        return false;
-                    }
-
-                    try
-                    {
-                        // Try opening a connection
-                        using var conn = new SqliteConnection($"Data Source={dbPath}");
-                        conn.Open(); // Will throw if invalid/corrupt
-
-                        CreateDatabase _DB = new CreateDatabase(AppGlobal.AppPaths);
-                        Database_Patches _DBPatches = new(new DataSource(AppGlobal.AppPaths));
-                    
-                    }
-                    catch (Exception error)
-                    {
-                        ErrorMessage = error.Message;
-                        return false;
-                    }
-                    return true;
-                }
+                return await ValidateAndUpdateDatabaseAsync(dbPath);
             }
-            catch (Exception error)
+            finally
             {
-                ErrorMessage = error.Message;
-                return false;
+                _semaphore.Release();
             }
         }
 
+        private async Task<bool> ValidateAndUpdateDatabaseAsync(string dbPath)
+        {
+            try
+            {
+                using var conn = new SqliteConnection($"Data Source={dbPath}");
+                await conn.OpenAsync(); // Async version
+
+                var updateDB = new AppliedDB.CreateDB.UpdateDB(dbPath, AppGlobal.AppPaths);
+                await updateDB.UpdateDatabaseAsync(); // Assuming async version exists
+
+                return true;
+            }
+            catch (SqliteException error) when (error.SqliteErrorCode == 14) // SQLITE_CORRUPT
+            {
+                ErrorMessage = $"Database file is corrupt: {error.Message}";
+                return false;
+            }
+            catch (Exception error)
+            {
+                // Log the full exception here
+                ErrorMessage = $"Database validation failed: {error.Message}";
+                return false;
+            }
+        }
         public void ReLoad()
         {
             IsLogin = true;
