@@ -10,7 +10,6 @@ namespace AppliedDB.CreateDB
         public string DBFile { get; set; }
         public SqliteConnection MyConnection { get; set; }
         public StringBuilder Log { get; set; } = new StringBuilder();
-        
 
         public UpdateDB(string dbFile, AppValues.AppPath appPaths) 
         {
@@ -34,16 +33,13 @@ namespace AppliedDB.CreateDB
 
             bool IsBook1Created = false;
             bool IsBook2Created = false;
-
+                        
             string[] fileNames = TableNames.GetTableNames();
             foreach(string tableName in fileNames)
             {
 
                 if (!TableIsExist(tableName))
                 {
-                    
-
-
                     string createTableQuery = TableQueries.GetTableQuery(tableName);
                     if (!string.IsNullOrEmpty(createTableQuery))
                     {
@@ -74,6 +70,8 @@ namespace AppliedDB.CreateDB
                         DataMigration dataMigration = new(Source);
                         await dataMigration.Cash2BookAsync();
                         Log.AppendLine("Data Migrated from CashBook to Book");
+                        await dataMigration.Bank2BookAsync();
+                        Log.AppendLine("Data Migrated from BankBook to Book");
                     }
                 }
             }

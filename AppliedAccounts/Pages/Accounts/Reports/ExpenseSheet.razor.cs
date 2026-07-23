@@ -8,9 +8,11 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 {
     public partial class ExpenseSheet
     {
-        public ReportActionClass RptBtn { get; set; }
+        #region Valiables
+        public ReportActionClass RptBtns { get; set; } = new();
         public ExpenseSheetModel MyModel { get; set; } = new();
 
+        public DataSource Source { get; set; }
         public string SearchText = "";
         public string SelectedSheetNo = "";
         public DataTable ExpenseTable { get; set; } = new();
@@ -19,11 +21,24 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         private decimal SearchDR = 0;
         private decimal SearchCR = 0;
 
-        internal void LoadSheets()
+        private DataRow SelectedRow { get; set; }
+        private bool IsModalOpen { get; set; } = false;
+
+        #endregion
+
+
+        #region Constructor
+        public ExpenseSheet()
+        {
+           //Source = new(AppGlobal.AppPaths);
+           //LoadSheetList();
+        }
+        #endregion
+
+        internal void LoadSheetList()
         {
             try
             {
-
                 SheetTable = [..AppGlobal.Source.GetTable(Quries.ExpenseSheetList())
                     .AsEnumerable()
                     .Select(r => new CodeTitle
@@ -178,6 +193,69 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         }
         #endregion
 
+        // Helper method to display selected sheet text
+        private string GetSelectedSheetText()
+        {
+            if (string.IsNullOrEmpty(MyModel?.SelectedSheetNo))
+                return null!;
+
+            var sheet = SheetTable?.FirstOrDefault(s => s.Code == MyModel.SelectedSheetNo);
+            return sheet?.Title ?? MyModel.SelectedSheetNo;
+        }
+
+        private void SelectSheet(string code)
+        {
+            if (!string.IsNullOrEmpty(code))
+            {
+                MyModel.SelectedSheetNo = code;
+                SelectedSheetNo = code;
+                LoadExpenseSheet();
+                StateHasChanged();
+            }
+        }
+
+
+
+        private void OpenPreviewModal(DataRow row)
+        {
+            SelectedRow = row;
+            IsModalOpen = true;
+            StateHasChanged();
+        }
+
+        // Method to close modal
+        private void CloseModal()
+        {
+            IsModalOpen = false;
+            SelectedRow = null!;
+            StateHasChanged();
+        }
+
+        // Helper method to safely get value from DataRow
+        private string GetStringValue(DataRow row, string columnName)
+        {
+            return row?.Table?.Columns?.Contains(columnName) == true
+                ? row[columnName]?.ToString() ?? string.Empty
+                : string.Empty;
+        }
+
+        private decimal GetDecimalValue(DataRow row, string columnName)
+        {
+            if (row?.Table?.Columns?.Contains(columnName) == true && row[columnName] != DBNull.Value)
+            {
+                return Convert.ToDecimal(row[columnName]);
+            }
+            return 0;
+        }
+
+        private DateTime GetDateTimeValue(DataRow row, string columnName)
+        {
+            if (row?.Table?.Columns?.Contains(columnName) == true && row[columnName] != DBNull.Value)
+            {
+                return Convert.ToDateTime(row[columnName]);
+            }
+            return DateTime.Now;
+        }
 
         public class ExpenseSheetModel
         {

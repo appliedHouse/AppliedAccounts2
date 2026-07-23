@@ -633,12 +633,12 @@ namespace SQLQueries
         {
             var _Text = new StringBuilder();
 
-            _Text.AppendLine("SELECT DISTINCT");
-            _Text.AppendLine("    [SheetNo]");
+            _Text.AppendLine("SELECT DISTINCT ");
+            _Text.AppendLine("[SheetNo]");
             _Text.AppendLine("FROM [Book]");
             _Text.AppendLine("WHERE [SheetNo] IS NOT NULL");
             _Text.AppendLine("  AND [SheetNo] <> ''");
-            _Text.AppendLine("ORDER BY [SheetNo]");
+            _Text.AppendLine("ORDER BY [Vou_Date] DESC, [SheetNo] DESC");
 
             return _Text.ToString();
         }

@@ -1,11 +1,20 @@
 ﻿@page "/Accounts/Reports/ExpenseSheet"
 
+@using System.Data
 @using AppliedAccounts.Component.ButtonsDictionery
 @using AppliedAccounts.Component.Libs
 
 @inject IToastService ToastService
 @inject PrintService ReportService
 @inject GlobalService AppGlobal
+
+@code{
+    protected override void OnInitialized()
+    {
+        Source = new(AppGlobal.AppPaths);
+        LoadSheetList();
+    }
+}
 
 <PageHeading Text="Expense Sheet List" />
 
@@ -52,7 +61,7 @@
                         <InputText id="txtSearch"
                                    class="form-control"
                                    placeholder="Search"
-                                   @bind-Value="MyModel.SearchText" />
+                                   @bind-Value="SearchText" />
                         <label for="txtSearch">Search</label>
                     </div>
                     <Btn1_Clear OnClick="ClearSearch" />
@@ -68,7 +77,7 @@
             <div class="col-md-3">
                 <ReportingButtons ReturnValue="PrintSummary" ID="2" />
             </div>
-            
+
         </div>
     </div>
 </EditForm>
@@ -80,32 +89,38 @@
             <table class="table-list">
                 <thead>
                     <tr>
-                        <th style="width:5%">Sr. No.</th>
+                        <th style="width:4%">Sr. No.</th>
                         <th style="width:5%">Voucher</th>
                         <th style="width:5%">Ref No</th>
-                        <th style="width:5%">Date</th>
+                        <th style="width:6%">Date</th>
                         <th style="width:10%">Account</th>
                         <th style="width:10%">Company / Customer</th>
                         <th style="width:8%" class="amount">Debit</th>
                         <th style="width:8%" class="amount">Credit</th>
-                        <th style="width:20%">Description</th>
+                        <th style="width:15%">Description</th>
+                        <th style="width:4%">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    
-                    @foreach (var row in SearchResult())
+                    @foreach (DataRow row in SearchResult())
                     {
-                        
                         <tr>
-                            <td>@sr++</td>
+                            <td>@(sr + 1)</td>
                             <td class="voucher-text">@row["Vou_No"]</td>
                             <td>@row["Ref_No"]</td>
-                            <td>@((string)((DateTime)row["Vou_Date"]).DisplayDate())</td>
+                            <td>@(Convert.ToDateTime(row["Vou_Date"]).ToString("dd-MMM-yyyy"))</td>
                             <td>@row["TitleCOA"]</td>
                             <td>@row["TitleCompany"]</td>
                             <td class="debit-text right">@Convert.ToDecimal(row["DR"]).ToString("N2")</td>
                             <td class="credit-text right">@Convert.ToDecimal(row["CR"]).ToString("N2")</td>
                             <td class="left">@row["Description"]</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary"
+                                        @onclick="() => OpenPreviewModal(row)"
+                                        title="Preview Details">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </td>
                         </tr>
                         sr++;
                     }
@@ -116,6 +131,7 @@
                         <th class="text-end">@SearchDR.ToString("N2")</th>
                         <th class="text-end">@SearchCR.ToString("N2")</th>
                         <th></th>
+                        <th></th>
                     </tr>
                 </tfoot>
             </table>
@@ -123,26 +139,344 @@
     </div>
 </div>
 
-@code {
-    // Helper method to display selected sheet text
-    private string GetSelectedSheetText()
-    {
-        if (string.IsNullOrEmpty(MyModel?.SelectedSheetNo))
-            return null!;
+<!-- Bootstrap Modal -->
+@if (IsModalOpen && SelectedRow != null)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show"
+         style="display:block;"
+         tabindex="-1"
+         role="dialog"
+         aria-modal="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-file-text"></i>
+                        Expense Details - @SelectedRow["Vou_No"]
+                    </h5>
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            @onclick="CloseModal"
+                            aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <!-- Header Information -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header bg-light">
+                                        <i class="bi bi-info-circle"></i> Voucher Information
+                                    </div>
+                                    <div class="card-body">
+                                        <dl class="row mb-0">
+                                            <dt class="col-sm-4">Voucher No:</dt>
+                                            <dd class="col-sm-8">@SelectedRow["Vou_No"]</dd>
 
-        var sheet = SheetTable?.FirstOrDefault(s => s.Code == MyModel.SelectedSheetNo);
-        return sheet?.Title ?? MyModel.SelectedSheetNo;
-    }
+                                            <dt class="col-sm-4">Date:</dt>
+                                            <dd class="col-sm-8">@Convert.ToDateTime(SelectedRow["Vou_Date"]).ToString("dd-MMM-yyyy hh:mm tt")</dd>
 
-    // Method to handle sheet selection
-    private void SelectSheet(string code)
-    {
-        if (!string.IsNullOrEmpty(code))
-        {
-            MyModel.SelectedSheetNo = code;
-            SelectedSheetNo = code;
-            LoadExpenseSheet();
-            StateHasChanged();
+                                            <dt class="col-sm-4">Ref No:</dt>
+                                            <dd class="col-sm-8">@(SelectedRow["Ref_No"]?.ToString() ?? "N/A")</dd>
+
+                                            <dt class="col-sm-4">Sheet No:</dt>
+                                            <dd class="col-sm-8">@(SelectedRow["SheetNo"]?.ToString() ?? "N/A")</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header bg-light">
+                                        <i class="bi bi-building"></i> Account Information
+                                    </div>
+                                    <div class="card-body">
+                                        <dl class="row mb-0">
+                                            <dt class="col-sm-4">Account:</dt>
+                                            <dd class="col-sm-8">@SelectedRow["TitleCOA"]</dd>
+
+                                            <dt class="col-sm-4">Company:</dt>
+                                            <dd class="col-sm-8">@SelectedRow["TitleCompany"]</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Amount Information -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="card border-success">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-subtitle mb-2 text-muted">
+                                            <i class="bi bi-arrow-up-circle text-success"></i> Debit Amount
+                                        </h6>
+                                        <h3 class="text-success mb-0">@Convert.ToDecimal(SelectedRow["DR"]).ToString("N2")</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-danger">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-subtitle mb-2 text-muted">
+                                            <i class="bi bi-arrow-down-circle text-danger"></i> Credit Amount
+                                        </h6>
+                                        <h3 class="text-danger mb-0">@Convert.ToDecimal(SelectedRow["CR"]).ToString("N2")</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <i class="bi bi-file-text"></i> Description
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">@SelectedRow["Description"]</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Full Details Table -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <i class="bi bi-table"></i> All Fields
+                                        <button class="btn btn-sm btn-outline-secondary float-end"
+                                                onclick="copyToClipboard()">
+                                            <i class="bi bi-clipboard"></i> Copy
+                                        </button>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered table-striped mb-0" id="detailsTable">
+                                                <tbody>
+                                                    @foreach (DataColumn column in SelectedRow.Table.Columns)
+                                                    {
+                                                        <tr>
+                                                            <th style="width:30%; background-color: #f8f9fa;">@column.ColumnName</th>
+                                                            <td>@(SelectedRow[column]?.ToString() ?? "NULL")</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            @onclick="CloseModal">
+                        <i class="bi bi-x-circle"></i> Close
+                    </button>
+                    <button type="button"
+                            class="btn btn-primary"
+                            onclick="window.print()">
+                        <i class="bi bi-printer"></i> Print
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    function copyToClipboard() {
+        // Get the table content
+        const table = document.getElementById('detailsTable');
+        if (table) {
+            const range = document.createRange();
+            range.selectNode(table);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            try {
+                document.execCommand('copy');
+                // Optional: Show a toast notification
+                alert('Table data copied to clipboard!');
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+            }
+            window.getSelection().removeAllRanges();
         }
     }
-}
+</script>
+
+<!-- Add Font Awesome or Bootstrap Icons if not already included -->
+
+<style>
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1040;
+    }
+
+    .modal {
+        z-index: 1050;
+    }
+
+    .modal-content {
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        border: none;
+    }
+
+    .modal-header {
+        border-radius: 12px 12px 0 0;
+        padding: 1rem 1.5rem;
+    }
+
+        .modal-header .modal-title {
+            font-weight: 600;
+        }
+
+    .modal-body {
+        padding: 1.5rem;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #dee2e6;
+    }
+
+    /* Card styles in modal */
+    .modal .card {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+        .modal .card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+    .modal .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+    }
+
+    .modal .card-body {
+        padding: 1rem;
+    }
+
+        .modal .card-body dl {
+            margin-bottom: 0;
+        }
+
+        .modal .card-body dt {
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .modal .card-body dd {
+            color: #212529;
+            margin-bottom: 0.25rem;
+        }
+
+    /* Amount cards */
+    .modal .border-success {
+        border: 2px solid #28a745 !important;
+    }
+
+    .modal .border-danger {
+        border: 2px solid #dc3545 !important;
+    }
+
+    /* Status badges */
+    .badge {
+        padding: 0.35rem 0.75rem;
+        font-weight: 500;
+    }
+
+    /* Button styles */
+    .modal .btn {
+        padding: 0.4rem 1rem;
+        border-radius: 6px;
+    }
+
+        .modal .btn i {
+            margin-right: 6px;
+        }
+
+    /* Table styles in modal */
+    .modal .table th {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .modal .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    /* Scrollbar styling */
+    .modal-body::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .modal-body::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb {
+        background: #c1c7cd;
+        border-radius: 3px;
+    }
+
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: #a8b0b8;
+        }
+
+    /* Preview button animation */
+    .btn-outline-primary i {
+        transition: transform 0.2s;
+    }
+
+    .btn-outline-primary:hover i {
+        transform: scale(1.1);
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .modal-dialog {
+            margin: 0.5rem;
+        }
+
+        .modal-body {
+            padding: 1rem;
+        }
+
+        .modal .card-body dl.row {
+            flex-direction: column;
+        }
+
+        .modal .card-body dt {
+            width: 100%;
+            margin-bottom: 0.25rem;
+        }
+
+        .modal .card-body dd {
+            width: 100%;
+            margin-bottom: 0.75rem;
+            padding-left: 0.5rem;
+        }
+    }
+</style>
