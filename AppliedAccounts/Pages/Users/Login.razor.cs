@@ -9,12 +9,12 @@ namespace AppliedAccounts.Pages.Users
     {
 
         private AppliedGlobals.AppUserModel MyModel = new();
-        bool IsLogin { get; set; } = true;
-        bool IsError { get; set; } = false;
-        bool IsUserFound { get; set; } = false;
-        string ErrorMessage { get; set; }
-        int LanguageID { get; set; } = 1;                       // Default Language is 1 = English
-        private static readonly Lock _lock = new();
+        private bool IsLogin { get; set; } = true;
+        private bool IsError { get; set; } = false;
+        private bool IsUserFound { get; set; } = false;
+        private string ErrorMessage { get; set; }
+        private int LanguageID { get; set; } = 1;                       // Default Language is 1 = English
+        private string DBFile { get; set; } = string.Empty;
 
         public async void Submit()
         {
@@ -42,6 +42,8 @@ namespace AppliedAccounts.Pages.Users
                     _UserData.PIN = "0000";
                     _UserData.SessionGuid = _newGUID;
                     _UserData.LanguageID = LanguageID;
+
+                    MyModel.DataFile = _UserData.SqliteFile;
 
                     bool IsDBFileValid = false;
                     await userAuthStateProvider.UpdateAuthenticateState(_UserData);
@@ -111,8 +113,10 @@ namespace AppliedAccounts.Pages.Users
         {
             try
             {
-                using var conn = new SqliteConnection($"Data Source={dbPath}");
-                await conn.OpenAsync(); // Async version
+                using var connection = new SqliteConnection($"Data Source={dbPath}");
+                connection.Open(); // Sync version
+
+                AppGlobal.AppPaths.DBFile = MyModel.DataFile;
 
                 var updateDB = new AppliedDB.CreateDB.UpdateDB(dbPath, AppGlobal.AppPaths);
                 await updateDB.UpdateDatabaseAsync(); // Assuming async version exists

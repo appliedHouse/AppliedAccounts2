@@ -31,6 +31,7 @@ builder.Services.AddScoped<MessagesService>();
 builder.Services.AddScoped<GlobalService>();
 builder.Services.AddScoped<IMenuDatabaseInitializer, MenuDatabaseInitializer>();
 builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddScoped<ProgressService>();
 builder.Services.AddToastNotification(options =>
 {
     options.DefaultDuration = 8000;

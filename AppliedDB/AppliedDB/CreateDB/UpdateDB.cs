@@ -15,19 +15,7 @@ namespace AppliedDB.CreateDB
         public UpdateDB(string dbFile, AppValues.AppPath appPaths) 
         {
             Source = new(appPaths);
-
             MyConnection = Source.MyConnection;
-
-            //DBFile = dbFile;
-            //if(File.Exists(DBFile))
-            //{
-            //    MyConnection = new SqliteConnection($"Data Source={DBFile};");
-            //    Log.AppendLine($"Database file {DBFile} exists. Connection established.");
-            //}
-            //else
-            //{
-            //    Log.AppendLine($"Database file {DBFile} does not exist.");
-            //}
         }
 
         public async Task UpdateDatabaseAsync()
@@ -40,7 +28,7 @@ namespace AppliedDB.CreateDB
 
             if(MyConnection.State != System.Data.ConnectionState.Open)
             {
-                await MyConnection.OpenAsync();
+                MyConnection.Open();
                 Log.AppendLine("Database connection opened.");
             }
 
@@ -62,7 +50,7 @@ namespace AppliedDB.CreateDB
                         try
                         {
                             using SqliteCommand command = new SqliteCommand(createTableQuery, MyConnection);
-                            await command.ExecuteNonQueryAsync();
+                            command.ExecuteNonQuery();
 
                             // If we get here, the table was created successfully
                             if (tableName.Equals("Book")) { IsBook1Created = true; }
@@ -84,7 +72,7 @@ namespace AppliedDB.CreateDB
                     {
                         Log.AppendLine("DataTable Book created in update process");
                         DataMigration dataMigration = new(Source);
-                        dataMigration.Cash2Book();
+                        await dataMigration.Cash2BookAsync();
                         Log.AppendLine("Data Migrated from CashBook to Book");
                     }
                 }
