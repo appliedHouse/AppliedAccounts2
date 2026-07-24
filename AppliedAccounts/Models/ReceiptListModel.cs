@@ -46,7 +46,7 @@ namespace AppliedAccounts.Models
         #region Load Data
         public List<DataRow> LoadData()
         {
-            using var _DataTable = Source.GetTable(SQLQueries.Quries.ReceiptList(GetFilterText()));
+            using var _DataTable = Source.GetTable(Quries.ReceiptList(GetFilterText()));
             return [.. _DataTable.AsEnumerable()];
         }
         #endregion

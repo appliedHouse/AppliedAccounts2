@@ -1,7 +1,11 @@
 ﻿@code {
-    [Parameter]  public string Message {get; set;}
+    [Parameter]  public string? Message {get; set;} 
 }
 
-<div class="alert alert-warning" role="alert">
-    @Message....
-</div>
+
+@if (!string.IsNullOrEmpty(Message))
+{
+    <div class="alert alert-warning" role="alert">
+        @Message....
+    </div>
+}

@@ -1,0 +1,11 @@
+﻿@code {
+    [Parameter] public bool Visiable { get; set; }
+}
+
+@if (Visiable)
+{
+    <div class="alert alert-info d-flex align-items-center fs-6" role="alert" style="padding-inline-start: 50px;">
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        <span>Wait..... Printing Report.....</span>
+    </div>
+}

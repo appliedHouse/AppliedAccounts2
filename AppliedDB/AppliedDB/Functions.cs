@@ -138,14 +138,24 @@ namespace AppliedDB
 
         public static DataRow RemoveDBNull(this DataRow row)
         {
-            foreach (DataColumn column in row.Table.Columns)
+            var row2 = row;
+            try
             {
-                if (row[column] == DBNull.Value)
+                foreach (DataColumn column in row.Table.Columns)
                 {
-                    row[column] = null;
+                    if (row[column] == DBNull.Value)
+                    {
+                        row[column] = null;
+                    }
                 }
+                return row;
             }
-            return row;
+            catch (Exception)
+            {
+
+                return row2;
+            }
+            
         }
     }
 }

@@ -104,7 +104,8 @@ namespace AppliedDB
                 if (!string.IsNullOrEmpty(_Filter)) { _Text.Append($"WHERE {_Filter} "); }
 
                 MyCommand.CommandText = _Text.ToString(); ;
-                return GetDataTable(_Table, MyCommand);
+                var _table = GetDataTable(_Table, MyCommand);
+                return _table;
             }
             return new DataTable();
         }
@@ -441,6 +442,19 @@ namespace AppliedDB
                 }
             }
             return new();
+        }
+
+        public List<DataRow>? GetList(string Query)
+        {
+            if (AppPaths is not null)
+            {
+                var _Table = GetTable(Query);
+                if (_Table is not null)
+                {
+                    return _Table.AsEnumerable().ToList();
+                }
+            }
+            return null;
         }
 
         #endregion

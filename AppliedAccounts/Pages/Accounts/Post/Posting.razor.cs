@@ -1,9 +1,7 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models.Posting;
 using Microsoft.JSInterop;
-using static AppliedAccounts.Pages.Accounts.Post.Posting;
 using static AppliedGlobals.AppErums;
-
 
 namespace AppliedAccounts.Pages.Accounts.Post
 {
@@ -16,10 +14,11 @@ namespace AppliedAccounts.Pages.Accounts.Post
         public long PostingVoucherID { get; set; } = 0;
         public string PostingVoucher { get; set; } =string.Empty;
 
-
+        #region Constructor
         protected override async Task OnInitializedAsync()
         {
             MyModel.Source = new(AppGlobal.AppPaths);
+            MyModel.MsgClass = MsgService.MsgClass;
            
             MyModel.Source.SetKey("IsPosting", false, KeyTypes.Boolean, "Is posting is in progress..");
             MyViewModel = new(); ;
@@ -32,6 +31,7 @@ namespace AppliedAccounts.Pages.Accounts.Post
             await MyModel.LoadData(MyViewModel);
             await InvokeAsync(StateHasChanged);
         }
+        #endregion
 
         private async void OnPageChangedInternal(int page)
         {

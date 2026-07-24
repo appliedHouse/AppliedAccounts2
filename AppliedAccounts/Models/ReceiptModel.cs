@@ -10,6 +10,7 @@ using System.Data;
 using static AppliedDB.Enums;
 using MESSAGE = AppMessages.Enums.Messages;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
+using AppliedAccounts.Data.Mapping;
 
 
 namespace AppliedAccounts.Models
@@ -57,7 +58,6 @@ namespace AppliedAccounts.Models
         {
             AppGlobal = _AppGlobal;
             ReportService = new(AppGlobal);
-
         }
         public ReceiptModel(GlobalService _AppGlobal, int _ReceiptID)
         {
@@ -215,60 +215,12 @@ namespace AppliedAccounts.Models
             {
                 try
                 {
-                    var VoucherData = Source.GetReceiptVoucher(ReceiptID).AsEnumerable().ToList();
-
-                    if (VoucherData != null)
-                    {
-                        if (VoucherData.Count > 0)
-                        {
-
-                            MyVoucher.Master = VoucherData!.Select(first => new Master()
-                            {
-                                ID1 = first.Field<long>("ID1"),
-                                Vou_No = first.Field<string>("Vou_No") ?? "",
-                                Vou_Date = first.Field<DateTime>("Vou_Date"),
-                                Payer = first.Field<long>("Payer"),
-                                COA = first.Field<long>("COA"),
-                                Amount = first.Field<decimal>("Amount"),
-                                Ref_No = first.Field<string>("Ref_No") ?? "",
-                                Remarks = first.Field<string>("Remarks") ?? "",
-                                Comments = first.Field<string>("Comments") ?? "",
-                                Status = first.Field<string>("Status") ?? "",
-
-                                TitleCOA = first.Field<string>("TitleCOA") ?? "",
-                                TitlePayer = first.Field<string>("TitlePayer") ?? "",
-                            }).First() ?? new();
-
-                            MyVoucher.Details = [.. VoucherData.Select(row => new Detail()
-                            {
-                                ID2 = row.Field<int>("ID2"),
-                                TranID = row.Field<int>("TranID"),
-                                Sr_No = row.Field<int>("SR_NO"),
-                                Account = row.Field<int>("COA"),
-                                Employee = row.Field<int>("Employee"),
-                                Project = row.Field<int>("Project"),
-                                DR = row.Field<decimal>("DR"),
-                                CR = row.Field<decimal>("CR"),
-                                Description = row.Field<string>("Description") ?? "",
-                                Action = "get",
-
-                                TitleAccount = row.Field<string>("TitleAccount") ?? "",
-                                TitleProject = row.Field<string>("TitleProject") ?? "",
-                                TitleEmployee = row.Field<string>("TitleEmployee") ?? "",
-                            })];
-
-                            if (MyVoucher.Details.Count > 0)
-                            {
-                                MyVoucher.Detail = MyVoucher.Details.First();
-                            }
-
-                            return true;
-                        }
-                    }
+                    var VoucherList = Source.GetReceiptVoucher(ReceiptID).AsEnumerable().ToList();
+                    MyVoucher = VoucherList.ToReceiptModel() ?? NewVoucher();
                 }
-                catch (Exception)
+                catch (Exception error)
                 {
-
+                    MsgClass.Error($"ERROR: {error.Message}");
                 }
             }
             return false;
@@ -597,13 +549,14 @@ namespace AppliedAccounts.Models
         #region Print
         public async Task Print(ReportActionClass reportAction)
         {
+            IsWaiting = true;
             await Task.Run(() =>
             {
                 try
                 {
                     SetKeys();
                     ReceiptID = reportAction.VoucherID;
-                    ReportService = new(AppGlobal); ;                      // Initialize Report Service
+                    ReportService = new(AppGlobal); ;                       // Initialize Report Service
                     ReportService.ReportType = reportAction.PrintType;      // Assign Report Type 
                     GetReportData();                                        // Report Data Source Setup
                     UpdateReportModel();                                    // Update Report Model
@@ -611,7 +564,7 @@ namespace AppliedAccounts.Models
                     if (!ReportService.IsError) { ReportService.Print(); }  // Report Print / Preview / PDF / Excel / Word / Image / HTML
                     else
                     {
-                        MsgClass.Critical(MESSAGE.rptNotValidToPrint);     // Add Error Message to Page error view if Report is not valid
+                        MsgClass.Critical(MESSAGE.rptNotValidToPrint);      // Add Error Message to Page error view if Report is not valid
                     }
                 }
                 catch (Exception error)
@@ -620,6 +573,7 @@ namespace AppliedAccounts.Models
                 }
 
             });
+            IsWaiting = false;
         }
 
         public void GetReportData()
@@ -672,13 +626,12 @@ namespace AppliedAccounts.Models
         #region Get & Set Keys
         public void SetKeys()
         {
-            AppRegistry.SetKey(Source.DBFile, "Receipt", MyVoucher.Master.Vou_Date, KeyType.Date, "Receipt Page");
-
+            Source.SetKey("Receipt", MyVoucher.Master.Vou_Date, KeyType.Date);
         }
 
         public void GetKeys()
         {
-
+            MyVoucher.Master.Vou_Date = Source.GetDate("Receipt");
         }
         #endregion
 
@@ -774,5 +727,8 @@ namespace AppliedAccounts.Models
             public string Action { get; set; }
         }
         #endregion
+
+
+      
     }
 }

@@ -31,7 +31,7 @@
 
     }
 
-    private void Edit(int ReceiptID)
+    private void Edit(long ReceiptID)
     {
         AppGlobal.NavManager.NavigateTo($"/Accounts/Receipt/{ReceiptID}");
     }
@@ -112,7 +112,7 @@
                         {
                             @foreach (var Item in MyModel.DataList)
                             {
-                                int _ID = (int)Item["ID"];
+                                long _ID = (long)Item["ID"];
                                 var _VouDate = ((DateTime)Item["Vou_Date"]).ToString(Format.DDMMMYY);
                                 var _DocDate = Item["Doc_Date"] == DBNull.Value ? "" : ((DateTime)Item["Doc_Date"]).ToString(Format.DDMMMYY); ;
                                 var _Amount = ((decimal)Item["Amount"]).ToString(Format.Digit);

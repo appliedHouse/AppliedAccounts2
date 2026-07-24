@@ -1,0 +1,14 @@
+﻿@code {
+    [Parameter] public string Message { get; set; } = "No Error Page Message";
+}
+
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="alert alert-danger" role="alert">
+                @Message
+            </div>
+        </div>
+    </div>
+</div>

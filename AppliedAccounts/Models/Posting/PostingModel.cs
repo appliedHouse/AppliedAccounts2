@@ -16,7 +16,7 @@ namespace AppliedAccounts.Models.Posting
     {
         [Inject] public GlobalService AppGlobal { get; set; } = default!;
 
-        public MessageClass MsgClass { get; set; } = new();
+        public MessageClass MsgClass { get; set; } 
         public List<DataListModel> DataListModelList { get; set; } = new();
         public bool IsPosting { get; set; }
         public DataSource Source { get; set; }
@@ -154,6 +154,8 @@ namespace AppliedAccounts.Models.Posting
 
         public async Task DoVoucherPosting(long vouId, PostingViewModel model)
         {
+            MsgClass.ClearMessages();
+
             if (model.PostingType == 0) return;
 
             var postingModel = new VoucherPostingModel
@@ -162,9 +164,19 @@ namespace AppliedAccounts.Models.Posting
                 DetailTable = Source.GetTable(Tables.Book2, $"TranID={vouId}")
             };
 
-            MsgClass.ClearMessages();
+            if(postingModel.MasterTable.Rows.Count == 0)
+            {
+                MsgClass.Danger(Messages.PostingMasterRecordNotFound);
+                return;
+            }
 
-            var post = new CashBook(Source, postingModel);
+            if (postingModel.DetailTable.Rows.Count == 0)
+            {
+                MsgClass.Danger(Messages.PostingDetailRecordNotFound);
+                return;
+            }
+            
+            var post = new CashBook(Source, postingModel, MsgClass);
 
             switch (model.PostingType)
             {

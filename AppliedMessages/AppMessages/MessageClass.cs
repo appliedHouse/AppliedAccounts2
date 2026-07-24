@@ -38,7 +38,11 @@ namespace AppMessages
 
 
         #region Clear Message / Error List
-        public void ClearMessages() { MessageList.Clear(); }
+        public void ClearMessages()
+        {
+            MessageList.Clear();
+            Errors.Clear();
+        }
         #endregion
 
         #region Add Message in the List
@@ -110,7 +114,7 @@ namespace AppMessages
             Errors.Add(GetMessage(_Code, Class.Error));
         }
         #endregion
-        
+
         #region Danger
         public void Danger(string _Text)
         {
@@ -144,10 +148,7 @@ namespace AppMessages
             if (MsgConnection != null)
             {
                 if (MsgConnection.State != ConnectionState.Open) { MsgConnection.Open(); }
-
-                //SELECT * FROM [LanguageText] WHERE [Key] = 'Save' AND [Language] = 1
                 var _Query = "SELECT * FROM Messages WHERE [Code] = @Code AND [Language] = @Language";
-
                 using var _Command = new SqliteCommand(_Query, MsgConnection);
 
                 _Command.Parameters.AddWithValue("@Code", _Code.ToString());
@@ -170,7 +171,6 @@ namespace AppMessages
                     _Message.MessageID = -1;
                 }
             }
-
             return _Message;
         }
 
@@ -225,7 +225,7 @@ namespace AppMessages
         {
             if (messageList.Count > 0)
             {
-                foreach (Message message in messageList) 
+                foreach (Message message in messageList)
                 {
                     MessageList.Add(message);
                 }

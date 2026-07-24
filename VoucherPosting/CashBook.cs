@@ -16,7 +16,7 @@ namespace VoucherPosting
         public LedgerModel LedgerData { get; set; }
         public bool PostSuccessful { get; set; } = false;
         public bool UnPostSuccessful { get; set; } = false;
-        public MessageClass MsgClass { get; set; } = new MessageClass();
+        public MessageClass MsgClass { get; set; }
         public string Action { get; set; } = string.Empty;
         public string Vou_No { get; set; }
         public long Vou_ID { get; set; }
@@ -27,6 +27,19 @@ namespace VoucherPosting
         {
             Source = _Source;
             PostingData = _PostingModel;
+            GetVouNumber();
+
+            if (!string.IsNullOrEmpty(Vou_No))
+            {
+                LedgerData = new LedgerModel(Source, Vou_No);
+            }
+        }
+        
+        public CashBook(DataSource _Source, VoucherPostingModel _PostingModel, MessageClass msgClass)
+        {
+            Source = _Source;
+            PostingData = _PostingModel;
+            MsgClass = msgClass;
             GetVouNumber();
 
             if (!string.IsNullOrEmpty(Vou_No))
@@ -47,19 +60,20 @@ namespace VoucherPosting
 
         public async Task DoCashPosting()
         {
+            MsgClass.ClearMessages();
             await PostBook();
         }
 
         public async Task DoBankPosting()
         {
+            MsgClass.ClearMessages();
             await PostBook();
         }
 
 
         public async Task PostBook()
         {
-            MsgClass.ClearMessages();           // Clear all previous messages.
-
+        
             // Validation of Voucher
             if (!PostValidate()) { return; }
 
@@ -67,7 +81,7 @@ namespace VoucherPosting
             {
                 Source.BeginTransaction();
                 DataRow _MasterRow = PostingData.MasterTable.Rows[0];
-                int SrNo = 1;
+                int SrNo = 0;
 
                 #region Master Record
                 var LedgerRow = LedgerData.LedgerTable.NewRow();
@@ -93,7 +107,7 @@ namespace VoucherPosting
                 LedgerRow["Comments"] = DBNull.Value;
 
                 Source.Save(LedgerRow);
-                if (!Source.IsSaved)
+                if (!Source.IsSaved)                // if Not saved the first transaction.
                 {
                     MsgClass = Source.MsgClass;
                     Source.RollbackTransaction();
@@ -138,7 +152,7 @@ namespace VoucherPosting
 
                 #region Mark as Posted
 
-                DataRow _PostedRow = Source.GetDataRow(AppliedDB.Enums.Tables.Book, Vou_ID);
+                DataRow _PostedRow = Source.GetDataRow(AppliedDB.Enums.Tables.Book, Vou_ID)!;
                 if (_PostedRow != null)
                 {
                     _PostedRow["Status"] = "Posted";
@@ -150,7 +164,7 @@ namespace VoucherPosting
                 else
                 {
                     PostSuccessful = false;
-                    MsgClass.Success(Messages.TransactionRollback);
+                    MsgClass.Critical(Messages.TransactionRollback);
                     Source.RollbackTransaction();               // Otherwsie rollback
                 }
 
@@ -159,7 +173,7 @@ namespace VoucherPosting
             catch (Exception ex)
             {
                 Source.RollbackTransaction();
-                MsgClass.Critical(ex.Message);
+                MsgClass.Error(ex.Message);
             }
             await Task.FromResult(true);
         }
@@ -169,6 +183,19 @@ namespace VoucherPosting
             try
             {
                 MsgClass.ClearMessages();
+
+
+                if(PostingData.MasterTable == null || PostingData.DetailTable == null)
+                {
+                    MsgClass.Error(Messages.PostingDataIsNull);
+                    return false;
+                }
+
+                if(PostingData.DetailTable.Rows.Count == 0)
+                {
+                    MsgClass.Error(Messages.PostingDetailRecordNotFound);
+                    return false;
+                }
 
                 if (Source == null) { MsgClass.Error(Messages.DataSourceIsNull); }
                 if (Vou_ID == 0) { MsgClass.Error(Messages.VouNoNotDefineProperly); }
@@ -197,7 +224,7 @@ namespace VoucherPosting
             }
             catch (Exception error)
             {
-                MsgClass.Critical(error.Message);
+                MsgClass.Error(error.Message);
                 return false;
             }
 

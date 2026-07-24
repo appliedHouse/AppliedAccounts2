@@ -119,6 +119,7 @@ namespace AppliedAccounts.Services
 
     public interface IMessagesService
     {
+        MessageClass MsgClass { get; set; }
         void AddRange(MessageClass msgClass);
         void Add(string message);
 
