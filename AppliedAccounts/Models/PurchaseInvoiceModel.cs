@@ -32,7 +32,7 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> Inventory { get; set; }
         public List<CodeTitle> Taxes { get; set; }
         public List<CodeTitle> Units { get; set; }
-        public MessageClass MsgClass { get; set; } = new();
+        public MessagesService MsgService { get; set; } 
         public PrintService ReportService { get; set; }
         public DateTime LastVoucherDate { get; set; }
         public DateTime MaxVouDate { get; set; }
@@ -51,15 +51,12 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public PurchaseInvoiceModel() { }
-        public PurchaseInvoiceModel(GlobalService _AppGlobal)
-        {
-            AppGlobal = _AppGlobal;
-            Source = new DataSource(AppGlobal.AppPaths);
-        }
+       
 
-        public PurchaseInvoiceModel(GlobalService _AppGlobal, long _PurchaseInvoiceID)
+        public PurchaseInvoiceModel(GlobalService _AppGlobal, MessagesService msgService, long _PurchaseInvoiceID)
         {
             AppGlobal = _AppGlobal;
+            MsgService = msgService;
             PurchaseInvoiceID = _PurchaseInvoiceID;
             Source = new DataSource(AppGlobal.AppPaths);
             Start(PurchaseInvoiceID);
@@ -75,7 +72,6 @@ namespace AppliedAccounts.Models
                 if (AppGlobal is null) { return; }
                 Source ??= new(AppGlobal.AppPaths);
 
-                MsgClass = new();
                 MyVoucher = new();
                 LastVoucherDate = GetDate(Source.DBFile, "PInvDate");           // Purchase Invoice Date
 
@@ -99,7 +95,7 @@ namespace AppliedAccounts.Models
             }
             catch (Exception error)
             {
-                MsgClass.Error(error.Message);
+                MsgService.Error(error.Message);
             }
         }
 
@@ -242,7 +238,7 @@ namespace AppliedAccounts.Models
             }
             catch (Exception ex)
             {
-                MsgClass.Error(ex.Message);
+                MsgService.Error(ex.Message);
             }
             return false;
 
@@ -253,7 +249,7 @@ namespace AppliedAccounts.Models
         public bool IsVoucherValidated()            // Validate Master and Detail both of all record
         {
             bool IsValid = true;
-            MsgClass.ClearMessages();
+            MsgService.Clear();
             if (!IsTransValidated())                // Temp code. update in future 20-DEC-2025
             {
                 IsValid = false;
@@ -264,37 +260,36 @@ namespace AppliedAccounts.Models
         public bool IsTransValidated()
         {
             bool IsValid = true;
-            MsgClass ??= new();
-            MsgClass.ClearMessages();
+            MsgService.Clear();
 
-            if (MyVoucher.Master == null) { MsgClass.Add(MESSAGE.MasterRecordisNull); return false; }
-            if (MyVoucher.Details == null) { MsgClass.Add(MESSAGE.DetailRecordsisNull); return false; }
+            if (MyVoucher.Master == null) { MsgService.Error(MESSAGE.MasterRecordisNull); return false; }
+            if (MyVoucher.Details == null) { MsgService.Error(MESSAGE.DetailRecordsisNull); return false; }
 
-            if (MyVoucher.Master.Vou_No.Length == 0) { MsgClass.Add(MESSAGE.VouNoNotDefine); }
+            if (MyVoucher.Master.Vou_No.Length == 0) { MsgService.Error(MESSAGE.VouNoNotDefine); }
             if (!MyVoucher.Master.Vou_No.ToLower().Equals("new"))
             {
-                if (MyVoucher.Master.Vou_No.Length < 11) { MsgClass.Add(MESSAGE.VouNoNotDefineProperly); }
+                if (MyVoucher.Master.Vou_No.Length < 11) { MsgService.Error(MESSAGE.VouNoNotDefineProperly); }
             }
-            if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgClass.Add(MESSAGE.VouDateLess); }
-            if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgClass.Add(MESSAGE.VouDateMore); }
-            if (MyVoucher.Master.Company == 0) { MsgClass.Add(MESSAGE.Row_CompanyIDZero); }
+            if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgService.Error(MESSAGE.VouDateLess); }
+            if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgService.Error(MESSAGE.VouDateMore); }
+            if (MyVoucher.Master.Company == 0) { MsgService.Error(MESSAGE.Row_CompanyIDZero); }
            
-            if (MyVoucher.Master.Remarks.Length == 0) { MsgClass.Add(MESSAGE.Row_NoRemarks); }
-            if (MyVoucher.Master.Status.Length == 0) { MsgClass.Add(MESSAGE.Row_NoStatus); }
+            if (MyVoucher.Master.Remarks.Length == 0) { MsgService.Error(MESSAGE.Row_NoRemarks); }
+            if (MyVoucher.Master.Status.Length == 0) { MsgService.Error(MESSAGE.Row_NoStatus); }
 
-            if (MyVoucher.Detail.Sr_No == 0) { MsgClass.Add(MESSAGE.SerialNoIsZero); }
-            if (MyVoucher.Detail.Inventory == 0) { MsgClass.Add(MESSAGE.Row_InventoryIDZero); }
+            if (MyVoucher.Detail.Sr_No == 0) { MsgService.Error(MESSAGE.SerialNoIsZero); }
+            if (MyVoucher.Detail.Inventory == 0) { MsgService.Error(MESSAGE.Row_InventoryIDZero); }
 
-            if (MyVoucher.Detail.Unit == 0) { MsgClass.Add(MESSAGE.Row_UnitIDZero); }
-            if (MyVoucher.Detail.Qty == 0) { MsgClass.Add(MESSAGE.Row_QtyZero); }
-            if (MyVoucher.Detail.Rate == 0) { MsgClass.Add(MESSAGE.Row_RateZero); }
-            if (MyVoucher.Detail.Gross == 0) { MsgClass.Add(MESSAGE.Row_GrossAmountZero); }
-            if (MyVoucher.Detail.Description.Length == 0) { MsgClass.Add(MESSAGE.DescriptionIsNothing); }
-            if (MsgClass.Count > 0) { IsValid = false; }
+            if (MyVoucher.Detail.Unit == 0) { MsgService.Error(MESSAGE.Row_UnitIDZero); }
+            if (MyVoucher.Detail.Qty == 0) { MsgService.Error(MESSAGE.Row_QtyZero); }
+            if (MyVoucher.Detail.Rate == 0) { MsgService.Error(MESSAGE.Row_RateZero); }
+            if (MyVoucher.Detail.Gross == 0) { MsgService.Error(MESSAGE.Row_GrossAmountZero); }
+            if (MyVoucher.Detail.Description.Length == 0) { MsgService.Error(MESSAGE.DescriptionIsNothing); }
+            if (MsgService.Count > 0) { IsValid = false; }
 
             if (MyVoucher.Detail.TaxRate == 0)
             {
-                if (MyVoucher.Detail.TaxID == 0) { MsgClass.Add(MESSAGE.Row_TaxIDZero); }
+                if (MyVoucher.Detail.TaxID == 0) { MsgService.Error(MESSAGE.Row_TaxIDZero); }
             }
             return IsValid;
         }
@@ -436,7 +431,7 @@ namespace AppliedAccounts.Models
             }
             else
             {
-                MsgClass.Add(MESSAGE.RecordNotValidated);
+                MsgService.Critical(MESSAGE.RecordNotValidated);
             }
             CalculateTotal();
 
@@ -448,7 +443,6 @@ namespace AppliedAccounts.Models
 
 
             IsWaiting = true;
-            MsgClass = new();
             bool isSaved = true;
 
             try
@@ -480,7 +474,7 @@ namespace AppliedAccounts.Models
 
                 if (!Validate_Master(masterRow))
                 {
-                    MsgClass.Add(MESSAGE.RecordNotValidated);
+                    MsgService.Critical(MESSAGE.RecordNotValidated);
                     return false;
                 }
 
@@ -496,7 +490,7 @@ namespace AppliedAccounts.Models
 
                 if (!masterCommand.SaveChanges())
                 {
-                    MsgClass.Add(MESSAGE.RowNotUpdated);
+                    MsgService.Critical(MESSAGE.RowNotUpdated);
                     isSaved = false;
                 }
 
@@ -521,7 +515,7 @@ namespace AppliedAccounts.Models
 
                         if (!deleteCommand.DeleteRow())
                         {
-                            MsgClass.Add(MESSAGE.RowNotDeleted);
+                            MsgService.Critical(MESSAGE.RowNotDeleted);
                             isSaved = false;
                             break;
                         }
@@ -562,7 +556,7 @@ namespace AppliedAccounts.Models
 
                         if (!Validate_Detail(detailRow))
                         {
-                            MsgClass.Add(MESSAGE.RecordNotValidated);
+                            MsgService.Critical(MESSAGE.RecordNotValidated);
                             isSaved = false;
                             break;
                         }
@@ -571,7 +565,7 @@ namespace AppliedAccounts.Models
 
                         if (!detailCommand.SaveChanges())
                         {
-                            MsgClass.Add(MESSAGE.RowNotUpdated);
+                            MsgService.Critical(MESSAGE.RowNotUpdated);
                             isSaved = false;
                             break;
                         }
@@ -598,7 +592,7 @@ namespace AppliedAccounts.Models
             catch (Exception ex)
             {
                 Source.RollbackTransaction();
-                MsgClass.Critical(ex.Message);
+                MsgService.Critical(ex.Message);
                 isSaved = false;
             }
             finally
@@ -659,7 +653,7 @@ namespace AppliedAccounts.Models
             }
             catch (Exception error)
             {
-                MsgClass.Add(error.Message);
+                MsgService.Error(error);
             }
         }
         public ReportData GetReportData()

@@ -1,9 +1,8 @@
 ﻿@using AppMessages;
-@using AppliedAccounts.Data;
 
 @code {
     [Parameter]
-    public AppMessages.MessageClass MsgClass { get; set; }
+    public MessagesService MsgService { get; set; }
 }
 
 <style>
@@ -23,12 +22,12 @@
 </style>
 
 
-@if (MsgClass is not null)
+@if (MsgService is not null)
 {
-    @if (MsgClass.Count > 0)
+    @if (MsgService.Count > 0)
     {
         <div class="messages">
-            @foreach (var Message in MsgClass.MessageList)
+            @foreach (var Message in MsgService.MsgClass.MessageList)
             {
                 @if (Message.MessageClass.Equals(Enums.Class.Error))
                 {
@@ -87,7 +86,7 @@
         </div>
 
         <div class="errors">
-            @foreach (var Message in MsgClass.Errors)
+            @foreach (var Message in MsgService.MsgClass.Errors)
             {
                 @if (Message.MessageClass.Equals(Enums.Class.Error))
                 {

@@ -33,7 +33,7 @@ namespace AppliedAccounts.Pages.Sale
         #region Edit
         public void Edit(long ID)
         {
-            NavManager.NavigateTo($"/Sale/SaleInvoice/{ID}");
+            AppGlobal.NavManager.NavigateTo($"/Sale/SaleInvoice/{ID}");
         }
         #endregion
         #region Select All and Select One
@@ -84,14 +84,14 @@ namespace AppliedAccounts.Pages.Sale
                     {
                         foreach (var message in ReportService.MyMessage)
                         {
-                            MyModel.MsgClass.Error(message);
+                            MyModel.MsgService.Error(message);
                         }
                     }
 
                 }
                 catch (Exception error)
                 {
-                    MyModel.MsgClass.Add(error.Message);
+                    MyModel.MsgService.Critical(error.Message);
                 }
             }
 
@@ -159,7 +159,7 @@ namespace AppliedAccounts.Pages.Sale
                     {
                         foreach (var message in ReportService.MyMessage)
                         {
-                            MyModel.MsgClass.Error(message);
+                            MyModel.MsgService.Error(message);
                         }
                     }
                 }
@@ -170,7 +170,7 @@ namespace AppliedAccounts.Pages.Sale
             }
             catch (Exception error)
             {
-                MyModel.MsgClass.Add(error.Message);
+                MyModel.MsgService.Error(error);
             }
 
         }
@@ -236,7 +236,7 @@ namespace AppliedAccounts.Pages.Sale
             }
             catch (Exception)
             {
-                MyModel.MsgClass.Add(MESSAGE.Default);
+                MyModel.MsgService.Error(MESSAGE.Default);
             }
 
         }

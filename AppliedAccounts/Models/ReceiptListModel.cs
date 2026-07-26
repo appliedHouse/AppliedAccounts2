@@ -1,7 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
 using SQLQueries;
 using System.Data;
 using System.Text;
@@ -23,19 +22,19 @@ namespace AppliedAccounts.Models
         public long PayerID { get; set; }
         public Tables Table { get; set; }
         public string SearchText { get; set; }
-        public MessageClass MsgClass { get; set; }
+        public MessagesService MsgService { get; set; }
         public DateTime DT_Start { get; set; }
         public DateTime DT_End { get; set; }
         public bool PageIsValid { get; set; } = false;
         public PrintService ReportService { get; set; }
         #endregion
 
-        public ReceiptListModel(GlobalService _AppGlobal)
+        public ReceiptListModel(GlobalService _AppGlobal, MessagesService msgService)
         {
             AppGlobal = _AppGlobal;
+            MsgService = msgService; 
             Table = Tables.view_Receipts;
             Source = new DataSource(AppGlobal.AppPaths);
-            MsgClass = new();
             DT_Start = AppRegistry.GetDate(Source.DBFile, "rcptFrom");
             DT_End = AppRegistry.GetDate(Source.DBFile, "rcptTo");
             SearchText = AppRegistry.GetText(Source.DBFile, "rcptSearch");
@@ -104,12 +103,12 @@ namespace AppliedAccounts.Models
                     if (!ReportService.IsError) { ReportService.Print(); }  // Report Print / Preview / PDF / Excel / Word / Image / HTML
                     else
                     {
-                        MsgClass.Critical(MESSAGES.rptNotValidToPrint);     // Add Error Message to Page error view if Report is not valid
+                        MsgService.Critical(MESSAGES.rptNotValidToPrint);     // Add Error Message to Page error view if Report is not valid
                     }
                 }
                 catch (Exception error)
                 {
-                    MsgClass.Add(error.Message);
+                    MsgService.Error(error);
                 }
 
             });
@@ -123,7 +122,7 @@ namespace AppliedAccounts.Models
             if (_Table.Columns.Count == 0)
             {
                 ReportService.IsError = true;
-                MsgClass.Error(MESSAGES.rptDataTableIsNull);
+                MsgService.Error(MESSAGES.rptDataTableIsNull);
             }
             else
             {

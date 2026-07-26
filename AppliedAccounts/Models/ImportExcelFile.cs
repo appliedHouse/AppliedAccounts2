@@ -86,7 +86,7 @@ namespace AppliedAccounts.Models
         {
             bool _Result = false;
             int _Records = 0;
-            string _Path = Connections.GetTempDBPath();
+            string _Path = Source.MyConnections.GetTempDBPath(); // Connections.GetTempDBPath();
             string _GUID = Guid.NewGuid().ToString();
             string _Title = $"Import file {ExcelFile} dated {DateTime.Now}";
             string _OldFile = AppRegistry.GetText(AppGlobal.DBFile, ExcelImportRegistry);

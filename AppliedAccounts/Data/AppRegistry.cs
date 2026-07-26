@@ -124,7 +124,7 @@ namespace AppliedAccounts.Data
             }
             catch (Exception)
             {
-
+               
                 return 0;
             }
 

@@ -16,7 +16,7 @@ namespace AppliedAccounts.Models
         public List<CustomerVM> Records { get; set; } = [];
         public List<DataRow> Data { get; set; } = new();
         public DataRow? MyDataRow { get; set; }
-        public MessageClass MsgClass { get; set; }
+        public MessagesService MsgService { get; set; }
         public bool RecordNotFound { get; set; } = false;
         public string SearchText { get; set; } = string.Empty;
         public List<DataRow> CustomerList { get; set; }
@@ -25,10 +25,10 @@ namespace AppliedAccounts.Models
         #region Constructor
         public CustomersModel() { }
 
-        public CustomersModel(GlobalService _AppGlobal)
+        public CustomersModel(GlobalService _AppGlobal, MessagesService msgService)
         {
             AppGlobal = _AppGlobal;
-            MsgClass = new();
+            MsgService = msgService;
             Source = new(AppGlobal.AppPaths);
             Data = Source.GetList(Query.CustomersList);
             CustomerList = [..Data.AsEnumerable()];
@@ -116,13 +116,14 @@ namespace AppliedAccounts.Models
                 }
                 else
                 {
-                    MsgClass.Alert(AppMessages.Enums.Messages.RecordNotSaved);
+                    MsgService.Alert(AppMessages.Enums.Messages.RecordNotSaved);
                 }
                 return _DataRow;
+             
             }
             catch (Exception ex)
             {
-                MsgClass.Alert(ex.Message);
+                MsgService.Error(ex);
             }
             return null;
             
@@ -199,16 +200,16 @@ namespace AppliedAccounts.Models
         private bool Validate(DataRow _Row)
         {
             bool _result = true;
-            MsgClass = new();
+            
 
-            if (_Row["ID"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.IDIsNull); _result = false; }
-            if (_Row["Code"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.CodeIsNull); _result = false; }
-            if (_Row["Title"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.TitleIsNull); _result = false; }
-            if (_Row["City"] == null) { MsgClass.Alert(AppMessages.Enums.Messages.CityIsZero); _result = false; }
+            if (_Row["ID"] == null) { MsgService.Error(AppMessages.Enums.Messages.IDIsNull); _result = false; }
+            if (_Row["Code"] == null) { MsgService.Error(AppMessages.Enums.Messages.CodeIsNull); _result = false; }
+            if (_Row["Title"] == null) { MsgService.Error(AppMessages.Enums.Messages.TitleIsNull); _result = false; }
+            if (_Row["City"] == null) { MsgService.Error(AppMessages.Enums.Messages.CityIsZero); _result = false; }
 
-            if (((string)_Row["Code"]).Length == 0) { MsgClass.Alert(AppMessages.Enums.Messages.CodeIsZero); _result = false; }
-            if (((string)_Row["Title"]).Length == 0) { MsgClass.Alert(AppMessages.Enums.Messages.TitleIsZero); _result = false; }
-            if (((string)_Row["City"]).Length == 0) { MsgClass.Alert(AppMessages.Enums.Messages.CityIsZero); _result = false; }
+            if (((string)_Row["Code"]).Length == 0) { MsgService.Error(AppMessages.Enums.Messages.CodeIsZero); _result = false; }
+            if (((string)_Row["Title"]).Length == 0) { MsgService.Error(AppMessages.Enums.Messages.TitleIsZero); _result = false; }
+            if (((string)_Row["City"]).Length == 0) { MsgService.Error(AppMessages.Enums.Messages.CityIsZero); _result = false; }
 
             return _result;
         }

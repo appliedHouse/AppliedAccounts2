@@ -7,9 +7,9 @@ using static AppMessages.Enums;
 
 namespace VoucherPosting
 {
-    internal class BillPayable
+    public partial class BillPayable
     {
-        public MessageClass MsgClass { get; set; } = new();
+        public MessageClass MsgClass { get; set; }
         public DataSource Source { get; set; }
 
 
@@ -18,7 +18,6 @@ namespace VoucherPosting
         {
             if (Source == null)
             {
-                MsgClass = new();
                 MsgClass.Warning(Messages.DataSourceIsNull);
                 return false;
             }
@@ -67,17 +66,6 @@ namespace VoucherPosting
 
                 int SRNO = 1;
                 string Vou_No = PurchaseInvoice.Rows[0]["Vou_No"].ToString()!;
-
-                //#region Check the vocher is already exist in the ledger ? or not exist.
-
-                //var vw_Ledger = tb_Ledger.AsDataView();
-                //vw_Ledger.RowFilter = $"Vou_No='{Vou_No}'";
-                //if (vw_Ledger.Count > 0)
-                //{
-                //    MsgClass.Warning(Messages.PurchasedInvoiceVoucherAlreadyPosted);
-
-                //}
-                //#endregion
 
                 if (MsgClass.Count == 0 && PurchasesInvoiceValidation())
                 {

@@ -2,9 +2,10 @@
 @using AppliedAccounts.Component.Libs
 
 @inject GlobalService AppGlobal
+@inject MessagesService MsgService
 
 <PageHeading Text="VOUCHER UN-POST" />
-<PageErrors Messages="@MyModel.MsgClass" />
+<ShowMessages MsgService="MsgService" />
 
 
 <!-- HEADING MENU -->

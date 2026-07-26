@@ -15,7 +15,7 @@ namespace AppliedAccounts.Pages.Sale
 
         protected async override Task OnInitializedAsync()
         {
-            Model = new(AppGlobal);
+            Model = new(AppGlobal, MsgService);
         }
 
         public void Back() => AppGlobal.NavManager.GoTo(MenuID.SaleDictionery);

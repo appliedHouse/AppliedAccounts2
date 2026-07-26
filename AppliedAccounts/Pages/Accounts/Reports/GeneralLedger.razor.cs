@@ -6,6 +6,7 @@ using AppMessages;
 using AppReports;
 using Microsoft.AspNetCore.Components;
 using System.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using Format = AppliedGlobals.AppValues.Format;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
 using MESSAGES = AppMessages.Enums.Messages;
@@ -17,7 +18,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
         public DataSource Source { get; set; }
         public GLModel MyModel { get; set; } = new();
-        public MessageClass MsgClass { get; set; } = new();
+        MessagesService MsgService { get; set; }
         public string DBFile { get; set; }
         public bool IsPageValid { get; set; }
         public bool IsPrinting { get; set; }
@@ -30,7 +31,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
         public void LoadData()
         {
-            MsgClass = new();
+            
             Source ??= new(AppGlobal.AppPaths);
                
             DBFile = AppGlobal.DBFile;
@@ -104,7 +105,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Print
         public async void Print(ReportActionClass PrintAction)
         {
-            MsgClass = new();           // Clear all previous messages - refresh
+                       // Clear all previous messages - refresh
             IsPrinting = true;
             await InvokeAsync(StateHasChanged);
 
@@ -126,7 +127,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             }
             catch (Exception error)
             {
-                MsgClass.Error(error.Message);
+                MsgService.Error(error);
             }
 
             IsPrinting = false;
@@ -140,7 +141,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             if (MyModel.COAID == 0)
             {
                 ReportService.IsError = true;
-                MsgClass.Add(MESSAGES.AccountIDIsZero);
+                MsgService.Error(MESSAGES.AccountIDIsZero);
                 return _Result;
             }
 
@@ -166,7 +167,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             if (_ReportTable.Columns.Count == 0)
             {
                 ReportService.IsError = false;
-                MsgClass.Add(MESSAGES.NoRecordFound);
+                MsgService.Error(MESSAGES.NoRecordFound);
             }
 
             _Result.DataSetName = "dsname_Ledger";
@@ -198,7 +199,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Print Company
         public async void PrintCompany(ReportActionClass PrintAction)
         {
-            MsgClass = new();           // Clear all previous messages - refresh
+                       // Clear all previous messages - refresh
             IsPrinting = true;
             await InvokeAsync(StateHasChanged);
 
@@ -216,7 +217,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             }
             catch (Exception error)
             {
-                MsgClass.Error(error.Message);
+                MsgService.Error(error);
             }
 
             IsPrinting = false;
@@ -245,7 +246,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             else
             {
                 ReportService.IsError = true;
-                MsgClass.Error(MESSAGES.rptRDLCNotExist + " " + ReportService.Model.InputReport.FileFullName);
+                MsgService.Error(MESSAGES.rptRDLCNotExist + " " + ReportService.Model.InputReport.FileFullName);
                 return false;
             }
             return true;
@@ -258,7 +259,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             if (MyModel.CompanyID == 0)
             {
                 ReportService.IsError = true;
-                MsgClass.Add(MESSAGES.AccountIDIsZero);
+                MsgService.Error(MESSAGES.AccountIDIsZero);
                 return _Result;
             }
 
@@ -275,8 +276,8 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             if (string.IsNullOrEmpty(_Nature))
             {
                 ReportService.IsError = true;
-                MsgClass.Add(MESSAGES.CompanyLedgerAC_Notdefined);
-                ToastService.ShowError(MsgClass.MessageList.Last().MessageText);            // show Last Message of the list
+                MsgService.Error(MESSAGES.CompanyLedgerAC_Notdefined);
+                ToastService.ShowError(MsgService.MsgClass.MessageList.Last().MessageText);            // show Last Message of the list
                 return _Result;
             }
 
@@ -294,7 +295,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             if (_ReportTable.Columns.Count == 0)
             {
                 ReportService.IsError = false;
-                MsgClass.Add(MESSAGES.NoRecordFound);
+                MsgService.Error(MESSAGES.NoRecordFound);
             }
 
             _Result.ReportTable = _ReportTable;
@@ -312,7 +313,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Print Employee
         public async void PrintEmployee(ReportActionClass PrintAction)
         {
-            MsgClass = new();           // Clear all previous messages - refresh
+                       // Clear all previous messages - refresh
             IsPrinting = true;
             await InvokeAsync(StateHasChanged);
             try
@@ -328,7 +329,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             }
             catch (Exception error)
             {
-                MsgClass.Error(error.Message);
+                MsgService.Error(error);
             }
             IsPrinting = false;
             await InvokeAsync(StateHasChanged);
@@ -356,7 +357,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             else
             {
                 ReportService.IsError = true;
-                MsgClass.Error(MESSAGES.rptRDLCNotExist + " " + ReportService.Model.InputReport.FileFullName);
+                MsgService.Error(MESSAGES.rptRDLCNotExist + " " + ReportService.Model.InputReport.FileFullName);
                 return false;
             }
             return true;
@@ -369,7 +370,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             if (MyModel.EmployeeID == 0)
             {
                 ReportService.IsError = true;
-                MsgClass.Add(MESSAGES.EmployeeIDIsZero);
+                MsgService.Error(MESSAGES.EmployeeIDIsZero);
                 return _Result;
             }
 
@@ -397,7 +398,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             if (_ReportTable.Columns.Count == 0)
             {
                 ReportService.IsError = false;
-                MsgClass.Add(MESSAGES.NoRecordFound);
+                MsgService.Error(MESSAGES.NoRecordFound);
             }
 
             _Result.ReportTable = _ReportTable;
@@ -414,7 +415,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Print Project
         public async void PrintProject(ReportActionClass PrintAction)
         {
-            MsgClass = new();           // Clear all previous messages - refresh
+                       // Clear all previous messages - refresh
             IsPrinting = true;
             await InvokeAsync(StateHasChanged); await Task.Delay(100);
             try
@@ -430,7 +431,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             }
             catch (Exception error)
             {
-                MsgClass.Error(error.Message);
+                MsgService.Error(error);
             }
 
             IsPrinting = false;
@@ -458,7 +459,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             else
             {
                 ReportService.IsError = true;
-                MsgClass.Error(MESSAGES.rptRDLCNotExist + " " + ReportService.Model.InputReport.FileFullName);
+                MsgService.Error(MESSAGES.rptRDLCNotExist + " " + ReportService.Model.InputReport.FileFullName);
                 return false;
             }
             return true;
@@ -470,7 +471,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             if (MyModel.ProjectID == 0)
             {
                 ReportService.IsError = true;
-                MsgClass.Add(MESSAGES.ProjectIDIsZero);
+                MsgService.Error(MESSAGES.ProjectIDIsZero);
                 return _Result;
             }
 
@@ -499,7 +500,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             if (_ReportTable.Columns.Count == 0)
             {
                 ReportService.IsError = false;
-                MsgClass.Add(MESSAGES.NoRecordFound);
+                MsgService.Error(MESSAGES.NoRecordFound);
             }
 
             _Result.ReportTable = _ReportTable;

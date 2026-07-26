@@ -1,15 +1,14 @@
 ﻿using AppliedDB;
-using AppMessages;
-using Menus;
 using System.Data;
 using AppliedAccounts.Models;
 using static AppliedDB.Enums;
+using AppliedAccounts.Services;
 
 namespace AppliedAccounts.Pages.Stock.Directory
 {
     public partial class StockDirectory
     {
-        public MessageClass MsgClass { get; set; } = new();
+        public MessagesService MsgService { get; set; }
 
         public CodeTitleModel MyModel { get; set; } = new();
         public DataSource Source { get; set; }
@@ -123,7 +122,7 @@ namespace AppliedAccounts.Pages.Stock.Directory
             }
             else
             {
-                MsgClass.Critical(AppMessages.Enums.Messages.DataTableNotFound);
+                MsgService.Critical(AppMessages.Enums.Messages.DataTableNotFound);
             }
         }
 

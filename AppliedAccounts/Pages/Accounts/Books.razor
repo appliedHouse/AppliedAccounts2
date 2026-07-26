@@ -23,7 +23,7 @@
     protected override void OnInitialized()
     {
         Start();
-        MyModel.MsgClass = MsgService.MsgClass;
+        MyModel.MsgService = MsgService;
     }
 
     private string ClearTotal()
@@ -48,7 +48,7 @@
 </style>
 
 <PageHeading Text="CASH OR BANK BOOK" />
-<PageErrors Messages="@MyModel.MsgClass" />
+<PageErrors Messages="@MyModel.MsgService" />
 
 @if (MyModel.IsWaiting)
 {

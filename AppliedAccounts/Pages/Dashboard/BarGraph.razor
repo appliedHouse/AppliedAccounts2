@@ -1,5 +1,6 @@
 ﻿@inject IJSRuntime JSRuntime
 
+
 <div class="canvas">
     <canvas id="myChart"></canvas>
 </div>
@@ -109,54 +110,3 @@
         });
     }
 </script>
-
-@* <script>
-    function renderChart(chartType, labels, dataValues, labelTitle, bgColors, bdrColors) {
-        const ctx = document.getElementById('myChart');
-
-        new Chart(ctx, {
-            type: chartType,
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: labelTitle,
-                    data: dataValues,
-                    backgroundColor: bgColors,
-                    borderColor: bdrColors,
-                    borderWidth: 1,
-                    
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true, // Allow the canvas to stretch to the container
-                 plugins: {
-                    legend: {
-                        display: true // Optional: Hides the legend (dataset label)
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                           backgroundColor: '#FFB1C1',
-                        },
-                    },
-                    x: {
-                        title: {
-                            display: false,
-                        }
-                    }
-                },
-                datalabels: {
-                    clamp: true,
-                    anchor: 'end',
-                    align: 'bottom',
-                            // ...other options
-                }
-            }
-        });
-    }
-</script> *@
-

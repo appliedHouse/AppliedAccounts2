@@ -1,6 +1,5 @@
 ﻿using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
 
 namespace AppliedAccounts.Models.Interface
 {
@@ -9,7 +8,7 @@ namespace AppliedAccounts.Models.Interface
         GlobalService AppGlobal { get; set; }
         DateTime LastVoucherDate { get; set; }
         DateTime MaxVouDate { get; set; }
-        MessageClass MsgClass { get; set; }
+        MessagesService MsgService { get; set; }
         PrintService ReportService { get; set; }
         DataSource Source { get; set; }
         List<CodeTitle> Companies { get; set; }

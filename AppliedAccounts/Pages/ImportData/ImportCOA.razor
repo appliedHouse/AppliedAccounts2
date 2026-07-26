@@ -1,11 +1,12 @@
 ﻿@page "/ImportCOA"
+@using AppliedAccounts.Component.Libs
 @using AppliedAccounts.Models
 @using AppliedAccounts.Services
 @using System.Data
-@using MESSAGES = AppMessages.Enums.Messages;
 
 @attribute [Authorize]
 @inject GlobalService AppGlobal
+@inject MessagesService MsgService
 
 @code {
     private bool PageIsValid { get; set; }
@@ -14,33 +15,21 @@
 
     protected override void OnInitialized()
     {
-        MyModel = new ImportCOAModel(AppGlobal);
+        MyModel = new ImportCOAModel(AppGlobal, MsgService);
 
 
         PageIsValid = true;
         if (AppGlobal is null) { PageIsValid = false; }
         if (MyModel is null) { PageIsValid = false; }
-        // else
-        // {
-        //     if(MyModel.ImportedData is null)  { PageIsValid = false; }
-        //     else { if (MyModel.ImportedData.Count == 0)
-        //         { PageIsValid = false; } }
-        // }
-
-
     }
 
     private async Task TriggerFileInput()
     {
         await AppGlobal.JS.InvokeVoidAsync("triggerFileUpload");
     }
-
-    
-
-
 }
 
-<ShowPageHeading PageTitle="Import Chart of Accounts" />
+<PageHeading Text="Import Chart of Accounts" />
 
 @if (ShowSpinner)
 {
@@ -141,11 +130,7 @@ else
             <span>No data available to display.</span>
         }
     </div>
-    
 }
-
-
-
 
 <script>
     // Close the alert after 10 seconds

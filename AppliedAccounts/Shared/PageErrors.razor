@@ -1,20 +1,18 @@
-﻿@using AppMessages;
-@using AppliedAccounts.Data;
+﻿@using AppMessages
 
 @code {
     [Parameter]
-    public MessageClass Messages { get; set; }
+    public MessageClass MsgClass { get; set; } = new();
 
     protected override void OnInitialized()
     {
-        Messages.MessageList ??= new();
-        Messages.Errors ??= new();
+        MsgClass.MessageList ??= new();
+        MsgClass.Errors ??= new();
     }
 
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
-        //Messages.Clear();
     }
 }
 
@@ -25,14 +23,14 @@
         margin: 1px;
         padding: 1px;
     }
-    .messages {
+    .MsgClass {
         margin-Top: 5px;
         margin-bottom: 10px;
     }
 </style>
 
-<div class="messages">
-    @foreach (var Message in Messages.MessageList)
+<div class="MsgClass">
+    @foreach (var Message in MsgClass.MessageList)
     {
         @if (Message.MessageClass.Equals(Enums.Class.Alert))
         {
@@ -94,7 +92,7 @@
 
     }
     
-    @foreach (var Message in Messages.Errors)
+    @foreach (var Message in MsgClass.Errors)
     {
         @if (Message.MessageClass.Equals(Enums.Class.Error))
         {

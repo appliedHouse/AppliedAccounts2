@@ -1,8 +1,6 @@
 ﻿using AppliedAccounts.Pages.Accounts.Post;
 using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
-using Microsoft.AspNetCore.Components;
 using System.Data;
 using VoucherPosting;
 using static AppliedAccounts.Pages.Accounts.Post.Posting;
@@ -14,9 +12,8 @@ namespace AppliedAccounts.Models.Posting
 {
     public class PostingModel
     {
-        [Inject] public GlobalService AppGlobal { get; set; } = default!;
-
-        public MessageClass MsgClass { get; set; } 
+        public GlobalService AppGlobal { get; set; } 
+        public Services.MessagesService MsgService { get; set; } 
         public List<DataListModel> DataListModelList { get; set; } = new();
         public bool IsPosting { get; set; }
         public DataSource Source { get; set; }
@@ -27,6 +24,19 @@ namespace AppliedAccounts.Models.Posting
         private List<long> _bankIds;
 
         #region Init
+
+        public PostingModel(GlobalService appGlobal)
+        {
+            AppGlobal = appGlobal;
+            Source = new(appGlobal.AppPaths);
+        }
+
+        public PostingModel(GlobalService appGlobal, Services.MessagesService msgService)
+        {
+            AppGlobal = appGlobal;
+            MsgService = msgService;
+            Source = new(appGlobal.AppPaths);
+        }
 
         public void Init()
         {
@@ -154,7 +164,7 @@ namespace AppliedAccounts.Models.Posting
 
         public async Task DoVoucherPosting(long vouId, PostingViewModel model)
         {
-            MsgClass.ClearMessages();
+            MsgService.Clear();
 
             if (model.PostingType == 0) return;
 
@@ -166,17 +176,17 @@ namespace AppliedAccounts.Models.Posting
 
             if(postingModel.MasterTable.Rows.Count == 0)
             {
-                MsgClass.Danger(Messages.PostingMasterRecordNotFound);
+                MsgService.Danger(Messages.PostingMasterRecordNotFound);
                 return;
             }
 
             if (postingModel.DetailTable.Rows.Count == 0)
             {
-                MsgClass.Danger(Messages.PostingDetailRecordNotFound);
+                MsgService.Danger(Messages.PostingDetailRecordNotFound);
                 return;
             }
             
-            var post = new CashBook(Source, postingModel, MsgClass);
+            var post = new CashBook(Source, postingModel, MsgService.MsgClass);
 
             switch (model.PostingType)
             {
@@ -194,12 +204,12 @@ namespace AppliedAccounts.Models.Posting
 
             if (post.PostSuccessful)
             {
-                MsgClass.Success(Messages.Saved);
+                MsgService.Success(Messages.Saved);
                 await LoadData(model); // ✅ FIXED
             }
             else
             {
-                MsgClass = post.MsgClass;
+                MsgService.MsgClass = post.MsgClass;
             }
         }
 

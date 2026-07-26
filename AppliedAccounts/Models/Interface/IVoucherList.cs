@@ -16,7 +16,7 @@ namespace AppliedAccounts.Models.Interface
         List<object> Records { get; set; } //List<Record> Records { get; set; }
 
         string SearchText { get; set; }
-        MessageClass MsgClass { get; set; }
+        MessagesService MsgService { get; set; }
 
         Tables Table { get; set; }                              // Name of Table for fatch Data
         decimal TotalAmount { get; set; } //= 0.00M;

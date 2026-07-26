@@ -20,7 +20,7 @@ namespace AppliedAccounts.Models.Accounts
         public GlobalService AppGlobal { get; set; }
         public DateTime LastVoucherDate { get; set; }
         public DateTime MaxVouDate { get; set; }
-        public MessageClass MsgClass { get; set; }
+        public MessagesService MsgService { get; set; }
         public PrintService ReportService { get; set; }
         public DataSource Source { get; set; }
         public List<CodeTitle> Companies { get; set; }
@@ -72,7 +72,7 @@ namespace AppliedAccounts.Models.Accounts
         {
             Source = new(AppGlobal.AppPaths);
 
-            MsgClass = new();
+            //
             MyVoucher = new();
             ReportService = new();
 
@@ -111,7 +111,7 @@ namespace AppliedAccounts.Models.Accounts
             {
                 if (string.IsNullOrWhiteSpace(Vou_No))
                 {
-                    MsgClass.Alert(Messages.VoucherNumberEmpty);
+                    MsgService.Alert(Messages.VoucherNumberEmpty);
                     return false;
                 }
 
@@ -150,11 +150,11 @@ namespace AppliedAccounts.Models.Accounts
                         })];
 
                 if (MyVoucher.Count > 0) { Transaction = MyVoucher.First(); return true; }
-                MsgClass.Alert(Messages.VoucherNotFound); return false;
+                MsgService.Alert(Messages.VoucherNotFound); return false;
             }
             catch (Exception error)
             {
-                MsgClass.Error(error.Message);
+                MsgService.Error(error.Message);
             }
             return false;
         }
@@ -164,36 +164,36 @@ namespace AppliedAccounts.Models.Accounts
         #region Validation
         public bool IsTransValidated()
         {
-            MsgClass = new();
+            //
 
 
-            if (Transaction.DR + Transaction.CR == 0) { MsgClass.Alert(Messages.VoucherAmountIsZero); }
-            if (string.IsNullOrEmpty(Transaction.Description)) { MsgClass.Alert(Messages.DescriptionIsNull); }
-            if (Transaction.COA.Equals(0)) { MsgClass.Alert(Messages.AccountIDIsZero); }
-            if (Transaction.DR > 0 && Transaction.CR > 0) { MsgClass.Alert(Messages.DRnCRHaveValue); }
+            if (Transaction.DR + Transaction.CR == 0) { MsgService.Alert(Messages.VoucherAmountIsZero); }
+            if (string.IsNullOrEmpty(Transaction.Description)) { MsgService.Alert(Messages.DescriptionIsNull); }
+            if (Transaction.COA.Equals(0)) { MsgService.Alert(Messages.AccountIDIsZero); }
+            if (Transaction.DR > 0 && Transaction.CR > 0) { MsgService.Alert(Messages.DRnCRHaveValue); }
 
-            return MsgClass.Count == 0;
+            return MsgService.Count == 0 ? true : false;
         }
 
         public bool IsVoucherValidated()
         {
-            MessageClass SaveMessages = new();
+            MsgService.Clear();
             var CurrentTransaction = Transaction.Clone();
             var _date = MyVoucher.First().Vou_Date;
 
             foreach (var item in MyVoucher)
             {
-                if (item.Vou_Date != _date) { SaveMessages.Alert(Messages.VoucherDateNotSame); }
+                if (item.Vou_Date != _date) { MsgService.Alert(Messages.VoucherDateNotSame); }
 
                 if (!IsTransValidated())
                 {
-                    SaveMessages.AddReange(MsgClass.MessageList);
+                    MsgService.AddRange(MsgService.MsgClass);
                     break;
                 }
             }
-            if (!Tot_DR.Equals(Tot_CR)) { SaveMessages.Alert(Messages.VoucherAmountNotEqual); }
+            if (!Tot_DR.Equals(Tot_CR)) { MsgService.Alert(Messages.VoucherAmountNotEqual); }
             Transaction = CurrentTransaction;
-            return SaveMessages.Count == 0;
+            return MsgService.Count == 0;
         }
 
 
@@ -349,7 +349,7 @@ namespace AppliedAccounts.Models.Accounts
             }
             catch (Exception error)
             {
-                MsgClass.Error(error.Message);
+                MsgService.Error(error.Message);
                 Source.RollbackTransaction();
 
             }
@@ -379,12 +379,12 @@ namespace AppliedAccounts.Models.Accounts
 
                 if (ReportService.IsError)
                 {
-                    MsgClass.Add(ReportService.MyMessage.First(), AppMessages.Enums.Class.Danger);
+                    MsgService.Danger(ReportService.MyMessage.First());
                 }
             }
             catch (Exception error)
             {
-                MsgClass.Add(error.Message);
+                MsgService.Error(error);
             }
         }
 

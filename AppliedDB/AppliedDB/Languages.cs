@@ -5,9 +5,18 @@ namespace AppliedDB
 {
     public class Languages
     {
-        public static DataTable GetLanguageList()
+        public SqliteConnection MyConnection { get; set; }
+
+        
+        public Languages(SqliteConnection connection)
         {
-            var _Connection = Connections.GetLanguageConnection();
+            MyConnection = connection;
+        }
+
+
+        public DataTable GetLanguageList()
+        {
+            var _Connection = MyConnection;
             if (_Connection is not null)
             {
                 // SELECT * FROM [LanguageList]
@@ -20,18 +29,17 @@ namespace AppliedDB
                 return dt;
                 
             }
-            return null;
+            return null!;
 
         }
-        public DataTable GetLanguageText(int _Language, string _Section)
+        public DataTable? GetLanguageText(int _Language, string _Section)
         {
-            var _Connection = Connections.GetLanguageConnection();
-            if (_Connection is not null)
+            
+            if (MyConnection is not null)
             {
                 // SELECT * FROM [Language records of specific language ]
-                _Connection.Open();
                 var _Filter = $"WHERE Language={_Language} AND Section IN ('{_Section}','Common')";
-                using var _Command = new SqliteCommand($"SELECT * FROM [LanguageText] {_Filter}", _Connection);
+                using var _Command = new SqliteCommand($"SELECT * FROM [LanguageText] {_Filter}", MyConnection);
                 using var _reader = _Command.ExecuteReader();
                 var dt = new DataTable();
                 dt.Load(_reader);
@@ -39,7 +47,7 @@ namespace AppliedDB
                 return dt;
                 
             }
-            return null;
+            return null!;
 
         }
 

@@ -1,10 +1,12 @@
 ﻿@page "/Sales/CustomerList"
-@attribute [Authorize];
+@attribute [Authorize]
 @using AppliedAccounts.Component.Libs;
 @using AppliedAccounts.Services
 
-@inject GlobalService AppGlobal;
-@inject IToastService Toaster;
+@inject GlobalService AppGlobal
+@inject IToastService Toaster
+@inject MessagesService MsgService
+
 
 
 <PageHeading Text="List of Customers, Clients, Vendors" />

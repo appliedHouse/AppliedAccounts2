@@ -11,146 +11,131 @@
 }
 
 <PageHeading Text="Trial Balance" />
+<ShowMessages MsgService="@MsgService" />
+<ShowPrintWait Visiable="@IsPrinting" />
 
+<EditForm Model="MyModel">
+    <div class="container">
+        <div class="row flex-md-row">
 
-@if (IsPrinting)
-{
-    <div class="alert alert-primary d-flex align-items-center" role="alert">
-        <div class="spinner-border text-primary me-2" role="status" aria-hidden="true"></div>
-        <div>
-            Loading printing data, please wait...
-        </div>
-    </div>
-}
-
-@if (MsgClass.Count > 0)
-{
-    <PageErrors Messages="@MsgClass" />
-}
-
-
-    <EditForm Model="MyModel">
-        <div class="container">
-            <div class="row flex-md-row">
-
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputDate id="DateFrom" class="form-control" @bind-Value="MyModel.TB_From"></InputDate>
-                        <label for="DateFrom">From</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <InputDate id="DateTo" class="form-control" @bind-Value="MyModel.TB_To"></InputDate>
-                        <label for="DateFrom">To</label>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <select class="form-select" @bind="MyModel.TB_Type" @bind:after="DisplayList">
-                        @foreach (var option in OptionTypes)
-                        {
-                            <option value="@option.Key">@option.Value</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <select class="form-select" @bind="MyModel.TB_Option" @bind:after="DisplayList">
-                        @foreach (var option in TB_Options)
-                        {
-                            <option value="@option.Key">@option.Value</option>
-                        }
-
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <div style="display: flex; justify-content: flex-end;">
-                        @if (!IsPrinting)
-                        {
-                            <ReportingButtons ReturnValue="Print" />
-                        }
-                    </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputDate id="DateFrom" class="form-control" @bind-Value="MyModel.TB_From"></InputDate>
+                    <label for="DateFrom">From</label>
                 </div>
             </div>
-
-            @if (MyModel.TB_Option > 1)
-            {
-                <div class="row flex-md-row">
-
-                    @if (MyModel.TB_Option == 2)
-                    {
-                        <div class="col-md-4">
-                            <div class="form-floating">
-                                <InputSelect id="ddProject" class="form-control item-height" TValue="long" Value="@MyModel.ProjectID" ValueExpression="@(() => @MyModel.ProjectID)" ValueChanged="@((e) => ProjectIDChanged(e))">
-                                    @if (MyModel.Projects.Any())
-                                    {
-                                        @foreach (var item in MyModel.Projects)
-                                        {
-                                            <option value="@item.ID">@item.Title</option>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <option value="0">No Records - Project</option>
-                                    }
-
-                                </InputSelect>
-                                <label for="ddProject">Project</label>
-                            </div>
-                        </div>
-
-                    }
-                    else if (MyModel.TB_Option == 3)
-                    {
-                        <div class="col-md-4">
-                            <div class="form-floating">
-                                <InputSelect id="ddCompany" class="form-control item-height" TValue="long" Value="@MyModel.CompanyID" ValueExpression="@(() => @MyModel.CompanyID)" ValueChanged="@((e) => CompanyIDChanged(e))">
-                                    @if (MyModel.Companies.Any())
-                                    {
-                                        @foreach (var item in MyModel.Companies)
-                                        {
-                                            <option value="@item.ID">@item.Title</option>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <option value="0">No Records -  Company</option>
-                                    }
-
-                                </InputSelect>
-                                <label for="ddCompany">Company / Customer / Sub Account</label>
-                            </div>
-                        </div>
-
-                    }
-                    else if (MyModel.TB_Option == 4)
-                    {
-                        <div class="col-md-4">
-                            <div class="form-floating">
-                                <InputSelect id="ddEmployee" class="form-control item-height" TValue="long" Value="@MyModel.EmployeeID" ValueExpression="@(() => @MyModel.EmployeeID)" ValueChanged="@((e) => EmployeeIDChanged(e))">
-                                    @if (MyModel.Employees.Any())
-                                    {
-                                        @foreach (var item in MyModel.Employees)
-                                        {
-                                            <option value="@item.ID">@item.Title</option>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <option value="0">No Records - Employee</option>
-                                    }
-
-                                </InputSelect>
-                                <label for="ddEmployee">Employee</label>
-                            </div>
-                        </div>
-                    }
-
-
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <InputDate id="DateTo" class="form-control" @bind-Value="MyModel.TB_To"></InputDate>
+                    <label for="DateFrom">To</label>
                 </div>
-            }
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" @bind="MyModel.TB_Type" @bind:after="DisplayList">
+                    @foreach (var option in OptionTypes)
+                    {
+                        <option value="@option.Key">@option.Value</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" @bind="MyModel.TB_Option" @bind:after="DisplayList">
+                    @foreach (var option in TB_Options)
+                    {
+                        <option value="@option.Key">@option.Value</option>
+                    }
 
+                </select>
+            </div>
+            <div class="col-md-2">
+                <div style="display: flex; justify-content: flex-end;">
+                    @if (!IsPrinting)
+                    {
+                        <ReportingButtons ReturnValue="Print" />
+                    }
+                </div>
+            </div>
         </div>
-    </EditForm>
+
+        @if (MyModel.TB_Option > 1)
+        {
+            <div class="row flex-md-row">
+
+                @if (MyModel.TB_Option == 2)
+                {
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <InputSelect id="ddProject" class="form-control item-height" TValue="long" Value="@MyModel.ProjectID" ValueExpression="@(() => @MyModel.ProjectID)" ValueChanged="@((e) => ProjectIDChanged(e))">
+                                @if (MyModel.Projects.Any())
+                                {
+                                    @foreach (var item in MyModel.Projects)
+                                    {
+                                        <option value="@item.ID">@item.Title</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="0">No Records - Project</option>
+                                }
+
+                            </InputSelect>
+                            <label for="ddProject">Project</label>
+                        </div>
+                    </div>
+
+                }
+                else if (MyModel.TB_Option == 3)
+                {
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <InputSelect id="ddCompany" class="form-control item-height" TValue="long" Value="@MyModel.CompanyID" ValueExpression="@(() => @MyModel.CompanyID)" ValueChanged="@((e) => CompanyIDChanged(e))">
+                                @if (MyModel.Companies.Any())
+                                {
+                                    @foreach (var item in MyModel.Companies)
+                                    {
+                                        <option value="@item.ID">@item.Title</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="0">No Records -  Company</option>
+                                }
+
+                            </InputSelect>
+                            <label for="ddCompany">Company / Customer / Sub Account</label>
+                        </div>
+                    </div>
+
+                }
+                else if (MyModel.TB_Option == 4)
+                {
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <InputSelect id="ddEmployee" class="form-control item-height" TValue="long" Value="@MyModel.EmployeeID" ValueExpression="@(() => @MyModel.EmployeeID)" ValueChanged="@((e) => EmployeeIDChanged(e))">
+                                @if (MyModel.Employees.Any())
+                                {
+                                    @foreach (var item in MyModel.Employees)
+                                    {
+                                        <option value="@item.ID">@item.Title</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="0">No Records - Employee</option>
+                                }
+
+                            </InputSelect>
+                            <label for="ddEmployee">Employee</label>
+                        </div>
+                    </div>
+                }
+
+
+            </div>
+        }
+
+    </div>
+</EditForm>
 
 @if (IsPageValidate)
 {

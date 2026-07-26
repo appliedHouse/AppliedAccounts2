@@ -4,6 +4,9 @@
 @using AppliedAccounts.Models
 @using AppliedAccounts.Component
 
+@inject MessagesService MsgService
+
+
 @code {
 
     private void CustomerList() { NavManager.NavigateTo("/CustomerList", true); }

@@ -18,7 +18,7 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> BookList { get; set; }
         public List<CodeTitle> NatureAccountsList { get; set; }
         public DataSource Source { get; set; }
-        public MessageClass MsgClass { get; set; }
+        public MessagesService MsgService { get; set; }
         public PrintService ReportService { get; set; }
         public PageModel Pages { get; set; } = new();
 
@@ -38,10 +38,10 @@ namespace AppliedAccounts.Models
         {
 
         }
-        public BookListModel(int _BookID, GlobalService _AppGlobal)
+        public BookListModel(int _BookID, GlobalService _AppGlobal, MessagesService msgService)
         {
             AppGlobal = _AppGlobal;
-            MsgClass = new();
+            MsgService = msgService;
             Source = new(AppGlobal.AppPaths);
             GetKeys();
 
@@ -67,9 +67,9 @@ namespace AppliedAccounts.Models
 
                 PageIsValid = LoadData();
             }
-            catch (Exception)
+            catch (Exception error)
             {
-                MsgClass.Add(Messages.PageIsNotValid);
+                MsgService!.Error(error);
             }
         }
         #endregion
@@ -84,7 +84,7 @@ namespace AppliedAccounts.Models
             }
             catch (Exception)
             {
-                MsgClass.Add(Messages.DataLoadFailed);
+                MsgService!.Error(Messages.DataLoadFailed);
                 return false;
             }
         }
@@ -195,7 +195,7 @@ namespace AppliedAccounts.Models
             }
             catch (Exception error)
             {
-                MsgClass.Add(error.Message);
+                MsgService.Error(error);
             }
         }
 

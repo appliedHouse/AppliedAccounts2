@@ -9,9 +9,10 @@ namespace VoucherPosting
 {
     public class BillReceivable
     {
-
         public MessageClass MsgClass { get; set; }
         public DataSource Source { get; set; }
+
+
 
 
         #region Bill Receivable / Sales Invoices

@@ -3,10 +3,10 @@
 @using AppliedAccounts.Component.Libs
 
 @inject GlobalService AppGlobal
-@inject IMessagesService MsgService
+@inject MessagesService MsgService
 
 <PageHeading Text="VOUCHER POSTING" />
-<PageErrors Messages="@MyModel.MsgClass" />
+<ShowMessages MsgService="@MsgService" />
 
 <!-- HEADING MENU -->
 <EditForm Model="MyViewModel" OnValidSubmit="Refresh">

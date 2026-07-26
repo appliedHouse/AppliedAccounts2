@@ -22,10 +22,10 @@ namespace AppliedAccounts.Pages.Accounts
         {
             var _Valid = true;
 
-            if (MyModel.Records is null) { _Valid = false; MyModel.MsgClass.Add("Records not found"); }
-            if (MyModel.Record is null) { _Valid = false; MyModel.MsgClass.Add("Account Class List is empty"); }
-            if (MyModel.NatureList is null) { _Valid = false; MyModel.MsgClass.Add("Account Nature List is empty"); }
-            if (MyModel.NotesList is null) { _Valid = false; MyModel.MsgClass.Add("Financial Notes List is empty"); }
+            if (MyModel.Records is null) { _Valid = false; MyModel.MsgService.Critical("Records not found"); }
+            if (MyModel.Record is null) { _Valid = false; MyModel.MsgService.Critical("Account Class List is empty"); }
+            if (MyModel.NatureList is null) { _Valid = false; MyModel.MsgService.Critical("Account Nature List is empty"); }
+            if (MyModel.NotesList is null) { _Valid = false; MyModel.MsgService.Critical("Financial Notes List is empty"); }
             return _Valid;
         }
         protected void Back() { AppGlobal.NavManager.GoTo(MenuID.AccountsDictionery); }
@@ -48,7 +48,7 @@ namespace AppliedAccounts.Pages.Accounts
             if(IsSaved)
             {
                 await InvokeAsync(StateHasChanged);
-                MyModel.MsgClass.Success(AppMessages.Enums.Messages.Saved);
+                MyModel.MsgService.Success(AppMessages.Enums.Messages.Saved);
                 ToastService.ShowSuccess($"Successfully saved {MyModel.Record.Title}");
             }
             else
@@ -62,7 +62,7 @@ namespace AppliedAccounts.Pages.Accounts
             var IsDeleted = MyModel.Delete(ID);
             if (IsDeleted)
             {
-                MyModel.MsgClass.Success(AppMessages.Enums.Messages.Delete);
+                MyModel.MsgService.Success(AppMessages.Enums.Messages.Delete);
                 ToastService.ShowSuccess(MyModel.MyMessage);
                 
                 MyModel.LoadData();

@@ -1,5 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Pages.Accounts.Reports;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppliedGlobals;
 using AppMessages;
@@ -12,7 +13,6 @@ namespace AppliedAccounts.Pages.Accounts
         public DataSource Source { get; set; }
         public JVListViewModel MyModel { get; set; } = new();
         public List<JVListDataModel> JVItems { get; set; } = new();
-        public MessageClass MsgClass { get; set; } = new();
         public PageModel Pages { get; set; } = new();
 
 
@@ -55,7 +55,7 @@ namespace AppliedAccounts.Pages.Accounts
             }
             catch (Exception error)
             {
-                MsgClass.Error(error.Message);
+                MsgService.Error(error.Message);
             }
         }
 
@@ -137,7 +137,7 @@ namespace AppliedAccounts.Pages.Accounts
                     }
                     catch (Exception error)
                     {
-                        MsgClass.Error($"Print operation error: {error.Message}");
+                        MsgService.Error($"Print operation error: {error.Message}");
                     }
                 });
 
@@ -146,7 +146,7 @@ namespace AppliedAccounts.Pages.Accounts
             }
             catch (Exception ex)
             {
-                MsgClass.Error($"Print error: {ex.Message}");
+                MsgService.Error($"Print error: {ex.Message}");
                 MyModel.IsWaiting = false;
                 await InvokeAsync(StateHasChanged);
             }

@@ -18,16 +18,17 @@ namespace AppliedAccounts.Models
 
         public int CountRecord => Records.Count;
         public int Count => Data.Count;
-        public AppMessages.MessageClass MsgClass { get; set; } = new();
+        public MessagesService MsgService { get; set; }
         public string SearchText { get; set; } = string.Empty;
         public bool IsDeleted { get; set; } = false;
         public string MyMessage { get; private set; }
 
         #region Constructor
         public COANatureModel() { }
-        public COANatureModel(GlobalService _AppGlobal)
+        public COANatureModel(GlobalService _AppGlobal, MessagesService msgService)
         {
             AppGlobal = _AppGlobal;
+            MsgService = msgService;
             Source = new(AppGlobal.AppPaths);
             LoadData();
            
@@ -104,7 +105,7 @@ namespace AppliedAccounts.Models
             DataRow _DataRow;
             if (Data.Count == 0)
             {
-                _DataRow = DataSource.GetNewRow(DBFile, Tables.COA_Nature);
+                _DataRow = Source!.GetNewRow(Tables.COA_Nature);
             }
             else
             {
@@ -133,7 +134,7 @@ namespace AppliedAccounts.Models
         #region Delete
         public bool Delete(long _ID)
         {
-            MsgClass.ClearMessages();
+            MsgService.Clear();
             var _DeleteRow = Source!.GetDataRow(Tables.COA_Nature, _ID);
 
             if (_DeleteRow is not null)
@@ -173,7 +174,7 @@ namespace AppliedAccounts.Models
                 }
                 else
                 {
-                    MsgClass.Add(MESSAGE.SQLQueryIsNull);
+                    MsgService.Critical(MESSAGE.SQLQueryIsNull);
                 }
             }
 
@@ -185,12 +186,12 @@ namespace AppliedAccounts.Models
         private bool Validate(DataRow _Row)
         {
             var _Validated = true;
-            if (_Row["ID"] is null) { _Validated = false; MsgClass.Add(MESSAGE.IDIsNull); }
-            if (_Row["Code"] is null) { _Validated = false; MsgClass.Add(MESSAGE.CodeIsNull); }
-            if (_Row["Title"] is null) { _Validated = false; MsgClass.Add(MESSAGE.ColumnIsNull); }
+            if (_Row["ID"] is null) { _Validated = false; MsgService.Error(MESSAGE.IDIsNull); }
+            if (_Row["Code"] is null) { _Validated = false; MsgService.Error(MESSAGE.CodeIsNull); }
+            if (_Row["Title"] is null) { _Validated = false; MsgService.Error(MESSAGE.ColumnIsNull); }
 
-            if (_Row["Code"].ToString()!.Length == 0) { _Validated = false; MsgClass.Add(MESSAGE.CodeIsZero); }
-            if (_Row["Title"].ToString()!.Length == 0) { _Validated = false; MsgClass.Add(MESSAGE.TitleIsZero); }
+            if (_Row["Code"].ToString()!.Length == 0) { _Validated = false; MsgService.Error(MESSAGE.CodeIsZero); }
+            if (_Row["Title"].ToString()!.Length == 0) { _Validated = false; MsgService.Error(MESSAGE.TitleIsZero); }
             return _Validated;
         }
         #endregion

@@ -1,5 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models.Posting;
+using AppliedDB;
 using Microsoft.JSInterop;
 using static AppliedGlobals.AppErums;
 
@@ -8,23 +9,20 @@ namespace AppliedAccounts.Pages.Accounts.Post
     public partial class Posting
     {
         public PostingViewModel MyViewModel { get; set; }
-        public PostingModel MyModel { get; set; } = new();
-        public string DBFile => AppGlobal.DBFile;
-
+        public PostingModel MyModel { get; set; }
         public long PostingVoucherID { get; set; } = 0;
         public string PostingVoucher { get; set; } =string.Empty;
 
         #region Constructor
         protected override async Task OnInitializedAsync()
         {
-            MyModel.Source = new(AppGlobal.AppPaths);
-            MyModel.MsgClass = MsgService.MsgClass;
+            MyModel = new(AppGlobal, MsgService);
            
             MyModel.Source.SetKey("IsPosting", false, KeyTypes.Boolean, "Is posting is in progress..");
             MyViewModel = new(); ;
-            MyViewModel.Dt_From = AppRegistry.GetDate(DBFile, "Post_dt_From");
-            MyViewModel.Dt_To = AppRegistry.GetDate(DBFile, "Post_dt_To");
-            MyViewModel.PostingType = (PostingTypes)AppRegistry.GetNumber(DBFile, "Post_Type");
+            MyViewModel.Dt_From = MyModel.Source.GetDate("Post_dt_From");
+            MyViewModel.Dt_To = MyModel.Source.GetDate("Post_dt_To");
+            MyViewModel.PostingType = (PostingTypes)MyModel.Source.GetNumber("Post_Type");
 
             MyModel.Pages.PageChanged += OnPageChangedInternal;
 
@@ -64,12 +62,12 @@ namespace AppliedAccounts.Pages.Accounts.Post
 
         public async void Refresh()
         {
-            AppRegistry.SetKey(DBFile, "Post_Type", MyViewModel.PostingType, KeyTypes.Number);
-            AppRegistry.SetKey(DBFile, "Post_dt_From", MyViewModel.Dt_From, KeyTypes.Date);
-            AppRegistry.SetKey(DBFile, "Post_dt_To", MyViewModel.Dt_To, KeyTypes.Date);
-            AppRegistry.SetKey(DBFile, "PostCash", false, KeyTypes.Boolean);    // Reset Post Cash Voucher Status
-            AppRegistry.SetKey(DBFile, "PostBank", false, KeyTypes.Boolean);    // Reset Post Bank Voucher Status
-            AppRegistry.SetKey(DBFile, "PostReceipt", false, KeyTypes.Boolean);
+            MyModel.Source.SetKey("Post_Type", MyViewModel.PostingType, KeyTypes.Number);
+            MyModel.Source.SetKey("Post_dt_From", MyViewModel.Dt_From, KeyTypes.Date);
+            MyModel.Source.SetKey("Post_dt_To", MyViewModel.Dt_To, KeyTypes.Date);
+            MyModel.Source.SetKey("PostCash", false, KeyTypes.Boolean);    // Reset Post Cash Voucher Status
+            MyModel.Source.SetKey("PostBank", false, KeyTypes.Boolean);    // Reset Post Bank Voucher Status
+            MyModel.Source.SetKey("PostReceipt", false, KeyTypes.Boolean);
 
             MyModel.Pages = new();
             await MyModel.LoadData(MyViewModel);

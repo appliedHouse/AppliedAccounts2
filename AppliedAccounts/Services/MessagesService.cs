@@ -6,11 +6,9 @@ namespace AppliedAccounts.Services
 {
     public class MessagesService : IMessagesService
     {
-        public MessageClass MsgClass { get; set; }
         public long LanguageID { get; set; } = 1;            // Default Language 1 is English
-
-        private SqliteConnection SqlConnection { get; set; }
-        private readonly string MsgConnectionString;
+        public MessageClass MsgClass { get; set; } = new();
+        private SqliteConnection MyConnection { get; set; }
 
         public MessagesService(IConfiguration configuration)
         {
@@ -20,32 +18,53 @@ namespace AppliedAccounts.Services
                 if (MsgPath != null)
                 {
                     var FilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", MsgPath, "Messages.db");
-                    MsgConnectionString = $"Data Source={FilePath}";
-                    SqlConnection = GetConnection();
-                    MsgClass = new() { MsgConnection = SqlConnection };
-                    SqlConnection = null!;
+                    var MsgConnectionString = $"Data Source={FilePath}";
+                    MyConnection = new SqliteConnection(MsgConnectionString);
                 }
             }
             catch (Exception ex)
             {
 
-                MsgClass!.Error(ex.Message);
+                Error(ex.Message);
             }
-        }
-
-        private SqliteConnection GetConnection()
-        {
-            return new SqliteConnection(MsgConnectionString);
         }
 
         public void AddRange(MessageClass msgClass)
         {
+            foreach (var msg in msgClass.MessageList)
+            {
+                MsgClass.MessageList.Add(msg);
+            }
+
+            foreach (var err in msgClass.Errors)
+            {
+                MsgClass.Errors.Add(err);
+            }
+
             MsgClass = msgClass;
         }
 
-        public void Add(string _message)
+        public void AddRange(MessagesService msgService)
         {
-            MsgClass.Add(_message);
+            foreach (var msg in msgService.MsgClass.MessageList)
+            {
+                MsgClass.MessageList.Add(msg);
+            }
+
+            foreach (var err in msgService.MsgClass.Errors)
+            {
+                MsgClass.Errors.Add(err);
+            }
+
+
+
+            MsgClass = msgService.MsgClass;
+        }
+
+
+        public void InsertDB(string _message)
+        {
+            MsgClass.InsertDB(_message);
         }
 
         // Errors
@@ -58,6 +77,10 @@ namespace AppliedAccounts.Services
         public void Error(string _text)
         {
             MsgClass.Errors.Add(MsgClass.GetMessage(_text, Class.Error));
+        }
+        public void Error(Exception _error)
+        {
+            MsgClass.Errors.Add(MessageClass.ErrorMessage(_error));
         }
 
         // Danger
@@ -112,19 +135,28 @@ namespace AppliedAccounts.Services
             MsgClass.MessageList.Add(MsgClass.GetMessage(_text, Class.Alert));
         }
 
-        public void Clear() => MsgClass.ClearMessages();
-        public int Count() => MsgClass.Count;
+        public void Clear()
+        {
+            MsgClass.MessageList.Clear();
+            MsgClass.Errors.Clear();
+        }
+
+        
+
+        public int Count => MsgClass.Count;
+        public int MessageCount => MsgClass.MessageList.Count;
+        public int ErrorCount => MsgClass.Errors.Count;
 
     }
 
     public interface IMessagesService
     {
-        MessageClass MsgClass { get; set; }
         void AddRange(MessageClass msgClass);
-        void Add(string message);
-
+        void AddRange(MessagesService msgService);
+        
         void Error(Messages code);
         void Error(string text);
+        void Error(Exception error);
 
         void Danger(Messages code);
         void Danger(string text);
@@ -142,6 +174,9 @@ namespace AppliedAccounts.Services
         void Alert(string text);
 
         void Clear();
-        int Count();
+
+        int Count { get; }
+        int MessageCount { get; }
+        int ErrorCount { get; }
     }
 }

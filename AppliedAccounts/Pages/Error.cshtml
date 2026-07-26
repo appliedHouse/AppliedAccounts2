@@ -1,46 +1,304 @@
-﻿@page
-@model AppliedAccounts.Pages.ErrorModel
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Error</title>
-    <link href="~/css/bootstrap/bootstrap.min.css" rel="stylesheet" />
-    <link href="~/css/site.css" rel="stylesheet" asp-append-version="true" />
-</head>
+    <title>Error · Applied Software House</title>
+    <!-- Bootstrap 5 + Icons & custom styling -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
+            body {
+                font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+                background: linear-gradient(145deg, #f8faff 0%, #eef3fc 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1.5rem;
+            }
+
+            .error-card {
+                max-width: 720px;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 48px;
+                padding: 2.8rem 2.8rem 3.2rem;
+                box-shadow: 0 30px 60px -20px rgba(0, 20, 40, 0.25), 0 8px 28px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+                transition: transform 0.25s ease, box-shadow 0.3s ease;
+            }
+
+                .error-card:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 40px 80px -24px rgba(0, 20, 50, 0.3);
+                }
+
+            /* header / icon */
+            .error-icon {
+                font-size: 3.2rem;
+                background: rgba(220, 53, 69, 0.08);
+                width: 80px;
+                height: 80px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 30px;
+                color: #b02a37;
+                margin-bottom: 1.2rem;
+                border: 1px solid rgba(220, 53, 69, 0.10);
+            }
+
+            .badge-soft {
+                background: rgba(13, 110, 253, 0.08);
+                color: #0a58ca;
+                padding: 0.3rem 1rem;
+                border-radius: 40px;
+                font-size: 0.75rem;
+                font-weight: 500;
+                letter-spacing: 0.02em;
+                border: 1px solid rgba(13, 110, 253, 0.10);
+            }
+
+            h1 {
+                font-weight: 700;
+                font-size: 2.2rem;
+                letter-spacing: -0.02em;
+                color: #0b1a33;
+                margin-bottom: 0.2rem;
+            }
+
+            .subhead {
+                font-size: 1.1rem;
+                font-weight: 450;
+                color: #2f405c;
+                margin-top: 0.3rem;
+                margin-bottom: 1.6rem;
+                border-left: 4px solid #dbe3f0;
+                padding-left: 1rem;
+            }
+
+            .error-details {
+                background: rgba(0, 0, 0, 0.02);
+                border-radius: 28px;
+                padding: 1.5rem 1.8rem;
+                margin: 1.8rem 0 2.2rem;
+                border: 1px solid rgba(0, 0, 0, 0.03);
+                backdrop-filter: blur(2px);
+            }
+
+            .request-id-box {
+                background: white;
+                border-radius: 40px;
+                padding: 0.6rem 1.4rem;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.6rem;
+                border: 1px solid #e6edf6;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+                font-size: 0.9rem;
+            }
+
+                .request-id-box code {
+                    background: #eef3fc;
+                    padding: 0.2rem 0.8rem;
+                    border-radius: 30px;
+                    font-weight: 500;
+                    color: #1f3a6b;
+                }
+
+            .db-missing-alert {
+                background: #fff6e6;
+                border-radius: 40px;
+                padding: 0.75rem 1.6rem;
+                border: 1px solid #ffd8b5;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.75rem;
+                font-weight: 500;
+                color: #8a5d2e;
+                font-size: 0.95rem;
+                margin-top: 0.8rem;
+            }
+
+                .db-missing-alert i {
+                    font-size: 1.4rem;
+                    color: #c56a1a;
+                }
+
+            .action-links {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                margin-top: 2.4rem;
+                padding-top: 1.4rem;
+                border-top: 1px solid #e6edf6;
+            }
+
+            .btn-outline-soft {
+                background: transparent;
+                border: 1px solid #d0ddea;
+                border-radius: 60px;
+                padding: 0.5rem 1.8rem;
+                font-weight: 500;
+                color: #1f3a6b;
+                transition: all 0.15s ease;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+                .btn-outline-soft:hover {
+                    background: #f0f6ff;
+                    border-color: #a4b9d9;
+                    color: #0b1a33;
+                }
+
+            .btn-primary-soft {
+                background: #0b1a33;
+                border: none;
+                border-radius: 60px;
+                padding: 0.6rem 2rem;
+                font-weight: 500;
+                color: white;
+                transition: 0.15s ease;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                box-shadow: 0 4px 12px rgba(11, 26, 51, 0.15);
+            }
+
+                .btn-primary-soft:hover {
+                    background: #142e4f;
+                    color: white;
+                    transform: scale(1.01);
+                    box-shadow: 0 8px 20px rgba(11, 26, 51, 0.2);
+                }
+
+            .footer-meta {
+                margin-top: 2rem;
+                font-size: 0.8rem;
+                color: #6b7d9e;
+                display: flex;
+                justify-content: center;
+                gap: 0.8rem;
+                flex-wrap: wrap;
+            }
+
+                .footer-meta span {
+                    opacity: 0.6;
+                }
+
+            /* responsive */
+            @@media (max-width: 500px) {
+                .error-card {
+                    padding: 2rem 1.5rem;
+                    border-radius: 32px;
+                }
+
+                h1 {
+                    font-size: 1.8rem;
+                }
+
+                .action-links {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                    .action-links a {
+                        justify-content: center;
+                    }
+            }
+    </style>
+</head>
 <body>
-    <div class="main">
-        <div class="content px-4">
-            <h1 class="text-danger">Applied Software House</h1>
-            <h2 class="text-danger">An error occurred while processing web request.</h2>
+
+    <div class="error-card">
+
+        <!-- icon + badge -->
+        <div class="d-flex align-items-start justify-content-between">
+            <div class="error-icon">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <span class="badge-soft"><i class="bi bi-shield-exclamation me-1"></i> HTTP 500</span>
+        </div>
+
+        <!-- main heading -->
+        <h1>
+            <span style="font-weight: 300; color: #3a5170;">Applied</span> Software House
+        </h1>
+        <div class="subhead">
+            <i class="bi bi-slash-circle me-2" style="color: #8a9bb8;"></i>
+            An error occurred while processing your request.
+        </div>
+
+        <!-- error details / request id & db alert -->
+        <div class="error-details">
 
             @if (Model.ShowRequestId)
             {
-                <p>
-                    <strong>Request ID:</strong> <code>@Model.RequestId</code>
-                </p>
+                <div class="request-id-box mb-2">
+                    <i class="bi bi-upc-scan" style="color: #3d6a9b;"></i>
+                    <span style="color: #28456b;">Request ID:</span>
+                    <code>@Model.RequestId</code>
+                </div>
             }
-            d
+            else
+            {
+                <div class="request-id-box mb-2" style="opacity: 0.6;">
+                    <i class="bi bi-upc-scan"></i>
+                    <span>Request ID not available</span>
+                </div>
+            }
 
-            <p>Database file is missing....</p>
+            <!-- Database file missing message — styled as friendly warning -->
+            <div class="db-missing-alert">
+                <i class="bi bi-database-fill-down"></i>
+                <span>Database file is missing…</span>
+            </div>
 
-
-            @* <h3>Development Mode</h3>
-            <p>
-                Swapping to the <strong>Development</strong> environment displays detailed information about the error that occurred.
-            </p>
-            <p>
-                <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
-                It can result in displaying sensitive information from exceptions to end users.
-                For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
-                and restarting the app.
-            </p> *@
+            <!-- additional hint (the lonely "d" from original is now a small note) -->
+            <div style="margin-top: 0.8rem; font-size: 0.85rem; color: #5a6f8c; display: flex; gap: 0.3rem; align-items: center;">
+                <i class="bi bi-dot" style="font-size: 1.6rem; color: #b7c8e0;"></i>
+                <span>Please contact support if the issue persists.</span>
+            </div>
         </div>
-    </div>
-</body>
 
+        <!-- action links / navigation -->
+        <div class="action-links">
+            <a href="#" class="btn-outline-soft" onclick="window.location.reload();">
+                <i class="bi bi-arrow-clockwise"></i> Retry
+            </a>
+            <a href="/" class="btn-primary-soft">
+                <i class="bi bi-house-fill"></i> Go to Home
+            </a>
+        </div>
+
+        <!-- subtle footer with version / timestamp (static for design) -->
+        <div class="footer-meta">
+            <span><i class="bi bi-dot"></i> Applied Accounts · Error</span>
+            <span>•</span>
+            <span><i class="bi bi-calendar3"></i> @DateTime.Now.ToString("yyyy-MM-dd HH:mm")</span>
+            <span>•</span>
+            <span><i class="bi bi-shield-check"></i> secure</span>
+        </div>
+
+        <!-- small remark: original "d" is integrated as visual dot above -->
+    </div>
+
+    <!-- optional Bootstrap JS (not required for design) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

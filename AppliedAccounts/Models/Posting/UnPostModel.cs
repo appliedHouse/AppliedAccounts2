@@ -14,7 +14,7 @@ namespace AppliedAccounts.Models.Posting
     {
         [Inject] public GlobalService AppGlobal { get; set; } = default!;
         public UnPostViewModel UnPostVM { get; set; } = new();
-        public MessageClass MsgClass { get; set; } = new();
+        public Services.MessagesService MsgService { get; set; }
         public List<DataListModel> DataListModelList { get; set; } = new();
         public bool IsPosting { get; set; } = false;
         public DataSource Source { get; set; }
@@ -169,7 +169,7 @@ namespace AppliedAccounts.Models.Posting
             }
             catch (Exception ex)
             {
-                MsgClass.Critical(ex.Message);
+                MsgService.Error(ex);
                 throw;
             }
             return _List;
@@ -195,17 +195,17 @@ namespace AppliedAccounts.Models.Posting
                 postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
                 postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
 
-                MsgClass.ClearMessages();                            // Clear all previous messages. 
+                MsgService.Clear();                            // Clear all previous messages. 
                 CashBook postCashBook = new(Source, postingModel);
                 await postCashBook.DoCashUnPost();                  // Cash Posting main method.
                 if (postCashBook.UnPostSuccessful)
                 {
-                    MsgClass.Success(Messages.Saved);        // add message after Save selected Vouchers.
+                    MsgService.Success(Messages.Saved);        // add message after Save selected Vouchers.
                     await LoadData();              // Refresh display Data afger save voucher.
                 }
                 else
                 {
-                    MsgClass = postCashBook.MsgClass;
+                    MsgService.MsgClass = postCashBook.MsgClass;
                 }
             }
 
@@ -217,18 +217,25 @@ namespace AppliedAccounts.Models.Posting
                 postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
                 postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
 
-                MsgClass.ClearMessages();                           // Clear all previous messages. 
+                if(postingModel.MasterTable.Rows.Count == 0)
+               {
+                    MsgService.Warning(Messages.VoucherNotFound);
+                    return;
+                }
+
+
+                MsgService.Clear();                           // Clear all previous messages. 
                 CashBook postBankBook = new(Source, postingModel);
                 // Cash & Bank Voucher data table is same. so here using same fucntion as using for cash
                 await postBankBook.DoCashUnPost();                   
                 if (postBankBook.PostSuccessful)
                 {
-                    MsgClass.Success(Messages.Saved);        // add message after Save selected Vouchers.
+                    MsgService.Success(Messages.Saved);        // add message after Save selected Vouchers.
                     await LoadData();              // Refresh display Data afger save voucher.
                 }
                 else
                 {
-                    MsgClass = postBankBook.MsgClass;
+                    MsgService.MsgClass = postBankBook.MsgClass;
                 }
             }
 

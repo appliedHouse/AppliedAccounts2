@@ -2,10 +2,11 @@
 @page "/Accounts/JV/{Vou_No}"
 @using AppliedAccounts.Component.ButtonsDictionery
 @using AppliedAccounts.Component.Libs
+
 @inject GlobalService AppGlobal
 @inject PrintService ReportService
 @inject IToastService ToastService
-
+@inject MessagesService MsgService
 
 @code {
 
@@ -26,6 +27,7 @@
     protected override void OnInitialized()
     {
         MyModel = new(AppGlobal, Vou_No);
+        MyModel.MsgService = MsgService;
 
         if (MyModel == null) { IsPageValid = false; }
         if (MyModel!.Count > 0) { VoucherNo = MyModel.MyVoucher[0].Vou_No; }
@@ -40,7 +42,7 @@
 
 <PageHeading Text="JOURNAL VOUCHER (JV)" />
 
-@if (MyModel.MsgClass.Count > 0)
+@if (MyModel.MsgService.Count > 0)
 {
     <PageErrors Messages="MyModel.MsgClass"></PageErrors>
 }

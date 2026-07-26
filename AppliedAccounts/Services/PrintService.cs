@@ -20,7 +20,7 @@ namespace AppliedAccounts.Services
 
         public bool IsError { get; set; } = false;
         public List<string> MyMessage { get; set; } = new();
-        public MessageClass MsgClass { get; set; }
+        public MessagesService MsgService { get; set; }
 
 
         public PrintService(GlobalService _Config)
@@ -107,7 +107,7 @@ namespace AppliedAccounts.Services
             }
             catch (InvalidOperationException ex) // ← Catches the actual exception
             {
-                MsgClass.Error($"Error: {ex.Message}");
+                MsgService.Error($"Error: {ex.Message}");
                 Console.WriteLine($"Caught: {ex.Message}");
             }
         }
@@ -119,13 +119,13 @@ namespace AppliedAccounts.Services
         {
             bool result = false;
             Extractor = new(Model.InputReport.FileFullName);
-            MsgClass ??= new();
+            MsgService.Clear();
 
             if (!Model.IsParametersValid())
             {
                 result = true;
                 MyMessage.Add("The report parameters are not aligned with the report requirements.");
-                MsgClass.Critical(MyMessage.Last());
+                MsgService.Critical(MyMessage.Last());
             }
 
 
@@ -135,14 +135,14 @@ namespace AppliedAccounts.Services
                 {
                     result = true;
                     MyMessage.Add("The report Dataset name is not aligned with the report requirements.");
-                    MsgClass.Critical(MyMessage.Last());
+                    MsgService.Critical(MyMessage.Last());
                 }
             }
             else
             {
                 result = true;
                 MyMessage.Add("The report Dataset name is not assign. Value is null");
-                MsgClass.Critical(MyMessage.Last());
+                MsgService.Critical(MyMessage.Last());
 
             }
 

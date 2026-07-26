@@ -35,7 +35,7 @@ namespace AppliedAccounts.Pages.ImportData
             MyModel.Pages ??= new();
             if(MyModel.ImportedData.Count == 0)
             {
-                MyModel.MsgClass.Add(MESSAGES.NoRecordFound);
+                MyModel.MsgService.Error(MESSAGES.NoRecordFound);
                 return [];  
             }
             return [..MyModel.ImportedData.Skip(MyModel.Pages.Current).Take(MyModel.Pages.Size)];                // Copy Imported Data to Filter Data

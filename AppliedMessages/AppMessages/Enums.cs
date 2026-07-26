@@ -203,7 +203,7 @@
             Row_SubCategoryIDZero = 1608,
             CompanyLedgerAC_Notdefined = 1609,
             RefNoIsNull = 1610,
-            
+            Unknown = 1611,
         }
 
 

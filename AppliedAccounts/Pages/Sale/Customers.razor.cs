@@ -19,7 +19,7 @@ namespace AppliedAccounts.Pages.Sale
 
         protected override void OnInitialized()
         {
-            MyModel = new(AppGlobal);
+            MyModel = new(AppGlobal, MsgService);
             MyModel.Record = MyModel.GetRecord(ID);
         }
 

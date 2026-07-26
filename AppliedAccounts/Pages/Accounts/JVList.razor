@@ -5,6 +5,7 @@
 @inject GlobalService AppGlobal
 @inject PrintService ReportService
 @inject IToastService ToastService
+@inject MessagesService MsgService
 
 @code {
 
@@ -18,7 +19,7 @@
 }
 
 <PageHeading Text="Journal Vouchers (JVs) List" />
-<ShowMessages MsgClass="MsgClass" />
+<ShowMessages MsgService="MsgService" />
 <ShowPrintWait Visiable="@MyModel.IsWaiting" />
 
 <EditForm Model="@MyModel">

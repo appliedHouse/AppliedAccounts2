@@ -39,7 +39,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         {
             try
             {
-                SheetTable = [..AppGlobal.Source.GetTable(Quries.ExpenseSheetList())
+                SheetTable = [..Source.GetTable(Quries.ExpenseSheetList())
                     .AsEnumerable()
                     .Select(r => new CodeTitle
                     {
@@ -65,7 +65,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         {
             try
             {
-                ExpenseTable = AppGlobal.Source.GetTable(Quries.ExpenseSheetData(SelectedSheetNo));
+                ExpenseTable = Source.GetTable(Quries.ExpenseSheetData(SelectedSheetNo));
             }
             catch (Exception ex)
             {
@@ -168,7 +168,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             try
             {
 
-                DataTable SummaryTable = AppGlobal.Source.GetTable(Quries.ExpenseSheetSummary(SelectedSheetNo));
+                DataTable SummaryTable = Source.GetTable(Quries.ExpenseSheetSummary(SelectedSheetNo));
                 ReportService.Data.DataSetName = "ds_ExpenseGroup";
                 ReportService.Data.ReportTable = SummaryTable;
                 ReportService.Model.InputReport.FileName = "ExpenseSheetGroup.rdl";

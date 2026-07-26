@@ -44,12 +44,6 @@ namespace AppliedDB
                         _Command.Parameters.AddWithValue(_ParameterName, CurrentRow[_Column.ColumnName]);
                     }
 
-                    //if (CurrentRow.Field<long>("ID") == 0)
-                    //{
-                    //    CurrentRow["ID"] = DataSource.GetMaxID(_TableName, DBConnection.ConnectionString);
-                    //    _Command.Parameters["@ID"].Value = CurrentRow["ID"];
-                    //}
-
                     return _Command;
                 }
                 return null;
@@ -149,18 +143,8 @@ namespace AppliedDB
                 return null;
             }
 
-            
+
         }
-        //public static DataRow RemoveDBNull(this DataRow row)
-        //{
-        //    foreach (DataColumn column in row.Table.Columns)
-        //    {
-        //        if (row[column] == DBNull.Value)
-        //        {
-        //            row[column] = null;
-        //        }
-        //    }
-        //    return row;
-        //}
+        
     }
 }

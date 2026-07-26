@@ -16,7 +16,6 @@ namespace AppliedAccounts.Models
         public bool FoundRow { get; set; } = false;
         public string DataFile { get; set; } = string.Empty;
 
-
         public TaxModel(string _DataFile)
         {
             DataFile = _DataFile;
@@ -89,13 +88,6 @@ namespace AppliedAccounts.Models
             return _CurrentRow;
         }
 
-        //private bool Validate(DataRow _Row)
-        //{
-        //    if (TB_Tax != null) { return true; }
-        //    return false;
-        //}
-
-
         public void GetCurrentRow()
         {
             if (TB_Tax is not null)
@@ -133,15 +125,5 @@ namespace AppliedAccounts.Models
                 COA = 0;
             }
         }
-
-        //public int SaveChanges()
-        //{
-        //    AppMessages.Message _Effected = new();
-        //    if (Validate(CurrentRow))
-        //    {
-        //        _Effected = AppFunctions.Save(DataFile, TB_Tax, CurrentRow);
-        //    }
-        //    return _Effected.RowEffected;
-        //}
     }
 }

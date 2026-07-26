@@ -26,16 +26,19 @@ namespace AppMessages
         public MessageClass()
         {
             LanguageID = 1;             // Default Language English, Id = 1
-
-
         }
-        //public MessageClass(SqliteConnection _Connection)
-        //{
-        //    LanguageID = 1;             // Default Language English, Id = 1
-        //    MsgConnection = _Connection;
-        //}
-        #endregion
 
+        public MessageClass(SqliteConnection msgConnection)
+        {
+            MsgConnection = msgConnection;
+            LanguageID = 1;             // Default Language English, Id = 1
+        }
+        public MessageClass(SqliteConnection msgConnection, long _LanguageID)
+        {
+            MsgConnection = msgConnection;
+            LanguageID = _LanguageID;
+        }
+        #endregion
 
         #region Clear Message / Error List
         public void ClearMessages()
@@ -48,24 +51,11 @@ namespace AppMessages
         #region Add Message in the List
         public void Add(Messages _Code)
         {
-            MessageList.Add(GetMessage(_Code));
+            MessageList.Add(GetMessage(_Code, Class.Alert));
         }
-        public void Add(string _Text)
-        {
-            MessageList.Add(GetMessage(_Text));
-        }
-        public void Add(Messages _Code, Class _Class)
-        {
-            MessageList.Add(GetMessage(_Code, _Class));
-        }
-        public void Add(string _Text, Class _Class)
-        {
-            MessageList.Add(GetMessage(_Text, _Class));
-        }
+        
         #endregion
-
-        // Messages
-
+        
         #region Success
         public void Success(string _Text)
         {
@@ -100,8 +90,6 @@ namespace AppMessages
             MessageList.Add(GetMessage(_Code, Class.Warning));
         }
         #endregion
-
-        // Errors
 
         #region Error
         public void Error(string _Text)
@@ -169,58 +157,31 @@ namespace AppMessages
                     _Message.MessageText = $"{_Code} : Not Found in Message List";
                     _Message.MessageClass = Class.Error;
                     _Message.MessageID = -1;
+
+                    _ = InsertDB(_Message); // Add the message to the database if not found
                 }
             }
             return _Message;
         }
-
-        public Message GetMessage(Messages _Code)
-        {
-            var _Message = new Message(); ;
-            if (MessagesTable != null)
-            {
-                if (MessagesTable.Rows.Count > 0)
-                {
-                    _Message.Code = _Code.ToString();
-                    MessagesTable.DefaultView.RowFilter = $"Code='{_Message.Code}'";
-                    if (MessagesTable.DefaultView.Count == 1)
-                    {
-                        DataRow _Row = MessagesTable.DefaultView[0].Row;
-                        int.TryParse(_Row["Class"].ToString(), out int _Class);
-                        _Message.MessageID = (long)_Row["ID"];
-                        _Message.MessageText = (string)_Row["MessageText"];
-                        _Message.MessageClass = (Class)_Class;
-                        _Message.MessageDate = DateTime.Now;
-                        return _Message;
-                    }
-                }
-            }
-            _Message.MessageText += " " + _Code.ToString();
-            return _Message; ;
-        }
-
-        public Message GetMessage(string _Text)
-        {
-            return new Message()
-            {
-                MessageID = -1,
-                MessageClass = Class.Error,
-                MessageDate = DateTime.Now,
-                MessageText = _Text
-            };
-        }
-
         public Message GetMessage(string _Text, Class _Class)
         {
-            return new Message()
-            {
-                MessageID = -1,
-                MessageClass = _Class,
-                MessageDate = DateTime.Now,
-                MessageText = _Text
-            };
+            var _Message = new Message();
+            _Message.Code = "NoCode";
+            _Message.MessageText = _Text;
+            _Message.MessageClass = _Class;
+            return _Message;
         }
+        public Message GetMessage(string _Text)
+        {
+            var _Message = new Message();
+            _Message.Code = "NoCode";
+            _Message.MessageText = _Text;
+            _Message.MessageClass = Class.Alert;
+            return _Message;
+        }
+        #endregion
 
+        #region Add Range of Messages
         public void AddReange(List<Message> messageList)
         {
             if (messageList.Count > 0)
@@ -241,6 +202,64 @@ namespace AppMessages
                     MessageList.Add(message);
                 }
             }
+        }
+
+        #endregion
+
+        #region Add Message if not in DB rows
+
+        public bool InsertDB(string _Code, string _Text, Class _Class)
+        {
+            if (string.IsNullOrEmpty(_Code) || string.IsNullOrEmpty(_Text)) { return false; }
+            var IsExist = GetMessage(_Code, _Class);
+            if (IsExist.Code == "NoCode")
+            {
+                string _Query = "INSERT [MessageText] VALUES (@ID, @Key, @Language, @TextValue, @Section)";
+                SqliteCommand _Command = new SqliteCommand(_Query, MsgConnection);
+                _Command.Parameters.AddWithValue("@ID", -1);
+                _Command.Parameters.AddWithValue("@Key", _Code);
+                _Command.Parameters.AddWithValue("@Language", LanguageID);
+                _Command.Parameters.AddWithValue("@TextValue", _Text);
+                _Command.Parameters.AddWithValue("@Section", _Class.ToString());
+                _Command.ExecuteNonQuery();
+            }
+            return true;
+        }
+
+        public bool InsertDB(Message message)
+        {
+            InsertDB(message.Code, message.MessageText, message.MessageClass);
+            return true;
+        }
+
+        public bool InsertDB(string messageText)
+        {
+            InsertDB(Guid.NewGuid().ToString(), messageText, Class.Error);
+            return true;
+        }
+        #endregion
+
+        #region Get Error Message 
+        public static Message GetError(string text)
+        {
+            Message message = new Message();
+            message.Code = "NoCode";
+            message.MessageText = text;
+            message.MessageClass = Class.Error;
+
+            return message;
+        }
+
+        public static Message ErrorMessage(Exception error)
+        {
+            Message message = new Message()
+            {
+                Code = error.ToString(),
+                MessageText = error.Message,
+                MessageClass = Class.Error
+
+            };
+            return message;
         }
 
         #endregion

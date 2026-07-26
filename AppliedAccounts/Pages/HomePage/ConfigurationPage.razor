@@ -1,10 +1,9 @@
 ﻿@page "/Config"
-@using AppliedAccounts.Data
 @using AppliedAccounts.Services
 @using AppliedDB
 @using AppliedGlobals
 
-@inject GlobalService AppGlobal;
+@inject GlobalService AppGlobal
 
 @code {
 
@@ -84,7 +83,7 @@
 <hr />
 
 
-@if (_Connections.GetSqliteClient != null)
+@if (_Connections!.GetSqliteClient != null)
 {
 
     <table style="width:100%">
@@ -95,17 +94,14 @@
             </tr>
         </thead>
         <tbody>
-            <tr><td>Client Connection String</td>      <td>@_Connections.GetSqliteClient</td></tr>
+            <tr><td>Client Connection String</td>      <td>@_Connections.GetSqliteClient()?.ConnectionString""</td></tr>
         </tbody>
     </table>
 }
 else
 {
-
-
-    <br />
-    <hr />
-
-    @* <p>@Source.ConnectionString</p> *@
-    <p>Connection is not established.</p>
+    <div class="alert alert-danger" role="alert">
+        <p>Connection is not established.</p>
+    </div>
+}
 }

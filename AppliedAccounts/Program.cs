@@ -27,7 +27,7 @@ builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<UserAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
 builder.Services.AddScoped<PrintService>();
-builder.Services.AddScoped<IMessagesService, MessagesService>();
+builder.Services.AddScoped<MessagesService>();
 builder.Services.AddScoped<GlobalService>();
 builder.Services.AddScoped<IMenuDatabaseInitializer, MenuDatabaseInitializer>();
 builder.Services.AddScoped<IMenuService, MenuService>();

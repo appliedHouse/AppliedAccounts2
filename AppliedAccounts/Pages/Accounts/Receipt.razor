@@ -9,6 +9,7 @@
 @inject IToastService ToastService
 @inject PrintService ReportService
 @inject GlobalService AppGlobal
+@inject MessagesService MsgService
 
 @code {
     [Parameter] public int ID { get; set; }
@@ -19,7 +20,7 @@
     protected override void OnInitialized()
     {
         IsPageValid = true;
-        MyModel = new ReceiptModel(AppGlobal, ID);
+        MyModel = new ReceiptModel(AppGlobal, MsgService, ID);
         //MyModel.Start(ID);
 
         if (MyModel.MyVoucher == null) { ErrorMessage = "Voucher is null"; }

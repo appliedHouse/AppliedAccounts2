@@ -105,7 +105,7 @@ namespace AppliedAccounts.Pages.Accounts
             }
             catch (Exception error)
             {
-                MsgService.MsgClass.Add(error.Message);
+                MsgService.Error(error.Message);
             }
         }
 
@@ -178,7 +178,7 @@ namespace AppliedAccounts.Pages.Accounts
                         if (DelValidaded(_ID))
                         {
                             Source.Delete(_Row);
-                            MsgService.AddRange(Source.MsgClass);
+                            //MsgService.AddRange(MyModel.Source.MsgClass);
                             LoadData();
                             ToastService.ShowSuccess($"Project {_Row["Title"]} deleted successfully.");
                         }
@@ -197,8 +197,8 @@ namespace AppliedAccounts.Pages.Accounts
             }
             catch (Exception error)
             {
-                MsgService.MsgClass.AddReange(Source.MsgClass);
-                MsgService.MsgClass.Add(error.Message);
+                //MsgService.MsgService.AddReange(Source.MsgClass);
+                MsgService.Error(error);
             }
         }
 

@@ -28,7 +28,7 @@ namespace AppliedAccounts.Pages.Accounts
         }
         public void Start()
         {
-            MyModel = new(ID, BookID, AppGlobal); ;
+            MyModel = new(ID, BookID, AppGlobal, MsgService); ;
             MyModel.ReportService = ReportService;
 
             if (MyModel == null) { IsPageValid = false; MsgService.Warning("Model is null"); return; }
@@ -105,7 +105,7 @@ namespace AppliedAccounts.Pages.Accounts
             }
             else
             {
-                MsgService.AddRange(MyModel.MsgClass);
+                MsgService.AddRange(MyModel.MsgService);
             }
 
             

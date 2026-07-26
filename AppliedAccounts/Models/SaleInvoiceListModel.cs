@@ -18,7 +18,7 @@ namespace AppliedAccounts.Models
         public DataTable Data { get; set; } = new();
         public PageModel Pages { get; set; } = new();
 
-        public MessageClass MsgClass { get; set; } = new();
+        public MessagesService MsgService { get; set; }
         public decimal TotalAmount { get; set; } = 0.00M;
         public bool SelectAll { get; set; }
         public long VoucherID { get; set; }
@@ -27,9 +27,10 @@ namespace AppliedAccounts.Models
 
 
         #region Constructor
-        public SaleInvoiceListModel(GlobalService _AppGlobal) 
+        public SaleInvoiceListModel(GlobalService _AppGlobal, MessagesService msgService) 
         {
             AppGlobal = _AppGlobal;
+            MsgService = msgService;
             Source = new(AppGlobal.AppPaths);
             LoadData();
         }
@@ -38,9 +39,8 @@ namespace AppliedAccounts.Models
 
         #region Load Data
         
-        public async Task LoadData()
+        public void LoadData()
         {
-            //Source ??= new(AppGlobal.AppPaths);
             var _Query = SQLQuery.SaleInvoiceList();
             var _Sort = "Vou_Date, Vou_No";
 
@@ -127,14 +127,14 @@ namespace AppliedAccounts.Models
         #region Search
         public async void Search()
         {
-            await LoadData();
+            await Task.Run(()=>LoadData());
 
         }
 
         public async void ClearText()
         {
             SearchText = string.Empty;
-            await LoadData();
+            await Task.Run(() => LoadData());
         }
         #endregion
 
