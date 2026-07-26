@@ -5,7 +5,7 @@
 @using AppliedAccounts.Services
 
 @inject GlobalService AppGlobal
-@inject IToastService ToastService
+@inject IToastService Toaster
 @inject MessagesService MsgService
 
 
@@ -17,12 +17,7 @@
 }
 
 <PageHeading Text="Notes of Accounts"></PageHeading>
-
-@* Page Errors Show *@
-@if (MyModel.MsgService.Count > 0)
-{
-    <PageErrors Messages="@MyModel.MsgService"></PageErrors>
-}
+<ShowMessages MsgService="@MyModel.MsgService"/>
 
 <EditForm Model="@MyModel">
     <div class="container">

@@ -14,11 +14,11 @@ namespace AppliedAccounts.Pages.Accounts
 
             if (IsSaved) 
             {
-                ToastService.ShowSuccess(MyModel.MyMessage);
+                Toaster.ShowSuccess(MyModel.MyMessage);
             }
             else
             {
-                ToastService.ShowWarning(MyModel.MyMessage);
+                Toaster.ShowWarning(MyModel.MyMessage);
             }
         }
 
@@ -31,12 +31,12 @@ namespace AppliedAccounts.Pages.Accounts
         {
             if(MyModel.Delete(ID))
             {
-                ToastService.ShowSuccess(MyModel.MyMessage);
+                Toaster.ShowSuccess(MyModel.MyMessage);
                 MyModel.LoadData();
             }
             else
             {
-                ToastService.ShowWarning(MyModel.MyMessage);
+                Toaster.ShowWarning(MyModel.MyMessage);
             }
         }
 

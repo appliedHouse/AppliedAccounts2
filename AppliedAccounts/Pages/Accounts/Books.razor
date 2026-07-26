@@ -7,7 +7,7 @@
 @using AppliedAccounts.Component.Libs;
 @using AppliedAccounts.Services
 
-@inject IToastService ToastService
+@inject IToastService Toaster
 @inject PrintService ReportService
 @inject GlobalService AppGlobal
 @inject MessagesService MsgService
@@ -48,7 +48,7 @@
 </style>
 
 <PageHeading Text="CASH OR BANK BOOK" />
-<PageErrors Messages="@MyModel.MsgService" />
+<ShowMessages MsgService="@MyModel.MsgService" />
 
 @if (MyModel.IsWaiting)
 {

@@ -78,7 +78,7 @@ namespace AppliedAccounts.Pages.Accounts
 
             if (IsSaved)
             {
-                ToastService.ShowSuccess($"Successfully saved {MyModel.MyVoucher.Master.Vou_No}");
+                Toaster.ShowSuccess($"Successfully saved {MyModel.MyVoucher.Master.Vou_No}");
                 AppGlobal.NavManager.NavigateTo($"/Accounts/Receipt/{MyModel.MyVoucher.Master.ID1}");
             }
         }

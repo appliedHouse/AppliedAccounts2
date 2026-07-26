@@ -3,7 +3,7 @@
 @using ToastNotificationLibrary.Models
 @implements IDisposable
 
-@inject IToastService ToastService
+@inject IToastService Toaster
 
 @if (CurrentMessage != null && CurrentMessage.IsVisible)
 {
@@ -29,8 +29,8 @@
 
     protected override void OnInitialized()
     {
-        ToastService.OnShow += OnToastShow;
-        ToastService.OnHide += OnToastHide;
+        Toaster.OnShow += OnToastShow;
+        Toaster.OnHide += OnToastHide;
     }
 
     private void OnToastShow(ToastMessage message)
@@ -89,8 +89,8 @@
 
     public void Dispose()
     {
-        ToastService.OnShow -= OnToastShow;
-        ToastService.OnHide -= OnToastHide;
+        Toaster.OnShow -= OnToastShow;
+        Toaster.OnHide -= OnToastHide;
         _cancellationTokenSource?.Dispose();
     }
 }

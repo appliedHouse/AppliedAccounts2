@@ -117,7 +117,7 @@ namespace AppliedAccounts.Pages.Stock.Directory
                 if (Source.IsSaved)
                 {
                     LoadData(TableName);
-                    ToastService.ShowSuccess($"'{MyModel.Title}' has been saved successfully!");
+                    Toaster.ShowSuccess($"'{MyModel.Title}' has been saved successfully!");
                 }
             }
             else

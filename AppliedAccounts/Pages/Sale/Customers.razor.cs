@@ -29,12 +29,12 @@ namespace AppliedAccounts.Pages.Sale
             ID = MyModel.Record.ID;
             if (MyModel.Delete(ID))
             {
-                ToastService.ShowSuccess($"Successfully deleted {MyModel.Record.Title}");
+                Toaster.ShowSuccess($"Successfully deleted {MyModel.Record.Title}");
                 AppGlobal.NavManager.NavigateTo("/CustomerList");
             }
             else
             {
-                ToastService.ShowError($"Fail to be deleted {MyModel.Record.Title}");
+                Toaster.ShowError($"Fail to be deleted {MyModel.Record.Title}");
             }
         }
 
@@ -42,11 +42,11 @@ namespace AppliedAccounts.Pages.Sale
         {
             if (MyModel.Save())
             {
-                ToastService.ShowSuccess($"Successfully saved {MyModel.Record.Title}");
+                Toaster.ShowSuccess($"Successfully saved {MyModel.Record.Title}");
             }
             else
             {
-                ToastService.ShowError($"Fail to be saved {MyModel.Record.Title}");
+                Toaster.ShowError($"Fail to be saved {MyModel.Record.Title}");
             }
         }
     }

@@ -93,14 +93,14 @@ namespace AppliedAccounts.Pages.Accounts
                 var IsSaved = await Source.SaveAsync(_Row);
                 if (IsSaved)
                 {
-                    ToastService.ShowSuccess($"Project {MyModel.Title} saved successfully.");
+                    Toaster.ShowSuccess($"Project {MyModel.Title} saved successfully.");
                     MsgService.Success(Messages.Saved);
                     LoadData();
                     EditMode = false;
                 }
                 else
                 {
-                    ToastService.ShowError($"Project {MyModel.Title} failed to save.");
+                    Toaster.ShowError($"Project {MyModel.Title} failed to save.");
                 }
             }
             catch (Exception error)
@@ -160,7 +160,7 @@ namespace AppliedAccounts.Pages.Accounts
                 }
                 else
                 {
-                    ToastService.ShowWarning($"Projct Id {_ID} not found to edit.");
+                    Toaster.ShowWarning($"Projct Id {_ID} not found to edit.");
                 }
             }
         }
@@ -180,18 +180,18 @@ namespace AppliedAccounts.Pages.Accounts
                             Source.Delete(_Row);
                             //MsgService.AddRange(MyModel.Source.MsgClass);
                             LoadData();
-                            ToastService.ShowSuccess($"Project {_Row["Title"]} deleted successfully.");
+                            Toaster.ShowSuccess($"Project {_Row["Title"]} deleted successfully.");
                         }
                         else
                         {
-                            ToastService.ShowWarning($"Project {_Row["Title"]} cannot be deleted because it is referenced in other records.");
+                            Toaster.ShowWarning($"Project {_Row["Title"]} cannot be deleted because it is referenced in other records.");
 
                         }
                     }
                 }
                 else
                 {
-                    ToastService.ShowWarning($"Project Id {_ID} not found to delete.");
+                    Toaster.ShowWarning($"Project Id {_ID} not found to delete.");
 
                 }
             }

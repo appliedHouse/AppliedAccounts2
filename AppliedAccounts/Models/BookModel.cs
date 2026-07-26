@@ -424,10 +424,6 @@ namespace AppliedAccounts.Models
                 {
                     if (MyVoucher.Master.Vou_No == "NEW")
                     {
-                        //_Trans.Sr_No = _Trans.Sr_No * -1;
-                        //_Trans.action = "delete";
-                        //Deleted.Add(_Trans);                     // Marked record as deleted.
-
                         MyVoucher.Details.Remove(_Trans);
 
                         if (MyVoucher.Details.Count > 0)

@@ -34,7 +34,7 @@ namespace AppliedAccounts.Pages.Accounts
                 MyModel.IsWaiting = false;
                 MyModel.LoadData();
 
-                ToastService.ShowSuccess($"Sucessfully save {MyModel.Vou_No}" );
+                Toaster.ShowSuccess($"Sucessfully save {MyModel.Vou_No}" );
                 await InvokeAsync(StateHasChanged);
             }
             else

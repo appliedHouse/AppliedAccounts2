@@ -92,12 +92,12 @@ namespace AppliedAccounts.Pages.Purchase
 
             if (IsSaved)
             {
-                ToastService.ShowSuccess($"Successfully saved {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
+                Toaster.ShowSuccess($"Successfully saved {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
                 AppGlobal.NavManager.NavigateTo($"/Sale/SaleInvoice/{MyModel.MyVoucher.Master.ID1}");
             }
             else
             {
-                ToastService.ShowError($"Failed to save {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
+                Toaster.ShowError($"Failed to save {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
             }
         }
         #endregion

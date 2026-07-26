@@ -97,9 +97,7 @@ namespace AppliedAccounts.Pages.Accounts
                     // Delete Master record if (details are all deleted / empty)  20-DEC-2025
                 }
 
-
-
-                ToastService.ShowSuccess($"Book saved successfully with Voucher No: {MyModel.MyVoucher.Master.Vou_No}");
+                Toaster.ShowSuccess($"Book saved successfully with Voucher No: {MyModel.MyVoucher.Master.Vou_No}");
                 //   ShowToast(ToastClass.SaveToast, MyModel.MyVoucher.Master.Vou_No);
                 await InvokeAsync(StateHasChanged);
             }

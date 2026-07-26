@@ -277,7 +277,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             {
                 ReportService.IsError = true;
                 MsgService.Error(MESSAGES.CompanyLedgerAC_Notdefined);
-                ToastService.ShowError(MsgService.MsgClass.MessageList.Last().MessageText);            // show Last Message of the list
+                Toaster.ShowError(MsgService.MsgClass.MessageList.Last().MessageText);            // show Last Message of the list
                 return _Result;
             }
 

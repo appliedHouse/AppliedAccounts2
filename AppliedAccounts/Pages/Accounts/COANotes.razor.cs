@@ -14,11 +14,11 @@ namespace AppliedAccounts.Pages.Accounts
 
             if (IsSaved)
             {
-                ToastService.ShowSuccess($"Record {MyModel.Record.Title} has been saved Save");
+                Toaster.ShowSuccess($"Record {MyModel.Record.Title} has been saved Save");
             }
             else
             {
-                ToastService.ShowWarning($"Record {MyModel.Record.Title} failed to  Save");
+                Toaster.ShowWarning($"Record {MyModel.Record.Title} failed to  Save");
             }
         }
 
@@ -31,11 +31,11 @@ namespace AppliedAccounts.Pages.Accounts
         {
             if (MyModel.Delete(ID))
             {
-                ToastService.ShowSuccess(MyModel.MyMessage);
+                Toaster.ShowSuccess(MyModel.MyMessage);
             }
             else
             {
-                ToastService.ShowWarning(MyModel.MyMessage);
+                Toaster.ShowWarning(MyModel.MyMessage);
             }
         }
 

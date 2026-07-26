@@ -49,11 +49,11 @@ namespace AppliedAccounts.Pages.Accounts
             {
                 await InvokeAsync(StateHasChanged);
                 MyModel.MsgService.Success(AppMessages.Enums.Messages.Saved);
-                ToastService.ShowSuccess($"Successfully saved {MyModel.Record.Title}");
+                Toaster.ShowSuccess($"Successfully saved {MyModel.Record.Title}");
             }
             else
             {
-                ToastService.ShowError($"Failed to save {MyModel.Record.Title}");
+                Toaster.ShowError($"Failed to save {MyModel.Record.Title}");
             }
         }
 
@@ -63,14 +63,14 @@ namespace AppliedAccounts.Pages.Accounts
             if (IsDeleted)
             {
                 MyModel.MsgService.Success(AppMessages.Enums.Messages.Delete);
-                ToastService.ShowSuccess(MyModel.MyMessage);
+                Toaster.ShowSuccess(MyModel.MyMessage);
                 
                 MyModel.LoadData();
                 MyModel.GetFirstRecord();
             }
             else
             {
-                ToastService.ShowError(MyModel.MyMessage);
+                Toaster.ShowError(MyModel.MyMessage);
             }
         }
 

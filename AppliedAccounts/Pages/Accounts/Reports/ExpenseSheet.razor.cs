@@ -57,7 +57,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             }
             catch (Exception ex)
             {
-                ToastService.ShowError(ex.Message);
+                Toaster.ShowError(ex.Message);
             }
         }
 
@@ -69,7 +69,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             }
             catch (Exception ex)
             {
-                ToastService.ShowError(ex.Message);
+                Toaster.ShowError(ex.Message);
             }
         }
 
@@ -121,7 +121,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             }
             catch (Exception ex)
             {
-                ToastService.ShowError(ex.Message);
+                Toaster.ShowError(ex.Message);
             }
         }
 
@@ -139,7 +139,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             }
             catch (Exception ex)
             {
-                ToastService.ShowError(ex.Message);
+                Toaster.ShowError(ex.Message);
             }
         }
 
@@ -160,7 +160,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             }
             catch (Exception ex)
             {
-                ToastService.ShowError(ex.Message);
+                Toaster.ShowError(ex.Message);
             }
         }
         public async Task CreateSummaryReportModel()
@@ -180,7 +180,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             }
             catch (Exception ex)
             {
-                ToastService.ShowError(ex.Message);
+                Toaster.ShowError(ex.Message);
             }
         }
 
