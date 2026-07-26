@@ -6,20 +6,16 @@
 @using AppliedAccounts.Component.Libs;
 @using AppliedAccounts.Services
 
-<!-- inject AuthenticationStateProvider authorized;-->
-
 @inject IJSRuntime js
 @inject GlobalService AppGlobal
 @inject MessagesService MsgService
+@inject IToastService Toaster
 
 @code {
 
     [Parameter] public int? Nature { get; set; } = 0;
-    //private string UserRoll;
     private string DateFormat = Format.DDMMYY;
     private string CurrFormat = Format.Currency;
-    //private decimal Tot_DR = 0.0M;
-    //private decimal Tot_CR = 0.0M;
 
 
     protected override void OnInitialized()
@@ -33,62 +29,32 @@
             BookNatureChanged((long)Nature); 
         }
     }
-        
-       private void BookNatureChanged(long _NatureID)
-    {
-        MyModel.BookNatureID = _NatureID;
-        MyModel.BookID = MyModel.Source.GetBookAccounts(MyModel.BookNatureID).First()?.ID ?? 0;
-    }
 
-    private void BookListChanged(long _BookID)
-    {
-        MyModel.BookID = _BookID; //result;
-    }
+    
 
-    private void PageClick(MouseEventArgs e)
-    {
-        
-    }
+    
 }
 
 <PageHeading Text="@MyModel.BookNatureTitle"/>
 <ShowMessages MsgService="MyModel.MsgService"/>
+<ShowPrintWait Visiable="@MyModel.IsWaiting"/>
 
-
-@if(MyModel.IsWaiting)
-{
-    <ShowWaiting MyMessage="Printing Report....."/>
-}
-else
-{
 <EditForm Model="@MyModel">
-    <div class="d-flex flex-row mb-3 filter" hidden="@MyModel.IsWaiting">
+    <div class="d-flex flex-row mb-3 filter">
         <div class="p-2">
-            <InputSelect id="ddBook" class="item-height"
-                         TValue="long"
-                         Value="@MyModel.BookNatureID"
-                         ValueExpression="@(() => MyModel.BookNatureID)"
-                         ValueChanged="@((e) => BookNatureChanged(e))">
-                
-                @foreach (var item in MyModel.NatureAccountsList)
-                {
-                    <option value="@item.ID">@item.Title</option>
-                }
-
-            </InputSelect>
+            <MyDropDown id="ddNature"
+                        Label="Account Nature"
+                        Value="@MyModel.BookNatureID"
+                        ValueChanged="@((e) => BookNatureChanged(e))"
+                        Items="@MyModel.NatureAccountsList"
+                        />
         </div>
         <div class="p-2">
-            <InputSelect id="ddBook" class="item-height"
-                         TValue="long"
-                         Value="@MyModel.BookID"
-                         ValueExpression="@(()=> MyModel.BookID)"
-                         ValueChanged="@((e)=>BookListChanged(e))">
-
-                @foreach (var item in MyModel.Source.GetBookAccounts(MyModel.BookNatureID))
-                {
-                    <option value="@item.ID">@item.Title</option>
-                }
-            </InputSelect>
+            <MyDropDown id="ddBook"
+                        Label="Book"
+                        Value="@MyModel.BookID"
+                        ValueChanged="@((e) => BookListChanged(e))"
+                        Items="@MyModel.Source.GetBookAccounts(MyModel.BookNatureID)"/>
         </div>
         <div class="p-2">
             <InputDate id="dateStat" class="item-height" @bind-Value="MyModel.DT_Start"></InputDate>
@@ -143,7 +109,12 @@ else
                             <td>
                                 <EditButton NavTo=@_NavTo Title="Edit Voucher" />
                                 <PrintButton ReturnValue="Print" VoucherID=Record.ID />
-                            </td>
+
+                                @if (Record.Status == Status.Submitted.ToString())
+                                {
+                                    <DeleteButton OnClick="@(()=>DeleteVoucher(Record.ID))" UserRole="@AppGlobal.UserRole"  />
+                                }
+                        </td>
                         </tr>
                     }
                 </tbody>
@@ -158,4 +129,3 @@ else
     </div>
     
 </EditForm>
-}

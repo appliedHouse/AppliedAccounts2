@@ -41,16 +41,7 @@ namespace AppliedAccounts.Services
 
             Client = ((UserAuthenticationStateProvider)_StateProvider).AppUser;
 
-            var databaseConfig = new DatabaseConfig
-            {
-                UsersDb = "AppliedUsers2.db",
-                MessagesDb = "Messages.db",
-                LanguagesDb = "Languages.db",
-                SystemDb = "System.db",
-                MenusDb = "MenusDB.db",
-                ClientDb = string.Empty,
-                SessionDb = string.Empty
-            };
+            var databaseConfig = new DatabaseConfig();  // Get SQLite database default file names from AppliedDB.Connection Class
 
             var connectionLogger = _logger as ILogger<Connections> ?? LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<Connections>();
             Connections = new Connections(AppPaths, connectionLogger);
@@ -74,7 +65,6 @@ namespace AppliedAccounts.Services
             AppPaths.DBTempPath = Config.GetValue<string>("Paths:DBTempPath") ?? "SqliteTemp";
             AppPaths.SessionPath = Config.GetValue<string>("Paths:SessionPath") ?? "Sessions";
             AppPaths.ExcelFilesPath = Config.GetValue<string>("Paths:ExcelFilesPath") ?? "ExcelFiles";
-
 
             Author = new()
             {

@@ -5,6 +5,7 @@ using AppliedDB;
 using AppReports;
 using System.Data;
 using Enums = AppliedDB.Enums;
+using Status = AppliedDB.Enums.Status;
 using Format = AppliedGlobals.AppValues.Format;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
 using Messages = AppMessages.Enums.Messages;
@@ -118,7 +119,8 @@ namespace AppliedAccounts.Models
                     Description = "Opening Balance",
                     TReceived = _TotCR.ToString(Format.Digit),
                     TPaid = _TotDR.ToString(Format.Digit),
-                    TBalance = _OBal.ToString(Format.Digit)
+                    TBalance = _OBal.ToString(Format.Digit),
+                    Status = Status.Submitted.ToString()
                 };
 
                 if (Pages.Current == 1)
@@ -165,6 +167,7 @@ namespace AppliedAccounts.Models
                         _Record.TReceived = _CR.ToString(Format.Digit);
                         _Record.TPaid = _DR.ToString(Format.Digit);
                         _Record.TBalance = _Bal.ToString(Format.Digit);
+                        _Record.Status = Row.Field<string>("Status") ?? "Unknow";
                     }
                     ;
 
@@ -253,16 +256,6 @@ namespace AppliedAccounts.Models
                 Source.SetKey("BkBook", DT_End, KeyType.To);
                 Source.SetKey("BkBook", SearchText, KeyType.Text);
             }
-
-
-            //if (!string.IsNullOrEmpty(Source.DBFile))
-            //{
-            //    AppRegistry.SetKey(Source.DBFile, "BkNatureID", BookNatureID, KeyType.Number);
-            //    AppRegistry.SetKey(Source.DBFile, "BkBook", BookID, KeyType.Number, "Cash / Bank BooK");
-            //    AppRegistry.SetKey(Source.DBFile, "BkBook", DT_Start, KeyType.From);
-            //    AppRegistry.SetKey(Source.DBFile, "BkBook", DT_End, KeyType.To);
-            //    AppRegistry.SetKey(Source.DBFile, "BkBook", SearchText, KeyType.Text);
-            //}
         }
 
         internal void GetKeys()
@@ -275,6 +268,11 @@ namespace AppliedAccounts.Models
                 DT_End = AppRegistry.GetTo(Source.DBFile, "BkBook");
                 SearchText = AppRegistry.GetText(Source.DBFile, "BkBook");
             }
+        }
+
+        internal bool DeleteAll(long VoucherID)
+        {
+            throw new NotImplementedException();
         }
         #endregion
 

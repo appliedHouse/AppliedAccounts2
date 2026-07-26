@@ -2,6 +2,7 @@
 using AppliedAccounts.Models;
 using AppliedDB;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace AppliedAccounts.Pages.Accounts
 {
@@ -36,12 +37,12 @@ namespace AppliedAccounts.Pages.Accounts
         }
         #endregion
 
-        public string GetTitle(List<CodeTitle> _List, int _Value)
-        {
-            if (_List == null || _List.Count == 0) { return string.Empty; }
-            return _List.FirstOrDefault(x => x.ID == _Value)!.Title ?? "";
+        //public string GetTitle(List<CodeTitle> _List, int _Value)
+        //{
+        //    if (_List == null || _List.Count == 0) { return string.Empty; }
+        //    return _List.FirstOrDefault(x => x.ID == _Value)!.Title ?? "";
 
-        }
+        //}
 
         #region Print
         public async Task Print(ReportActionClass reportAction)
@@ -66,6 +67,33 @@ namespace AppliedAccounts.Pages.Accounts
         }
         #endregion
 
+        #region DropDown Changed
+        private void BookNatureChanged(long _NatureID)
+        {
+            MyModel.BookNatureID = _NatureID;
+            MyModel.BookID = MyModel.Source.GetBookAccounts(MyModel.BookNatureID).First()?.ID ?? 0;
+        }
+
+        private void BookListChanged(long _BookID)
+        {
+            MyModel.BookID = _BookID; //result;
+        }
+        #endregion
+
+
+        #region Delete record and Voucher
+        private void DeleteVoucher(long VoucherID)
+        {
+            if (MyModel.DeleteAll(VoucherID))
+            {
+                Toaster.ShowInfo($"Voucher Deleted Successfully {VoucherID}");
+            }
+            else
+            {
+                Toaster.ShowError($"Voucher Deletion Failed {VoucherID}");
+            }
+        }
+        #endregion
 
     }
 
@@ -84,6 +112,7 @@ namespace AppliedAccounts.Pages.Accounts
         public string TReceived { get; set; }
         public string TPaid { get; set; }
         public string TBalance { get; set; }
+        public string Status { get; set; }
 
     }
     #endregion
