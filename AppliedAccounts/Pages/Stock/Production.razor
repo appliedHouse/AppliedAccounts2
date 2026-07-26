@@ -1,6 +1,11 @@
 ﻿@page "/MainMenu/Production"
 @attribute [Authorize];
-@inject NavigationManager NavManager;
+    
+@inject GlobalService AppGlobals
+@inject MessagesService MsgService
+@inject ToastService ToastService
+
+
 <h3>Production</h3>
 
 @code {

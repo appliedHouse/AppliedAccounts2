@@ -55,9 +55,9 @@ namespace AppliedAccounts.Pages.Accounts
                 MyModel.VoucherID = reportAction.VoucherID;
                 await Task.Run(() => { MyModel.Print(reportAction.PrintType); });
             }
-            catch (Exception)
+            catch (Exception error)
             {
-                MyModel.MsgClass.Add(AppMessages.Enums.Messages.prtReportError);
+                MyModel.MsgService.Error(error);
             }
 
             MyModel.IsWaiting = false;

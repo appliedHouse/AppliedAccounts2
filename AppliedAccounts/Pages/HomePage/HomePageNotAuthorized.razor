@@ -1,22 +1,17 @@
 ﻿@layout NotAuthorizedLayout
-@inject NavigationManager NavManager;
+@inject NavigationManager NavManager
 
-@using AppliedLanguage;
-@using AppliedAccounts.Data;
-@using AppliedAccounts.Models;
 @using AppliedAccounts.Services;
-@inject GlobalService GlobalService;
-@inject NavigationManager NavManager;
+@inject GlobalService AppGlobal
+@inject NavigationManager NavManager
 
 @code {
 
-    public GlobalService AppGlobal { get; set; }
     public string? BusinessPic { get; set; }
     public bool UserDBFileExist { get; set; }
 
     protected override void OnInitialized()
     {
-        AppGlobal = GlobalService;
         BusinessPic = Path.Combine(AppGlobal.AppPaths.ImagesPath, "Accounts3.jpg");
         string UserDB = Path.Combine(AppGlobal.AppPaths.FirstPath,
                                      AppGlobal.AppPaths.RootPath,

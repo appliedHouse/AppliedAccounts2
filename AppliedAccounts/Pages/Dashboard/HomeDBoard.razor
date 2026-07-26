@@ -1,15 +1,16 @@
-﻿@using AppliedAccounts.Data.ChartData
-@using AppliedAccounts.Services
+﻿@using AppliedAccounts.Services
 @using System.Data
+@using AppliedDB
 @using static AppliedGlobals.AppErums
 
 @inject GlobalService AppGlobal
 @inject IJSRuntime JS
+@inject MessagesService MsgService
 
 @code {
     public double Alpha = 0.7;   // Color ocapacity for the chart colors
 
-    public AppliedDB.DataSource Source { get; set; }
+    public DataSource Source { get; set; } = new();
     private string ChartType = "bar";
     private List<string> Labels = new();
     private List<int> DataValues = new();
@@ -50,7 +51,7 @@
 
     private class SearchModel
     {
-        public string SearchText { get; set; }
+        public string SearchText { get; set; } = string.Empty;
     }
 
     protected override void OnInitialized()
@@ -152,14 +153,6 @@
 <div class="container">
     <!-- First Row -->
     <div class="row mt-2 mb-2">
-        @* <div class="col-md-6 col-12 mb-5 top-left">
-            <BarGraph ChartType="bar"
-                      labelTitle="Revenue"
-                      Labels="Labels"
-                      DataValues="DataValues"
-                      BackgroundColors="BackgroundColors"
-                      BorderColors="BorderColors" />
-        </div> *@
         <div class="col-12 mb-5 top-right">
             <PieGraph ChartId="myDoughnutChart"
                       ChartType="doughnut"

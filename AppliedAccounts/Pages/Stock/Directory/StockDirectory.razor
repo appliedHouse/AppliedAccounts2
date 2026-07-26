@@ -1,6 +1,6 @@
 ﻿@page "/Stock/Directory/{TableName}"
 @using AppliedAccounts.Component.ButtonsDictionery
-@using AppliedAccounts.Libs
+@using AppliedAccounts.Component.Libs
 
 @inject GlobalService AppGlobal
 
@@ -18,14 +18,14 @@
         }
         else
         {
-            MsgClass.Critical("No Directory Name Found");
+            MsgService.Critical("No Directory Name Found");
         }
 
     }
 }
 
 <PageHeading Text="@SubHeadingTitle" />
-<ShowMessages MsgClass="MsgClass"></ShowMessages>
+<ShowMessages MsgService="@MsgService"/>
 
 <EditForm Model="MyModel">
     @if (EditMode)

@@ -14,8 +14,8 @@ namespace AppliedDB
         public TempDB(string _TempDBFile)
         {
             TempDBFile = _TempDBFile;
-            string _DBPath = Path.Combine(Connections.GetTempDBPath(), TempDBFile);
-            MyConnection = new SqliteConnection($"Data Source={_DBPath}");
+            //string _DBPath = Path.Combine( Connections.GetTempDBPath(), TempDBFile);
+            MyConnection = new SqliteConnection($"Data Source={_TempDBFile}");
         }
 
         public async Task<DataTable> GetTempTableAsync(string tableName)

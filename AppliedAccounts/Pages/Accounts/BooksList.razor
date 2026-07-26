@@ -2,17 +2,15 @@
 @page "/Accounts/BooksList";
 @page "/Accounts/BooksList/{Nature:int}";
 @attribute [Authorize];
-@using AppliedAccounts.Libs;
-@using AppliedAccounts.Models;
-@using AppliedAccounts.Data;
+
+@using AppliedAccounts.Component.Libs;
 @using AppliedAccounts.Services
-@using AppliedDB
-@using System.Data
 
 <!-- inject AuthenticationStateProvider authorized;-->
 
 @inject IJSRuntime js
 @inject GlobalService AppGlobal
+@inject MessagesService MsgService
 
 @code {
 
@@ -26,7 +24,7 @@
 
     protected override void OnInitialized()
     {
-        MyModel = new(0, AppGlobal);   // BookID and UserProfile.
+        MyModel = new(0, AppGlobal, MsgService);   // BookID and UserProfile.
         MyModel.GetKeys();
         NavManager = AppGlobal.NavManager;
 
@@ -54,7 +52,7 @@
 }
 
 <PageHeading Text="@MyModel.BookNatureTitle"/>
-<ShowMessages MsgClass="MyModel.MsgClass"/>
+<ShowMessages MsgService="MyModel.MsgService"/>
 
 
 @if(MyModel.IsWaiting)

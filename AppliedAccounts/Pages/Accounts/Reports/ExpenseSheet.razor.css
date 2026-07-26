@@ -1,0 +1,214 @@
+﻿.expense-page {
+    background: #f4f6f9;
+    min-height: 100vh;
+    padding-bottom: 30px;
+}
+
+/* TITLE */
+
+.expense-title {
+    background: linear-gradient(90deg, #0f172a, #334155);
+    color: white;
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+    padding: 16px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+}
+
+/* TOOLBAR */
+
+.expense-toolbar {
+    background: white;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+}
+
+/* LEFT RIGHT */
+
+.toolbar-side {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: 280px;
+}
+
+.right-side {
+    align-items: flex-end;
+}
+
+/* LABELS */
+
+.expense-info-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.expense-info-label {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* SELECT */
+
+.expense-sheet-select {
+    width: 260px;
+    height: 46px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    padding: 0 12px;
+}
+
+/* COMPANY */
+
+.expense-company-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* SEARCH */
+
+.toolbar-center {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    justify-content: center;
+}
+
+.expense-search-input {
+    width: 360px;
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    padding: 0 14px;
+    font-size: 15px;
+}
+
+.expense-clear-btn {
+    height: 48px;
+    min-width: 95px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+/* REPORT BOX */
+
+.expense-report-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f8fafc;
+    border: 1px solid #dbe3ea;
+    border-radius: 14px;
+    padding: 12px 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* HEADING */
+
+.expense-inline-heading {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* TABLE */
+
+.expense-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border-radius: 18px;
+    background: white;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+}
+
+    /* TABLE HEAD */
+
+    .expense-table thead tr {
+        background: #6f8d73;
+    }
+
+    .expense-table thead th {
+        color: white;
+        font-size: 15px;
+        font-weight: 700;
+        padding: 16px;
+        text-align: center;
+    }
+
+    /* TABLE BODY */
+
+    .expense-table tbody td {
+        background: white;
+        padding: 15px;
+        border-bottom: 1px solid #edf2f7;
+        color: #1e293b;
+    }
+
+    /* HOVER */
+
+    .expense-table tbody tr:hover td {
+        background: #f8fafc;
+    }
+
+    /* FOOTER */
+
+    .expense-table tfoot tr {
+        background: linear-gradient(90deg, #0f172a, #111827);
+    }
+
+    .expense-table tfoot th {
+        color: white;
+        padding: 18px;
+    }
+
+/* COLORS */
+
+.voucher-text {
+    color: #2563eb;
+    font-weight: 700;
+}
+
+.debit-text {
+    color: #0f766e;
+    font-weight: 700;
+    text-align: right;
+}
+
+.credit-text {
+    color: #dc2626;
+    font-weight: 700;
+    text-align: right;
+}
+
+/* MOBILE */
+
+@media(max-width:1200px) {
+
+    .expense-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .toolbar-center {
+        justify-content: flex-start;
+    }
+
+    .right-side {
+        align-items: flex-start;
+    }
+}

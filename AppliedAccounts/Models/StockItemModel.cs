@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Services;
 using AppliedDB;
 using System.Data;
 using Tables = AppliedDB.Enums.Tables;
@@ -27,7 +28,7 @@ namespace AppliedAccounts.Models
 
         public virtual long StockID { get; set; }
         public virtual string DataFile { get; set; } = string.Empty;
-        public virtual AppMessages.MessageClass MsgClass { get; set; } = new();
+        public virtual MessagesService MsgService { get; set; } 
 
         #region Constructor
         public StockItemModel() { CurrentRow = TB_Stock.NewRow(); }
@@ -97,7 +98,7 @@ namespace AppliedAccounts.Models
         {
 
 
-            MsgClass.ClearMessages();
+            MsgService.Clear();
             
 
             CurrentRow["ID"] = ID;
@@ -112,7 +113,7 @@ namespace AppliedAccounts.Models
             
             // Depreciated
             //AppFunctions.Save(DataFile, TB_Stock, CurrentRow);                      // change it to Source (DataSource) of DB
-            MsgClass.Add(string.Concat([Code, ",", Title, " : Add Record"]));
+            MsgService.Alert(string.Concat([Code, ",", Title, " : Add Record"]));
 
 
 

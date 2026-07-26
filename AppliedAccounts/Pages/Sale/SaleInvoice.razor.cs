@@ -92,7 +92,7 @@ namespace AppliedAccounts.Pages.Sale
             if (IsSaved)
             {
                 ToastService.ShowSuccess($"Successfully saved {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
-                NavManager.NavigateTo($"/Sale/SaleInvoice/{MyModel.MyVoucher.Master.ID1}");
+                AppGlobal.NavManager.NavigateTo($"/Sale/SaleInvoice/{MyModel.MyVoucher.Master.ID1}");
             }
             else
             {
@@ -109,7 +109,7 @@ namespace AppliedAccounts.Pages.Sale
             {
                 MyModel.Deleted.Add(MyModel.MyVoucher.Detail);                  // Save in deleted list
                 MyModel.MyVoucher.Details.Remove(MyModel.MyVoucher.Detail);     // remove from detail list
-                MyModel.MsgClass.Add(AppMessages.Enums.Messages.RowDeleted);    // Set message to display after deleted.
+                MyModel.MsgService.Warning(AppMessages.Enums.Messages.RowDeleted);    // Set message to display after deleted.
             }
 
         }
@@ -118,12 +118,12 @@ namespace AppliedAccounts.Pages.Sale
         #region Home & Back Buttons
         public void GotoHome()
         {
-            NavManager.NavigateTo("/");
+            AppGlobal.NavManager.NavigateTo("/");
         }
 
         public void BackPage()
         {
-            NavManager.NavigateTo("/Sale/SaleInvoiceList");
+            AppGlobal.NavManager.NavigateTo("/Sale/SaleInvoiceList");
         }
 
 

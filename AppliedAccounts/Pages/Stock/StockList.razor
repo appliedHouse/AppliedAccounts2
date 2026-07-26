@@ -4,11 +4,12 @@
 @attribute [Authorize];
 
 @using AppliedAccounts.Component
-@using AppliedAccounts.Libs
+@using AppliedAccounts.Component.Libs
 @using AppliedAccounts.Services
 
 @inject GlobalService AppGlobal
 @inject IToastService Toaster
+@inject MessagesService MsgService
 
 @code {
     private string UserRoll;
@@ -19,7 +20,8 @@
 
     protected override void OnInitialized()
     {
-        MyModel = new(AppGlobal);   // BookID and UserProfile.
+        MyModel = new(AppGlobal, MsgService);   // BookID and UserProfile.
+        MyModel.MsgService = MsgService;
         ShowList = true;
         ShowForm = false;
     }
@@ -27,7 +29,7 @@
 
 <PageHeading Text="Inventory / Stock / Services" />
 
-<ShowMessages MsgClass="MyModel.MsgClass" />
+<ShowMessages MsgClass="MyModel.MsgService.MsgClass" />
 
 <EditForm Model="MyModel">
     @if (ShowForm)

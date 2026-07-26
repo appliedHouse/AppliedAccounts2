@@ -2,12 +2,12 @@
 @attribute [Authorize]
 @layout PageLayout
 
-@using AppliedAccounts.Libs
-@using AppliedAccounts.Models
+@using AppliedAccounts.Component.Libs
 @using AppliedAccounts.Services
 
 @inject PrintService PrintReport
 @inject GlobalService AppGlobal
+@inject MessagesService MsgService
 
 @code {
     private bool IsPageValid = true;

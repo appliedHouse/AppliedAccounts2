@@ -1,7 +1,6 @@
 ﻿using AppliedGlobals;
 using AppMessages;
 using Microsoft.Data.Sqlite;
-using System.Configuration;
 using System.Data;
 using System.Text;
 using static AppliedDB.Enums;
@@ -13,45 +12,37 @@ namespace AppliedDB
     public class DataSource : IDisposable
     {
         public AppValues.AppPath AppPaths { get; set; }
-        public SqliteConnection MyConnection { get; set; }
-        public SqliteConnection MyConnection2 { get; set; }
+        public Connections MyConnections { get; set; }
+        public SqliteConnection MyConnection => MyConnections.GetSqliteClient()!;
+        public SqliteConnection MsgConnection => MyConnections.GetSqliteMessage()!;
+        public SqliteConnection SysConnection => MyConnections.GetSqliteSystem()!;
         public SqliteCommand MyCommand { get; set; }
         public CommandClass MyCommands { get; set; } = new();
         public string DBFile => GetDataFile();
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } 
         public bool IsSaved { get; set; } = false;
-        public MessageClass MsgClass { get; set; } = new();
+        public MessageClass MsgClass { get; set; } 
 
         public SqliteTransaction? DBtransaction;
 
 
         #region Constructor
 
+        public DataSource()
+        {
+        }
+
         public DataSource(AppValues.AppPath _AppPaths)
         {
+            MyConnections = new Connections(_AppPaths);
             AppPaths = _AppPaths;
-            var _Connection = new Connections(AppPaths);
-            MyConnection = _Connection.GetSqliteClient()!;               // Get a connection of Client
-            MyConnection2 = _Connection.GetSqliteClient()!;              // Get a connection of Client
+            MsgClass = new MessageClass(MsgConnection);
 
             if (MyConnection is not null)
             {
                 MyCommand = new SqliteCommand("", MyConnection);
             }
-
-            var FilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", AppPaths.MessagesPath, "Messages.db");
-
-            if(!string.IsNullOrEmpty(FilePath))
-            {
-                var _ConnectionString = $"Data Source={FilePath}";
-                MsgClass.MsgConnection = new SqliteConnection(_ConnectionString);
-            }
         }
-
-        public DataSource()
-        {
-        }
-
 
         #endregion
 
@@ -85,7 +76,8 @@ namespace AppliedDB
                 if (!string.IsNullOrEmpty(_Filter)) { _Text.Append($"WHERE {_Filter} "); }
 
                 MyCommand.CommandText = _Text.ToString(); ;
-                return GetDataTable(_Table, MyCommand);
+                var _table = GetDataTable(_Table, MyCommand);
+                return _table;
             }
             return new DataTable();
         }
@@ -184,7 +176,6 @@ namespace AppliedDB
         {
             return GetTable(_SQLQuery, "", "");
         }
-
         public async Task<DataTable> GetTableAsync(string _SQLQuery)
         {
             var _Table = await Task.Run(() => GetTable(_SQLQuery, "", ""));
@@ -221,6 +212,32 @@ namespace AppliedDB
             {
                 MsgClass.Critical(ex.Message);
                 return new DataTable();
+            }
+        }
+
+        public DataTable? GetTable(string _SQLQuery, SqliteConnection _Connection)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(_SQLQuery))
+                    if (_Connection is not null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(_SQLQuery))
+                        {
+                            if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
+                            using var _Command = new SqliteCommand(_SQLQuery, _Connection);
+                            using var reader = _Command.ExecuteReader();
+                            var dt = GetDataTableExtention(reader);
+                            dt.TableName = ExtractTableNameFromQuery(_SQLQuery);
+                            return dt;
+                        }
+                    }
+                return new DataTable();
+            }
+            catch (Exception ex)
+            {
+                MsgClass.Critical(ex.Message);
+                return null;
             }
         }
         #endregion
@@ -360,11 +377,11 @@ namespace AppliedDB
         public static DataTable Messages()
         {
             var DefaultLanguage = 1;
-            return Messages(DefaultLanguage);
+            return Messages(DefaultLanguage, new Connections());
         }
-        public static DataTable Messages(int _Language)
+        public static DataTable Messages(int _Language, Connections _Connections)
         {
-            var _Connection = Connections.GetMessagesConnection();
+            var _Connection = _Connections.GetSqliteMessage();
             if (_Connection is not null)
             {
                 if (_Connection.State != ConnectionState.Open) { _Connection.Open(); }
@@ -424,12 +441,25 @@ namespace AppliedDB
             return new();
         }
 
+        public List<DataRow>? GetList(string Query)
+        {
+            if (AppPaths is not null)
+            {
+                var _Table = GetTable(Query);
+                if (_Table is not null)
+                {
+                    return _Table.AsEnumerable().ToList();
+                }
+            }
+            return null;
+        }
+
         #endregion
 
         #region Get Data Row
         public DataRow? GetDataRow(Tables _Table, long ID)
         {
-            var _Connection = Connections.GetSqliteConnection(MyConnection.DataSource)!;
+            var _Connection = MyConnections.GetSqliteClient();
             var _DataTable = GetDataTable(_Table, _Connection, $"ID={ID}");
             if (_DataTable.Rows.Count > 0)
             {
@@ -442,8 +472,7 @@ namespace AppliedDB
 
         public DataRow? GetDataRow(string _Query)
         {
-            var _Connection = Connections.GetSqliteConnection(MyConnection.DataSource)!;
-            var _DataTable = GetQueryTable(_Query, _Connection);
+            var _DataTable = GetQueryTable(_Query, MyConnection);
             if (_DataTable.Rows.Count > 0)
             {
                 DataRow row = _DataTable.Rows[0];
@@ -767,9 +796,9 @@ namespace AppliedDB
 
                 }
             }
-            catch (Exception)
+            catch (Exception error)
             {
-
+                // Save error message in log.
             }
 
             return new DataTable();
@@ -842,7 +871,7 @@ namespace AppliedDB
         {
             // Create this function due to command.transaction issue.
             // Create a new connection without transaction to avoid error in transaction mode.
-            var _Connection = Connections.GetSqliteConnectionbyString(ConnectionString);
+            var _Connection =  Connections.GetSqliteConnectionbyString(ConnectionString);
             DataTable _DataTable = GetDataTable(_Table, _Connection!);
             if (_DataTable.Rows.Count == 0) { return 1; }
             long _MaxID = (long)_DataTable.Compute("MAX(ID)", "") + 1;
@@ -917,9 +946,22 @@ namespace AppliedDB
         #endregion
 
         #region Get NewRow of Table
-        public static DataRow GetNewRow(string DBFile, Tables _Table)
+        //public static DataRow GetNewRow(string DBFile, Tables _Table)
+        //{
+        //    using var _DataTable = GetDataTable(DBFile, _Table);
+        //    if (_DataTable is not null)
+        //    {
+        //        var _NewRow = _DataTable.NewRow();
+        //        _DataTable.Dispose();
+        //        return _NewRow;
+        //    }
+        //    return null!;
+        //}
+
+
+        public DataRow GetNewRow(Tables _Table)
         {
-            using var _DataTable = GetDataTable(DBFile, _Table);
+            using var _DataTable = GetDataTable(DBFile,_Table);
             if (_DataTable is not null)
             {
                 var _NewRow = _DataTable.NewRow();
@@ -927,12 +969,8 @@ namespace AppliedDB
                 return _NewRow;
             }
             return null!;
-        }
 
-
-        public DataRow GetNewRow(Tables _Table)
-        {
-            return GetNewRow(DBFile, _Table);
+            //return GetNewRow(DBFile, _Table);
         }
 
         #endregion
@@ -1536,13 +1574,13 @@ namespace AppliedDB
                     MyConnection.Close();
 
                 MyConnection?.Dispose();
-                MyConnection = null!;
+                //MyConnection = null!;
 
-                if (MyConnection2?.State == ConnectionState.Open)
-                    MyConnection2.Close();
+                //if (MyConnection2?.State == ConnectionState.Open)
+                //    MyConnection2.Close();
 
-                MyConnection2?.Dispose();
-                MyConnection2 = null!;
+                //MyConnection2?.Dispose();
+                //MyConnection2 = null!;
             }
             catch
             {

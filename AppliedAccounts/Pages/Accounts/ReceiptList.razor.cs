@@ -29,7 +29,7 @@ namespace AppliedAccounts.Pages.Accounts
             }
             catch (Exception error)
             {
-                MyModel.MsgClass.Danger(error.Message);
+                MyModel.MsgService.Danger(error.Message);
             }
             finally
             {

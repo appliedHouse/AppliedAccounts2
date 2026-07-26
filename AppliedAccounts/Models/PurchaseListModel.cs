@@ -17,7 +17,7 @@ namespace AppliedAccounts.Models
         public ListFilter FilterClass { get; set; }
         public List<PurchaseRecord> Records { get; set; }
         public PurchaseRecord Record { get; set; }
-        public MessageClass MsgClass { get; set; }
+        public MessagesService MsgService { get; set; }
         public AppliedDB.Enums.Tables Table { get; set; }
         public bool SelectAll { get; set; }
 
@@ -25,7 +25,7 @@ namespace AppliedAccounts.Models
         {
             AppGlobal = _AppGlobal;
             Source = new(AppGlobal.AppPaths);
-            MsgClass = new();
+            
             FilterClass = new(AppGlobal.DBFile);
             Table = Tables.view_BillPayable;
             Records = LoadData();

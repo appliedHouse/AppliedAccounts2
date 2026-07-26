@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Services;
 using AppliedDB;
 using AppMessages;
 using AppReports;
@@ -11,7 +12,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
     {
         public TBProjectModel MyModel { get; set; }
         public DataSource Source { get; set; }
-        public MessageClass MsgClass { get; set; } = new MessageClass();
+        public MessagesService MsgService { get; set; } 
 
         bool IsPrinting = false;
 
@@ -21,7 +22,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Print Trial Balance
         public async void Print(ReportActionClass PrintAction)
         {
-            MsgClass = new();           // Clear all previous messages - refresh
+                       // Clear all previous messages - refresh
             IsPrinting = true;
             await InvokeAsync(StateHasChanged); await Task.Delay(100);
 
@@ -34,13 +35,13 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 if (!ReportService.IsError)
                 {
                     ReportService.Print();
-                    MsgClass = ReportService.MsgClass;
+                    MsgService.AddRange(ReportService.MsgService.MsgClass);
                 }
 
             }
             catch (Exception error)
             {
-                MsgClass.Error(error.Message);
+                MsgService.Error(error.Message);
             }
 
             IsPrinting = false;

@@ -1,26 +1,37 @@
 ﻿@page "/ViewPDF"
 @* @page "/ViewPDF/{string:PDFFile}" *@
-@attribute [Authorize];
-@using AppliedAccounts.Libs;
-@using AppliedAccounts.Models;
-@using AppliedDB;
 
-@inject AuthenticationStateProvider authStateProvider;
-@inject NavigationManager NavManager;
-@inject IJSRuntime js
+
+@attribute [Authorize];
+
 
 @code {
 
+    [Parameter] public string PDFFile { get; set; } = string.Empty;
 
-    [Parameter] public string PDFFile { get; set; }
-    public AppUserModel AppUser { get; set; }
     protected override void OnInitialized()
     {
-        AppUser = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
-        //AppRegistry.GetText(AppUser.DataFile, "PDFFile");
+    }
+
+    public class PDFFileConstraint : IRouteConstraint
+    {
+        public bool Match(HttpContext httpContext, IRouter route, string routeKey,
+                          RouteValueDictionary values, RouteDirection routeDirection)
+        {
+            if (values.TryGetValue(routeKey, out object value) && value is string str)
+            {
+                // Your validation logic for PDF files
+                return str.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase) ||
+                       // or check if it's a valid file name
+                       !string.IsNullOrWhiteSpace(str);
+            }
+            return false;
+        }
     }
 }
 
-<a href=@PDFFile target="_blank">Open PDF in New Tab</a>
-
-<iframe src="@PDFFile" style="width:100%; height:100vh;"></iframe>
+@if(!string.IsNullOrWhiteSpace(PDFFile))
+{
+    <a href=@PDFFile target="_blank">Open PDF in New Tab</a>
+    <iframe src="@PDFFile" style="width:100%; height:100vh;"></iframe>
+}

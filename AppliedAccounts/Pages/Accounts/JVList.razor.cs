@@ -4,7 +4,6 @@ using AppliedAccounts.Services;
 using AppliedDB;
 using AppliedGlobals;
 using AppMessages;
-using AppReports;
 using System.Data;
 
 namespace AppliedAccounts.Pages.Accounts
@@ -14,7 +13,6 @@ namespace AppliedAccounts.Pages.Accounts
         public DataSource Source { get; set; }
         public JVListViewModel MyModel { get; set; } = new();
         public List<JVListDataModel> JVItems { get; set; } = new();
-        public MessageClass MsgClass { get; set; } = new();
         public PageModel Pages { get; set; } = new();
 
 
@@ -57,7 +55,7 @@ namespace AppliedAccounts.Pages.Accounts
             }
             catch (Exception error)
             {
-                MsgClass.Error(error.Message);
+                MsgService.Error(error.Message);
             }
         }
 
@@ -123,41 +121,36 @@ namespace AppliedAccounts.Pages.Accounts
         #region Print
         public async Task Print(ReportActionClass reportAction)
         {
-            MyModel.IsWaiting = true;
-
-            await InvokeAsync(StateHasChanged);
-
             try
             {
-                MyModel.VoucherNo = (string)Source.SeekValue(AppliedDB.Enums.Tables.Ledger, reportAction.VoucherID, "Vou_No")!;
-                if (!string.IsNullOrEmpty(MyModel.VoucherNo))
+                MyModel.IsWaiting = true;
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(100);
+
+                var reportService = new VoucherPrint(reportAction, AppGlobal);
+
+                await Task.Run(async () =>
                 {
-                    VoucherPrint PrintClass = new(AppGlobal, reportAction.PrintType, MyModel.VoucherNo);
-                    if (!PrintClass.IsError)
+                    try
                     {
-                        await PrintClass.Print();
+                        await reportService.PrintAsync();
                     }
-                }
-                else
-                {
-                    MsgClass.Warning(AppMessages.Enums.Messages.VoucherNotFound);
-                }
+                    catch (Exception error)
+                    {
+                        MsgService.Error($"Print operation error: {error.Message}");
+                    }
+                });
 
-
+                MyModel.IsWaiting = false;
+                await InvokeAsync(StateHasChanged);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MsgClass.Add(AppMessages.Enums.Messages.prtReportError);
+                MsgService.Error($"Print error: {ex.Message}");
+                MyModel.IsWaiting = false;
+                await InvokeAsync(StateHasChanged);
             }
-
-            MyModel.IsWaiting = false;
-            await InvokeAsync(StateHasChanged);
-            await Task.Delay(100);                  // Delay for show the message and 
         }
-
-
-
-
         #endregion
 
         #region Keys

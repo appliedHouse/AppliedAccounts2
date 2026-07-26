@@ -28,7 +28,7 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> BookList { get; set; } = [];
         public GlobalService AppGlobal { get; set; }
         public DataSource Source { get; set; }
-        public MessageClass MsgClass { get; set; }
+        public MessagesService MsgService { get; set; }
         public DateTime LastVoucherDate { get; set; }
         public DateTime MinVouDate = AppRegistry.MinDate;
         public DateTime MaxVouDate { get; set; }
@@ -57,10 +57,10 @@ namespace AppliedAccounts.Models
         {
 
         }
-        public BookModel(long _VoucherID, long _BookID, GlobalService _AppGlobal)
+        public BookModel(long _VoucherID, long _BookID, GlobalService _AppGlobal, MessagesService msgService)
         {
             AppGlobal = _AppGlobal;
-            MsgClass = new();
+            MsgService = msgService;    
             MyVoucher = new();
 
             try
@@ -106,14 +106,14 @@ namespace AppliedAccounts.Models
                 }
                 else
                 {
-                    MsgClass.Alert(MESSAGE.UserProfileIsNull);
+                    MsgService.Alert(MESSAGE.UserProfileIsNull);
                 }
 
 
             }
             catch (Exception ex)
             {
-                MsgClass.Danger(ex.Message);
+                MsgService.Danger(ex.Message);
 
 
             }
@@ -181,7 +181,7 @@ namespace AppliedAccounts.Models
                 }
                 catch (Exception error)
                 {
-                    MsgClass.Error(error.Message);
+                    MsgService.Error(error.Message);
                 }
             }
             return false;
@@ -353,7 +353,7 @@ namespace AppliedAccounts.Models
                                             var deleted = cmdClassDel.DeleteRow();
                                             if(!deleted)
                                             {
-                                                MsgClass.Danger(MESSAGE.VouTransNotDeleted);
+                                                MsgService.Danger(MESSAGE.VouTransNotDeleted);
                                                 // Roll Back master record
                                                 IsSaved = false;
                                                 break;
@@ -377,7 +377,7 @@ namespace AppliedAccounts.Models
                                             var save2 = cmdClass2.SaveChanges();
                                             if (!save2)
                                             {
-                                                MsgClass.Error(MESSAGE.NotSave);
+                                                MsgService.Error(MESSAGE.NotSave);
                                                 //var stop = true;
                                                 // roll Bank master record from Data Table
                                             }
@@ -390,19 +390,19 @@ namespace AppliedAccounts.Models
                                 }
                                 else
                                 {
-                                    MsgClass.Error(MESSAGE.NotSave);
+                                    MsgService.Error(MESSAGE.NotSave);
                                 }
                             }
                             else
                             {
-                                MsgClass.Alert(MESSAGE.VouNoNotDefineProperly);
+                                MsgService.Alert(MESSAGE.VouNoNotDefineProperly);
                             }
                         }
 
                         catch (Exception ex)
                         {
                             IsSaved = false;
-                            MsgClass.Danger(ex.Message);
+                            MsgService.Danger(ex.Message);
                         }
                     }
                 });
@@ -466,7 +466,7 @@ namespace AppliedAccounts.Models
             MasterDataRow["ID"] = MyVoucher.Master.ID1;
             CommandClass cmdMasterDelete = new(MasterDataRow, Source.MyConnection);
             var IsDeleted = cmdMasterDelete.DeleteRow();
-            MsgClass.Add(IsDeleted ? MESSAGE.VouMasterDeleted : MESSAGE.VouMasterNotDeleted);
+            MsgService.Warning(IsDeleted ? MESSAGE.VouMasterDeleted : MESSAGE.VouMasterNotDeleted);
 
         }
 
@@ -475,23 +475,23 @@ namespace AppliedAccounts.Models
         #region Validation
         public bool IsVoucherValidated()
         {
-            MsgClass.ClearMessages();
+            MsgService.Clear();
             bool IsValid = true;
 
-            if (MyVoucher.Master.BookID == 0) { MsgClass.Add(MESSAGE.BookIDIsZero); }
-            if (MyVoucher.Master.Vou_No.Length == 0) { MsgClass.Add(MESSAGE.VouNoNotDefine); }
-            if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgClass.Add(MESSAGE.VouDateLess); }
-            if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgClass.Add(MESSAGE.VouDateMore); }
-            if (MyVoucher.Master.Remarks.Length == 0) { MsgClass.Add(MESSAGE.Row_NoRemarks); }
-            if (MyVoucher.Master.Status.Length == 0) { MsgClass.Add(MESSAGE.Row_NoStatus); }
+            if (MyVoucher.Master.BookID == 0) { MsgService!.Error(MESSAGE.BookIDIsZero); }
+            if (MyVoucher.Master.Vou_No.Length == 0) { MsgService!.Error(MESSAGE.VouNoNotDefine); }
+            if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgService!.Error(MESSAGE.VouDateLess); }
+            if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgService!.Error(MESSAGE.VouDateMore); }
+            if (MyVoucher.Master.Remarks.Length == 0) { MsgService!.Error(MESSAGE.Row_NoRemarks); }
+            if (MyVoucher.Master.Status.Length == 0) { MsgService!.Error(MESSAGE.Row_NoStatus); }
 
             foreach (var Trans in MyVoucher.Details)
             {
-                if (Trans.Sr_No == 0) { MsgClass.Add(MESSAGE.SerialNoIsZero); }
-                if (Trans.COA == 0) { MsgClass.Add(MESSAGE.Row_COAIsZero); }
-                if (Trans.DR > 0 && Trans.CR > 0) { MsgClass.Add(MESSAGE.DRnCRHaveValue); }
-                if (Trans.DR == 0 && Trans.CR == 0) { MsgClass.Add(MESSAGE.DRnCRAreZero); }
-                if (string.IsNullOrEmpty(Trans.Description)) { MsgClass.Add(MESSAGE.DescriptionIsNothing); }
+                if (Trans.Sr_No == 0) { MsgService!.Error(MESSAGE.SerialNoIsZero); }
+                if (Trans.COA == 0) { MsgService!.Error(MESSAGE.Row_COAIsZero); }
+                if (Trans.DR > 0 && Trans.CR > 0) { MsgService!.Error(MESSAGE.DRnCRHaveValue); }
+                if (Trans.DR == 0 && Trans.CR == 0) { MsgService!.Error(MESSAGE.DRnCRAreZero); }
+                if (string.IsNullOrEmpty(Trans.Description)) { MsgService!.Error(MESSAGE.DescriptionIsNothing); }
 
             }
             return IsValid;
@@ -503,19 +503,19 @@ namespace AppliedAccounts.Models
             bool IsValid = true;
 
 
-            MsgClass = new();
-            if (MyVoucher.Master.BookID == 0) { MsgClass.Alert(MESSAGE.BookIDIsZero); }
-            if (MyVoucher.Master.Vou_No.Length == 0) { MsgClass.Alert(MESSAGE.VouNoNotDefine); }
-            if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgClass.Alert(MESSAGE.VouDateLess); }
-            if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgClass.Alert(MESSAGE.VouDateMore); }
-            if (MyVoucher.Master.Remarks.Length == 0) { MsgClass.Alert(MESSAGE.Row_NoRemarks); }
-            if (MyVoucher.Master.Status.Length == 0) { MsgClass.Alert(MESSAGE.Row_NoStatus); }
-            if (MyVoucher.Detail.Sr_No == 0) { MsgClass.Alert(MESSAGE.SerialNoIsZero); }
-            if (MyVoucher.Detail.COA == 0) { MsgClass.Alert(MESSAGE.Row_COAIsZero); }
-            if (MyVoucher.Detail.DR > 0 && MyVoucher.Detail.CR > 0) { MsgClass.Alert(MESSAGE.DRnCRHaveValue); }
-            if (MyVoucher.Detail.DR == 0 && MyVoucher.Detail.CR == 0) { MsgClass.Alert(MESSAGE.DRnCRAreZero); }
-            if (string.IsNullOrEmpty(MyVoucher.Detail.Description)) { MsgClass.Alert(MESSAGE.DescriptionIsNothing); }
-            if (MsgClass.Count > 0) { IsValid = false; }
+            //
+            if (MyVoucher.Master.BookID == 0) { MsgService.Alert(MESSAGE.BookIDIsZero); }
+            if (MyVoucher.Master.Vou_No.Length == 0) { MsgService.Alert(MESSAGE.VouNoNotDefine); }
+            if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgService.Alert(MESSAGE.VouDateLess); }
+            if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgService.Alert(MESSAGE.VouDateMore); }
+            if (MyVoucher.Master.Remarks.Length == 0) { MsgService.Alert(MESSAGE.Row_NoRemarks); }
+            if (MyVoucher.Master.Status.Length == 0) { MsgService.Alert(MESSAGE.Row_NoStatus); }
+            if (MyVoucher.Detail.Sr_No == 0) { MsgService.Alert(MESSAGE.SerialNoIsZero); }
+            if (MyVoucher.Detail.COA == 0) { MsgService.Alert(MESSAGE.Row_COAIsZero); }
+            if (MyVoucher.Detail.DR > 0 && MyVoucher.Detail.CR > 0) { MsgService.Alert(MESSAGE.DRnCRHaveValue); }
+            if (MyVoucher.Detail.DR == 0 && MyVoucher.Detail.CR == 0) { MsgService.Alert(MESSAGE.DRnCRAreZero); }
+            if (string.IsNullOrEmpty(MyVoucher.Detail.Description)) { MsgService.Alert(MESSAGE.DescriptionIsNothing); }
+            if (MsgService.Count > 0) { IsValid = false; }
 
             return IsValid;
 
@@ -587,12 +587,12 @@ namespace AppliedAccounts.Models
 
                 if (ReportService.IsError)
                 {
-                    MsgClass.Add(ReportService.MyMessage.First(), AppMessages.Enums.Class.Danger);
+                    MsgService.Critical(ReportService.MyMessage.First());
                 }
             }
             catch (Exception error)
             {
-                MsgClass.Add(error.Message);
+                MsgService.Error(error.Message);
             }
 
 

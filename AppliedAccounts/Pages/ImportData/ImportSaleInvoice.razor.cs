@@ -2,10 +2,8 @@
 using AppliedAccounts.Models;
 using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
-using SQLitePCL;
 using System.Data;
 using System.Diagnostics;
 using Format = AppliedGlobals.AppValues.Format;
@@ -19,7 +17,6 @@ namespace AppliedAccounts.Pages.ImportData
         #region Variables
         public ImportSaleInvoiceModel MyModel { get; set; }
         public ImportExcelFile ImportExcel { get; set; }
-        public MessageClass MsgClass { get; set; }
         public DataSet? ExcelDataSet { get; set; }
         public DataTable? ClientData { get; private set; }
         public DataTable? SalesData { get; set; }
@@ -104,12 +101,12 @@ namespace AppliedAccounts.Pages.ImportData
                 IsExcelLoaded = true;                           // Excel file has been loaded successfully.
 
 
-                MsgClass.Add($"{DateTime.Now} Excel File loaded.... OK");
+                MsgService.Success($"{DateTime.Now} Excel File loaded.... OK");
             }
             catch (Exception)
             {
                 MyModel.IsError = true;
-                MsgClass.Add($"{DateTime.Now} ERROR: Excel file not loaded.... ");
+                MsgService.Critical($"{DateTime.Now} ERROR: Excel file not loaded.... ");
             }
             finally
             {
@@ -177,7 +174,7 @@ namespace AppliedAccounts.Pages.ImportData
 
                     Stopwatch.Stop();
                     var ts = Stopwatch.Elapsed;
-                    MsgClass.Add($"{DateTime.Now} Total time spent in process: {ts.TotalSeconds} seconds");
+                    MsgService.Success($"{DateTime.Now} Total time spent in process: {ts.TotalSeconds} seconds");
 
                     ShowSpinner = false;
                     ShowProgress = false;
@@ -194,8 +191,10 @@ namespace AppliedAccounts.Pages.ImportData
         {
 
             MyModel.SpinnerMessage = "Sales invoice data is being Process... Gathering Data sheets";
-            string _TempGUID = AppRegistry.GetText(AppGlobal.DBFile, "ExcelImport");
-            TempDB _TempDB = new(_TempGUID + ".db");
+            //string _TempGUID = AppRegistry.GetText(AppGlobal.DBFile, "ExcelImport");
+            string _TempGUID = Source.GetText("ExcelImport");
+            string _TempPath = Path.Combine(Source.MyConnections.GetTempDBPath(), _TempGUID + ".db");
+            TempDB _TempDB = new(_TempPath);
             ClientData = await _TempDB.GetTempTableAsync("Clients List");
             SalesData = await _TempDB.GetTempTableAsync("Data");
             SalesSchema = await _TempDB.GetTempTableAsync("Schema");
@@ -290,7 +289,7 @@ namespace AppliedAccounts.Pages.ImportData
             {
                 MyModel.IsError = true;
                 MyModel.ErrorMessage = error.Message;
-                MsgClass.Add(error.Message);
+                MsgService.Error(error);
             }
 
         }
@@ -322,7 +321,7 @@ namespace AppliedAccounts.Pages.ImportData
             }
             catch (Exception error)
             {
-                MsgClass.Add(error.Message);
+                MsgService.Error(error);
             }
 
 
@@ -342,7 +341,7 @@ namespace AppliedAccounts.Pages.ImportData
             await GenerateInvoice();
             await InvokeAsync(StateHasChanged);
 
-            MsgClass.Add($"{DateTime.Now} Task Completed.");
+            MsgService.Success($"{DateTime.Now} Task Completed.");
 
             MyModel.ShowImportedData = true;
 
@@ -371,11 +370,11 @@ namespace AppliedAccounts.Pages.ImportData
         public async Task GenerateInvoice()                 // Step 2.3.1
         {
 
-            MsgClass.Add($"{DateTime.Now} Start Process for Generate Invoice");
+            MsgService.Alert($"{DateTime.Now} Start Process for Generate Invoice");
             #region Error Message
             if (InvData is null || SalesData is null || SalesSchema is null)
             {
-                MsgClass.Add($"{DateTime.Now} Date is not available to proceed...");
+                MsgService.Critical($"{DateTime.Now} Date is not available to proceed...");
                 return;
             }
             #endregion
@@ -386,7 +385,7 @@ namespace AppliedAccounts.Pages.ImportData
             MyModel.TotalRec = SalesData.Rows.Count;
 
             GetInvoiceData();          // 2.3.1.1 Gather data from excel sheet schema for creating voucher Data parameters.
-            MsgClass.Add($"{DateTime.Now} GetInvoiceData() Completed");
+            MsgService.Success($"{DateTime.Now} GetInvoiceData() Completed");
 
             MyModel.ShowImportedData = true;
             MyModel.IsProgressBar = true;
@@ -432,7 +431,7 @@ namespace AppliedAccounts.Pages.ImportData
                     MyModel.SaleInvoiceList.Add(_Row1);
                     MyModel.ShowImportedData = false;
 
-                    MsgClass.Add($" # {MyModel.Counter}");
+                    MsgService.Warning($" # {MyModel.Counter}");
 
                     MyModel.SpinnerMessage = $"{Row["CompanyName"]} is being generated.";
                     await GetInvoiceDetails(Row);   // Step 2.3.1.2 Generates detail record of sale invoices.
@@ -443,14 +442,14 @@ namespace AppliedAccounts.Pages.ImportData
                     MyModel.RejectedList.Add(Row);
                 }
             }
-            MsgClass.Add($"{DateTime.Now} End Sales Invoice details process..");
+            MsgService.Warning($"{DateTime.Now} End Sales Invoice details process..");
         }
         #endregion
 
         #region 2.3.1.1  - Get Invoice Data from Excel file   
         public void GetInvoiceData()        // Step 2.3.1.1         
         {
-            MsgClass.Add($"{DateTime.Now} Gathering Invoice Data");
+            MsgService.Alert($"{DateTime.Now} Gathering Invoice Data");
             #region Get Invoice Date
 
             if (InvData != null)
@@ -485,7 +484,7 @@ namespace AppliedAccounts.Pages.ImportData
         {
             await Task.Run(() =>
             {
-                MsgClass.Add($"{DateTime.Now} Working of Sale Invoice details.");
+                MsgService.Alert($"{DateTime.Now} Working of Sale Invoice details.");
                 var Counter2 = 0;
                 var Sr_No = 0;
 
@@ -574,7 +573,7 @@ namespace AppliedAccounts.Pages.ImportData
             catch (Exception ex)
             {
 
-                MsgClass.Critical(ex.Message);
+                MsgService.Critical(ex.Message);
             }
         }
 
@@ -582,7 +581,6 @@ namespace AppliedAccounts.Pages.ImportData
         {
             try
             {
-                MsgClass = new();
                 Source = new(AppGlobal.AppPaths);
                 var BillRec1 = Source.GetTable(Tables.BillReceivable);
                 var BillRec2 = Source.GetTable(Tables.BillReceivable2);
@@ -602,14 +600,14 @@ namespace AppliedAccounts.Pages.ImportData
                     MyModel.BarPercent = Math.Round((_Counter / _TotalRec) * 100, 2);
                     MyModel.SpinnerMessage = $"{Invoice["Description"]} is being generated.";
 
-                    MsgClass.Add($"{DateTime.Now} Invoice {master["Vou_No"]} is processing...");
+                    MsgService.Alert($"{DateTime.Now} Invoice {master["Vou_No"]} is processing...");
                     master = Invoice;
                     //master["ID"] = MaxID1; MaxID1++;
                     details = MyModel.SaleDetailsList.Where(row => (long)row["TranID"] == (long)master["ID"]).ToList();
 
-                    MsgClass.Add($"{DateTime.Now} {details.Count} records found in invoice {master["Vou_No"]}");
+                    MsgService.Alert($"{DateTime.Now} {details.Count} records found in invoice {master["Vou_No"]}");
                     Validated = Validation(master);
-                    MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} is {Validated} validated");
+                    MsgService.Success($"{DateTime.Now} {master["Vou_No"]} is {Validated} validated");
 
                     foreach (var Row in details)
                     {
@@ -619,16 +617,16 @@ namespace AppliedAccounts.Pages.ImportData
                         {
                             break;
                         }
-                        MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} Serial # {Row["Sr_No"]}  is {Validated} validated");
+                        MsgService.Success($"{DateTime.Now} {master["Vou_No"]} Serial # {Row["Sr_No"]}  is {Validated} validated");
                     }
 
                     if (Validated)
                     {
-                        MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} validated for post / save... ");
+                        MsgService.Success($"{DateTime.Now} {master["Vou_No"]} validated for post / save... ");
                         master["ID"] = 0;           // Set a DataRow for insert command
                         CommandClass _Commands = new(master, AppGlobal.DBFile);
                         var IsSaved = _Commands.SaveChanges();
-                        MsgClass.Add($"{DateTime.Now} {master["Vou_No"]} saved ---> {IsSaved} ");
+                        MsgService.Success($"{DateTime.Now} {master["Vou_No"]} saved ---> {IsSaved} ");
                         var _TranID = _Commands.PrimaryKeyID;        // Get ID after save row in Sqlite Data Table.
                         foreach (var Row in details)
                         {
@@ -641,14 +639,14 @@ namespace AppliedAccounts.Pages.ImportData
                                 _Commands.SaveChanges();
                             });
 
-                            MsgClass.Add($"{DateTime.Now} Serial # {Row["Sr_No"]} is saved ---> {IsSaved} ");
+                            MsgService.Success($"{DateTime.Now} Serial # {Row["Sr_No"]} is saved ---> {IsSaved} ");
 
                             ToastService.ShowSuccess($"Successfully saved {master["Vou_No"]}"); // show the toast
                         }
                     }
                     else
                     {
-                        MsgClass.Add($"{DateTime.Now} ERROR : Sales Date is not valid to post...");
+                        MsgService.Critical($"{DateTime.Now} ERROR : Sales Date is not valid to post...");
                     }
 
                     await Task.Delay(100); // Simulate some delay for UI update
@@ -657,7 +655,7 @@ namespace AppliedAccounts.Pages.ImportData
             }
             catch (Exception ex)
             {
-                MsgClass.Critical(ex.Message);
+                MsgService.Critical(ex.Message);
             }
 
         }
@@ -692,7 +690,7 @@ namespace AppliedAccounts.Pages.ImportData
                 Totals.Tot_Net += item.NetAmount;
             }
 
-            await js.InvokeVoidAsync("showModol", "ModolSaleInvoice");
+            await AppGlobal.JS.InvokeVoidAsync("showModol", "ModolSaleInvoice");
 
         }
         #endregion

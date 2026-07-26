@@ -5,39 +5,31 @@
 
 @using AppReports
 @using AppliedAccounts.Component;
-@using AppliedAccounts.Libs;
+@using AppliedAccounts.Component.Libs;
 @using AppliedAccounts.Services;
 
-@inject AuthenticationStateProvider Authorized
-@inject NavigationManager NavManager
-@inject IJSRuntime js
 @inject IToastService ToastService
 @inject PrintService PrintService
 @inject GlobalService AppGlobal
+@inject MessagesService MsgService
+
 
 @code {
     [Parameter] public long ID { get; set; }
 
     protected override void OnInitialized()
     {
-        //var UserProfile = ((UserAuthenticationStateProvider)Authorized).AppUser;
-        MyModel = new(AppGlobal, ID);
+        MyModel = new(AppGlobal, MsgService, ID);
 
-        // Validate page
         IsPageValid = true;
         if (MyModel is null) { IsPageValid = false; }
         if (MyModel!.Source is null) { IsPageValid = false; }
         if (MyModel!.MyVoucher is null) { IsPageValid = false; }
     }
 }
+
 <PageHeading Text="Sale Invoice" />
-
-@if (MyModel.MsgClass.Count > 0)
-{
-    <PageErrors Messages="@MyModel.MsgClass"></PageErrors>
-}
-
-
+<ShowMessages MsgService="@MyModel.MsgService" />
 
 @if (IsPageValid)
 {

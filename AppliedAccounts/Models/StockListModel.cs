@@ -1,7 +1,5 @@
 ﻿using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
-using Org.BouncyCastle.Asn1.Esf;
 using System.Data;
 using Tables = AppliedDB.Enums.Tables;
 
@@ -11,7 +9,7 @@ namespace AppliedAccounts.Models
     {
         public GlobalService AppGlobal { get; set; }
         public DataSource Source { get; set; }
-        public MessageClass MsgClass { get; set; }
+        public MessagesService MsgService { get; set; }
         public long RecordID { get; set; } = 0; // Current record ID
         public RecordModel Record { get; set; } = new(); // List of stock records
         public List<RecordModel> Records { get; set; } = new(); // List of stock records
@@ -26,11 +24,11 @@ namespace AppliedAccounts.Models
 
         public BrowseModel BrowseClass { get; set; } = new();
 
-        public StockListModel(GlobalService _AppGlobal)
+        public StockListModel(GlobalService _AppGlobal, MessagesService msgService)
         {
             AppGlobal = _AppGlobal;
+            MsgService = msgService;
             Source = new(AppGlobal.AppPaths);
-            MsgClass = new();
             GetKeys();
             LoadData();
         }
@@ -79,7 +77,7 @@ namespace AppliedAccounts.Models
             }
             catch (Exception error)
             {
-                MsgClass.Add(error.Message);
+                MsgService.Error(error);
             }
         }
 
@@ -101,7 +99,6 @@ namespace AppliedAccounts.Models
             if (Validated(_Row))
             {
                 Source.Save(_Row);
-                MsgClass = Source.MyCommands.MyMessages;
                 RefreshData();
                 return Source.IsSaved;
             }
@@ -110,14 +107,14 @@ namespace AppliedAccounts.Models
 
         private bool Validated(DataRow Row)
         {
-            MsgClass.ClearMessages();
-            if (string.IsNullOrEmpty(Row["Code"].ToString())) { MsgClass.Alert(AppMessages.Enums.Messages.CodeIsNull); }
-            if (string.IsNullOrEmpty(Row["Title"].ToString())) { MsgClass.Alert(AppMessages.Enums.Messages.TitleIsNull); }
-            if ((long)Row["Packing"] == 0) { MsgClass.Alert(AppMessages.Enums.Messages.Row_PackingIdZero); }
-            if ((long)Row["UOM"] == 0) { MsgClass.Alert(AppMessages.Enums.Messages.Row_UnitIDZero); }
-            if ((long)Row["Size"] == 0) { MsgClass.Alert(AppMessages.Enums.Messages.Row_SizeIDZero); }
-            if ((long)Row["SubCategory"] == 0) { MsgClass.Alert(AppMessages.Enums.Messages.Row_SubCategoryIDZero); }
-            return MsgClass.Count == 0;
+            MsgService.Clear();
+            if (string.IsNullOrEmpty(Row["Code"].ToString())) { MsgService.Alert(AppMessages.Enums.Messages.CodeIsNull); }
+            if (string.IsNullOrEmpty(Row["Title"].ToString())) { MsgService.Alert(AppMessages.Enums.Messages.TitleIsNull); }
+            if ((long)Row["Packing"] == 0) { MsgService.Alert(AppMessages.Enums.Messages.Row_PackingIdZero); }
+            if ((long)Row["UOM"] == 0) { MsgService.Alert(AppMessages.Enums.Messages.Row_UnitIDZero); }
+            if ((long)Row["Size"] == 0) { MsgService.Alert(AppMessages.Enums.Messages.Row_SizeIDZero); }
+            if ((long)Row["SubCategory"] == 0) { MsgService.Alert(AppMessages.Enums.Messages.Row_SubCategoryIDZero); }
+            return MsgService.Count == 0;
         }
         #endregion
 
@@ -140,7 +137,9 @@ namespace AppliedAccounts.Models
         }
         private RecordModel Row2Record(DataRow row)
         {
-            AppliedDB.Functions.RemoveNull(row);
+            row.RemoveDBNull();
+
+            //AppliedDB.Functions.RemoveNull(row);
 
             return new RecordModel
             {

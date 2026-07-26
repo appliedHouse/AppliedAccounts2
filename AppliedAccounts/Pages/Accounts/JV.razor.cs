@@ -1,7 +1,5 @@
 ﻿using AppliedAccounts.Data;
-using AppliedAccounts.Models;
 using AppliedAccounts.Models.Accounts;
-using AppliedAccounts.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -14,7 +12,6 @@ namespace AppliedAccounts.Pages.Accounts
         public JVModel MyModel { get; set; }
         public List<JVViewModel> MyVoucher => MyModel.MyVoucher;
         public bool IsPageValid { get; set; } = true;
-        public MessagesService MsgService { get; set; }
         public bool CanEdit => GetCanEdit();
         private bool GetCanEdit()
         {
@@ -42,7 +39,7 @@ namespace AppliedAccounts.Pages.Accounts
             }
             else
             {
-                MsgService.AddRange(MyModel.MsgClass);
+                MsgService.AddRange(MyModel.MsgService.MsgClass);
             }
 
 

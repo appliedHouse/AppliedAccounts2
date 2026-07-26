@@ -10,6 +10,8 @@ namespace AppliedDB
         {
             public static SqliteCommand? Insert(DataRow CurrentRow, SqliteConnection DBConnection)
             {
+                CurrentRow.RemoveDBNull();
+
                 if (CurrentRow.Field<long>("ID") == 0)
                 {
                     DataColumnCollection _Columns = CurrentRow.Table.Columns;
@@ -41,12 +43,6 @@ namespace AppliedDB
                         _ParameterName = string.Concat('@', _Column.ColumnName.Replace(" ", ""));
                         _Command.Parameters.AddWithValue(_ParameterName, CurrentRow[_Column.ColumnName]);
                     }
-
-                    //if (CurrentRow.Field<long>("ID") == 0)
-                    //{
-                    //    CurrentRow["ID"] = DataSource.GetMaxID(_TableName, DBConnection.ConnectionString);
-                    //    _Command.Parameters["@ID"].Value = CurrentRow["ID"];
-                    //}
 
                     return _Command;
                 }
@@ -147,6 +143,8 @@ namespace AppliedDB
                 return null;
             }
 
+
         }
+        
     }
 }

@@ -1,16 +1,14 @@
 ﻿@page "/Sale/SaleInvoiceList"
 @attribute [Authorize]
 
-@using AppliedAccounts.Libs
+@using AppliedAccounts.Component.Libs
 @using AppliedAccounts.Models
 @using AppliedAccounts.Services
 
-@inject AuthenticationStateProvider authStateProvider
-@inject NavigationManager NavManager
-@inject IJSRuntime js
 @inject GlobalService AppGlobal
 @inject PrintService ReportService
 @inject HttpClient Http
+@inject MessagesService MsgService
 
 @code {
     private Timer MyTime { get; set; }
@@ -22,7 +20,7 @@
     {
         try
         {
-            MyModel = new(AppGlobal);
+            MyModel = new(AppGlobal, MsgService);
             IsDataLoad = true;
         }
         catch (Exception)
@@ -36,12 +34,11 @@
     {
         if (IsPrinted) { await DeletePrintedReports(); }
 
-        MyModel ??= new(AppGlobal);
         IsSearchText = string.IsNullOrEmpty(MyModel.SearchText) ? false : true;
         IsRecords = MyModel.Records.Count == 0 ? true : false;
 
         MyModel.Pages.PageChanged += OnPageChangedInternal;
-        await MyModel.LoadData();
+        MyModel.LoadData();
 
     }
 
@@ -49,7 +46,7 @@
     private async void OnPageChangedInternal(int page)
     {
         if (MyModel is null) { return; }
-        await MyModel.LoadData();
+        MyModel.LoadData();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -78,7 +75,7 @@
 @if (IsDataLoad)
 {
     <PageHeading Text="List of Sale Invoices" />
-    <PageErrors Messages="@MyModel.MsgClass"></PageErrors>
+    <ShowMessages MsgService="@MyModel.MsgService" />
     @if (IsPrinting)
     {
         <div class="alert alert-info justify-content-center align-items-center" role="alert" style="height:100px">

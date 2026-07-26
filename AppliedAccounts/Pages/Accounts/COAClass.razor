@@ -1,17 +1,18 @@
 ﻿@page "/Accounts/COAClass"
 @attribute [Authorize]
-@using AppliedAccounts.Libs;
+@using AppliedAccounts.Component.Libs;
 @using AppliedAccounts.Models;
 @using AppliedAccounts.Services
 
 @inject GlobalService AppGlobal
 @inject IToastService ToastService
+@inject MessagesService MsgService
 
 
 @code {
     protected override void OnInitialized()
     {
-        MyModel = new(AppGlobal);
+        MyModel = new(AppGlobal, MsgService);
     }
 
     
@@ -22,9 +23,9 @@
 
 
 @* Page Errors Show *@
-@if (MyModel.MsgClass.Count > 0)
+@if (MyModel.MsgService.Count > 0)
 {
-    <PageErrors Messages="@MyModel.MsgClass"></PageErrors>
+    <PageErrors Messages="@MyModel.MsgService"></PageErrors>
 }
 
 <EditForm Model="@MyModel">

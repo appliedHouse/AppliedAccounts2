@@ -1,6 +1,7 @@
 ﻿@code {
     [Parameter] public string MyMessage { get; set; }
 
+
     protected override void OnInitialized()
     {
         MyMessage ??= "Title";

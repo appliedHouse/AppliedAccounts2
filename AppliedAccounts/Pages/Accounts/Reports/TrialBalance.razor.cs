@@ -1,10 +1,9 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
 using AppReports;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Data;
-using System.Net;
 using static AppliedGlobals.AppErums;
 using static AppliedGlobals.AppValues;
 
@@ -21,7 +20,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         bool IsPageValidate = false;
         bool IsPrinting = false;
 
-        public MessageClass MsgClass { get; set; } = new MessageClass();
+        public MessagesService MsgService { get; set; } 
 
         #region Dictionaries for Dropdowns
         public Dictionary<int, string> OptionTypes { get; set; } = new Dictionary<int, string>
@@ -104,7 +103,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             }
             catch (Exception error)
             {
-                MsgClass.Error(error.Message);
+                MsgService.Error(error.Message);
             }
             await InvokeAsync(StateHasChanged);
         }
@@ -113,7 +112,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Print Trial Balance
         public async Task Print(ReportActionClass PrintAction)
         {
-            MsgClass = new();           // Clear all previous messages - refresh
+                       // Clear all previous messages - refresh
             IsPrinting = true;
 
             await InvokeAsync(StateHasChanged);
@@ -128,13 +127,13 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 if (!ReportService.IsError)
                 {
                     ReportService.Print();
-                    MsgClass = ReportService.MsgClass;
+                    MsgService = ReportService.MsgService;
                 }
 
             }
             catch (Exception error)
             {
-                MsgClass.Error(error.Message);
+                MsgService.Error(error.Message);
             }
 
             IsPrinting = false;
@@ -275,7 +274,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Print Ledger
         public void PrintLedger()
         {
-            MsgClass.Add("Printing of Ledger is being generated...");
+            MsgService.Alert("Printing of Ledger is being generated...");
         }
         #endregion
 

@@ -141,7 +141,7 @@ namespace AppliedAccounts.Pages.Purchase
             }
             catch (Exception)
             {
-                MyModel.MsgClass.Add(MESSAGE.Default);
+                MyModel.MsgService.Error(MESSAGE.Default);
             }
 
             return _Reportmodel;

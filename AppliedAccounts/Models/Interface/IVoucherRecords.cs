@@ -13,7 +13,7 @@ namespace AppliedAccounts.Models.Interface
         NavigationManager NavManager { get; set; }
         ListFilter FilterClass { get; set; }
         List<T> Records { get; set; }
-        MessageClass MsgClass { get; set; }
+        MessagesService MsgService { get; set; }
         AppliedDB.Enums.Tables Table { get; set; }
         List<T> LoadData();
         void Print(long ID);

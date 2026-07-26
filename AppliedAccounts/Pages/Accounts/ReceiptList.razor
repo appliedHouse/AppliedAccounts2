@@ -1,16 +1,12 @@
 ﻿@layout PageLayout;
 @page "/Accounts/ReceiptList";
 @attribute [Authorize];
-@using AppliedAccounts.Libs;
-@using AppliedAccounts.Models;
-@using AppliedAccounts.Data;
+@using AppliedAccounts.Component.Libs;
 @using AppliedAccounts.Services
-@using AppliedDB
-@using System.Data
 
-@inject AuthenticationStateProvider authorized
 @inject PrintService PrintService
 @inject GlobalService AppGlobal
+@inject MessagesService MsgService
 
 @code {
     private string UserRoll;
@@ -20,8 +16,7 @@
     private decimal Tot_CR = 0.0M;
     protected override void OnInitialized()
     {
-        UserProfile = ((UserAuthenticationStateProvider)authorized).AppUser;
-        MyModel = new(AppGlobal);   
+        MyModel = new(AppGlobal, MsgService);   
         MyModel.GetKeys();
 
         MyModel.PageIsValid = true;
@@ -35,7 +30,7 @@
 
     }
 
-    private void Edit(int ReceiptID)
+    private void Edit(long ReceiptID)
     {
         AppGlobal.NavManager.NavigateTo($"/Accounts/Receipt/{ReceiptID}");
     }
@@ -116,7 +111,7 @@
                         {
                             @foreach (var Item in MyModel.DataList)
                             {
-                                int _ID = (int)Item["ID"];
+                                long _ID = (long)Item["ID"];
                                 var _VouDate = ((DateTime)Item["Vou_Date"]).ToString(Format.DDMMMYY);
                                 var _DocDate = Item["Doc_Date"] == DBNull.Value ? "" : ((DateTime)Item["Doc_Date"]).ToString(Format.DDMMMYY); ;
                                 var _Amount = ((decimal)Item["Amount"]).ToString(Format.Digit);

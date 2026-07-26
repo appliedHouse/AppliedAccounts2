@@ -1,12 +1,13 @@
 ﻿@page "/Accounts/COA"
 @attribute [Authorize];
 @using AppliedAccounts.Component.ButtonsDictionery
-@using AppliedAccounts.Libs
+@using AppliedAccounts.Component.Libs
 @using AppliedAccounts.Models
 @using AppliedAccounts.Services
 
 @inject GlobalService AppGlobal
 @inject IToastService ToastService
+@inject MessagesService MsgService
 
 @code {
     private string[] BrowseList = { "Class", "Nature", "Notes" };
@@ -15,7 +16,7 @@
 
     protected override void OnInitialized()
     {
-        MyModel = new(AppGlobal);
+        MyModel = new(AppGlobal, MsgService);
         IsPageValid = GetPageIsValid();
     }
 
@@ -24,12 +25,8 @@
 }
 
 <PageHeading Text="Chart of Accounts" />
+<ShowMessages MsgService="@MyModel.MsgService"/>
 
-@* Page Errors Show *@
-@if (MyModel.MsgClass.Count > 0)
-{
-    <PageErrors Messages="@MyModel.MsgClass"></PageErrors>
-}
 
 @if (IsPageValid)
 {

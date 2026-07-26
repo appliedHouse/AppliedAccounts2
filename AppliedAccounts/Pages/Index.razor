@@ -2,7 +2,6 @@
 @layout NotAuthorizedLayout
 @using AppliedAccounts.Services
 @using AppliedGlobals
-@using AppliedDB;
 @using AppliedAccounts.Pages.HomePage
 
 @attribute [AllowAnonymous]
@@ -14,15 +13,20 @@
 
 @code {
     [CascadingParameter]
-    private Task<AuthenticationState> AppAuthState { get; set; }
+    private Task<AuthenticationState>? AppAuthState { get; set; }
     private Task<AppUserModel>? UserProfile { get; set; }
     private AppUserModel? UserModel { get; set; }
     private string _Message = string.Empty;
-    private AppliedDB.Connections _Conn = new();
     public string UserName { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        if (AppAuthState == null)
+        {
+            _Message = "Authentication state is not available.";
+            return;
+        }
+
         if(AppAuthState.Result.User.Identity!.IsAuthenticated)
         {
             UserModel = await Task.Run(()=> ((UserAuthenticationStateProvider)authStateProvider).AppUser);
@@ -34,8 +38,6 @@
     {
         if (firstRender)
         {
-            
-            //await Create_Update_Database();
             await DisplayGreetingMessage();
         }
     }
@@ -52,19 +54,6 @@
             });
         }
     }
-
-    //Create or Update DataBase Tables.
-    // private async Task Create_Update_Database()
-    // {
-    //     if (UserModel != null)
-    //     {
-    //         await Task.Run(() =>
-    //         {
-    //             CreateDatabase _DB = new CreateDatabase(AppGlobal.AppPaths);
-    //             Database_Patches _DBPatches = new(new DataSource(AppGlobal.AppPaths));
-    //         });
-    //     }
-    // }
 }
 
 <AuthorizeView>

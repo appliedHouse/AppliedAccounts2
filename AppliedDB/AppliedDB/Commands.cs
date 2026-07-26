@@ -17,7 +17,7 @@ namespace AppliedDB
         public string Message { get; set; } = string.Empty;
         public int Effected { get; set; } = 0;
         public long PrimaryKeyID { get; set; } = 0;
-        public MessageClass MyMessages { get; set; } = new();
+        public MessageClass MsgClass { get; set; } = new();
         public AppliedGlobals.AppValues.AppPath AppPath { get; set; }
 
         #region Constructors
@@ -73,7 +73,7 @@ namespace AppliedDB
         {
             if (Row is null)
             {
-                MyMessages.Add(Messages.RowValueNull);
+                MsgClass.Add(Messages.RowValueNull);
                 return false;
             }
 
@@ -93,16 +93,16 @@ namespace AppliedDB
 
                     if (Effected > 0)
                     {
-                        MyMessages.Add(Messages.Saved);
+                        MsgClass.Add(Messages.Saved);
                         return true;
                     }
 
-                    MyMessages.Alert(Messages.NotSave);
+                    MsgClass.Alert(Messages.NotSave);
                     return false;
                 }
                 catch (Exception ex)
                 {
-                    MyMessages.Critical(ex.Message);
+                    MsgClass.Critical(ex.Message);
                     return false;
                 }
             }
@@ -137,7 +137,7 @@ namespace AppliedDB
                     if (savePoint != null) { CommandInsert.Transaction!.Release(savePoint); }
 
 
-                    MyMessages.Success(Messages.Saved);
+                    MsgClass.Success(Messages.Saved);
                     return true;
                 }
                 catch (Exception ex)
@@ -146,7 +146,7 @@ namespace AppliedDB
                     //{
                     //    try { CommandInsert.Transaction.Rollback(); } catch { }
                     //}
-                    MyMessages.Danger(ex.Message);
+                    MsgClass.Danger(ex.Message);
                     return false;
                 }
             }
@@ -199,20 +199,18 @@ namespace AppliedDB
             return Convert.ToInt64(cmd.ExecuteScalar()!);
         }
 
-
-
         // Delete the row
         public bool DeleteRow()
         {
             if (Row == null)
             {
-                MyMessages.Add(Messages.RowNotDeleted);
+                MsgClass.Add(Messages.RowNotDeleted);
                 return false;
             }
 
             if (CommandDelete is null)
             {
-                MyMessages.Add(Messages.RowNotDeleted);
+                MsgClass.Add(Messages.RowNotDeleted);
                 return false;
             }
 
@@ -230,16 +228,16 @@ namespace AppliedDB
 
                 if (Effected > 0)
                 {
-                    MyMessages.Add(Messages.RowDeleted);
+                    MsgClass.Add(Messages.RowDeleted);
                     return true;
                 }
 
-                MyMessages.Add(Messages.RowNotDeleted);
+                MsgClass.Add(Messages.RowNotDeleted);
                 return false;
             }
             catch (Exception ex)
             {
-                MyMessages.Danger(ex.Message);
+                MsgClass.Danger(ex.Message);
                 return false;
             }
         }

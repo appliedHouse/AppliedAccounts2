@@ -17,16 +17,17 @@ namespace AppliedAccounts.Models
 
         public int CountRecord => Records.Count;
         public int Count => Data.Count;
-        public AppMessages.MessageClass MsgClass { get; set; } = new();
+        public MessagesService MsgService { get; set; }
         public string SearchText { get; set; } = string.Empty;
         public bool IsDeleted { get; set; } = false;
         public string MyMessage { get; set; } = "No Message";
 
         #region Constructor
         public COANotesModel() { }
-        public COANotesModel(GlobalService _AppGlobal)
+        public COANotesModel(GlobalService _AppGlobal, MessagesService msgService)
         {
             AppGlobal = _AppGlobal;
+            MsgService = msgService;
             Source = new(AppGlobal.AppPaths);
             LoadData();
         }
@@ -99,7 +100,7 @@ namespace AppliedAccounts.Models
             DataRow _DataRow;
             if (Data.Count == 0)
             {
-                _DataRow = DataSource.GetNewRow(DBFile, Tables.COA_Notes);
+                _DataRow = Source!.GetNewRow(Tables.COA_Notes);
             }
             else
             {
@@ -131,7 +132,7 @@ namespace AppliedAccounts.Models
         #region Delete
         public bool Delete(long _ID)
         {
-            MsgClass.ClearMessages();
+            MsgService.Clear();
             var _DeleteRow = Source!.GetDataRow(Tables.COA_Notes, _ID);
 
             if (_DeleteRow is not null)
@@ -171,7 +172,7 @@ namespace AppliedAccounts.Models
                 }
                 else
                 {
-                    MsgClass.Add(MESSAGE.SQLQueryIsNull);
+                    MsgService.Error(MESSAGE.SQLQueryIsNull);
                 }
             }
 
@@ -184,31 +185,31 @@ namespace AppliedAccounts.Models
         {
             if (_Row["ID"] is null)
             {
-                MsgClass.Add(MESSAGE.IDIsNull);
+                MsgService.Error(MESSAGE.IDIsNull);
                 return false;
             }
 
             if (_Row["Code"] is null)
             {
-                MsgClass.Add(MESSAGE.CodeIsNull);
+                MsgService.Error(MESSAGE.CodeIsNull);
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(_Row["Code"].ToString()))
             {
-                MsgClass.Add(MESSAGE.CodeIsZero);
+                MsgService.Error(MESSAGE.CodeIsZero);
                 return false;
             }
 
             if (_Row["Title"] is null)
             {
-                MsgClass.Add(MESSAGE.ColumnIsNull);
+                MsgService.Error(MESSAGE.ColumnIsNull);
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(_Row["Title"].ToString()))
             {
-                MsgClass.Add(MESSAGE.TitleIsZero);
+                MsgService.Error(MESSAGE.TitleIsZero);
                 return false;
             }
 

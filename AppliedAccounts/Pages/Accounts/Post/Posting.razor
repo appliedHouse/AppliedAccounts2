@@ -1,15 +1,12 @@
 ﻿@page "/Posting"
-@using System.Data
-@using AppliedAccounts.Models
-@using AppliedAccounts.Models.Posting
-@using static AppliedAccounts.Models.Posting.PostingModel
+@page "/Menu/Accounts/Posting"
+@using AppliedAccounts.Component.Libs
 
 @inject GlobalService AppGlobal
+@inject MessagesService MsgService
 
-
-<ShowPageHeading PageTitle="VOUCHER POSTING" />
-<PageErrors Messages="@MyModel.MsgClass" />
-
+<PageHeading Text="VOUCHER POSTING" />
+<ShowMessages MsgService="@MsgService" />
 
 <!-- HEADING MENU -->
 <EditForm Model="MyViewModel" OnValidSubmit="Refresh">

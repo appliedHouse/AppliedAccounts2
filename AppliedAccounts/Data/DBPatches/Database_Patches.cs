@@ -1,4 +1,4 @@
-﻿using AppMessages;
+﻿using AppliedAccounts.Services;
 using Microsoft.Data.Sqlite;
 using Enums = AppliedDB.Enums;
 
@@ -7,12 +7,13 @@ namespace AppliedAccounts.Data
     public class Database_Patches
     {
         public AppliedDB.DataSource Source { get; set; }
-        public MessageClass MsgClass { get; set; } = new();
-        public MessageClass ErrorMsgClass { get; set; } = new();
-        public List<bool> IsPatchApplied { get; set; } = [];
-        public Database_Patches(AppliedDB.DataSource source)
+        public MessagesService MsgService { get; set; }
+        public List<bool> IsPatchApplied { get; set; } = new List<bool>();
+        public Database_Patches(AppliedDB.DataSource source, MessagesService messagesService)
         {
             Source = source;
+            MsgService = messagesService; 
+
             IsPatchApplied.Add(BillReceivable2_AddUnit());
             IsPatchApplied.Add(BillPayable2_AddUnit());
             IsPatchApplied.Add(CustomerAddress3());
@@ -25,7 +26,7 @@ namespace AppliedAccounts.Data
 
             if (Source.MyConnection == null)
             {
-                MsgClass.Danger("Database connection is not available.");
+                MsgService.Danger("Database connection is not available.");
                 return false;
             }
 
@@ -64,7 +65,7 @@ namespace AppliedAccounts.Data
             }
             catch (Exception ex)
             {
-                ErrorMsgClass.Error($"Failed to add columns to Project table: {ex.Message}");
+                MsgService.Error(ex);
                 return false;
             }
             finally
@@ -78,7 +79,7 @@ namespace AppliedAccounts.Data
                 }
                 catch (Exception closeEx)
                 {
-                    ErrorMsgClass.Error($"Error closing connection: {closeEx.Message}");
+                    MsgService.Error(closeEx);
                 }
             }
         }
@@ -90,12 +91,12 @@ namespace AppliedAccounts.Data
                 try
                 {
                     command.ExecuteNonQuery();
-                    MsgClass.Add(Message);
+                    MsgService.Success(Message);
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    MsgClass.Add($"Error: {ex.Message}");
+                    MsgService.Error(ex);
                     return false;
                 }
             }
@@ -114,7 +115,7 @@ namespace AppliedAccounts.Data
             // 3. Validate connection
             if (Source.MyConnection == null)
             {
-                MsgClass.Danger("Database connection is not available.");
+                MsgService.Danger("Database connection is not available.");
                 return false;
             }
 
@@ -150,19 +151,13 @@ namespace AppliedAccounts.Data
                         // Or refresh from database
                     }
 
-                    MsgClass.Add("Column 'Address3' added to [Customers] table successfully.");
+                    MsgService.Success("Column 'Address3' added to [Customers] table successfully.");
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                // 8. Better error handling with more context
-                string errorMessage = $"Failed to add Address3 column to Customers table: {ex.Message}";
-                ErrorMsgClass.Error(errorMessage);
-
-                // Log the full exception for debugging if needed
-                // Logger.Error(ex, "AddCustomerAddress3Column failed");
-
+                MsgService.Error(ex);
                 return false;
             }
             finally
@@ -177,8 +172,7 @@ namespace AppliedAccounts.Data
                 }
                 catch (Exception closeEx)
                 {
-                    // Log but don't throw - we want the original exception to propagate
-                    ErrorMsgClass.Error($"Error closing connection: {closeEx.Message}");
+                    MsgService.Error(closeEx);
                 }
             }
         }
@@ -199,25 +193,25 @@ namespace AppliedAccounts.Data
                 int _effected = _Command.ExecuteNonQuery();
                 if (_effected > 0)
                 {
-                    MsgClass.Add("Column 'Unit' added to [BillReceivable2] table successfully.");
+                    MsgService.Success("Column 'Unit' added to [BillReceivable2] table successfully.");
                     return true;
                 }
                 else
                 {
-                    MsgClass.Danger("Column 'Unit' NOT added to [BillReceivable2] table successfully.");
+                    MsgService.Danger("Column 'Unit' NOT added to [BillReceivable2] table successfully.");
                     return false;
                 }
             }
             catch (Exception error)
             {
-                ErrorMsgClass.Error(error.Message);
+                MsgService.Error(error);
                 return false;
             }
         }
 
         public bool BillPayable2_AddUnit()
         {
-            var _DataTable = Source.GetTable(AppliedDB.Enums.Tables.BillPayable2);
+            var _DataTable = Source.GetTable(Enums.Tables.BillPayable2);
             if (_DataTable.Columns.Contains("Unit")) return true; // Column already exists
             if (Source.MyConnection == null) { return false; }
 
@@ -229,18 +223,18 @@ namespace AppliedAccounts.Data
                 int _effected = _Command.ExecuteNonQuery();
                 if (_effected > 0)
                 {
-                    MsgClass.Add("Column 'Unit' added to [BillPayable2] table successfully.");
+                    MsgService.Success("Column 'Unit' added to [BillPayable2] table successfully.");
                     return true;
                 }
                 else
                 {
-                    MsgClass.Danger("Column 'Unit' NOT added to BillPayable2 table successfully.");
+                    MsgService.Danger("Column 'Unit' NOT added to BillPayable2 table successfully.");
                     return false;
                 }
             }
             catch (Exception error)
             {
-                ErrorMsgClass.Error(error.Message);
+                MsgService.Error(error);
                 return false;
             }
         }

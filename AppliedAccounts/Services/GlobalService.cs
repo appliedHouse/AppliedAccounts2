@@ -9,10 +9,11 @@ using AppliedDB;
 namespace AppliedAccounts.Services
 {
     public class GlobalService : IDisposable
-        {
+    {
         public readonly IConfiguration Config;
         public readonly NavigationManager NavManager;
         public readonly IJSRuntime JS;
+        public readonly Connections Connections;
 
         public AppPath AppPaths { get; set; } = new();
         public AuthorClass Author { get; set; } = new();
@@ -21,7 +22,6 @@ namespace AppliedAccounts.Services
         public CurrencyClass Currency { get; set; } = new();
         public Format Format { get; set; } = new();
         public PrintReport Reporting { get; set; } = new();
-        public DataSource Source { get; private set; } = default!;
         public string DBFile => AppPaths.DBFile;
         public string UserID = string.Empty;
         public string UserRole = string.Empty;
@@ -29,15 +29,31 @@ namespace AppliedAccounts.Services
         public event Action? OnLanguageChanged;
 
 
+
+
         //public GlobalService() { }
 
-        public GlobalService(IConfiguration _Config, NavigationManager _NavManager, IJSRuntime _JS, AuthenticationStateProvider _StateProvider)
+        public GlobalService(IConfiguration _Config, NavigationManager _NavManager, IJSRuntime _JS, AuthenticationStateProvider _StateProvider, ILogger<GlobalService> _logger)
         {
             Config = _Config;
             NavManager = _NavManager;
             JS = _JS;
 
             Client = ((UserAuthenticationStateProvider)_StateProvider).AppUser;
+
+            var databaseConfig = new DatabaseConfig
+            {
+                UsersDb = "AppliedUsers2.db",
+                MessagesDb = "Messages.db",
+                LanguagesDb = "Languages.db",
+                SystemDb = "System.db",
+                MenusDb = "MenusDB.db",
+                ClientDb = string.Empty,
+                SessionDb = string.Empty
+            };
+
+            var connectionLogger = _logger as ILogger<Connections> ?? LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<Connections>();
+            Connections = new Connections(AppPaths, connectionLogger);
 
             AppPaths.DBFile = Client.DataFile;
             UserID = Client.UserID;
@@ -59,7 +75,6 @@ namespace AppliedAccounts.Services
             AppPaths.SessionPath = Config.GetValue<string>("Paths:SessionPath") ?? "Sessions";
             AppPaths.ExcelFilesPath = Config.GetValue<string>("Paths:ExcelFilesPath") ?? "ExcelFiles";
 
-            Source = new(AppPaths);
 
             Author = new()
             {
@@ -84,10 +99,10 @@ namespace AppliedAccounts.Services
             Currency = new()
             {
                 ID = Config.GetValue<int>("Currency:ID"),
-                Sign = Config.GetValue<string>("Currency:Sign"),
-                Title = Config.GetValue<string>("Currency:Title"),
-                Format = Config.GetValue<string>("Currency:Format"),
-                Units = Source.GetText("CurrencyUnit")
+                Sign = Config.GetValue<string>("Currency:Sign") ?? "",
+                Title = Config.GetValue<string>("Currency:Title") ?? "",
+                Format = Config.GetValue<string>("Currency:Format") ?? "",
+                Units = Config.GetValue<string>("Currency:Units") ?? "",
             };
 
             Reporting = new()
@@ -112,7 +127,7 @@ namespace AppliedAccounts.Services
 
         public void Dispose()
         {
-            Source?.Dispose();
+            
         }
     }
 }

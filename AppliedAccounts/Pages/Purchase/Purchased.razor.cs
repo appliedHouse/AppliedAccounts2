@@ -93,7 +93,7 @@ namespace AppliedAccounts.Pages.Purchase
             if (IsSaved)
             {
                 ToastService.ShowSuccess($"Successfully saved {MyModel.MyVoucher.Master.Vou_No}"); // show the toast
-                NavManager.NavigateTo($"/Sale/SaleInvoice/{MyModel.MyVoucher.Master.ID1}");
+                AppGlobal.NavManager.NavigateTo($"/Sale/SaleInvoice/{MyModel.MyVoucher.Master.ID1}");
             }
             else
             {
@@ -110,7 +110,7 @@ namespace AppliedAccounts.Pages.Purchase
             {
                 MyModel.Deleted.Add(MyModel.MyVoucher.Detail);                  // Save in deleted list
                 MyModel.MyVoucher.Details.Remove(MyModel.MyVoucher.Detail);     // remove from detail list
-                MyModel.MsgClass.Add(AppMessages.Enums.Messages.RowDeleted);    // Set message to display after deleted.
+                MyModel.MsgService.Warning(AppMessages.Enums.Messages.RowDeleted);    // Set message to display after deleted.
             }
 
         }
@@ -124,7 +124,7 @@ namespace AppliedAccounts.Pages.Purchase
 
         public void BackPage()
         {
-            NavManager.NavigateTo("/Purchase/PurchaseList");
+            AppGlobal.NavManager.NavigateTo("/Purchase/PurchaseList");
         }
 
         public void TestRecord()

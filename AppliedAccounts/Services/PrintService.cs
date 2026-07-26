@@ -20,7 +20,7 @@ namespace AppliedAccounts.Services
 
         public bool IsError { get; set; } = false;
         public List<string> MyMessage { get; set; } = new();
-        public MessageClass MsgClass { get; set; }
+        public MessagesService MsgService { get; set; }
 
 
         public PrintService(GlobalService _Config)
@@ -64,10 +64,23 @@ namespace AppliedAccounts.Services
 
         public async Task PrintAsync()
         {
-            IsError = ReportValidate();
 
             Model.OutputReport.ReportType = ReportType;
-            Model.ReportDataSource = Data; // Set the data source for the report
+
+            if (Data == null && Model.ReportDataSource != null)
+            {
+                Data = Model.ReportDataSource;
+            }
+            else if (Data != null && Model.ReportDataSource == null)
+            {
+                Model.ReportDataSource = Data;
+            }
+
+
+
+            //Model.ReportDataSource = Data; // Set the data source for the report
+
+            IsError = ReportValidate();
 
             if (!IsError)
             {
@@ -88,28 +101,14 @@ namespace AppliedAccounts.Services
 
         public async void Print()
         {
-            IsError = ReportValidate();
-
-            Model.OutputReport.ReportType = ReportType;
-            Model.ReportDataSource = Data; // Set the data source for the report
-
-            if (!IsError)
+            try
             {
-                switch (ReportType)
-                {
-                    case ReportType.Print: await Printer(); break;
-                    case ReportType.Preview: await Preview(); break;
-                    case ReportType.PDF: await PDF(); break;
-                    case ReportType.Excel: await Excel(); break;
-                    case ReportType.Word: await Word(); break;
-                    case ReportType.Image: await Image(); break;
-                    case ReportType.HTML: await HTML(); break;
-                    default: await Preview(); break;
-                }
+                PrintAsync().GetAwaiter().GetResult();
             }
-            else
+            catch (InvalidOperationException ex) // ← Catches the actual exception
             {
-                bool stop = true;
+                MsgService.Error($"Error: {ex.Message}");
+                Console.WriteLine($"Caught: {ex.Message}");
             }
         }
 
@@ -120,24 +119,34 @@ namespace AppliedAccounts.Services
         {
             bool result = false;
             Extractor = new(Model.InputReport.FileFullName);
-            MsgClass ??= new();
+            MsgService.Clear();
 
             if (!Model.IsParametersValid())
             {
                 result = true;
                 MyMessage.Add("The report parameters are not aligned with the report requirements.");
-                MsgClass.Critical("The report parameters are not aligned with the report requirements.");
+                MsgService.Critical(MyMessage.Last());
             }
 
-            if (Data.DataSetName != Extractor.DataSetName)
+
+            if (Data != null)
+            {
+                if (Data.DataSetName != Extractor.DataSetName)
+                {
+                    result = true;
+                    MyMessage.Add("The report Dataset name is not aligned with the report requirements.");
+                    MsgService.Critical(MyMessage.Last());
+                }
+            }
+            else
             {
                 result = true;
-                MyMessage.Add("The report Dataset name is not aligned with the report requirements.");
-                MsgClass.Critical("The report Dataset name is not aligned with the report requirements.");
+                MyMessage.Add("The report Dataset name is not assign. Value is null");
+                MsgService.Critical(MyMessage.Last());
+
             }
 
             return result;
-
         }
         #endregion
 

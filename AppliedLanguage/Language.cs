@@ -1,30 +1,37 @@
-﻿using System.Data;
+﻿using AppliedDB;
+using Microsoft.Data.Sqlite;
+using System.Data;
 
 namespace AppLanguages
 {
     public class Language
     {
         //private DataTable? LanguageDataTable { get; set; }
-        public readonly List<DataRow> Languages = new LanguageList().LangList;
+        public List<DataRow> Languages { get; set; }
         public int LanguagesCount => Languages.Count;
         public List<DataRow> LanguageText { get; set; } = new();
 
         public int LanguageID { get; set; }
         public string Section { get; set; } = string.Empty;
+        public DataSource Source { get; set; }
 
-
-        public Language(int _LanguageID, string _Section)
+        public Language(int _LanguageID, string _Section, DataSource dataSource)
         {
+            Source = dataSource;
             LanguageText = GetLanguageText(_LanguageID, _Section);
             Languages = GetLanguageList();
         }
 
-        private static List<DataRow> GetLanguageText(int _LanguageID, string _Section)
+        private List<DataRow> GetLanguageText(int _LanguageID, string _Section)
         {
             List<DataRow> _List = new();
-            DataTable _Table = new AppliedDB.Languages().GetLanguageText(_LanguageID, _Section);
+            SqliteConnection? _Connection = Source.MyConnections.GetSqliteLanguage();
+            if(_Connection == null) { return null!; }
 
-            if (_Table.Rows.Count > 0)
+            string _Query = $"SELECT * FROM LanguageText WHERE LanguageID={_LanguageID} AND Section='{_Section}'";
+            DataTable? _Table = Source.GetTable(_Query, _Connection);
+
+            if (_Table != null && _Table.Rows.Count > 0)
             {
                 foreach (DataRow _Row in _Table.Rows)
                 {
@@ -32,15 +39,19 @@ namespace AppLanguages
                 }
                 return _List;
             }
-            return null;
+            return null!;
         }
 
-        private static List<DataRow> GetLanguageList()
+        private List<DataRow> GetLanguageList()
         {
             List<DataRow> _List = new();
-            DataTable _Table = AppliedDB.Languages.GetLanguageList();
+            SqliteConnection? _Connection = Source.MyConnections.GetSqliteLanguage();
+            if (_Connection == null) { return null!; }
 
-            if (_Table.Rows.Count > 0)
+            string _Query = $"SELECT * FROM [LanguageList]";
+            DataTable? _Table = Source.GetTable(_Query, _Connection);
+
+            if (_Table != null && _Table.Rows.Count > 0)
             {
                 foreach (DataRow _Row in _Table.Rows)
                 {
@@ -48,7 +59,7 @@ namespace AppLanguages
                 }
                 return _List;
             }
-            return null;
+            return null!;
         }
 
 

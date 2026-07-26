@@ -19,15 +19,16 @@ namespace AppliedAccounts.Models
         public string SelectedTable { get; set; }
         public List<DataRow> ImportedData { get; set; } = [];
         public List<DataRow> FilterData { get; set; } = [];
-        public MessageClass MsgClass { get; set; } = new();
+        public MessagesService MsgService { get; set; } 
         public PageModel Pages { get; set; } = new();
 
 
         public ImportCOAModel() { }
-        public ImportCOAModel(GlobalService _AppGlobal)
+        public ImportCOAModel(GlobalService _AppGlobal, MessagesService msgService)
         {
             if (_AppGlobal is not null)
             {
+                MsgService = msgService;
                 AppGlobal = _AppGlobal;
                 ExcelImportRegistry = "ImportCOA";              // Get a GUID of DB from registry data
                 Source = new(_AppGlobal.AppPaths);
@@ -39,13 +40,11 @@ namespace AppliedAccounts.Models
         public void LoadImportedData()
         {
 
-            string _Path = Connections.GetTempDBPath();                               // Temp DB Path
-            string _File = Source.GetText(ExcelImportRegistry);                       // Imported DB File for COA
-            string _ImportDBPath = Path.Combine(_Path, _File + ".db");                        // Connection string Path
+            string _Path = Source.MyConnections.GetTempDBPath();                         // Connections.GetTempDBPath();                               // Temp DB Path
+            string _File = Source.GetText(ExcelImportRegistry);                          // Imported DB File for COA
+            string _ImportDBPath = Path.Combine(_Path, _File + ".db");                   // Connection string Path
             SqliteConnection _TempDBConnection = new($"Data Source={_ImportDBPath}");
             ImportedData = [.. DataSource.GetDataTable(SelectedTable, _TempDBConnection).AsEnumerable()];
-            //Pages = new(); Pages.Refresh(ImportedData.Count); // Refresh Page Model with Total Records
-            //FilterData = [.. ImportedData.Skip(Pages.Current).Take(Pages.Size)]; // Copy Imported Data to Filter Data
             IsExcelLoaded = true;       // Data Successcully loaded.
         }
     }

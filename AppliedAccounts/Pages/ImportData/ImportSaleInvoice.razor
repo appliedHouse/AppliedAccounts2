@@ -1,19 +1,16 @@
 ﻿@page "/ImportData/ImportSalesInvoice"
 
 @attribute [Authorize]
-@using System.Data
 @using AppliedAccounts.Services
 @using AppliedAccounts.Component
-@using AppliedDB
 @using Microsoft.AspNetCore.Components.Forms
 
 
 @inject AuthenticationStateProvider authStateProvider
-@inject NavigationManager NavManager
-@inject IJSRuntime js
 @inject IToastService ToastService
 @inject GlobalService AppGlobal
 @inject PrintService ReportService
+@inject MessagesService MsgService
 
 
 @code {
@@ -25,19 +22,18 @@
     protected override void OnInitialized()
     {
         Stopwatch.Start();
-        MsgClass = new();
         Source = new(AppGlobal.AppPaths);
         
     }
 
     private async Task TriggerFileInput()
     {
-        await js.InvokeVoidAsync("triggerFileUpload");
+        await AppGlobal.JS.InvokeVoidAsync("triggerFileUpload");
     }
 
     private async Task SaveMessage()
     {
-        await js.InvokeVoidAsync("showModol", "modalSave");
+        await AppGlobal.JS.InvokeVoidAsync("showModol", "modalSave");
 
     }
 }
@@ -207,7 +203,7 @@ else
 
             <div class="border rounded" style="max-height: 70vh; overflow-y: auto;">
                 <ul class="list-group">
-                    @foreach (var item in MsgClass.MessageList)
+                    @foreach (var item in MsgService.MsgClass.MessageList)
                     {
                         <li class="list-group-item">@item.MessageText</li>
                     }

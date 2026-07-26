@@ -2,7 +2,7 @@
 @attribute [Authorize]
 @layout PageLayout
 
-@using AppliedAccounts.Libs
+@using AppliedAccounts.Component.Libs
 @using AppliedAccounts.Services
 
 @inject IToastService ToastService
@@ -41,9 +41,9 @@
 	</div>
 }
 
-@if (MsgClass.Count > 0)
+@if (MsgService.Count > 0)
 {
-	<PageErrors Messages="@MsgClass" />
+	<PageErrors Messages="@MsgService" />
 }
 
 

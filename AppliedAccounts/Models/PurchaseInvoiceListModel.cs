@@ -17,7 +17,7 @@ namespace AppliedAccounts.Models
         public List<PurchaseRecord> DisplayRecords { get; set; } = new();
         public List<DataRow> Data { get; set; } = new();
         public string SearchText { get; set; } = string.Empty;
-        public AppMessages.MessageClass MyMessages { get; set; } = new();
+        public MessagesService MsgService { get; set; } 
         public decimal TotalAmount { get; set; } = 0.00M;
         public int Page { get; set; } = 1;
         public int Pages { get; set; } = 0;
@@ -62,13 +62,13 @@ namespace AppliedAccounts.Models
                 else
                 {
                     var IsSearch = false;
-                    if (_Row["Vou_No"].ToString().Contains(SearchText)) { IsSearch = true; }
-                    if (AppFunctions.Date2Text(_Row["Vou_Date"]).Contains(SearchText)) { IsSearch = true; }
-                    if (AppFunctions.Date2Text(_Row["Inv_Date"]).Contains(SearchText)) { IsSearch = true; }
-                    if (AppFunctions.Date2Text(_Row["Pay_Date"]).Contains(SearchText)) { IsSearch = true; }
-                    if (_Row["Company"].ToString().ToUpper().Contains(SearchText.ToUpper())) { IsSearch = true; }
-                    if (_Row["City"].ToString().ToUpper().Contains(SearchText.ToUpper())) { IsSearch = true; }
-                    if (_Row["Employee"].ToString().ToUpper().Contains(SearchText.ToUpper())) { IsSearch = true; }
+                    if (_Row["Vou_No"].ToString()!.Contains(SearchText)) { IsSearch = true; }
+                    if (AppFunctions.Date2Text(_Row["Vou_Date"])!.Contains(SearchText)) { IsSearch = true; }
+                    if (AppFunctions.Date2Text(_Row["Inv_Date"])!.Contains(SearchText)) { IsSearch = true; }
+                    if (AppFunctions.Date2Text(_Row["Pay_Date"])!.Contains(SearchText)) { IsSearch = true; }
+                    if (_Row["Company"].ToString()!.ToUpper().Contains(SearchText.ToUpper())) { IsSearch = true; }
+                    if (_Row["City"].ToString()!.ToUpper().Contains(SearchText.ToUpper())) { IsSearch = true; }
+                    if (_Row["Employee"].ToString()!.ToUpper().Contains(SearchText.ToUpper())) { IsSearch = true; }
 
                     if (IsSearch)
                     {
@@ -85,7 +85,7 @@ namespace AppliedAccounts.Models
         #region Get Records by Row & ID
         private PurchaseRecord GetRecord(DataRow _Row)
         {
-            _Row = AppliedDB.Functions.RemoveNull(_Row);
+            _Row.RemoveDBNull(); // = AppliedDB.Functions.RemoveNull(_Row);
             PurchaseRecord _Record = new();
             {
                 _Record.ID = (int)_Row["ID"];

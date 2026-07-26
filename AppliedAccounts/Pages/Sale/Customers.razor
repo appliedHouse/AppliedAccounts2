@@ -2,17 +2,15 @@
 @page "/Sales/Customer/{ID:long}"
 @page "/Sales/Customer/{ID:long}/{IsDelete:bool}"
 @attribute [Authorize];
-@using AppliedAccounts.Libs;
+@using AppliedAccounts.Component.Libs;
 @using AppliedAccounts.Services;
 
 @inject GlobalService AppGlobal
 @inject IToastService ToastService
-
+@inject MessagesService MsgService
 
 <PageHeading Text="Customer / Client Detail" />
-
-@* Show Messages if any *@
-<ShowMessages MsgClass="MyModel.MsgClass"></ShowMessages>
+<ShowMessages MsgService="@MyModel.MsgService"></ShowMessages>
 
 @if (!MyModel.RecordNotFound)
 {

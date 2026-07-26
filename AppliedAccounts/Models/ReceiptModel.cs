@@ -10,6 +10,7 @@ using System.Data;
 using static AppliedDB.Enums;
 using MESSAGE = AppMessages.Enums.Messages;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
+using AppliedAccounts.Data.Mapping;
 
 
 namespace AppliedAccounts.Models
@@ -21,7 +22,7 @@ namespace AppliedAccounts.Models
         public int[] NatureIDs { get; set; }
         public DateTime LastVoucherDate { get; set; }
         public DateTime MaxVouDate { get; set; }
-        public MessageClass MsgClass { get; set; }
+        public MessagesService MsgService { get; set; }
         public PrintService ReportService { get; set; }
         public Voucher MyVoucher { get; set; }
         public List<Detail> Deleted { get; set; }
@@ -33,8 +34,6 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> Accounts { get; set; }
         public List<CodeTitle> PayCOA { get; set; }
         public List<CodeTitle> InvoiceList { get; set; }
-        //public string DataFile => AppGlobal.DBFile;
-
         public AppUserModel? UserProfile { get; set; }
         public int Index { get; set; }
         public bool RecordFound { get; set; }
@@ -53,15 +52,11 @@ namespace AppliedAccounts.Models
 
         #region Constructor
 
-        public ReceiptModel(GlobalService _AppGlobal)
+      
+        public ReceiptModel(GlobalService _AppGlobal, MessagesService msgService, int _ReceiptID)
         {
             AppGlobal = _AppGlobal;
-            ReportService = new(AppGlobal);
-
-        }
-        public ReceiptModel(GlobalService _AppGlobal, int _ReceiptID)
-        {
-            AppGlobal = _AppGlobal;
+            MsgService = msgService;
             ReceiptID = _ReceiptID;
             ReportService = new(AppGlobal);
             Start(ReceiptID);
@@ -73,7 +68,6 @@ namespace AppliedAccounts.Models
             //if (UserProfile is null) { return; }
             Source ??= new(AppGlobal.AppPaths);
 
-            MsgClass = new();
             MyVoucher = new();
             LastVoucherDate = AppRegistry.GetDate(Source.DBFile, "rcptDate");
 
@@ -103,12 +97,12 @@ namespace AppliedAccounts.Models
                 }
                 else
                 {
-                    MsgClass.Add(MESSAGE.UserProfileIsNull);
+                    MsgService.Critical(MESSAGE.UserProfileIsNull);
                 }
             }
             catch (Exception ex)
             {
-                MsgClass.Add(ex.Message);
+                MsgService.Error(ex.Message);
             }
         }
         #endregion
@@ -155,7 +149,6 @@ namespace AppliedAccounts.Models
         public bool IsVoucherValidated()
         {
             bool IsValid = true;
-            MsgClass = new();
             // update for (voucher master and detail before save to data base)
             return IsValid;
         }
@@ -164,30 +157,29 @@ namespace AppliedAccounts.Models
         public bool IsTransValidated()
         {
             bool IsValid = true;
-            MsgClass = new();
 
-            if (MyVoucher.Master == null) { MsgClass.Add(MESSAGE.MasterRecordisNull); return false; }
-            if (MyVoucher.Details == null) { MsgClass.Add(MESSAGE.DetailRecordsisNull); return false; }
-            //if (MyVoucher.Details.Count == 0) { MsgClass.Add(MESSAGE.DetailRecordsAreZero); return false; }
+            if (MyVoucher.Master == null) { MsgService.Error(MESSAGE.MasterRecordisNull); return false; }
+            if (MyVoucher.Details == null) { MsgService.Error(MESSAGE.DetailRecordsisNull); return false; }
+            //if (MyVoucher.Details.Count == 0) { MsgService.Error(MESSAGE.DetailRecordsAreZero); return false; }
 
-            if (MyVoucher.Master.Vou_No.Length == 0) { MsgClass.Add(MESSAGE.VouNoNotDefine); }
+            if (MyVoucher.Master.Vou_No.Length == 0) { MsgService.Error(MESSAGE.VouNoNotDefine); }
             if (!MyVoucher.Master.Vou_No.ToLower().Equals("new"))
             {
-                if (MyVoucher.Master.Vou_No.Length != 11) { MsgClass.Add(MESSAGE.VouNoNotDefineProperly); }
+                if (MyVoucher.Master.Vou_No.Length != 11) { MsgService.Error(MESSAGE.VouNoNotDefineProperly); }
             }
-            if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgClass.Add(MESSAGE.VouDateLess); }
-            if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgClass.Add(MESSAGE.VouDateMore); }
-            if (MyVoucher.Master.COA == 0) { MsgClass.Add(MESSAGE.Row_COAIsZero); }
-            if (MyVoucher.Master.Payer == 0) { MsgClass.Add(MESSAGE.Row_CompanyIDZero); }
-            if (MyVoucher.Master.Remarks.Length == 0) { MsgClass.Add(MESSAGE.Row_NoRemarks); }
-            if (MyVoucher.Master.Status.Length == 0) { MsgClass.Add(MESSAGE.Row_NoStatus); }
+            if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgService.Error(MESSAGE.VouDateLess); }
+            if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgService.Error(MESSAGE.VouDateMore); }
+            if (MyVoucher.Master.COA == 0) { MsgService.Error(MESSAGE.Row_COAIsZero); }
+            if (MyVoucher.Master.Payer == 0) { MsgService.Error(MESSAGE.Row_CompanyIDZero); }
+            if (MyVoucher.Master.Remarks.Length == 0) { MsgService.Error(MESSAGE.Row_NoRemarks); }
+            if (MyVoucher.Master.Status.Length == 0) { MsgService.Error(MESSAGE.Row_NoStatus); }
 
-            if (MyVoucher.Detail.Sr_No == 0) { MsgClass.Add(MESSAGE.SerialNoIsZero); }
-            if (MyVoucher.Detail.Account == 0) { MsgClass.Add(MESSAGE.Row_COAIsZero); }
-            if (MyVoucher.Detail.DR > 0 && MyVoucher.Detail.CR > 0) { MsgClass.Add(MESSAGE.DRnCRHaveValue); }
-            if (MyVoucher.Detail.DR == 0 && MyVoucher.Detail.CR == 0) { MsgClass.Add(MESSAGE.DRnCRAreZero); }
-            if (MyVoucher.Detail.Description.Length == 0) { MsgClass.Add(MESSAGE.DescriptionIsNothing); }
-            if (MsgClass.Count > 0) { IsValid = false; }
+            if (MyVoucher.Detail.Sr_No == 0) { MsgService.Error(MESSAGE.SerialNoIsZero); }
+            if (MyVoucher.Detail.Account == 0) { MsgService.Error(MESSAGE.Row_COAIsZero); }
+            if (MyVoucher.Detail.DR > 0 && MyVoucher.Detail.CR > 0) { MsgService.Error(MESSAGE.DRnCRHaveValue); }
+            if (MyVoucher.Detail.DR == 0 && MyVoucher.Detail.CR == 0) { MsgService.Error(MESSAGE.DRnCRAreZero); }
+            if (MyVoucher.Detail.Description.Length == 0) { MsgService.Error(MESSAGE.DescriptionIsNothing); }
+            if (MsgService.Count > 0) { IsValid = false; }
 
             return IsValid;
         }
@@ -215,60 +207,12 @@ namespace AppliedAccounts.Models
             {
                 try
                 {
-                    var VoucherData = Source.GetReceiptVoucher(ReceiptID).AsEnumerable().ToList();
-
-                    if (VoucherData != null)
-                    {
-                        if (VoucherData.Count > 0)
-                        {
-
-                            MyVoucher.Master = VoucherData!.Select(first => new Master()
-                            {
-                                ID1 = first.Field<long>("ID1"),
-                                Vou_No = first.Field<string>("Vou_No") ?? "",
-                                Vou_Date = first.Field<DateTime>("Vou_Date"),
-                                Payer = first.Field<long>("Payer"),
-                                COA = first.Field<long>("COA"),
-                                Amount = first.Field<decimal>("Amount"),
-                                Ref_No = first.Field<string>("Ref_No") ?? "",
-                                Remarks = first.Field<string>("Remarks") ?? "",
-                                Comments = first.Field<string>("Comments") ?? "",
-                                Status = first.Field<string>("Status") ?? "",
-
-                                TitleCOA = first.Field<string>("TitleCOA") ?? "",
-                                TitlePayer = first.Field<string>("TitlePayer") ?? "",
-                            }).First() ?? new();
-
-                            MyVoucher.Details = [.. VoucherData.Select(row => new Detail()
-                            {
-                                ID2 = row.Field<int>("ID2"),
-                                TranID = row.Field<int>("TranID"),
-                                Sr_No = row.Field<int>("SR_NO"),
-                                Account = row.Field<int>("COA"),
-                                Employee = row.Field<int>("Employee"),
-                                Project = row.Field<int>("Project"),
-                                DR = row.Field<decimal>("DR"),
-                                CR = row.Field<decimal>("CR"),
-                                Description = row.Field<string>("Description") ?? "",
-                                Action = "get",
-
-                                TitleAccount = row.Field<string>("TitleAccount") ?? "",
-                                TitleProject = row.Field<string>("TitleProject") ?? "",
-                                TitleEmployee = row.Field<string>("TitleEmployee") ?? "",
-                            })];
-
-                            if (MyVoucher.Details.Count > 0)
-                            {
-                                MyVoucher.Detail = MyVoucher.Details.First();
-                            }
-
-                            return true;
-                        }
-                    }
+                    var VoucherList = Source.GetReceiptVoucher(ReceiptID).AsEnumerable().ToList();
+                    MyVoucher = VoucherList.ToReceiptModel() ?? NewVoucher();
                 }
-                catch (Exception)
+                catch (Exception error)
                 {
-
+                    MsgService.Error($"ERROR: {error.Message}");
                 }
             }
             return false;
@@ -366,17 +310,16 @@ namespace AppliedAccounts.Models
             }
             else
             {
-                MsgClass.Add(MESSAGE.RecordNotValidated);
+                MsgService.Critical(MESSAGE.RecordNotValidated);
             }
             CalculateTotal();
         }
 
         public async Task<bool> SaveAllAsync()
         {
-            MsgClass = new();
             if (!IsAmountEqual())
             {
-                MsgClass.Add(MESSAGE.AmountNotEqual);
+                MsgService.Critical(MESSAGE.AmountNotEqual);
                 return false;
             }
 
@@ -416,7 +359,7 @@ namespace AppliedAccounts.Models
                         if (!_Command.SaveChanges())
                         {
                             IsSaved = false;
-                            MsgClass.Add(MESSAGE.RowNotUpdated);
+                            MsgService.Critical(MESSAGE.RowNotUpdated);
                         }
 
                         if (IsSaved)         // If master record saved successfully.
@@ -442,7 +385,7 @@ namespace AppliedAccounts.Models
                                     _Command = new(RowDeleted, Source.DBFile);
                                     if (!_Command.DeleteRow())
                                     {
-                                        MsgClass.Add(MESSAGE.RowNotDeleted);
+                                        MsgService.Critical(MESSAGE.RowNotDeleted);
                                     }
                                 }
 
@@ -480,7 +423,7 @@ namespace AppliedAccounts.Models
                                     if (!_Command.SaveChanges())
                                     {
                                         IsSaved = false;
-                                        MsgClass.Add(MESSAGE.RowNotUpdated);
+                                        MsgService.Critical(MESSAGE.RowNotUpdated);
                                         break;
                                     }
                                 }
@@ -597,13 +540,14 @@ namespace AppliedAccounts.Models
         #region Print
         public async Task Print(ReportActionClass reportAction)
         {
+            IsWaiting = true;
             await Task.Run(() =>
             {
                 try
                 {
                     SetKeys();
                     ReceiptID = reportAction.VoucherID;
-                    ReportService = new(AppGlobal); ;                      // Initialize Report Service
+                    ReportService = new(AppGlobal); ;                       // Initialize Report Service
                     ReportService.ReportType = reportAction.PrintType;      // Assign Report Type 
                     GetReportData();                                        // Report Data Source Setup
                     UpdateReportModel();                                    // Update Report Model
@@ -611,15 +555,16 @@ namespace AppliedAccounts.Models
                     if (!ReportService.IsError) { ReportService.Print(); }  // Report Print / Preview / PDF / Excel / Word / Image / HTML
                     else
                     {
-                        MsgClass.Critical(MESSAGE.rptNotValidToPrint);     // Add Error Message to Page error view if Report is not valid
+                        MsgService.Critical(MESSAGE.rptNotValidToPrint);      // Add Error Message to Page error view if Report is not valid
                     }
                 }
                 catch (Exception error)
                 {
-                    MsgClass.Add(error.Message);
+                    MsgService.Error(error);
                 }
 
             });
+            IsWaiting = false;
         }
 
         public void GetReportData()
@@ -630,7 +575,7 @@ namespace AppliedAccounts.Models
             if (_Table.Columns.Count == 0)
             {
                 ReportService.IsError = true;
-                MsgClass.Error(MESSAGE.rptDataTableIsNull);
+                MsgService.Error(MESSAGE.rptDataTableIsNull);
             }
             else
             {
@@ -672,13 +617,12 @@ namespace AppliedAccounts.Models
         #region Get & Set Keys
         public void SetKeys()
         {
-            AppRegistry.SetKey(Source.DBFile, "Receipt", MyVoucher.Master.Vou_Date, KeyType.Date, "Receipt Page");
-
+            Source.SetKey("Receipt", MyVoucher.Master.Vou_Date, KeyType.Date);
         }
 
         public void GetKeys()
         {
-
+            MyVoucher.Master.Vou_Date = Source.GetDate("Receipt");
         }
         #endregion
 
@@ -774,5 +718,8 @@ namespace AppliedAccounts.Models
             public string Action { get; set; }
         }
         #endregion
+
+
+      
     }
 }

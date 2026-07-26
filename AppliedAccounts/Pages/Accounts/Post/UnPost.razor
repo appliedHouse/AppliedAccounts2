@@ -1,12 +1,11 @@
 ﻿@page "/Unpost"
-@using System.Data
-@using AppliedAccounts.Models
-@using AppliedAccounts.Models.Posting
+@using AppliedAccounts.Component.Libs
 
 @inject GlobalService AppGlobal
+@inject MessagesService MsgService
 
-<ShowPageHeading PageTitle="VOUCHER UN-POST" />
-<PageErrors Messages="@MyModel.MsgClass" />
+<PageHeading Text="VOUCHER UN-POST" />
+<ShowMessages MsgService="MsgService" />
 
 
 <!-- HEADING MENU -->

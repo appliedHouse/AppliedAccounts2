@@ -10,14 +10,13 @@ namespace AppliedAccounts.Pages.Accounts
         public ReceiptModel MyModel { get; set; }
         public bool IsPageValid { get; set; }
         public string ErrorMessage { get; set; }
-        private bool IsWaiting { get; set; }
         private string SpinnerMessage { get; set; }
 
         public Receipt()
         {
-            MyModel = new ReceiptModel(AppGlobal);
-            IsPageValid = true;
-            ErrorMessage = string.Empty;
+            //MyModel = new ReceiptModel(AppGlobal);
+            //IsPageValid = true;
+            //ErrorMessage = string.Empty;
         }
 
         #region DropDown Changed
@@ -29,16 +28,6 @@ namespace AppliedAccounts.Pages.Accounts
                 .Select(e => e.Title)
                 .First() ?? "";
         }
-
-        private void PayerIDChanged(long _ID)
-        {
-            MyModel.MyVoucher.Master.Payer = _ID;
-            MyModel.MyVoucher.Master.TitlePayer = MyModel.Companies
-                .Where(e => e.ID == MyModel.MyVoucher.Master.Payer)
-                .Select(e => e.Title)
-                .First() ?? "";
-        }
-
         private void AccountIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Account = _ID;
@@ -47,7 +36,14 @@ namespace AppliedAccounts.Pages.Accounts
                 .Select(e => e.Title)
                 .First() ?? "";
         }
-
+        private void PayerIDChanged(long _ID)
+        {
+            MyModel.MyVoucher.Master.Payer = _ID;
+            MyModel.MyVoucher.Master.TitlePayer = MyModel.Companies
+                .Where(e => e.ID == MyModel.MyVoucher.Master.Payer)
+                .Select(e => e.Title)
+                .First() ?? "";
+        }
         private void ProjectIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Project = _ID;
@@ -56,7 +52,6 @@ namespace AppliedAccounts.Pages.Accounts
                 .Select(e => e.Title)
                 .First() ?? "";
         }
-
         private void EmployeeIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Employee = _ID;
@@ -70,7 +65,7 @@ namespace AppliedAccounts.Pages.Accounts
         #region Back Page
         private void BackPage()
         {
-            NavManager.NavigateTo("/Accounts/ReceiptList");
+            AppGlobal.NavManager.NavigateTo("/Accounts/ReceiptList");
         }
         #endregion
 
@@ -84,30 +79,25 @@ namespace AppliedAccounts.Pages.Accounts
             if (IsSaved)
             {
                 ToastService.ShowSuccess($"Successfully saved {MyModel.MyVoucher.Master.Vou_No}");
-                NavManager.NavigateTo($"/Accounts/Receipt/{MyModel.MyVoucher.Master.ID1}");
+                AppGlobal.NavManager.NavigateTo($"/Accounts/Receipt/{MyModel.MyVoucher.Master.ID1}");
             }
         }
         #endregion
 
         #region Print
 
-        public async void Print(ReportActionClass reportAction)
+        public async Task Print(ReportActionClass reportAction)
         {
+            //MyModel.IsWaiting = true;
+            //await InvokeAsync(StateHasChanged);
+
             await MyModel.Print(reportAction);
+            
+            //MyModel.IsWaiting = false;
+            //await InvokeAsync(StateHasChanged);
+            
         }
         #endregion
 
-        public void TestRecord()
-        {
-
-            try
-            {
-                MyModel.TestNewAsync();
-            }
-            catch (Exception ex)
-            {
-                ToastService.ShowError(ex.Message);
-            }
-        }
     }
 }

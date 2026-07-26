@@ -2,13 +2,12 @@
 using AppliedDB;
 using System.Data;
 using static AppliedDB.Enums;
-using static AppMessages.Enums;
+using MESSAGES = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Models
 {
     public class COAClassModel
     {
-        //public AppliedGlobals.AppUserModel? AppUser { get; set; }
         public GlobalService AppGlobal { get; set; }
         public DataSource? Source { get; set; }
         public string DBFile => Source!.DBFile;
@@ -18,17 +17,18 @@ namespace AppliedAccounts.Models
 
         public int CountRecord => Records.Count;
         public int Count => Data.Count;
-        public AppMessages.MessageClass MsgClass { get; set; } = new();
         public string SearchText { get; set; } = string.Empty;
         public bool IsDeleted { get; set; } = false;
         public string MyMessage { get; private set; }
+        public MessagesService MsgService { get; set; }
 
 
         #region Constructor
         public COAClassModel() { }
-        public COAClassModel(GlobalService _AppGlobal)
+        public COAClassModel(GlobalService _AppGlobal, MessagesService msgService)
         {
             AppGlobal = _AppGlobal;
+            MsgService = msgService;
             Source = new(AppGlobal.AppPaths);
             LoadData();
         }
@@ -101,7 +101,8 @@ namespace AppliedAccounts.Models
             DataRow _DataRow;
             if (Data.Count == 0)
             {
-                _DataRow = DataSource.GetNewRow(DBFile, Tables.COA_Class);
+                _DataRow = Source!.GetNewRow(Tables.COA_Class);
+                //_DataRow =  DataSource.GetNewRow(DBFile, Tables.COA_Class);
             }
             else
             {
@@ -133,7 +134,7 @@ namespace AppliedAccounts.Models
         #region Delete
         public bool Delete(long _ID)
         {
-            MsgClass.ClearMessages();
+            MsgService.Clear();
             var _DeleteRow = Source!.GetDataRow(Tables.COA_Class, _ID);
 
             if (_DeleteRow is not null)
@@ -171,7 +172,7 @@ namespace AppliedAccounts.Models
                 }
                 else
                 {
-                    MsgClass.Add(Messages.SQLQueryIsNull);
+                    MsgService.Error(MESSAGES.SQLQueryIsNull);
                 }
             }
 
@@ -184,12 +185,12 @@ namespace AppliedAccounts.Models
         private bool Validate(DataRow _Row)
         {
             var _Validated = true;
-            if (_Row["ID"] is null) { _Validated = false; MsgClass.Add(Messages.IDIsNull); }
-            if (_Row["Code"] is null) { _Validated = false; MsgClass.Add(Messages.CodeIsNull); }
-            if (_Row["Title"] is null) { _Validated = false; MsgClass.Add(Messages.ColumnIsNull); }
+            if (_Row["ID"] is null) { _Validated = false; MsgService.Error(MESSAGES.IDIsNull); }
+            if (_Row["Code"] is null) { _Validated = false; MsgService.Error(MESSAGES.CodeIsNull); }
+            if (_Row["Title"] is null) { _Validated = false; MsgService.Error(MESSAGES.ColumnIsNull); }
 
-            if (_Row["Code"].ToString()!.Length == 0) { _Validated = false; MsgClass.Add(Messages.CodeIsZero); }
-            if (_Row["Title"].ToString()!.Length == 0) { _Validated = false; MsgClass.Add(Messages.TitleIsZero); }
+            if (_Row["Code"].ToString()!.Length == 0) { _Validated = false; MsgService.Error(MESSAGES.CodeIsZero); }
+            if (_Row["Title"].ToString()!.Length == 0) { _Validated = false; MsgService.Error(MESSAGES.TitleIsZero); }
             return _Validated;
         }
         #endregion
