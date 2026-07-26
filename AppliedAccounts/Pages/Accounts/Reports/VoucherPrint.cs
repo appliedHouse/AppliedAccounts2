@@ -11,7 +11,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         public ReportModel Model { get; set; } = new();
         public GlobalService AppGlobal { get; set; }
 
-        public long VoucherID { get; set; }  
+        public long VoucherID { get; set; }
         public string VoucherNo { get; set; }
         public DataSource Source { get; set; }
         public bool IsPrinting { get; set; } = false;
@@ -23,7 +23,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         {
 
         }
-        
+
         public VoucherPrint(ReportActionClass reportAction, GlobalService appGlobal)
         {
             AppGlobal = appGlobal;
@@ -31,7 +31,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             Source = new(AppGlobal.AppPaths);
             ReportService.JS = AppGlobal.JS;
         }
-        
+
         #endregion
 
         public async Task PrintAsync()
@@ -44,7 +44,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 ReportService.Print();
             }
         }
-        
+
         public void Print()
         {
             IsPrinting = true;                                   // Flag for show printing status in UI
@@ -99,7 +99,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
             if (VoucherNo == null)
             {
-                if(VoucherID == 0)
+                if (VoucherID == 0)
                 {
                     Model.ReportDataSource.ReportTable = null!;
                     Model.ReportDataSource.DataSetName = null!;
@@ -107,7 +107,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 }
                 else
                 {
-                    
+
                     _Query = $"SELECT [Voucher_No] FROM Ledger WHERE id = {VoucherID}";
                     VoucherNo = (string)Source.SeekValue(Enums.Tables.Ledger, VoucherID, "Vou_No")! ?? "";
                 }

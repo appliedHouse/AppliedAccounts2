@@ -1,5 +1,4 @@
 ﻿using AppliedAccounts.Models;
-using AppliedAccounts.Services;
 using Microsoft.JSInterop;
 
 namespace AppliedAccounts.Pages.Stock

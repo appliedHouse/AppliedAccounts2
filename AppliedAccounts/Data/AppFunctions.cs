@@ -1,7 +1,4 @@
-﻿using AppliedDB;
-using AppMessages;
-using System.Data;
-using System.Globalization;
+﻿using System.Globalization;
 using Format = AppliedGlobals.AppValues.Format;
 
 namespace AppliedAccounts.Data
@@ -62,7 +59,7 @@ namespace AppliedAccounts.Data
             return _Value;
         }
 
-        public static string QueryDate (this DateTime _Date)
+        public static string QueryDate(this DateTime _Date)
         {
             return _Date.ToString("yyyy-MM-dd");
         }
@@ -72,7 +69,7 @@ namespace AppliedAccounts.Data
             return _Date.ToString("dd-MMM-yyyy");
         }
 
-        public static string Display (this decimal _decimal)
+        public static string Display(this decimal _decimal)
         {
             // Show Display decimal as 123,456,789.99
             return _decimal.ToString("N2", CultureInfo.CurrentCulture);

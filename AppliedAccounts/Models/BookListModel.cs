@@ -4,11 +4,10 @@ using AppliedAccounts.Services;
 using AppliedDB;
 using AppReports;
 using System.Data;
-using Format = AppliedGlobals.AppValues.Format;
-using Messages = AppMessages.Enums.Messages;
-using KeyType = AppliedGlobals.AppErums.KeyTypes;
 using Enums = AppliedDB.Enums;
-using AppMessages;
+using Format = AppliedGlobals.AppValues.Format;
+using KeyType = AppliedGlobals.AppErums.KeyTypes;
+using Messages = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Models
 {
@@ -246,7 +245,7 @@ namespace AppliedAccounts.Models
         #region Get & Set Keys
         internal void SetKeys()
         {
-            if(Source != null)
+            if (Source != null)
             {
                 Source.SetKey("BkNatureID", BookNatureID, KeyType.Number);
                 Source.SetKey("BkBook", BookID, KeyType.Number);

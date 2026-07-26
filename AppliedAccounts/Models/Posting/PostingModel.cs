@@ -12,8 +12,8 @@ namespace AppliedAccounts.Models.Posting
 {
     public class PostingModel
     {
-        public GlobalService AppGlobal { get; set; } 
-        public Services.MessagesService MsgService { get; set; } 
+        public GlobalService AppGlobal { get; set; }
+        public Services.MessagesService MsgService { get; set; }
         public List<DataListModel> DataListModelList { get; set; } = new();
         public bool IsPosting { get; set; }
         public DataSource Source { get; set; }
@@ -174,7 +174,7 @@ namespace AppliedAccounts.Models.Posting
                 DetailTable = Source.GetTable(Tables.Book2, $"TranID={vouId}")
             };
 
-            if(postingModel.MasterTable.Rows.Count == 0)
+            if (postingModel.MasterTable.Rows.Count == 0)
             {
                 MsgService.Danger(Messages.PostingMasterRecordNotFound);
                 return;
@@ -185,7 +185,7 @@ namespace AppliedAccounts.Models.Posting
                 MsgService.Danger(Messages.PostingDetailRecordNotFound);
                 return;
             }
-            
+
             var post = new CashBook(Source, postingModel, MsgService.MsgClass);
 
             switch (model.PostingType)

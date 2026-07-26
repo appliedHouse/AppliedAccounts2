@@ -1,8 +1,8 @@
-﻿using AppliedDB;
-using System.Data;
-using AppliedAccounts.Models;
-using static AppliedDB.Enums;
+﻿using AppliedAccounts.Models;
 using AppliedAccounts.Services;
+using AppliedDB;
+using System.Data;
+using static AppliedDB.Enums;
 
 namespace AppliedAccounts.Pages.Stock.Directory
 {
@@ -14,8 +14,8 @@ namespace AppliedAccounts.Pages.Stock.Directory
         public DataSource Source { get; set; }
         public string Filter { get; set; }
         public string Sort { get; set; }
-        public bool EditMode { get; set; } 
-        public bool IsDeleted { get; set; } 
+        public bool EditMode { get; set; }
+        public bool IsDeleted { get; set; }
 
         public List<CodeTitle> StockDirectoryList { get; set; }
 
@@ -28,7 +28,7 @@ namespace AppliedAccounts.Pages.Stock.Directory
             ["Inv_UOM"] = (Tables.Inv_UOM, "Stock Unit of Measurement")
         };
 
-        private async Task GetBackPath() 
+        private async Task GetBackPath()
         {
             EditMode = false;
             IsDeleted = false;
@@ -38,7 +38,7 @@ namespace AppliedAccounts.Pages.Stock.Directory
 
         public void LoadData(string tableName)
         {
-            
+
             Source ??= new(AppGlobal.AppPaths);
 
             if (_tableMap.TryGetValue(tableName, out var mapping))
@@ -75,12 +75,12 @@ namespace AppliedAccounts.Pages.Stock.Directory
         }
         public async Task Delete(long _ID)
         {
-            
+
             var _ExistingRow = GetExistingRow(_ID);
             if (_ExistingRow != null)
             {
                 IsDeleted = await Source.DeleteAsync(_ExistingRow);   // if delete is successful, IsDeleted will be false, otherwise true
-                if (IsDeleted) 
+                if (IsDeleted)
                 {
                     LoadData(TableName!);
                     IsDeleted = false;
@@ -128,7 +128,7 @@ namespace AppliedAccounts.Pages.Stock.Directory
 
         #endregion
 
-        
+
 
     }
 }

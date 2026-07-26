@@ -149,7 +149,7 @@ namespace AppliedAccounts.Pages.Sale
         public void CopyVouDate()
         {
             MyModel.MyVoucher.Master.Inv_Date = MyModel.MyVoucher.Master.Vou_Date;
-            
+
         }
 
         public void CopyInvDate()

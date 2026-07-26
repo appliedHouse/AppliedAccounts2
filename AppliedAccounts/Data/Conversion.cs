@@ -38,9 +38,9 @@ namespace AppliedAccounts.Data
             {
                 var type = _Value.GetType();
 
-                if (type == typeof(string)) 
+                if (type == typeof(string))
                 {
-                    return int.Parse((string)_Value); 
+                    return int.Parse((string)_Value);
                 }
                 if (type == typeof(decimal)) { return int.Parse(_Value.ToString()!); }
                 if (type == typeof(long)) { return int.Parse(_Value.ToString()!); }
@@ -57,7 +57,7 @@ namespace AppliedAccounts.Data
 
         public static decimal ToDecimal(object _Value)
         {
-            if(_Value == null) { return 0.00M; }
+            if (_Value == null) { return 0.00M; }
             try
             {
                 var type = _Value.GetType();

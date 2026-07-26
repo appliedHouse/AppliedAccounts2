@@ -12,7 +12,7 @@ using ToastNotificationLibrary.Models;
 
 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
- var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 Batteries.Init();                       // Start SQLite Engine.
 
@@ -48,13 +48,13 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-app.UseMiddleware<DatabaseValidation>(); 
+app.UseMiddleware<DatabaseValidation>();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-app.UseUserDatabaseValidation();         
+app.UseUserDatabaseValidation();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

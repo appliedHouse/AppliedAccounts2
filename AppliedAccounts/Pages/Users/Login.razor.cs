@@ -49,7 +49,7 @@ namespace AppliedAccounts.Pages.Users
                     await userAuthStateProvider.UpdateAuthenticateState(_UserData);
                     IsDBFileValid = await UserDatabaseFileValidateAsync(AppUser.Profile.DataFile);
 
-                    if(IsDBFileValid)
+                    if (IsDBFileValid)
                     {
                         NavManager.NavigateTo("/", true);
                     }
@@ -59,7 +59,7 @@ namespace AppliedAccounts.Pages.Users
                     }
 
 
-                    
+
 
                 }
                 else

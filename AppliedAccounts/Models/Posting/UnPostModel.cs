@@ -1,7 +1,6 @@
 ﻿using AppliedAccounts.Pages.Accounts.Post;
 using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
 using Microsoft.AspNetCore.Components;
 using System.Data;
 using VoucherPosting;
@@ -19,7 +18,7 @@ namespace AppliedAccounts.Models.Posting
         public bool IsPosting { get; set; } = false;
         public DataSource Source { get; set; }
         public string Filter { get; set; } = string.Empty;
-        public string Sort {get; set; } = "Vou_Date, Vou_No";
+        public string Sort { get; set; } = "Vou_Date, Vou_No";
         public int PostType { get; set; } = 0;
 
         public PageModel Pages { get; set; } = new();
@@ -69,7 +68,7 @@ namespace AppliedAccounts.Models.Posting
                         var CashAccIDs = string.Join(",", _CashAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
                         Filter = $"BookID IN ({CashAccIDs}) AND [Status] = 'Posted' AND ";
                         Filter += AppliedDB.Functions.GetDateFilter(FilterDates);
-                        
+
                     }
                     var _Sort = Sort + Pages.GetLimit();            // Add pagination filter to select records / rows.
                     var _DataTableCash = Source.GetTable(Tables.Book, Filter, _Sort);
@@ -87,7 +86,7 @@ namespace AppliedAccounts.Models.Posting
                         var BankAccIDs = string.Join(",", _BankAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
                         Filter = $"BookID IN ({BankAccIDs}) AND [Status] = 'Posted' AND ";
                         Filter += AppliedDB.Functions.GetDateFilter(FilterDates);
-                       
+
 
                     }
                     _Sort = Sort + Pages.GetLimit();            // Add pagination filter to select records / rows.
@@ -124,7 +123,7 @@ namespace AppliedAccounts.Models.Posting
                     DataListModelList.Clear();
                     break;
 
-                
+
                 default:
                     DataListModelList.Clear();
                     break;
@@ -217,8 +216,8 @@ namespace AppliedAccounts.Models.Posting
                 postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
                 postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
 
-                if(postingModel.MasterTable.Rows.Count == 0)
-               {
+                if (postingModel.MasterTable.Rows.Count == 0)
+                {
                     MsgService.Warning(Messages.VoucherNotFound);
                     return;
                 }
@@ -227,7 +226,7 @@ namespace AppliedAccounts.Models.Posting
                 MsgService.Clear();                           // Clear all previous messages. 
                 CashBook postBankBook = new(Source, postingModel);
                 // Cash & Bank Voucher data table is same. so here using same fucntion as using for cash
-                await postBankBook.DoCashUnPost();                   
+                await postBankBook.DoCashUnPost();
                 if (postBankBook.PostSuccessful)
                 {
                     MsgService.Success(Messages.Saved);        // add message after Save selected Vouchers.

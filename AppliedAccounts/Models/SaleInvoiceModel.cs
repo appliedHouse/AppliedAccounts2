@@ -2,7 +2,6 @@
 using AppliedAccounts.Models.Interface;
 using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
 using AppReports;
 using Microsoft.AspNetCore.Components;
 using SQLQueries;
@@ -34,7 +33,7 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> Inventory { get; set; }
         public List<CodeTitle> Taxes { get; set; }
         public List<CodeTitle> Units { get; set; }
-        public MessagesService MsgService { get; set; } 
+        public MessagesService MsgService { get; set; }
         public PrintService ReportService { get; set; }
         public DateTime LastVoucherDate { get; set; }
         public DateTime MaxVouDate { get; set; }
@@ -46,13 +45,13 @@ namespace AppliedAccounts.Models
         public bool IsWaiting { get; set; }             // Page is wait for completion of process like save or data load
         public int Count => MyVoucher.Details.Count;    // total records in detail list.
         public int ListType { get; set; }               // List type for display in View Table at page
-        
+
 
         #endregion
 
         #region Constructor
         public SaleInvoiceModel() { }
-      
+
         public SaleInvoiceModel(GlobalService _AppGlobal, MessagesService msgService, long _SaleInvoiceID)
         {
             AppGlobal = _AppGlobal;
@@ -71,7 +70,7 @@ namespace AppliedAccounts.Models
                 if (AppGlobal is null) { return; }
                 Source ??= new(AppGlobal.AppPaths);
 
-                
+
                 MyVoucher = new();
                 LastVoucherDate = GetDate(Source.DBFile, "SInvDate");           // Sale Invoice Date
 
@@ -471,7 +470,7 @@ namespace AppliedAccounts.Models
 
 
             IsWaiting = true;
-            
+
             bool isSaved = true;
             string CurrentVoucherNo = MyVoucher.Master.Vou_No;
 
@@ -599,7 +598,7 @@ namespace AppliedAccounts.Models
                 if (isSaved) { Source.CommitTransaction(); }
                 else
                 {
-                    MyVoucher.Master.Vou_No = CurrentVoucherNo; 
+                    MyVoucher.Master.Vou_No = CurrentVoucherNo;
                     Source.RollbackTransaction();
                 }
 
@@ -655,7 +654,7 @@ namespace AppliedAccounts.Models
 
         private bool Validate_Master(DataRow rowMaster)
         {
-            
+
             var _return = true;
             var _FiscalStart = Source.GetDate("FiscalStart");
             var _FiscalEnd = Source.GetDate("FiscalEnd");

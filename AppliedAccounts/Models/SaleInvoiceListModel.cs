@@ -1,6 +1,5 @@
 ﻿using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
 using AppReports;
 using Microsoft.AspNetCore.Components;
 using System.Data;
@@ -27,18 +26,18 @@ namespace AppliedAccounts.Models
 
 
         #region Constructor
-        public SaleInvoiceListModel(GlobalService _AppGlobal, MessagesService msgService) 
+        public SaleInvoiceListModel(GlobalService _AppGlobal, MessagesService msgService)
         {
             AppGlobal = _AppGlobal;
             MsgService = msgService;
             Source = new(AppGlobal.AppPaths);
             LoadData();
         }
-        
+
         #endregion
 
         #region Load Data
-        
+
         public void LoadData()
         {
             var _Query = SQLQuery.SaleInvoiceList();
@@ -64,7 +63,7 @@ namespace AppliedAccounts.Models
             {
                 Filter = string.Empty;
             }
-            
+
             Data = Source.GetTable(_Query, Filter, _Sort + Pages.GetLimit());
             Records = Data.AsEnumerable().Select(row => GetRecord(row)).ToList();
             Pages.Refresh(Source.RecordCound(Tables.BillReceivable, Filter));
@@ -127,7 +126,7 @@ namespace AppliedAccounts.Models
         #region Search
         public async void Search()
         {
-            await Task.Run(()=>LoadData());
+            await Task.Run(() => LoadData());
 
         }
 

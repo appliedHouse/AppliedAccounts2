@@ -161,7 +161,7 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-        
+
         #region Get & Set Registry Keys
         public void GetKeys()
         {
@@ -170,7 +170,7 @@ namespace AppliedAccounts.Models
 
         public void SetKeys()
         {
-            Source.SetKey("StockList", SearchText, AppliedGlobals.AppErums.KeyTypes.Text,"Inventory List");
+            Source.SetKey("StockList", SearchText, AppliedGlobals.AppErums.KeyTypes.Text, "Inventory List");
         }
         #endregion
 

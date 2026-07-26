@@ -12,5 +12,5 @@ namespace AppliedAccounts.Services
         }
     }
 
-    
+
 }

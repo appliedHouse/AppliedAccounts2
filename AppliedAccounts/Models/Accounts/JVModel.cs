@@ -1,13 +1,11 @@
 ﻿using AppliedAccounts.Data;
-using AppliedAccounts.Models.Interface;
-using AppliedAccounts.Services;
-using AppliedAccounts.Pages.Accounts.Post;
-using AppliedDB;
-using AppMessages;
-using System.Data;
-
-using Messages = AppMessages.Enums.Messages;
 using AppliedAccounts.Data.Mapping;
+using AppliedAccounts.Models.Interface;
+using AppliedAccounts.Pages.Accounts.Post;
+using AppliedAccounts.Services;
+using AppliedDB;
+using System.Data;
+using Messages = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Models.Accounts
 {

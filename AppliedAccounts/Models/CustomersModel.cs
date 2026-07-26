@@ -1,6 +1,5 @@
 ﻿using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using static AppliedDB.Enums;
@@ -31,7 +30,7 @@ namespace AppliedAccounts.Models
             MsgService = msgService;
             Source = new(AppGlobal.AppPaths);
             Data = Source.GetList(Query.CustomersList);
-            CustomerList = [..Data.AsEnumerable()];
+            CustomerList = [.. Data.AsEnumerable()];
             MyDataRow = Source.Seek(Tables.Customers, 0);
 
             if (Data is not null) { Records = GetFilterRecords(""); }
@@ -119,14 +118,14 @@ namespace AppliedAccounts.Models
                     MsgService.Alert(AppMessages.Enums.Messages.RecordNotSaved);
                 }
                 return _DataRow;
-             
+
             }
             catch (Exception ex)
             {
                 MsgService.Error(ex);
             }
             return null;
-            
+
         }
         #endregion
 
@@ -200,7 +199,7 @@ namespace AppliedAccounts.Models
         private bool Validate(DataRow _Row)
         {
             bool _result = true;
-            
+
 
             if (_Row["ID"] == null) { MsgService.Error(AppMessages.Enums.Messages.IDIsNull); _result = false; }
             if (_Row["Code"] == null) { MsgService.Error(AppMessages.Enums.Messages.CodeIsNull); _result = false; }

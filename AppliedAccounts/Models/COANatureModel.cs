@@ -1,5 +1,5 @@
-﻿using AppliedAccounts.Services;
-using AppliedAccounts.Data.Mapping;
+﻿using AppliedAccounts.Data.Mapping;
+using AppliedAccounts.Services;
 using AppliedDB;
 using System.Data;
 using static AppliedDB.Enums;
@@ -11,7 +11,7 @@ namespace AppliedAccounts.Models
     {
         public GlobalService AppGlobal { get; set; }
         public DataSource? Source { get; set; }
-        public string DBFile => Source!.DBFile ?? "" ;
+        public string DBFile => Source!.DBFile ?? "";
         public COANatureRecord Record { get; set; } = new();
         public List<COANatureRecord> Records { get; set; } = new();
         public List<DataRow> Data { get; set; } = new();
@@ -31,7 +31,7 @@ namespace AppliedAccounts.Models
             MsgService = msgService;
             Source = new(AppGlobal.AppPaths);
             LoadData();
-           
+
 
         }
         #endregion
@@ -149,7 +149,7 @@ namespace AppliedAccounts.Models
 
         }
 
-       
+
 
         #endregion
 

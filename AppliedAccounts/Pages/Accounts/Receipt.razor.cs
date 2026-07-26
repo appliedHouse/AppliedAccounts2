@@ -1,6 +1,5 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
-using AppliedAccounts.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace AppliedAccounts.Pages.Accounts
@@ -92,10 +91,10 @@ namespace AppliedAccounts.Pages.Accounts
             //await InvokeAsync(StateHasChanged);
 
             await MyModel.Print(reportAction);
-            
+
             //MyModel.IsWaiting = false;
             //await InvokeAsync(StateHasChanged);
-            
+
         }
         #endregion
 

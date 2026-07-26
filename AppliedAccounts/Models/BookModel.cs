@@ -2,7 +2,6 @@
 using AppliedAccounts.Models.Interface;
 using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
 using Microsoft.AspNetCore.Components;
 using System.Data;
 using MESSAGE = AppMessages.Enums.Messages;
@@ -60,7 +59,7 @@ namespace AppliedAccounts.Models
         public BookModel(long _VoucherID, long _BookID, GlobalService _AppGlobal, MessagesService msgService)
         {
             AppGlobal = _AppGlobal;
-            MsgService = msgService;    
+            MsgService = msgService;
             MyVoucher = new();
 
             try
@@ -346,12 +345,12 @@ namespace AppliedAccounts.Models
 
                                     foreach (var item in MyVoucher.Details)
                                     {
-                                        if(item.action == _Deleted)
+                                        if (item.action == _Deleted)
                                         {
                                             Row2["ID"] = item.ID2;
                                             CommandClass cmdClassDel = new(Row2, Source.MyConnection);
                                             var deleted = cmdClassDel.DeleteRow();
-                                            if(!deleted)
+                                            if (!deleted)
                                             {
                                                 MsgService.Danger(MESSAGE.VouTransNotDeleted);
                                                 // Roll Back master record
@@ -383,7 +382,7 @@ namespace AppliedAccounts.Models
                                             }
                                         }
 
-                                        
+
                                     }
 
                                     IsWaiting = false;
@@ -444,10 +443,10 @@ namespace AppliedAccounts.Models
                     }
                 }
             }
-            if( _SrNo < 0)
+            if (_SrNo < 0)
             {
                 var _Trans = MyVoucher.Details.FirstOrDefault(sr => sr.Sr_No == _SrNo);
-                if(_Trans != null)
+                if (_Trans != null)
                 {
                     _Trans.Sr_No = _Trans.Sr_No * -1;            // Undo Removed transaction
                     _Trans.action = "get";
@@ -624,7 +623,7 @@ namespace AppliedAccounts.Models
             throw new NotImplementedException();
         }
 
-       
+
         #endregion
 
         #region Models

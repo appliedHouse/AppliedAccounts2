@@ -6,8 +6,8 @@ using System.Data;
 using System.Text;
 using static AppliedDB.Enums;
 using Format = AppliedGlobals.AppValues.Format;
-using MESSAGES = AppMessages.Enums.Messages;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
+using MESSAGES = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Models
 {
@@ -32,7 +32,7 @@ namespace AppliedAccounts.Models
         public ReceiptListModel(GlobalService _AppGlobal, MessagesService msgService)
         {
             AppGlobal = _AppGlobal;
-            MsgService = msgService; 
+            MsgService = msgService;
             Table = Tables.view_Receipts;
             Source = new DataSource(AppGlobal.AppPaths);
             DT_Start = AppRegistry.GetDate(Source.DBFile, "rcptFrom");

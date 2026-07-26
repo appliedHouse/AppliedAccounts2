@@ -1,7 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
 using AppReports;
 using System.Data;
 using static AppliedGlobals.AppErums;
@@ -12,7 +11,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
     {
         public TBProjectModel MyModel { get; set; }
         public DataSource Source { get; set; }
-        public MessagesService MsgService { get; set; } 
+        public MessagesService MsgService { get; set; }
 
         bool IsPrinting = false;
 
@@ -22,7 +21,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Print Trial Balance
         public async void Print(ReportActionClass PrintAction)
         {
-                       // Clear all previous messages - refresh
+            // Clear all previous messages - refresh
             IsPrinting = true;
             await InvokeAsync(StateHasChanged); await Task.Delay(100);
 
@@ -91,7 +90,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         {
             DataTable _Table;
             var _OrderBy = "Code";
-            var _Query = SQLQueries.Quries.TBProject(MyModel.Project,string.Empty, _OrderBy);
+            var _Query = SQLQueries.Quries.TBProject(MyModel.Project, string.Empty, _OrderBy);
             _Table = await Source.GetTableAsync(_Query);
             return _Table;
         }
@@ -123,10 +122,10 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Set and Get Keys
         public void SetKeys()
         {
-            Source.SetKey("TBP_Account", MyModel.Project,KeyTypes.Number, "Trial Balance Project");
-            Source.SetKey("TBP_Project", MyModel.Account,KeyTypes.Number);
-            Source.SetKey("TBP_DtFrom", MyModel.DateFrom,KeyTypes.Date);
-            Source.SetKey("TBP_DtFrom", MyModel.DateTo,KeyTypes.Date);
+            Source.SetKey("TBP_Account", MyModel.Project, KeyTypes.Number, "Trial Balance Project");
+            Source.SetKey("TBP_Project", MyModel.Account, KeyTypes.Number);
+            Source.SetKey("TBP_DtFrom", MyModel.DateFrom, KeyTypes.Date);
+            Source.SetKey("TBP_DtFrom", MyModel.DateTo, KeyTypes.Date);
         }
 
         public void GetKeys()

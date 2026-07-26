@@ -12,7 +12,7 @@ namespace AppliedAccounts.Data
         public Database_Patches(AppliedDB.DataSource source, MessagesService messagesService)
         {
             Source = source;
-            MsgService = messagesService; 
+            MsgService = messagesService;
 
             IsPatchApplied.Add(BillReceivable2_AddUnit());
             IsPatchApplied.Add(BillPayable2_AddUnit());

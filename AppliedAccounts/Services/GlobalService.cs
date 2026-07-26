@@ -1,10 +1,10 @@
 ﻿using AppliedAccounts.Authentication;
+using AppliedDB;
 using AppliedGlobals;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using static AppliedGlobals.AppValues;
-using AppliedDB;
 
 namespace AppliedAccounts.Services
 {
@@ -127,7 +127,7 @@ namespace AppliedAccounts.Services
 
         public void Dispose()
         {
-            
+
         }
     }
 }

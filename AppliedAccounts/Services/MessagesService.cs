@@ -141,7 +141,7 @@ namespace AppliedAccounts.Services
             MsgClass.Errors.Clear();
         }
 
-        
+
 
         public int Count => MsgClass.Count;
         public int MessageCount => MsgClass.MessageList.Count;
@@ -153,7 +153,7 @@ namespace AppliedAccounts.Services
     {
         void AddRange(MessageClass msgClass);
         void AddRange(MessagesService msgService);
-        
+
         void Error(Messages code);
         void Error(string text);
         void Error(Exception error);

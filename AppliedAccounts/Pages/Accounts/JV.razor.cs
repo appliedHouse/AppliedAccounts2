@@ -15,13 +15,13 @@ namespace AppliedAccounts.Pages.Accounts
         public bool CanEdit => GetCanEdit();
         private bool GetCanEdit()
         {
-            if(MyModel.MyVoucher.Count == 0) return false;
-            if(MyModel.Transaction.Sr_No == 1) return false;
+            if (MyModel.MyVoucher.Count == 0) return false;
+            if (MyModel.Transaction.Sr_No == 1) return false;
             return true;
         }
 
         #endregion
-       
+
         #region Save
         public async void SaveAll()
         {
@@ -34,7 +34,7 @@ namespace AppliedAccounts.Pages.Accounts
                 MyModel.IsWaiting = false;
                 MyModel.LoadData();
 
-                Toaster.ShowSuccess($"Sucessfully save {MyModel.Vou_No}" );
+                Toaster.ShowSuccess($"Sucessfully save {MyModel.Vou_No}");
                 await InvokeAsync(StateHasChanged);
             }
             else

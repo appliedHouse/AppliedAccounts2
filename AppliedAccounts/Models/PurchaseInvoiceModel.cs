@@ -1,7 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
 using AppReports;
 using Microsoft.AspNetCore.Components;
 using SQLQueries;
@@ -32,7 +31,7 @@ namespace AppliedAccounts.Models
         public List<CodeTitle> Inventory { get; set; }
         public List<CodeTitle> Taxes { get; set; }
         public List<CodeTitle> Units { get; set; }
-        public MessagesService MsgService { get; set; } 
+        public MessagesService MsgService { get; set; }
         public PrintService ReportService { get; set; }
         public DateTime LastVoucherDate { get; set; }
         public DateTime MaxVouDate { get; set; }
@@ -51,7 +50,7 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public PurchaseInvoiceModel() { }
-       
+
 
         public PurchaseInvoiceModel(GlobalService _AppGlobal, MessagesService msgService, long _PurchaseInvoiceID)
         {
@@ -273,7 +272,7 @@ namespace AppliedAccounts.Models
             if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgService.Error(MESSAGE.VouDateLess); }
             if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgService.Error(MESSAGE.VouDateMore); }
             if (MyVoucher.Master.Company == 0) { MsgService.Error(MESSAGE.Row_CompanyIDZero); }
-           
+
             if (MyVoucher.Master.Remarks.Length == 0) { MsgService.Error(MESSAGE.Row_NoRemarks); }
             if (MyVoucher.Master.Status.Length == 0) { MsgService.Error(MESSAGE.Row_NoStatus); }
 
@@ -411,7 +410,7 @@ namespace AppliedAccounts.Models
             }
         }
 
-     
+
         #endregion
 
 

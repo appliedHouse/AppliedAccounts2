@@ -1,8 +1,6 @@
 ﻿// Services/MenuDatabaseInitializer.cs
 using Menus;
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Logging;
-using System.Data;
 
 namespace AppliedAccounts.Services.Menus
 {

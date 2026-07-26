@@ -60,11 +60,11 @@ namespace AppliedAccounts.Pages.Accounts.Post
             await MyModel.LoadData(MyViewModel);
             await InvokeAsync(StateHasChanged);
         }
-        
+
         #endregion
 
 
-        
+
 
         public async Task UnPostingVoucher(long id)
         {
@@ -76,7 +76,7 @@ namespace AppliedAccounts.Pages.Accounts.Post
             await MyModel.DoVoucherUnPost(id, MyViewModel.PostingType);
             await AppGlobal.JS.InvokeVoidAsync("hideModal", "SaveVoucher");
             MyModel.IsPosting = false;
-            
+
             await MyModel.LoadData(MyViewModel);
             await InvokeAsync(StateHasChanged);
 

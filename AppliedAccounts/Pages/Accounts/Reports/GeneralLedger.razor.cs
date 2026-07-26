@@ -2,11 +2,9 @@
 using AppliedAccounts.Models;
 using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
 using AppReports;
 using Microsoft.AspNetCore.Components;
 using System.Data;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using Format = AppliedGlobals.AppValues.Format;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
 using MESSAGES = AppMessages.Enums.Messages;
@@ -31,9 +29,9 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
         public void LoadData()
         {
-            
+
             Source ??= new(AppGlobal.AppPaths);
-               
+
             DBFile = AppGlobal.DBFile;
             MyModel.AccountList = Source.GetAccounts();
             MyModel.CompanyList = Source.GetCustomers();
@@ -105,7 +103,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Print
         public async void Print(ReportActionClass PrintAction)
         {
-                       // Clear all previous messages - refresh
+            // Clear all previous messages - refresh
             IsPrinting = true;
             await InvokeAsync(StateHasChanged);
 
@@ -199,7 +197,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Print Company
         public async void PrintCompany(ReportActionClass PrintAction)
         {
-                       // Clear all previous messages - refresh
+            // Clear all previous messages - refresh
             IsPrinting = true;
             await InvokeAsync(StateHasChanged);
 
@@ -313,7 +311,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Print Employee
         public async void PrintEmployee(ReportActionClass PrintAction)
         {
-                       // Clear all previous messages - refresh
+            // Clear all previous messages - refresh
             IsPrinting = true;
             await InvokeAsync(StateHasChanged);
             try
@@ -415,7 +413,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Print Project
         public async void PrintProject(ReportActionClass PrintAction)
         {
-                       // Clear all previous messages - refresh
+            // Clear all previous messages - refresh
             IsPrinting = true;
             await InvokeAsync(StateHasChanged); await Task.Delay(100);
             try

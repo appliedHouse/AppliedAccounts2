@@ -1,16 +1,15 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Data.Mapping;
 using AppliedAccounts.Models.Interface;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppliedGlobals;
-using AppMessages;
 using AppReports;
 using SQLQueries;
 using System.Data;
 using static AppliedDB.Enums;
-using MESSAGE = AppMessages.Enums.Messages;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
-using AppliedAccounts.Data.Mapping;
+using MESSAGE = AppMessages.Enums.Messages;
 
 
 namespace AppliedAccounts.Models
@@ -52,7 +51,7 @@ namespace AppliedAccounts.Models
 
         #region Constructor
 
-      
+
         public ReceiptModel(GlobalService _AppGlobal, MessagesService msgService, int _ReceiptID)
         {
             AppGlobal = _AppGlobal;
@@ -720,6 +719,6 @@ namespace AppliedAccounts.Models
         #endregion
 
 
-      
+
     }
 }

@@ -12,7 +12,7 @@ namespace AppliedAccounts.Pages.Accounts
         {
             var IsSaved = MyModel.Save();
 
-            if (IsSaved) 
+            if (IsSaved)
             {
                 Toaster.ShowSuccess(MyModel.MyMessage);
             }
@@ -29,7 +29,7 @@ namespace AppliedAccounts.Pages.Accounts
 
         public void Delete(long ID)
         {
-            if(MyModel.Delete(ID))
+            if (MyModel.Delete(ID))
             {
                 Toaster.ShowSuccess(MyModel.MyMessage);
                 MyModel.LoadData();

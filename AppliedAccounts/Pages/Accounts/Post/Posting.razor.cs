@@ -1,6 +1,4 @@
-﻿using AppliedAccounts.Data;
-using AppliedAccounts.Models.Posting;
-using AppliedDB;
+﻿using AppliedAccounts.Models.Posting;
 using Microsoft.JSInterop;
 using static AppliedGlobals.AppErums;
 
@@ -11,13 +9,13 @@ namespace AppliedAccounts.Pages.Accounts.Post
         public PostingViewModel MyViewModel { get; set; }
         public PostingModel MyModel { get; set; }
         public long PostingVoucherID { get; set; } = 0;
-        public string PostingVoucher { get; set; } =string.Empty;
+        public string PostingVoucher { get; set; } = string.Empty;
 
         #region Constructor
         protected override async Task OnInitializedAsync()
         {
             MyModel = new(AppGlobal, MsgService);
-           
+
             MyModel.Source.SetKey("IsPosting", false, KeyTypes.Boolean, "Is posting is in progress..");
             MyViewModel = new(); ;
             MyViewModel.Dt_From = MyModel.Source.GetDate("Post_dt_From");
@@ -48,14 +46,14 @@ namespace AppliedAccounts.Pages.Accounts.Post
             MyViewModel.PostingType = value;
             await MyModel.LoadData(MyViewModel);
         }
-       
+
 
         private async void OnStatusChanged(int _PostingStatus)
         {
 
             MyViewModel.PostingStatus = _PostingStatus;
             await MyModel.LoadData(MyViewModel);
-        
+
         }
 
         #endregion

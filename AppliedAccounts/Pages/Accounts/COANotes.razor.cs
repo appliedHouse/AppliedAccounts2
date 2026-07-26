@@ -43,7 +43,7 @@ namespace AppliedAccounts.Pages.Accounts
         {
             MyModel.Edit(ID);
         }
-        
+
         public void Back()
         {
             AppGlobal.NavManager.GoTo(MenuID.AccountsDictionery);

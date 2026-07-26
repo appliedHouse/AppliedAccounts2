@@ -66,7 +66,7 @@ namespace AppliedAccounts.Authentication
                     var _Result = await Task.FromResult(new AuthenticationState(ClaimPrincipal));
                     GetAppUser(_Result);
 
-                    Claims = [.. _Result.User.Claims]; 
+                    Claims = [.. _Result.User.Claims];
                     return _Result;
                 }
             }
@@ -135,7 +135,8 @@ namespace AppliedAccounts.Authentication
                 AppUser.PIN = claims?.FirstOrDefault(x => x.Type.Equals("PIN", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
                 AppUser.LanguageID = int.Parse(claims?.FirstOrDefault(x => x.Type.Equals("LanguageID", StringComparison.OrdinalIgnoreCase))?.Value ?? "");
                 AppUser.Session = claims?.FirstOrDefault(x => x.Type.Equals("Session", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
-            };
+            }
+            ;
         }
 
         public async Task LogoutAsync()

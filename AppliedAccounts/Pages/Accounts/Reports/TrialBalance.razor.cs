@@ -20,7 +20,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         bool IsPageValidate = false;
         bool IsPrinting = false;
 
-        public MessagesService MsgService { get; set; } 
+        public MessagesService MsgService { get; set; }
 
         #region Dictionaries for Dropdowns
         public Dictionary<int, string> OptionTypes { get; set; } = new Dictionary<int, string>
@@ -112,7 +112,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Print Trial Balance
         public async Task Print(ReportActionClass PrintAction)
         {
-                       // Clear all previous messages - refresh
+            // Clear all previous messages - refresh
             IsPrinting = true;
 
             await InvokeAsync(StateHasChanged);

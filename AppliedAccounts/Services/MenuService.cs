@@ -1,7 +1,7 @@
-﻿using System.Data;
+﻿using Menus;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Caching.Memory;
-using Menus;
+using System.Data;
 
 namespace AppliedAccounts.Services.Menus
 {

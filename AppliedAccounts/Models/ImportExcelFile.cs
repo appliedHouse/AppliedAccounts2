@@ -3,8 +3,8 @@ using AppliedAccounts.Services;
 using AppliedDB;
 using ExcelDataReader;
 using Microsoft.AspNetCore.Components.Forms;
-using System.Data;
 using Microsoft.Data.Sqlite;
+using System.Data;
 using System.Text;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
 
@@ -33,7 +33,7 @@ namespace AppliedAccounts.Models
         {
             AppGlobal = _AppGlobal;
             ExcelFile = excelFile;
-            ExcelImportRegistry = _FileGuid; 
+            ExcelImportRegistry = _FileGuid;
         }
         #endregion
 
@@ -192,11 +192,11 @@ namespace AppliedAccounts.Models
         }
         #endregion
 
-        
+
 
         internal void GetImportedData(string tableName)
         {
-           
+
         }
     }
 }

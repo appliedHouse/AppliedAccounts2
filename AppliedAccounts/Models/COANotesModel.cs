@@ -141,7 +141,7 @@ namespace AppliedAccounts.Models
                 LoadData();
                 MyMessage = $"Record {_DeleteRow["Title"]} has been deleted sucessfully.";
                 return _result;
-                
+
             }
             MyMessage = $"Record {_DeleteRow!["Title"]} failed to be deleted.";
             return false;

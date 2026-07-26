@@ -8,8 +8,8 @@ namespace AppliedAccounts.Data.Mapping
 {
     public static class Mapping
     {
-        
-        
+
+
 
         public static DataRow? ToDataRow(this COARecord rec, DataRow row)
         {
@@ -26,8 +26,8 @@ namespace AppliedAccounts.Data.Mapping
 
         public static DataRow ToDataRow(this COANatureRecord rec, DataRow row)
         {
-            row["Id"] =    rec.ID;
-            row["Code"] =  rec.Code;
+            row["Id"] = rec.ID;
+            row["Code"] = rec.Code;
             row["Title"] = rec.Title;
             return row;
         }

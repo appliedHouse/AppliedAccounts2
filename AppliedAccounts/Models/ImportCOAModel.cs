@@ -1,10 +1,7 @@
-﻿using AppliedAccounts.Data;
-using AppliedAccounts.Services;
+﻿using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
-using System;
-using System.Data;
 using Microsoft.Data.Sqlite;
+using System.Data;
 
 namespace AppliedAccounts.Models
 {
@@ -19,7 +16,7 @@ namespace AppliedAccounts.Models
         public string SelectedTable { get; set; }
         public List<DataRow> ImportedData { get; set; } = [];
         public List<DataRow> FilterData { get; set; } = [];
-        public MessagesService MsgService { get; set; } 
+        public MessagesService MsgService { get; set; }
         public PageModel Pages { get; set; } = new();
 
 

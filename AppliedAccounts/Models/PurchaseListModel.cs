@@ -2,7 +2,6 @@
 using AppliedAccounts.Models.Interface;
 using AppliedAccounts.Services;
 using AppliedDB;
-using AppMessages;
 using Microsoft.AspNetCore.Components;
 using System.Data;
 using static AppliedDB.Enums;
@@ -25,7 +24,7 @@ namespace AppliedAccounts.Models
         {
             AppGlobal = _AppGlobal;
             Source = new(AppGlobal.AppPaths);
-            
+
             FilterClass = new(AppGlobal.DBFile);
             Table = Tables.view_BillPayable;
             Records = LoadData();

@@ -1,8 +1,6 @@
 ﻿using AppliedAccounts.Models;
-using AppliedAccounts.Services;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Data;
-using System.Linq;
 using MESSAGES = AppMessages.Enums.Messages;
 
 namespace AppliedAccounts.Pages.ImportData
@@ -14,7 +12,7 @@ namespace AppliedAccounts.Pages.ImportData
         public ImportExcelFile ImportCOAModel { get; set; }
         public bool ShowSpinner { get; set; } = false;
         public string SpinnerMessage { get; set; } = "Loading... Please wait...";
-        
+
         public async Task GetExcelFile(InputFileChangeEventArgs e)
         {
             ShowSpinner = true;
@@ -33,12 +31,12 @@ namespace AppliedAccounts.Pages.ImportData
         public List<DataRow> GetFilteredData(string _TableName)
         {
             MyModel.Pages ??= new();
-            if(MyModel.ImportedData.Count == 0)
+            if (MyModel.ImportedData.Count == 0)
             {
                 MyModel.MsgService.Error(MESSAGES.NoRecordFound);
-                return [];  
+                return [];
             }
-            return [..MyModel.ImportedData.Skip(MyModel.Pages.Current).Take(MyModel.Pages.Size)];                // Copy Imported Data to Filter Data
+            return [.. MyModel.ImportedData.Skip(MyModel.Pages.Current).Take(MyModel.Pages.Size)];                // Copy Imported Data to Filter Data
         }
     }
 }

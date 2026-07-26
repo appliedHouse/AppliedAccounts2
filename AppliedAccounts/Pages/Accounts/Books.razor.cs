@@ -2,7 +2,6 @@
 using AppliedAccounts.Models;
 using Microsoft.AspNetCore.Components;
 using System.Data;
-using AppliedAccounts.Services;
 
 
 namespace AppliedAccounts.Pages.Accounts
@@ -21,9 +20,9 @@ namespace AppliedAccounts.Pages.Accounts
         private decimal Tot_CR = 0.0M;
         private string ErrorMessage = string.Empty;
 
-        
 
-        public Books() 
+
+        public Books()
         {
         }
         public void Start()
@@ -90,7 +89,7 @@ namespace AppliedAccounts.Pages.Accounts
                 MyModel.IsWaiting = false;
                 MyModel.LoadData();
 
-                if(MyModel.MyVoucher.Details.Count == 0)
+                if (MyModel.MyVoucher.Details.Count == 0)
                 {
                     MyModel.DeleteMaster();
 
@@ -106,7 +105,7 @@ namespace AppliedAccounts.Pages.Accounts
                 MsgService.AddRange(MyModel.MsgService);
             }
 
-            
+
         }
         #endregion
 
@@ -124,6 +123,6 @@ namespace AppliedAccounts.Pages.Accounts
         }
         #endregion
 
-        
+
     }
 }

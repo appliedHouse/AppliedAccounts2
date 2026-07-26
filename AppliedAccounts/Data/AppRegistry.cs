@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using Format = AppliedGlobals.AppValues.Format;
-using Tables = AppliedDB.Enums.Tables;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
+using Tables = AppliedDB.Enums.Tables;
 
 namespace AppliedAccounts.Data
 {
@@ -124,11 +124,11 @@ namespace AppliedAccounts.Data
             }
             catch (Exception)
             {
-               
+
                 return 0;
             }
 
-            
+
         }
         public static decimal GetCurrency(string DataFile, string Key)
         {
@@ -210,7 +210,7 @@ namespace AppliedAccounts.Data
         {
 
             if (DataFile == null || DataFile == string.Empty) { return false; }
-            DataTable TB_Registry = GetRegistryTable(DataFile,Key);
+            DataTable TB_Registry = GetRegistryTable(DataFile, Key);
             DataRow CurrentRow;
             string SQLAction;
 
@@ -222,11 +222,11 @@ namespace AppliedAccounts.Data
                 CurrentRow.AcceptChanges();
             }
             else
-                {
-                    SQLAction = "Insert";
-                    CurrentRow = TB_Registry.NewRow();
-                    CurrentRow["ID"] = DBNull.Value;
-                }
+            {
+                SQLAction = "Insert";
+                CurrentRow = TB_Registry.NewRow();
+                CurrentRow["ID"] = DBNull.Value;
+            }
             CurrentRow["Code"] = Key;
             CurrentRow["Title"] = _Title;
             CurrentRow["UserName"] = DataFile;

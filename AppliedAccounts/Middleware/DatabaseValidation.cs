@@ -8,7 +8,7 @@ namespace AppliedAccounts.Middleware
 
         private static bool _isDatabaseValid = false;
         private static bool _validationPerformed = false;
-        private static readonly Lock  _lock = new();
+        private static readonly Lock _lock = new();
 
         public DatabaseValidation(RequestDelegate next)
         {

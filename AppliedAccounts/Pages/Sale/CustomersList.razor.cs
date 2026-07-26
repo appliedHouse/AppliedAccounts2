@@ -21,7 +21,7 @@ namespace AppliedAccounts.Pages.Sale
         public void Back() => AppGlobal.NavManager.GoTo(MenuID.SaleDictionery);
         public void Add1() { AppGlobal.NavManager.NavigateTo(NavigationPaths.Customer()); }
         public void Edit(long ID) { AppGlobal.NavManager.NavigateTo(NavigationPaths.Customer(ID)); }
-        public void Delete(long ID) { AppGlobal.NavManager.NavigateTo(NavigationPaths.Customer(ID,true)); }
+        public void Delete(long ID) { AppGlobal.NavManager.NavigateTo(NavigationPaths.Customer(ID, true)); }
 
         public void Submit() { }
 

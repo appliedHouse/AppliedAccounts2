@@ -37,7 +37,7 @@ namespace AppliedAccounts.Models
 
         #region Constructor
         public COAModel() { }
-       
+
         public COAModel(GlobalService _AppGlobal, MessagesService msgService)
         {
             AppGlobal = _AppGlobal;

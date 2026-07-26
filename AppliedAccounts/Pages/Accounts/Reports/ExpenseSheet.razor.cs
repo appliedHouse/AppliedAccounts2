@@ -1,8 +1,7 @@
 ﻿using AppliedAccounts.Data;
-using SQLQueries;
-using Microsoft.AspNetCore.Components;
-using System.Data;
 using AppliedDB;
+using SQLQueries;
+using System.Data;
 
 namespace AppliedAccounts.Pages.Accounts.Reports
 {
@@ -30,8 +29,8 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Constructor
         public ExpenseSheet()
         {
-           //Source = new(AppGlobal.AppPaths);
-           //LoadSheetList();
+            //Source = new(AppGlobal.AppPaths);
+            //LoadSheetList();
         }
         #endregion
 
@@ -83,7 +82,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             sr = 0;
             SearchDR = 0;
             SearchCR = 0;
-            
+
             DataRow[] Rows;
             if (string.IsNullOrWhiteSpace(SearchText))
             {

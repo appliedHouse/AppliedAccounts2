@@ -498,7 +498,7 @@ namespace AppliedAccounts.Pages.ImportData
                     decimal _Amount = Conversion.ToDecimal(Row[(string)Scheme["Amount"]]);
                     if (_Amount == 0) { continue; }          // Skip if amount is zero.
 
-                    Counter2++; 
+                    Counter2++;
                     Sr_No++;
 
                     DataRow _Row2 = Sale2.NewRow();

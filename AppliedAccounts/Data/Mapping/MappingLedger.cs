@@ -1,6 +1,5 @@
 ﻿using AppliedAccounts.Models;
 using System.Data;
-using VoucherPosting;
 
 namespace AppliedAccounts.Data.Mapping
 {
@@ -64,7 +63,7 @@ namespace AppliedAccounts.Data.Mapping
         }
 
 
-       
-       
+
+
     }
 }

@@ -1,6 +1,6 @@
 ﻿using AppliedAccounts.Models;
-using Microsoft.JSInterop;
 using Menus;
+using Microsoft.JSInterop;
 
 
 
@@ -12,7 +12,7 @@ namespace AppliedAccounts.Pages.Accounts
     {
         public COAModel MyModel { get; set; } = new();
         public bool IsPageValid { get; set; }
-        
+
         public COA()
         {
 
@@ -45,7 +45,7 @@ namespace AppliedAccounts.Pages.Accounts
         public async void Save()
         {
             var IsSaved = await Task.Run(MyModel.Save);
-            if(IsSaved)
+            if (IsSaved)
             {
                 await InvokeAsync(StateHasChanged);
                 MyModel.MsgService.Success(AppMessages.Enums.Messages.Saved);
@@ -64,7 +64,7 @@ namespace AppliedAccounts.Pages.Accounts
             {
                 MyModel.MsgService.Success(AppMessages.Enums.Messages.Delete);
                 Toaster.ShowSuccess(MyModel.MyMessage);
-                
+
                 MyModel.LoadData();
                 MyModel.GetFirstRecord();
             }

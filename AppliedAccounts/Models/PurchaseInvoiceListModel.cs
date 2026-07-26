@@ -17,7 +17,7 @@ namespace AppliedAccounts.Models
         public List<PurchaseRecord> DisplayRecords { get; set; } = new();
         public List<DataRow> Data { get; set; } = new();
         public string SearchText { get; set; } = string.Empty;
-        public MessagesService MsgService { get; set; } 
+        public MessagesService MsgService { get; set; }
         public decimal TotalAmount { get; set; } = 0.00M;
         public int Page { get; set; } = 1;
         public int Pages { get; set; } = 0;
