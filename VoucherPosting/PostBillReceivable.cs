@@ -7,7 +7,7 @@ using static AppMessages.Enums;
 
 namespace VoucherPosting
 {
-    public class BillReceivable
+    public class PostBillReceivable
     {
         public MessageClass MsgClass { get; set; }
         public DataSource Source { get; set; }
@@ -16,7 +16,7 @@ namespace VoucherPosting
 
 
         #region Bill Receivable / Sales Invoices
-        public async Task<bool> PostBillReceivable(string UserName, int id)
+        public async Task<bool> BillReceivable(string UserName, int id)
         {
             if (Source == null)
             {

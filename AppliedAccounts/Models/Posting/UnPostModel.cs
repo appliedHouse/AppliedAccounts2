@@ -182,29 +182,44 @@ namespace AppliedAccounts.Models.Posting
 
         #region Voucher UnPost
 
-        public async Task DoVoucherUnPost(long _VouID, PostingTypes _PostType)
+        public async Task<bool> DoVoucherUnPost(long _VouID, PostingTypes _PostType)
         {
-            if (_PostType == 0) { return; }         // Return if type not assigned.
+            if (_PostType == 0) { return false; }         // Return if type not assigned.
 
             // Cash Book Posting
             if (_PostType == PostingTypes.CashBook)
             {
-                VoucherPostingModel postingModel = new();
+                VoucherPostingModel postingModel = new(); ;
 
                 postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
                 postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
 
+                if(postingModel.MasterTable.Rows.Count == 0)
+                {
+                    MsgService.Warning(Messages.VoucherNotFound);
+                    return false; 
+                }
+
+                if (postingModel.DetailTable.Rows.Count == 0)
+                {
+                    MsgService.Warning(Messages.PostingDetailRecordNotFound);
+                    return false;
+                }
+
+
                 MsgService.Clear();                            // Clear all previous messages. 
-                CashBook postCashBook = new(Source, postingModel);
+                PostCashBook postCashBook = new(Source, postingModel);
                 await postCashBook.DoCashUnPost();                  // Cash Posting main method.
                 if (postCashBook.UnPostSuccessful)
                 {
                     MsgService.Success(Messages.Saved);        // add message after Save selected Vouchers.
-                    await LoadData();              // Refresh display Data afger save voucher.
+                    await LoadData();                          // Refresh display Data afger save voucher.
+                    return true;
                 }
                 else
                 {
-                    MsgService.MsgClass = postCashBook.MsgClass;
+                    MsgService.MsgClass.AddRange(postCashBook.MsgClass);
+                    return false;
                 }
             }
 
@@ -219,33 +234,35 @@ namespace AppliedAccounts.Models.Posting
                 if (postingModel.MasterTable.Rows.Count == 0)
                 {
                     MsgService.Warning(Messages.VoucherNotFound);
-                    return;
+                    return false;
                 }
 
 
                 MsgService.Clear();                           // Clear all previous messages. 
-                CashBook postBankBook = new(Source, postingModel);
+                PostCashBook postBankBook = new(Source, postingModel);
                 // Cash & Bank Voucher data table is same. so here using same fucntion as using for cash
                 await postBankBook.DoCashUnPost();
                 if (postBankBook.PostSuccessful)
                 {
                     MsgService.Success(Messages.Saved);        // add message after Save selected Vouchers.
-                    await LoadData();              // Refresh display Data afger save voucher.
+                    await LoadData();                          // Refresh display Data afger save voucher.
+                    return true;
                 }
                 else
                 {
-                    MsgService.MsgClass = postBankBook.MsgClass;
+                    MsgService.MsgClass.AddRange(postBankBook.MsgClass);
+                    return false;
                 }
             }
 
             // Bill Receivable Posting  
             if (_PostType == PostingTypes.BillReceivable)
             {
-                BillReceivable UnPostBillReceivable = new();
+                PostBillReceivable UnPostBillReceivable = new();
 
-                return;
+                return false;
             }
-            return;
+            return false; 
         }
 
         #endregion

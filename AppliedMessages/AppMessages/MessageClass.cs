@@ -182,7 +182,7 @@ namespace AppMessages
         #endregion
 
         #region Add Range of Messages
-        public void AddReange(List<Message> messageList)
+        public void AddRange(List<Message> messageList)
         {
             if (messageList.Count > 0)
             {
@@ -193,7 +193,7 @@ namespace AppMessages
             }
         }
 
-        public void AddReange(MessageClass messageClass)
+        public void AddRange(MessageClass messageClass)
         {
             if (messageClass.MessageList.Count > 0)
             {

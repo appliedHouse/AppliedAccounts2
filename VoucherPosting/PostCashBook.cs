@@ -8,7 +8,7 @@ using static AppMessages.Enums;
 namespace VoucherPosting
 {
     // Posting of Cash Voucher
-    public class CashBook
+    public class PostCashBook
     {
 
         public DataSource Source { get; set; }
@@ -23,7 +23,7 @@ namespace VoucherPosting
 
 
 
-        public CashBook(DataSource _Source, VoucherPostingModel _PostingModel)
+        public PostCashBook(DataSource _Source, VoucherPostingModel _PostingModel)
         {
             Source = _Source;
             PostingData = _PostingModel;
@@ -35,7 +35,7 @@ namespace VoucherPosting
             }
         }
         
-        public CashBook(DataSource _Source, VoucherPostingModel _PostingModel, MessageClass msgClass)
+        public PostCashBook(DataSource _Source, VoucherPostingModel _PostingModel, MessageClass msgClass)
         {
             Source = _Source;
             PostingData = _PostingModel;

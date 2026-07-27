@@ -13,7 +13,7 @@ namespace AppliedAccounts.Models.Posting
     public class PostingModel
     {
         public GlobalService AppGlobal { get; set; }
-        public Services.MessagesService MsgService { get; set; }
+        public MessagesService MsgService { get; set; }
         public List<DataListModel> DataListModelList { get; set; } = new();
         public bool IsPosting { get; set; }
         public DataSource Source { get; set; }
@@ -29,6 +29,7 @@ namespace AppliedAccounts.Models.Posting
         {
             AppGlobal = appGlobal;
             Source = new(appGlobal.AppPaths);
+            MsgService = appGlobal.MsgService;
         }
 
         public PostingModel(GlobalService appGlobal, Services.MessagesService msgService)
@@ -162,11 +163,15 @@ namespace AppliedAccounts.Models.Posting
 
         #region Voucher Posting
 
-        public async Task DoVoucherPosting(long vouId, PostingViewModel model)
+        public async Task<bool> DoVoucherPosting(long vouId, PostingViewModel model)
         {
             MsgService.Clear();
 
-            if (model.PostingType == 0) return;
+            if (model.PostingType == 0)
+            {
+                MsgService.Danger(Messages.PostingTypeNotDefined);
+                return false;
+            }
 
             var postingModel = new VoucherPostingModel
             {
@@ -177,16 +182,16 @@ namespace AppliedAccounts.Models.Posting
             if (postingModel.MasterTable.Rows.Count == 0)
             {
                 MsgService.Danger(Messages.PostingMasterRecordNotFound);
-                return;
+                return false;
             }
 
             if (postingModel.DetailTable.Rows.Count == 0)
             {
                 MsgService.Danger(Messages.PostingDetailRecordNotFound);
-                return;
+                return false;
             }
 
-            var post = new CashBook(Source, postingModel, MsgService.MsgClass);
+            var post = new PostCashBook(Source, postingModel, MsgService.MsgClass);
 
             switch (model.PostingType)
             {
@@ -199,17 +204,21 @@ namespace AppliedAccounts.Models.Posting
                     break;
 
                 default:
-                    return;
+                    return false;
             }
+
+            MsgService.MsgClass.AddRange(post.MsgClass);
 
             if (post.PostSuccessful)
             {
                 MsgService.Success(Messages.Saved);
-                await LoadData(model); // ✅ FIXED
+                await LoadData(model);
+                return true;
             }
             else
             {
-                MsgService.MsgClass = post.MsgClass;
+                MsgService.Critical(Messages.NotSave);
+                return false;
             }
         }
 

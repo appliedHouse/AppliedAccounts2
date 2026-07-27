@@ -4,9 +4,10 @@
 
 @inject GlobalService AppGlobal
 @inject MessagesService MsgService
+@inject ToastService Toaster
 
 <PageHeading Text="VOUCHER POSTING" />
-<ShowMessages MsgService="@MsgService" />
+<ShowMessages MsgService="@MyModel.MsgService" />
 
 <!-- HEADING MENU -->
 <EditForm Model="MyViewModel" OnValidSubmit="Refresh">

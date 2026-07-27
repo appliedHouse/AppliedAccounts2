@@ -7,14 +7,14 @@ using static AppMessages.Enums;
 
 namespace VoucherPosting
 {
-    public partial class BillPayable
+    public class PostBillPayable
     {
         public MessageClass MsgClass { get; set; }
         public DataSource Source { get; set; }
 
 
         #region Bill Payable / Purchase Invoices
-        public async Task<bool> PostBillPayable(string UserName, int id)
+        public async Task<bool> BillPayable(string UserName, int id)
         {
             if (Source == null)
             {
