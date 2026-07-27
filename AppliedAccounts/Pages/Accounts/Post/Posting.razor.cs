@@ -14,7 +14,7 @@ namespace AppliedAccounts.Pages.Accounts.Post
         #region Constructor
         protected override async Task OnInitializedAsync()
         {
-            MyModel = new(AppGlobal, MsgService);
+            MyModel = new(AppGlobal);
 
             MyModel.Source.SetKey("IsPosting", false, KeyTypes.Boolean, "Is posting is in progress..");
             MyViewModel = new(); ;
@@ -79,7 +79,15 @@ namespace AppliedAccounts.Pages.Accounts.Post
 
             await AppGlobal.JS.InvokeVoidAsync("showModal", "SaveVoucher");
 
-            await MyModel.DoVoucherPosting(id, MyViewModel);
+            var result = await MyModel.DoVoucherPosting(id, MyViewModel);
+
+            if(result)
+            {
+                
+                Toaster.ShowSuccess($"Voucher posted successfully.");
+            }
+
+
 
             await AppGlobal.JS.InvokeVoidAsync("hideModal", "SaveVoucher");
             MyModel.IsPosting = false;
