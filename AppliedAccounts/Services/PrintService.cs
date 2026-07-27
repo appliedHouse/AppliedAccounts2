@@ -8,7 +8,7 @@ namespace AppliedAccounts.Services
     public class PrintService
     {
         public IJSRuntime JS { get; set; }
-        public GlobalService Config { get; set; }
+        public GlobalService AppGlobals { get; set; }
         public NavigationManager NavManager { get; set; }
         public AppliedGlobals.AppUserModel? UserProfile { get; set; }
 
@@ -22,35 +22,36 @@ namespace AppliedAccounts.Services
         public MessagesService MsgService { get; set; }
 
 
-        public PrintService(GlobalService _Config)
+        public PrintService(GlobalService appGlobals)
         {
-            if (_Config is not null)
+            if (appGlobals is not null)
             {
 
-                Config = _Config;
-                NavManager = Config.NavManager;
-                JS = Config.JS;
+                AppGlobals = appGlobals;
+                NavManager = AppGlobals.NavManager;
+                JS = AppGlobals.JS;
+                MsgService = AppGlobals.MsgService;
 
                 Data = new();
                 Model = new();
 
-                Model.InputReport.RootPath = Config.AppPaths.RootPath;
-                Model.InputReport.FilePath = Config.AppPaths.ReportPath;
+                Model.InputReport.RootPath = AppGlobals.AppPaths.RootPath;
+                Model.InputReport.FilePath = AppGlobals.AppPaths.ReportPath;
 
                 Model.OutputReport.BasePath = NavManager.BaseUri;
-                Model.OutputReport.RootPath = Config.AppPaths.RootPath;
-                Model.OutputReport.FilePath = Config.AppPaths.PDFPath;
+                Model.OutputReport.RootPath = AppGlobals.AppPaths.RootPath;
+                Model.OutputReport.FilePath = AppGlobals.AppPaths.PDFPath;
 
-                Config.Reporting.ReportTitle = _Config.Client.DisplayName;
+                AppGlobals.Reporting.ReportTitle = AppGlobals.Client.DisplayName;
 
-                if (string.IsNullOrEmpty(Config.Reporting.ReportTitle)) { Config.Reporting.ReportTitle = "APPLIED SOFTWARE HOUSE"; }
-                if (string.IsNullOrEmpty(Config.Reporting.ReportFooter)) { Config.Reporting.ReportFooter = "APPLIED ACCOUNTS"; }
+                if (string.IsNullOrEmpty(AppGlobals.Reporting.ReportTitle)) { AppGlobals.Reporting.ReportTitle = "APPLIED SOFTWARE HOUSE"; }
+                if (string.IsNullOrEmpty(AppGlobals.Reporting.ReportFooter)) { AppGlobals.Reporting.ReportFooter = "APPLIED ACCOUNTS"; }
 
 
                 Model.ReportParameters =
                 [
-                    new ReportParameter("CompanyName", Config.Reporting.ReportTitle ),
-                    new ReportParameter("Footer", Config.Reporting.ReportFooter)
+                    new ReportParameter("CompanyName", AppGlobals.Reporting.ReportTitle ),
+                    new ReportParameter("Footer", AppGlobals.Reporting.ReportFooter)
                 ];
             }
         }

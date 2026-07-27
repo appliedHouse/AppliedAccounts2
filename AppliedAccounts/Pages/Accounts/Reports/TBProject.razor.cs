@@ -53,7 +53,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         {
             var _Heading1 = $"Trial Balance (Project) ";
             var _Heading2 = $"[{MyModel.DateFrom.QueryDate()} to [{MyModel.DateTo.QueryDate()}] ";
-            var _CompanyName = ReportService.Config.Client.Company.Replace(" ", "_");
+            var _CompanyName = AppGlobal.Client.Company.Replace(" ", "_");
 
             ReportService.Model.InputReport.FileName = "TB.rdl";
             ReportService.Model.ReportDataSource = await GetReportData();                   // Load Reporting Data to Report Model

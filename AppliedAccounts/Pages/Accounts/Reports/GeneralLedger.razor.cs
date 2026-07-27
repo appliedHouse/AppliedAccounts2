@@ -1,6 +1,5 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
-using AppliedAccounts.Services;
 using AppliedDB;
 using AppReports;
 using Microsoft.AspNetCore.Components;
@@ -16,7 +15,6 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
         public DataSource Source { get; set; }
         public GLModel MyModel { get; set; } = new();
-        MessagesService MsgService { get; set; }
         public string DBFile { get; set; }
         public bool IsPageValid { get; set; }
         public bool IsPrinting { get; set; }
@@ -204,7 +202,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             try
             {
                 SetKeys();
-                ReportService = new(AppGlobal); ;
+                ReportService = new(AppGlobal);
                 ReportService.ReportType = PrintAction.PrintType;
                 ReportService.IsError = await CreateReportModel_Company();
                 if (ReportService.IsError)
@@ -317,7 +315,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             try
             {
                 SetKeys();
-                ReportService = new(AppGlobal); ;
+                ReportService = new(AppGlobal);
                 ReportService.ReportType = PrintAction.PrintType;
                 ReportService.IsError = await CreateReportModel_Employee();
                 if (ReportService.IsError)

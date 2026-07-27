@@ -14,7 +14,7 @@ namespace AppliedAccounts.Models
 {
     public class BookListModel  // : IVoucherList
     {
-        public GlobalService AppGlobal { get; set; }
+        public GlobalService AppGlobals { get; set; }
         public List<CodeTitle> BookList { get; set; }
         public List<CodeTitle> NatureAccountsList { get; set; }
         public DataSource Source { get; set; }
@@ -40,9 +40,9 @@ namespace AppliedAccounts.Models
         }
         public BookListModel(int _BookID, GlobalService _AppGlobal, MessagesService msgService)
         {
-            AppGlobal = _AppGlobal;
+            AppGlobals = _AppGlobal;
             MsgService = msgService;
-            Source = new(AppGlobal.AppPaths);
+            Source = new(AppGlobals.AppPaths);
             GetKeys();
 
             try
@@ -189,7 +189,7 @@ namespace AppliedAccounts.Models
 
             try
             {
-                ReportService = new(AppGlobal); ;
+                ReportService = new(AppGlobals); ;
                 ReportService.ReportType = _ReportType;
                 GetReportData();
                 ReportModel();                              // Add / update Report model data.
@@ -223,8 +223,8 @@ namespace AppliedAccounts.Models
             ReportService.Model.OutputReport.FileName = $"Book_{_VoucherNo}" +
                 $"{ReportService.Model.OutputReport.FileExt}";          // without Extention
 
-            ReportService.Model.CurrencySign = AppGlobal.Currency.Sign ?? "RS.";
-            ReportService.Model.CurrencyUnit = AppGlobal.Currency.Units ?? "Ps.";
+            ReportService.Model.CurrencySign = AppGlobals.Currency.Sign ?? "RS.";
+            ReportService.Model.CurrencyUnit = AppGlobals.Currency.Units ?? "Ps.";
 
             //ReportService.Model.AmountInWords = _Spelling.ChangeCurrencyToWords(_Amount, ReportService.Model.CurrencySign,  )
 
@@ -241,7 +241,7 @@ namespace AppliedAccounts.Models
         public void Edit(long _ID)
         {
             SetKeys();
-            AppGlobal.NavManager.NavigateTo($"/Accounts/Books/{BookID}/{BookNatureID}");
+            AppGlobals.NavManager.NavigateTo($"/Accounts/Books/{BookID}/{BookNatureID}");
         }
         #endregion
 

@@ -165,7 +165,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
             var _Heading1 = $"Trial Balance ";
             var _Heading2 = $"[{MyModel.TB_From.ToString(Format.DDMMMYY)}] to [{MyModel.TB_To.ToString(Format.DDMMMYY)}] ";
-            var _CompanyName = ReportService.Config.Client.Company.Replace(" ", "_");
+            var _CompanyName = AppGlobal.Client.DisplayName.Replace(" ", "_");
 
             ReportService.Model.InputReport.FileName = "TB.rdl";
             ReportService.Model.ReportDataSource = await GetReportData();                   // Load Reporting Data to Report Model

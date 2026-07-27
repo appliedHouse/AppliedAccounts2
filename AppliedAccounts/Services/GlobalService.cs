@@ -27,6 +27,7 @@ namespace AppliedAccounts.Services
         public string UserRole = string.Empty;
 
         public event Action? OnLanguageChanged;
+        public MessagesService MsgService { get; set; } 
 
 
 
@@ -38,6 +39,7 @@ namespace AppliedAccounts.Services
             Config = _Config;
             NavManager = _NavManager;
             JS = _JS;
+            MsgService = new(_Config);
 
             Client = ((UserAuthenticationStateProvider)_StateProvider).AppUser;
 

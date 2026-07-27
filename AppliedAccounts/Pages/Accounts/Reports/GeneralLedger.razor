@@ -8,6 +8,7 @@
 @inject IToastService Toaster
 @inject PrintService ReportService
 @inject GlobalService AppGlobal
+@inject MessagesService MsgService
 
 @code {
 	decimal LedgerBalance;
@@ -31,22 +32,8 @@
 
 }
 
-@if (IsPrinting)
-{
-	<div class="alert alert-primary d-flex align-items-center" role="alert">
-		<div class="spinner-border text-primary me-2" role="status" aria-hidden="true"></div>
-		<div>
-			Loading printing data, please wait...
-		</div>
-	</div>
-}
-
-@if (MsgService.Count > 0)
-{
-	<PageErrors Messages="@MsgService" />
-}
-
-
+<ShowMessages MsgService="@MsgService"/>
+<ShowPrintWait Visiable="@IsPrinting" />
 
 @if (IsPageValid)
 {
