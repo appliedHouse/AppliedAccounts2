@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using SQLitePCL;
 using ToastNotificationLibrary.Extensions;
 using ToastNotificationLibrary.Models;
+using ToastNotificationLibrary.Services;
 
 
 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
@@ -32,6 +33,7 @@ builder.Services.AddScoped<GlobalService>();
 builder.Services.AddScoped<IMenuDatabaseInitializer, MenuDatabaseInitializer>();
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<ProgressService>();
+builder.Services.AddScoped<ToastService>();
 builder.Services.AddToastNotification(options =>
 {
     options.DefaultDuration = 8000;

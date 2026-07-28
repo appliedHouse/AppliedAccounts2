@@ -186,7 +186,10 @@ namespace AppMessages
         {
             if (messageList.Count > 0)
             {
-                foreach (Message message in messageList)
+                // Create a copy to avoid modifying the collection being iterated
+                var messagesToAdd = messageList.ToList();
+
+                foreach (Message message in messagesToAdd)
                 {
                     MessageList.Add(message);
                 }
@@ -197,9 +200,22 @@ namespace AppMessages
         {
             if (messageClass.MessageList.Count > 0)
             {
-                foreach (Message message in messageClass.MessageList)
+                // If they're the same list, we need to copy first
+                if (object.ReferenceEquals(messageClass.MessageList, MessageList))
                 {
-                    MessageList.Add(message);
+                    // Create a copy of the source before adding
+                    var messagesToAdd = messageClass.MessageList.ToList();
+                    foreach (Message message in messagesToAdd)
+                    {
+                        MessageList.Add(message);
+                    }
+                }
+                else
+                {
+                    foreach (Message message in messageClass.MessageList)
+                    {
+                        MessageList.Add(message);
+                    }
                 }
             }
         }

@@ -34,7 +34,7 @@ namespace VoucherPosting
                 LedgerData = new LedgerModel(Source, Vou_No);
             }
         }
-        
+
         public PostCashBook(DataSource _Source, VoucherPostingModel _PostingModel, MessageClass msgClass)
         {
             Source = _Source;
@@ -58,24 +58,27 @@ namespace VoucherPosting
             Vou_ID = (long)PostingData?.MasterTable.Rows[0]["ID"]!;
         }
 
-        public async Task DoCashPosting()
+        public async Task<bool> DoCashPosting()
         {
             MsgClass.ClearMessages();
-            await PostBook();
+            var result = await PostBook();
+            return result;
         }
 
-        public async Task DoBankPosting()
+        public async Task<bool> DoBankPosting()
         {
             MsgClass.ClearMessages();
-            await PostBook();
+            var result = await PostBook();
+            return result;
         }
 
 
-        public async Task PostBook()
+        public async Task<bool> PostBook()
         {
-        
+            bool result = false;
+
             // Validation of Voucher
-            if (!PostValidate()) { return; }
+            if (!PostValidate()) { return false; }
 
             try
             {
@@ -107,15 +110,15 @@ namespace VoucherPosting
                 LedgerRow["Comments"] = DBNull.Value;
 
                 Source.Save(LedgerRow);
-                if (!Source.IsSaved)                // if Not saved the first transaction.
+                if (!Source.IsSaved)
                 {
-                    MsgClass = Source.MsgClass;
+                    MsgClass.Critical(Messages.TransactionRollback);
                     Source.RollbackTransaction();
-                    return;
+                    return false;
                 }
-
                 #endregion
 
+                // Voucher Details Record 
                 #region Details
                 foreach (DataRow Row in PostingData.DetailTable.Rows)
                 {
@@ -141,41 +144,53 @@ namespace VoucherPosting
                     Source.Save(LedgerRow);
                     if (!Source.IsSaved)
                     {
-                        MsgClass = Source.MsgClass;
+                        MsgClass.Critical(Messages.TransactionRollback);
                         Source.RollbackTransaction();
-                        break;
+                        return false;
                     }
-
-                    MsgClass = Source.MsgClass;
                 }
+                MsgClass.Success(Messages.Saved);
                 #endregion
 
                 #region Mark as Posted
-
                 DataRow _PostedRow = Source.GetDataRow(AppliedDB.Enums.Tables.Book, Vou_ID)!;
                 if (_PostedRow != null)
                 {
                     _PostedRow["Status"] = "Posted";
                     Source.Save(_PostedRow);
-                    Source.CommitTransaction();                 // At the end commit the transaction
-                    PostSuccessful = true;
-                    MsgClass.Success(Messages.TransactionCommited);
+                    if (Source.IsSaved)
+                    {
+                        Source.CommitTransaction();
+                        PostSuccessful = true;
+                        MsgClass.Success(Messages.Posted);
+                        MsgClass.Add(Messages.VoucherPosted);
+                        result = true;
+                    }
+                    else
+                    {
+                        PostSuccessful = false;
+                        MsgClass.Critical(Messages.TransactionRollback);
+                        Source.RollbackTransaction();
+                        result = false;
+                    }
                 }
                 else
                 {
                     PostSuccessful = false;
                     MsgClass.Critical(Messages.TransactionRollback);
-                    Source.RollbackTransaction();               // Otherwsie rollback
+                    Source.RollbackTransaction();
+                    result = false;
                 }
-
                 #endregion
+
+                return result;
             }
             catch (Exception ex)
             {
                 Source.RollbackTransaction();
                 MsgClass.Error(ex.Message);
+                return false;
             }
-            await Task.FromResult(true);
         }
 
         public bool PostValidate()
@@ -185,13 +200,13 @@ namespace VoucherPosting
                 MsgClass.ClearMessages();
 
 
-                if(PostingData.MasterTable == null || PostingData.DetailTable == null)
+                if (PostingData.MasterTable == null || PostingData.DetailTable == null)
                 {
                     MsgClass.Error(Messages.PostingDataIsNull);
                     return false;
                 }
 
-                if(PostingData.DetailTable.Rows.Count == 0)
+                if (PostingData.DetailTable.Rows.Count == 0)
                 {
                     MsgClass.Error(Messages.PostingDetailRecordNotFound);
                     return false;
@@ -238,7 +253,7 @@ namespace VoucherPosting
         public async Task DoCashUnPost()
         {
             MsgClass = new();
-            
+
             Vou_No ??= string.Empty;
             await Task.Run(() =>
             {
@@ -253,7 +268,7 @@ namespace VoucherPosting
                             #region Delete Voucher
                             foreach (DataRow Row in _Ledger.Rows)
                             {
-                                if(!Source.Delete(Row))
+                                if (!Source.Delete(Row))
                                 {
                                     UnPostSuccessful = false;
                                     MsgClass.Warning(Messages.TransactionRollback);
@@ -291,7 +306,7 @@ namespace VoucherPosting
                 }
             });
         }
-       
+
         #endregion
     }
 }

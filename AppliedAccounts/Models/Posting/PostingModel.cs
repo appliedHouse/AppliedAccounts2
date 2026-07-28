@@ -30,9 +30,11 @@ namespace AppliedAccounts.Models.Posting
             AppGlobal = appGlobal;
             Source = new(appGlobal.AppPaths);
             MsgService = appGlobal.MsgService;
+            
+           
         }
 
-        public PostingModel(GlobalService appGlobal, Services.MessagesService msgService)
+        public PostingModel(GlobalService appGlobal, MessagesService msgService)
         {
             AppGlobal = appGlobal;
             MsgService = msgService;
@@ -192,15 +194,16 @@ namespace AppliedAccounts.Models.Posting
             }
 
             var post = new PostCashBook(Source, postingModel, MsgService.MsgClass);
+            var result = false;
 
             switch (model.PostingType)
             {
                 case PostingTypes.CashBook:
-                    await post.DoCashPosting();
+                    result = await post.DoCashPosting();
                     break;
 
                 case PostingTypes.BankBook:
-                    await post.DoBankPosting();
+                    result = await post.DoBankPosting();
                     break;
 
                 default:
@@ -209,14 +212,16 @@ namespace AppliedAccounts.Models.Posting
 
             MsgService.MsgClass.AddRange(post.MsgClass);
 
-            if (post.PostSuccessful)
+            if (result)
             {
-                MsgService.Success(Messages.Saved);
+                MsgService.Clear();
+                MsgService.Success(Messages.Posted);
                 await LoadData(model);
                 return true;
             }
             else
             {
+                MsgService.AddRange(post.MsgClass);
                 MsgService.Critical(Messages.NotSave);
                 return false;
             }

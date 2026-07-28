@@ -86,6 +86,10 @@ namespace AppliedAccounts.Pages.Accounts.Post
                 
                 Toaster.ShowSuccess($"Voucher posted successfully.");
             }
+            else
+            {
+                Toaster.ShowWarning("Voucher posting failed. Please check the details and try again.");
+            }
 
 
 
