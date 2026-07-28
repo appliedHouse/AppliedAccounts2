@@ -42,45 +42,47 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Get & Set Registry Keys 
         private void GetKeys()
         {
-            MyModel.COAID = AppRegistry.GetNumber(DBFile, "GL_COA");
-            MyModel.Date_From = AppRegistry.GetFrom(DBFile, "GL_COA");
-            MyModel.Date_To = AppRegistry.GetTo(DBFile, "GL_COA");
-            MyModel.SortBy = AppRegistry.GetText(DBFile, "GL_COA");
+            MyModel.COAID = Source.GetNumber("GL_COA");
+            MyModel.Date_From = Source.GetFrom("GL_COA");
+            MyModel.Date_To = Source.GetTo("GL_COA");
+            MyModel.SortBy = Source.GetText("GL_COA");
 
-            MyModel.CompanyID = AppRegistry.GetNumber(DBFile, "GL_Company");
-            MyModel.DtFrom_Com = AppRegistry.GetFrom(DBFile, "GL_Company");
-            MyModel.DtTo_Com = AppRegistry.GetTo(DBFile, "GL_Company");
+            MyModel.CompanyID = Source.GetNumber("GL_Company");
+            MyModel.DtFrom_Com = Source.GetFrom("GL_Company");
+            MyModel.DtTo_Com = Source.GetTo("GL_Company");
 
-            MyModel.EmployeeID = AppRegistry.GetNumber(DBFile, "GL_Employee");
-            MyModel.DtFrom_Emp = AppRegistry.GetFrom(DBFile, "GL_Employee");
-            MyModel.DtTo_Emp = AppRegistry.GetTo(DBFile, "GL_Employee");
+            MyModel.EmployeeID = Source.GetNumber("GL_Employee");
+            MyModel.DtFrom_Emp = Source.GetFrom("GL_Employee");
+            MyModel.DtTo_Emp = Source.GetTo("GL_Employee");
 
-            MyModel.ProjectID = AppRegistry.GetNumber(DBFile, "GL_Project");
-            MyModel.DtFrom_Prj = AppRegistry.GetFrom(DBFile, "GL_Project");
-            MyModel.DtTo_Prj = AppRegistry.GetTo(DBFile, "GL_Project");
+            MyModel.ProjectID = Source.GetNumber("GL_Project");
+            MyModel.DtFrom_Prj = Source.GetFrom("GL_Project");
+            MyModel.DtTo_Prj = Source.GetTo("GL_Project");
         }
 
         private void SetKeys()
+
+
         {
-            AppRegistry.SetKey(DBFile, "GL_COA", MyModel.COAID, KeyType.Number, "General Ledger ID,From,To,Sort");
-            AppRegistry.SetKey(DBFile, "GL_COA", MyModel.Date_From, KeyType.From);
-            AppRegistry.SetKey(DBFile, "GL_COA", MyModel.Date_To, KeyType.To);
-            AppRegistry.SetKey(DBFile, "GL_COA", MyModel.SortBy, KeyType.Text);
+            Source.SetKey("GL_COA", MyModel.COAID, KeyType.Number, "General Ledger ID,From,To,Sort");
+            Source.SetKey("GL_COA", MyModel.Date_From, KeyType.From);
+            Source.SetKey("GL_COA", MyModel.Date_To, KeyType.To);
+            Source.SetKey("GL_COA", MyModel.SortBy, KeyType.Text);
 
-            AppRegistry.SetKey(DBFile, "GL_Company", MyModel.CompanyID, KeyType.Number, "Company Ledger ID,From,To,Sort");
-            AppRegistry.SetKey(DBFile, "GL_Company", MyModel.DtFrom_Com, KeyType.From);
-            AppRegistry.SetKey(DBFile, "GL_Company", MyModel.DtTo_Com, KeyType.To);
-            AppRegistry.SetKey(DBFile, "GL_Company", MyModel.SortBy, KeyType.Text);
+            Source.SetKey("GL_Company", MyModel.CompanyID, KeyType.Number, "Company Ledger ID,From,To,Sort");
+            Source.SetKey("GL_Company", MyModel.DtFrom_Com, KeyType.From);
+            Source.SetKey("GL_Company", MyModel.DtTo_Com, KeyType.To);
+            Source.SetKey("GL_Company", MyModel.SortBy, KeyType.Text);
 
-            AppRegistry.SetKey(DBFile, "GL_Employee", MyModel.EmployeeID, KeyType.Number, "Company Ledger ID,From,To,Sort");
-            AppRegistry.SetKey(DBFile, "GL_Employee", MyModel.DtFrom_Emp, KeyType.From);
-            AppRegistry.SetKey(DBFile, "GL_Employee", MyModel.DtTo_Emp, KeyType.To);
-            AppRegistry.SetKey(DBFile, "GL_Employee", MyModel.SortBy, KeyType.Text);
+            Source.SetKey("GL_Employee", MyModel.EmployeeID, KeyType.Number, "Company Ledger ID,From,To,Sort");
+            Source.SetKey("GL_Employee", MyModel.DtFrom_Emp, KeyType.From);
+            Source.SetKey("GL_Employee", MyModel.DtTo_Emp, KeyType.To);
+            Source.SetKey("GL_Employee", MyModel.SortBy, KeyType.Text);
 
-            AppRegistry.SetKey(DBFile, "GL_Project", MyModel.ProjectID, KeyType.Number, "Project Ledger ID,From,To,Sort");
-            AppRegistry.SetKey(DBFile, "GL_Project", MyModel.DtFrom_Prj, KeyType.From);
-            AppRegistry.SetKey(DBFile, "GL_Project", MyModel.DtTo_Prj, KeyType.To);
-            AppRegistry.SetKey(DBFile, "GL_Project", MyModel.SortBy, KeyType.Text);
+            Source.SetKey("GL_Project", MyModel.ProjectID, KeyType.Number, "Project Ledger ID,From,To,Sort");
+            Source.SetKey("GL_Project", MyModel.DtFrom_Prj, KeyType.From);
+            Source.SetKey("GL_Project", MyModel.DtTo_Prj, KeyType.To);
+            Source.SetKey("GL_Project", MyModel.SortBy, KeyType.Text);
 
         }
         #endregion
@@ -141,7 +143,13 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 return _Result;
             }
 
-            var _OBDate = MyModel.Date_From.AddDays(-1).ToString(Format.YMD);
+            var _OBDate = DateTime.Now.ToString(Format.YMD);
+
+            if (MyModel.Date_From > DateTime.MinValue)
+            {
+                _OBDate = MyModel.Date_From.AddDays(-1).ToString(Format.YMD);
+            }
+
             var _DateFrom = MyModel.Date_From.ToString(Format.YMD);
             var _DateTo = MyModel.Date_To.ToString(Format.YMD);
 
