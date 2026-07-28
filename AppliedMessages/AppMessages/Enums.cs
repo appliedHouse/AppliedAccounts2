@@ -13,6 +13,7 @@
             NotDelete = 5,
             Insert = 6,
             NotInsert = 7,
+            Posted = 8,
 
             RowInserted = 101,
             RowNotInserted = 102,
@@ -172,8 +173,9 @@
             PostingMasterIsNull = 1204,
             PostingDataIsNull = 1205,
             VoucherAlreadyPosted = 1206,
-            VoucherNotPosted = 1207,
-            VoucherNumberEmpty = 1208,
+            VoucherPosted = 1207,
+            VoucherNotPosted = 1208,
+            VoucherNumberEmpty = 1209,
 
             TransactionRollback = 1301,
             TransactionCommited = 1302,
@@ -205,6 +207,7 @@
             CompanyLedgerAC_Notdefined = 1609,
             RefNoIsNull = 1610,
             Unknown = 1611,
+           
         }
 
 

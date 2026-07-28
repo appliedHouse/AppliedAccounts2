@@ -13,15 +13,15 @@ namespace AppliedDB
     {
         public AppValues.AppPath AppPaths { get; set; }
         public Connections MyConnections { get; set; }
-        public SqliteConnection MyConnection => MyConnections.GetSqliteClient()!;
-        public SqliteConnection MsgConnection => MyConnections.GetSqliteMessage()!;
-        public SqliteConnection SysConnection => MyConnections.GetSqliteSystem()!;
+        public SqliteConnection MyConnection { get; set; } //= MyConnections.GetSqliteClient()!;
+        public SqliteConnection MsgConnection { get; set; } //= MyConnections.GetSqliteMessage()!;
+        public SqliteConnection SysConnection { get; set; } //= MyConnections.GetSqliteSystem()!;
         public SqliteCommand MyCommand { get; set; }
         public CommandClass MyCommands { get; set; } = new();
         public string DBFile => GetDataFile();
-        public string ErrorMessage { get; set; } 
+        public string ErrorMessage { get; set; }
         public bool IsSaved { get; set; } = false;
-        public MessageClass MsgClass { get; set; } 
+        public MessageClass MsgClass { get; set; }
 
         public SqliteTransaction? DBtransaction;
 
@@ -34,12 +34,16 @@ namespace AppliedDB
 
         public DataSource(AppValues.AppPath _AppPaths)
         {
-            MyConnections = new Connections(_AppPaths);
             AppPaths = _AppPaths;
-            MsgClass = new MessageClass(MsgConnection);
+            MyConnections = new Connections(_AppPaths);
 
-            if (MyConnection is not null)
+            if (MyConnections != null)
             {
+                MyConnection = MyConnections.GetSqliteClient()!;
+                MsgConnection = MyConnections.GetSqliteMessage()!;
+                SysConnection = MyConnections.GetSqliteSystem()!;
+
+                MsgClass = new MessageClass(MsgConnection);
                 MyCommand = new SqliteCommand("", MyConnection);
             }
         }
@@ -424,7 +428,7 @@ namespace AppliedDB
 
         public async Task<List<DataRow>> GetListAsync(Query Query)
         {
-            return await Task.Run(()=> GetList(Query));
+            return await Task.Run(() => GetList(Query));
         }
 
         public List<DataRow> GetList(Query Query)
@@ -560,7 +564,7 @@ namespace AppliedDB
             {
                 _TaxRate = _DataRow.Field<decimal>("Rate");
             }
-            
+
             return _TaxRate;
         }
         #endregion
@@ -871,7 +875,7 @@ namespace AppliedDB
         {
             // Create this function due to command.transaction issue.
             // Create a new connection without transaction to avoid error in transaction mode.
-            var _Connection =  Connections.GetSqliteConnectionbyString(ConnectionString);
+            var _Connection = Connections.GetSqliteConnectionbyString(ConnectionString);
             DataTable _DataTable = GetDataTable(_Table, _Connection!);
             if (_DataTable.Rows.Count == 0) { return 1; }
             long _MaxID = (long)_DataTable.Compute("MAX(ID)", "") + 1;
@@ -931,7 +935,7 @@ namespace AppliedDB
             }
 
             var IsDeleted = MyCommands.DeleteRow();
-            if(IsDeleted)
+            if (IsDeleted)
             {
                 MsgClass.Warning(AppMessages.Enums.Messages.Delete);
             }
@@ -946,22 +950,9 @@ namespace AppliedDB
         #endregion
 
         #region Get NewRow of Table
-        //public static DataRow GetNewRow(string DBFile, Tables _Table)
-        //{
-        //    using var _DataTable = GetDataTable(DBFile, _Table);
-        //    if (_DataTable is not null)
-        //    {
-        //        var _NewRow = _DataTable.NewRow();
-        //        _DataTable.Dispose();
-        //        return _NewRow;
-        //    }
-        //    return null!;
-        //}
-
-
         public DataRow GetNewRow(Tables _Table)
         {
-            using var _DataTable = GetDataTable(DBFile,_Table);
+            using var _DataTable = GetDataTable(DBFile, _Table);
             if (_DataTable is not null)
             {
                 var _NewRow = _DataTable.NewRow();
@@ -1094,7 +1085,7 @@ namespace AppliedDB
 
                 var _Filter = $"Vou_No = '{Vou_No}'";
                 var _Query = SQLQueries.Quries.JournalVoucher();
-                
+
                 using var _Table = GetTable(_Query, _Filter, "Sr_No");
                 if (_Table != null && _Table.Columns.Count > 0)
                 {
@@ -1405,7 +1396,7 @@ namespace AppliedDB
                     {
                         _DataType = typeof(int);
                     }
-                    else if(upperColumnName == "DR" ||
+                    else if (upperColumnName == "DR" ||
                             upperColumnName == "CR")
                     {
                         _DataType = typeof(decimal);
@@ -1430,7 +1421,7 @@ namespace AppliedDB
                         {
                             // Get the value and handle type conversions
                             object value = _reader.GetValue(i);
-                            Type columnType = dt.Columns[columnName].DataType;
+                            Type columnType = dt.Columns[columnName]!.DataType;
 
                             // Convert if needed
                             if (value.GetType() != columnType)
@@ -1471,7 +1462,7 @@ namespace AppliedDB
 
             return dt;
 
-            
+
         }
 
         private static string ExtractTableNameFromQuery(string sqlQuery)
