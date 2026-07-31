@@ -15,9 +15,10 @@ namespace AppliedAccounts.Pages.Accounts.Post
         protected override async Task OnInitializedAsync()
         {
             MyModel.Source = new(AppGlobal.AppPaths);
+            MyModel.MsgService = MsgService;
 
             MyModel.Source.SetKey("IsUnPost", false, KeyTypes.Boolean, "Is Un-post is in progress..");
-            MyViewModel = new();
+            MyViewModel = new(); ;
             MyViewModel.Dt_From = MyModel.Source.GetDate("UnPost_dt_From");
             MyViewModel.Dt_To = MyModel.Source.GetDate("UnPost_dt_To");
             MyViewModel.PostingType = (PostingTypes)MyModel.Source.GetNumber("UnPost_Type");
@@ -37,6 +38,7 @@ namespace AppliedAccounts.Pages.Accounts.Post
 
         public async void Refresh()
         {
+            MyModel.MsgService.Clear();
             AppRegistry.SetKey(DBFile, "UnPost_Type", (int)MyViewModel.PostingType, KeyTypes.Number, "");
             AppRegistry.SetKey(DBFile, "UnPost_dt_From", MyViewModel.Dt_From, KeyTypes.Date, "");
             AppRegistry.SetKey(DBFile, "UnPost_dt_To", MyViewModel.Dt_To, KeyTypes.Date, "");

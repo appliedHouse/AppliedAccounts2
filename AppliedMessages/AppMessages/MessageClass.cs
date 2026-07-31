@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using System.Data;
+using AppliedGlobals;
 using static AppMessages.Enums;
 
 namespace AppMessages
@@ -7,6 +8,7 @@ namespace AppMessages
     public class MessageClass
     {
         #region Variables
+        public AppValues AppGlobal { get; set; }
         public Message MyMessage { get; set; }
         public List<Message> MessageList { get; set; } = [];
         public List<Message> Errors { get; set; } = [];
@@ -15,17 +17,36 @@ namespace AppMessages
         public int Count => MessageList.Count + Errors.Count;
         public int CountError => Errors.Count;
         public int CountMessages => MessageList.Count;
-        public SqliteConnection MsgConnection { get; set; }
+        public SqliteConnection? MsgConnection { get; set; }
         public long LanguageID { get; set; }
         public string FilePath { get; set; }
 
-        //public object AppliedDB { get; }
         #endregion
 
         #region Constructor
         public MessageClass()
         {
             LanguageID = 1;             // Default Language English, Id = 1
+        }
+
+        public MessageClass (AppValues appGlobals)
+        {
+            AppGlobal = appGlobals;
+            LanguageID = 1;
+            MsgConnection = GetConnection()!;
+        }
+
+        public MessageClass(AppValues appGlobals, long languageID)
+        {
+            AppGlobal = appGlobals;
+            LanguageID = languageID;
+        }
+
+        public MessageClass(SqliteConnection msgConnection, AppValues appGlobals, long languageID)
+        {
+            MsgConnection = msgConnection;
+            AppGlobal = appGlobals;
+            LanguageID = languageID;
         }
 
         public MessageClass(SqliteConnection msgConnection)
@@ -47,6 +68,24 @@ namespace AppMessages
             Errors.Clear();
         }
         #endregion
+
+        #region GetConnection
+        private SqliteConnection? GetConnection()
+        {
+
+            if (!string.IsNullOrEmpty(AppGlobal.Paths.DBFile))
+            {
+                SqliteConnection _Connection = new();
+                FilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SQLiteDB", AppGlobal.Paths.DBFile);
+                _Connection.ConnectionString = $"Data Source={FilePath}";
+                return _Connection;
+            }
+            return null;
+         
+        }
+        #endregion
+
+
 
         #region Add Message in the List
         public void Add(Messages _Code)
@@ -165,7 +204,7 @@ namespace AppMessages
         }
         public Message GetMessage(string _Text, Class _Class)
         {
-            var _Message = new Message();
+            var _Message = new Message(); ;
             _Message.Code = "NoCode";
             _Message.MessageText = _Text;
             _Message.MessageClass = _Class;
@@ -173,7 +212,7 @@ namespace AppMessages
         }
         public Message GetMessage(string _Text)
         {
-            var _Message = new Message();
+            var _Message = new Message(); ;
             _Message.Code = "NoCode";
             _Message.MessageText = _Text;
             _Message.MessageClass = Class.Alert;
@@ -226,7 +265,10 @@ namespace AppMessages
 
         public bool InsertDB(string _Code, string _Text, Class _Class)
         {
+
+            if(MsgConnection == null) { return false; }
             if (string.IsNullOrEmpty(_Code) || string.IsNullOrEmpty(_Text)) { return false; }
+
             var IsExist = GetMessage(_Code, _Class);
             if (IsExist.Code == "NoCode")
             {

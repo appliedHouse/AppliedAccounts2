@@ -36,6 +36,7 @@ namespace AppliedDB
         {
             AppPaths = _AppPaths;
             MyConnections = new Connections(_AppPaths);
+            
 
             if (MyConnections != null)
             {
