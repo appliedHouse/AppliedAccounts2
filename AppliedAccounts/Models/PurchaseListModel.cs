@@ -17,7 +17,7 @@ namespace AppliedAccounts.Models
         public List<PurchaseRecord> Records { get; set; }
         public PurchaseRecord Record { get; set; }
         public MessagesService MsgService { get; set; }
-        public AppliedDB.Enums.Tables Table { get; set; }
+        public Tables Table { get; set; }
         public bool SelectAll { get; set; }
 
         public PurchaseListModel(GlobalService _AppGlobal)
@@ -25,7 +25,7 @@ namespace AppliedAccounts.Models
             AppGlobal = _AppGlobal;
             Source = new(AppGlobal.AppPaths);
 
-            FilterClass = new(AppGlobal.DBFile);
+            FilterClass = new(AppGlobal.DBFile);    // Will bw depreciate in future 31-7-2026.  
             Table = Tables.view_BillPayable;
             Records = LoadData();
         }

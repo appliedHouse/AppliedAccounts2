@@ -7,13 +7,12 @@ namespace AppliedAccounts.Models.Interface
 {
     public interface IVoucherRecords<T> where T : class
     {
-        GlobalService AppGlobal { get; set; }
         DataSource Source { get; set; }
         NavigationManager NavManager { get; set; }
         ListFilter FilterClass { get; set; }
         List<T> Records { get; set; }
         MessagesService MsgService { get; set; }
-        AppliedDB.Enums.Tables Table { get; set; }
+        Enums.Tables Table { get; set; }
         List<T> LoadData();
         void Print(long ID);
         void Edit(long ID);

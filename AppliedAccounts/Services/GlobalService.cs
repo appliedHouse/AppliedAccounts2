@@ -4,6 +4,7 @@ using AppliedGlobals;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
+using Microsoft.Reporting.NETCore.Internal.Soap.ReportingServices2005.Execution;
 using static AppliedGlobals.AppValues;
 
 namespace AppliedAccounts.Services
@@ -14,8 +15,7 @@ namespace AppliedAccounts.Services
         public readonly NavigationManager NavManager;
         public readonly IJSRuntime JS;
         public readonly Connections Connections;
-        
-
+        public readonly ILogger<GlobalService> MyLogger;
 
         public AppPath AppPaths { get; set; } = new();
         public AuthorClass Author { get; set; } = new();
@@ -28,8 +28,7 @@ namespace AppliedAccounts.Services
         public string UserID = string.Empty;
         public string UserRole = string.Empty;
 
-        public event Action? OnLanguageChanged;
-        public MessagesService MsgService { get; set; } 
+        #region Constructor
 
         public GlobalService(IConfiguration _Config, NavigationManager _NavManager, IJSRuntime _JS, AuthenticationStateProvider _StateProvider, ILogger<GlobalService> _logger)
         {
@@ -37,6 +36,8 @@ namespace AppliedAccounts.Services
             NavManager = _NavManager;
             JS = _JS;
             MsgService = new(_Config);
+            MyLogger = _logger as ILogger<GlobalService> ?? LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<GlobalService>();
+
 
             Client = ((UserAuthenticationStateProvider)_StateProvider).AppUser;
 
@@ -102,6 +103,54 @@ namespace AppliedAccounts.Services
             };
 
         }
+        #endregion
+
+
+        #region MinDate and MaxDate
+        public DateTime MinDate() => GetMinDate();
+
+        private DateTime GetMinDate()
+        {
+            var _result = new DateTime(2000, 1, 1);
+            DataSource Source = new(AppPaths);
+            try
+            {
+                _result = Source.GetDate("MinDate");
+
+            }
+            catch (Exception)
+            {
+                _result = new DateTime(2000, 1, 1);
+            }
+
+
+            return _result;
+        }
+
+        public DateTime MaxDate() => GetMaxDate();
+
+        private DateTime GetMaxDate()
+        {
+            var _result = new DateTime(2030, 12, 31);
+            DataSource Source = new(AppPaths);
+            try
+            {
+                _result = Source.GetDate("MaxDate");
+
+            }
+            catch (Exception)
+            {
+                _result = new DateTime(2030, 12, 31);
+            }
+
+
+            return _result;
+        }
+        #endregion
+
+
+        public event Action? OnLanguageChanged;
+        public MessagesService MsgService { get; set; } 
 
         public void SetLanguage(int id)
         {

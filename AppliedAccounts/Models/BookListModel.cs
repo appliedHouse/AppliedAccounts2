@@ -262,11 +262,11 @@ namespace AppliedAccounts.Models
         {
             if (!string.IsNullOrEmpty(Source.DBFile))
             {
-                BookNatureID = AppRegistry.GetNumber(Source.DBFile, "BkNatureID");
-                BookID = AppRegistry.GetNumber(Source.DBFile, "BkBook");
-                DT_Start = AppRegistry.GetFrom(Source.DBFile, "BkBook");
-                DT_End = AppRegistry.GetTo(Source.DBFile, "BkBook");
-                SearchText = AppRegistry.GetText(Source.DBFile, "BkBook");
+                BookNatureID = Source.GetNumber("BkNatureID");
+                BookID = Source.GetNumber("BkBook");
+                DT_Start = Source.GetFrom("BkBook");
+                DT_End = Source.GetTo("BkBook");
+                SearchText = Source.GetText("BkBook");
             }
         }
 

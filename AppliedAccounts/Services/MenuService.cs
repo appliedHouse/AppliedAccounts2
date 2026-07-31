@@ -161,6 +161,13 @@ namespace AppliedAccounts.Services.Menus
             {
                 var menus = new List<MenuItem>();
 
+                menus = MenusFromDB.Get2();
+
+                if(menus.Count > 0)
+                {
+                    return menus;
+                }
+
                 using var connection = new SqliteConnection($"Data Source={DB_PATH}");
                 connection.Open();
 
