@@ -1,0 +1,102 @@
+﻿@using AppliedAccounts.Services
+@using ToastNotificationLibrary.Services
+@using AppliedDB
+@inject GlobalService AppGlobals
+@inject NavigationManager NavManager
+@inject ToastService Toaster
+@inject IJSRuntime JSRuntime
+
+@code {
+    private DataSource? Source { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Source = new(AppGlobals.AppPaths);
+    }
+
+    private void ConfigPage()
+    {
+        NavManager.NavigateTo("/Config");
+    }
+
+    private async Task OpenModal()
+    {
+        // Use JS to open modal at body level
+        await JSRuntime.InvokeVoidAsync("openGlobalModal");
+    }
+
+    private void HandleButtonClick(string buttonName)
+    {
+        Console.WriteLine($"{buttonName} clicked");
+        Toaster.ShowSuccess($"{buttonName} was clicked!");
+    }
+
+    private void OnButton1Click() => HandleButtonClick("Button 1");
+    private void OnButton2Click() => HandleButtonClick("Button 2");
+    private void OnButton3Click() => HandleButtonClick("Button 3");
+    private void OnButton4Click() => HandleButtonClick("Button 4");
+    private void OnSaveClick() => HandleButtonClick("Save Changes");
+}
+
+<div class="p-3">
+    <div class="row mb-3">
+        <div class="col">
+            <button type="button" class="btn btn-primary w-100" @onclick="OpenModal">
+                <i class="bi bi-gear me-2"></i>General Setting
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-2">
+        <div class="col-12 col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="bi bi-file-earmark-text fs-2"></i>
+                    <p class="mb-0">Purchase Invoice</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="bi bi-receipt fs-2"></i>
+                    <p class="mb-0">Sale Invoice</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="bi bi-gear fs-2"></i>
+                    <p class="mb-0">Production</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Global Modal - Will be moved to body via JavaScript -->
+<div id="globalModalContainer" style="display:none;">
+    <div class="modal fade" id="Setting1" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Application Setting</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="button" class="btn btn-primary" @onclick="OnButton1Click">Button 1</button>
+                        <button type="button" class="btn btn-secondary" @onclick="OnButton2Click">Button 2</button>
+                        <button type="button" class="btn btn-success" @onclick="OnButton3Click">Button 3</button>
+                        <button type="button" class="btn btn-warning" @onclick="OnButton4Click">Button 4</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" @onclick="OnSaveClick">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
