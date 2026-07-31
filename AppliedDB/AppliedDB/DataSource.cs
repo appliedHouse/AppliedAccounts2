@@ -46,8 +46,12 @@ namespace AppliedDB
 
                 MsgClass = new MessageClass(MsgConnection);
                 MyCommand = new SqliteCommand("", MyConnection);
+
             }
         }
+
+        
+
 
         #endregion
 

@@ -14,6 +14,8 @@ namespace AppliedAccounts.Services
         public readonly NavigationManager NavManager;
         public readonly IJSRuntime JS;
         public readonly Connections Connections;
+        
+
 
         public AppPath AppPaths { get; set; } = new();
         public AuthorClass Author { get; set; } = new();
@@ -28,11 +30,6 @@ namespace AppliedAccounts.Services
 
         public event Action? OnLanguageChanged;
         public MessagesService MsgService { get; set; } 
-
-
-
-
-        //public GlobalService() { }
 
         public GlobalService(IConfiguration _Config, NavigationManager _NavManager, IJSRuntime _JS, AuthenticationStateProvider _StateProvider, ILogger<GlobalService> _logger)
         {

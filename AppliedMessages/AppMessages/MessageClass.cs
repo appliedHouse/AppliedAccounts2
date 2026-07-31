@@ -18,7 +18,7 @@ namespace AppMessages
         public int CountError => Errors.Count;
         public int CountMessages => MessageList.Count;
         public SqliteConnection? MsgConnection { get; set; }
-        public long LanguageID { get; set; }
+        public long LanguageID { get; set; } = 1;             // Default Language English, Id = 1
         public string FilePath { get; set; }
 
         #endregion
@@ -27,26 +27,6 @@ namespace AppMessages
         public MessageClass()
         {
             LanguageID = 1;             // Default Language English, Id = 1
-        }
-
-        public MessageClass (AppValues appGlobals)
-        {
-            AppGlobal = appGlobals;
-            LanguageID = 1;
-            MsgConnection = GetConnection()!;
-        }
-
-        public MessageClass(AppValues appGlobals, long languageID)
-        {
-            AppGlobal = appGlobals;
-            LanguageID = languageID;
-        }
-
-        public MessageClass(SqliteConnection msgConnection, AppValues appGlobals, long languageID)
-        {
-            MsgConnection = msgConnection;
-            AppGlobal = appGlobals;
-            LanguageID = languageID;
         }
 
         public MessageClass(SqliteConnection msgConnection)
@@ -68,24 +48,6 @@ namespace AppMessages
             Errors.Clear();
         }
         #endregion
-
-        #region GetConnection
-        private SqliteConnection? GetConnection()
-        {
-
-            if (!string.IsNullOrEmpty(AppGlobal.Paths.DBFile))
-            {
-                SqliteConnection _Connection = new();
-                FilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SQLiteDB", AppGlobal.Paths.DBFile);
-                _Connection.ConnectionString = $"Data Source={FilePath}";
-                return _Connection;
-            }
-            return null;
-         
-        }
-        #endregion
-
-
 
         #region Add Message in the List
         public void Add(Messages _Code)
@@ -174,30 +136,37 @@ namespace AppMessages
 
             if (MsgConnection != null)
             {
-                if (MsgConnection.State != ConnectionState.Open) { MsgConnection.Open(); }
-                var _Query = "SELECT * FROM Messages WHERE [Code] = @Code AND [Language] = @Language";
-                using var _Command = new SqliteCommand(_Query, MsgConnection);
-
-                _Command.Parameters.AddWithValue("@Code", _Code.ToString());
-                _Command.Parameters.AddWithValue("@Language", LanguageID);
-
-                using var reader = _Command.ExecuteReader();
-
-                if (reader.Read())
+                try
                 {
-                    _Message.Code = reader["Code"]?.ToString() ?? "";
-                    _Message.MessageText = reader["MessageText"]?.ToString() ?? "";
-                    _Message.MessageClass = (Class)Convert.ToInt64(reader["Class"]);
-                    _Message.MessageID = Convert.ToInt64(reader["ID"]);
+                    if (MsgConnection.State != ConnectionState.Open) { MsgConnection.Open(); }
+                    var _Query = "SELECT * FROM Messages WHERE [Code] = @Code AND [Language] = @Language";
+                    using var _Command = new SqliteCommand(_Query, MsgConnection);
+
+                    _Command.Parameters.AddWithValue("@Code", _Code.ToString());
+                    _Command.Parameters.AddWithValue("@Language", LanguageID);
+
+                    using var reader = _Command.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        _Message.Code = reader["Code"]?.ToString() ?? "";
+                        _Message.MessageText = reader["MessageText"]?.ToString() ?? "";
+                        _Message.MessageClass = (Class)Convert.ToInt64(reader["Class"]);
+                        _Message.MessageID = Convert.ToInt64(reader["ID"]);
+                    }
+
+                    else
+                    {
+                        _Message.Code = _Code.ToString();
+                        _Message.MessageText = $"{_Code} : Not Found in Message List";
+                        _Message.MessageClass = Class.Error;
+                        _Message.MessageID = -1;
+
+                        //_ = InsertDB(_Message); // Add the message to the database if not found
+                    }
                 }
-                else
+                catch (Exception)
                 {
-                    _Message.Code = _Code.ToString();
-                    _Message.MessageText = $"{_Code} : Not Found in Message List";
-                    _Message.MessageClass = Class.Error;
-                    _Message.MessageID = -1;
-
-                    _ = InsertDB(_Message); // Add the message to the database if not found
                 }
             }
             return _Message;

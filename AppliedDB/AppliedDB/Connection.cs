@@ -1,6 +1,7 @@
 ﻿using AppliedGlobals;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
+using static AppliedGlobals.AppValues;
 
 namespace AppliedDB
 {
@@ -23,6 +24,7 @@ namespace AppliedDB
         private readonly DatabaseConfig _config;
 
         // Instance properties
+        public AppValues AppGlobals { get; set; }
         public AppValues.AppPath AppPaths { get; private set; }
         public string BaseUrl { get; private set; } = string.Empty;
         public string RootPath { get; private set; } = "wwwroot";
@@ -47,21 +49,39 @@ namespace AppliedDB
             _config = new DatabaseConfig();
         }
 
-        public Connections(AppValues.AppPath appPaths, ILogger<Connections>? logger = null)
+        public Connections(AppValues appValues)
+        {
+            _config = new DatabaseConfig();
+            AppGlobals = appValues;
+            InitializeFromAppPaths(appValues.Paths);
+            AppPaths = appValues.Paths;
+
+        }
+
+        public Connections(AppValues appValues, ILogger<Connections>? logger = null)
+        {
+            _logger = logger;
+            _config = new DatabaseConfig();
+            AppGlobals = appValues;
+            AppPaths = appValues.Paths;
+            InitializeFromAppPaths(appValues.Paths);
+        }
+
+        public Connections(AppPath appPaths, ILogger<Connections>? logger = null)
         {
             _logger = logger;
             _config = new DatabaseConfig();
             InitializeFromAppPaths(appPaths);
         }
 
-        public Connections(AppValues.AppPath appPaths, DatabaseConfig config, ILogger<Connections>? logger = null)
+        public Connections(AppPath appPaths, DatabaseConfig config, ILogger<Connections>? logger = null)
         {
             _logger = logger;
             _config = config ?? new DatabaseConfig();
             InitializeFromAppPaths(appPaths);
         }
 
-        private void InitializeFromAppPaths(AppValues.AppPath appPaths)
+        private void InitializeFromAppPaths(AppPath appPaths)
         {
             AppPaths = appPaths;
             BaseUrl = appPaths.BaseUri;
