@@ -1,0 +1,36 @@
+﻿@page "/SettingUser"
+
+@inject IJSRuntime JS
+@inject GlobalService AppGlobals
+
+@code {
+    [Parameter] public string ModelName { get; set; }
+    public AppUserModel Client => AppGlobals.Client; 
+}
+
+<div class="modal fade" id="@ModelName" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Backup Setting</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex gap-2 flex-wrap">
+                    <label>@Client.DisplayName</label>
+                    <label>@Client.Company</label>
+                    <label>@Client.Address1</label>
+                    <label>@Client.Address2</label>
+                    <label>@Client.City</label>
+                    <label>@Client.Country</label>
+                    <label>@Client.Contact</label>
+                    <label>@Client.UserEmail</label>
+                    <label>@Client.Session</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
