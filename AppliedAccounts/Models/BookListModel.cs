@@ -38,6 +38,43 @@ namespace AppliedAccounts.Models
         {
 
         }
+
+        public BookListModel(int _BookID, GlobalService _AppGlobal)
+        {
+            AppGlobals = _AppGlobal;
+            MsgService = AppGlobals.MsgService;
+            Source = new(AppGlobals.AppPaths);
+            GetKeys();
+
+            try
+            {
+                if (_BookID == 0) { BookID = 1; } else { BookID = _BookID; }
+                var result = Source?.SeekValue(Enums.Tables.COA, BookID, "Nature") ?? 0;
+                if (result.GetType() == typeof(DBNull)) { BookNatureID = 1; }        // Use Dafault ID
+                if (result.GetType() == typeof(long)) { BookNatureID = (long)result; }        // Use Dafault ID
+                if (result.GetType() != typeof(long))
+                {
+                    long.TryParse(result.ToString(), out long _Value);
+                    BookNatureID = _Value;
+                }
+
+                BookID = _BookID;
+
+                NatureAccountsList =
+                [
+                    new() { ID = 1, Code = "01", Title = "Cash" },
+                    new() { ID = 2, Code = "02", Title = "Bank" },
+                ];
+
+                PageIsValid = LoadData();
+            }
+            catch (Exception error)
+            {
+                MsgService!.Error(error);
+            }
+        }
+
+
         public BookListModel(int _BookID, GlobalService _AppGlobal, MessagesService msgService)
         {
             AppGlobals = _AppGlobal;

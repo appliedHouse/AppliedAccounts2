@@ -29,8 +29,7 @@ namespace AppliedAccounts.Services
 
             // Scoped Services
             services.AddScoped<ProtectedSessionStorage>();
-            services.AddScoped<UserAuthenticationStateProvider>();
-            services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
+            
             services.AddScoped<PrintService>();
             services.AddScoped<MessagesService>();
             services.AddScoped<GlobalService>();
@@ -45,6 +44,11 @@ namespace AppliedAccounts.Services
                 options.DefaultDuration = 8000;
                 options.DefaultPosition = ToastPosition.BottomEnd;
             });
+
+            services.AddScoped<UserAuthenticationStateProvider>();
+            services.AddScoped<AuthenticationStateProvider>(sp =>
+                sp.GetRequiredService<UserAuthenticationStateProvider>());
+
 
             return services;
         }

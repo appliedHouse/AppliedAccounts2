@@ -20,7 +20,7 @@
 
     protected override void OnInitialized()
     {
-        MyModel = new(0, AppGlobal, MsgService);   // BookID and UserProfile.
+        MyModel = new(0,AppGlobal);   // BookID and UserProfile.
         MyModel.GetKeys();
         NavManager = AppGlobal.NavManager;
 

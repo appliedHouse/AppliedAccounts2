@@ -16,12 +16,9 @@
 
     protected override void OnInitialized()
     {
-        MyModel = new(AppGlobal, MsgService);
+        MyModel = new(AppGlobal);
         IsPageValid = GetPageIsValid();
     }
-
-
-
 }
 
 <PageHeading Text="Chart of Accounts" />

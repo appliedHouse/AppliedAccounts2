@@ -19,7 +19,6 @@ namespace AppliedAccounts.Models
 
         public int CountRecord => Records.Count;
         public int Count => Data.Count;
-        private DataRow NewDataRow => Data.FirstOrDefault() ?? throw new InvalidOperationException("No data available.");
 
         public List<CodeTitle> ClassList { get; set; } = new();
         public List<CodeTitle> NatureList { get; set; } = new();
@@ -36,13 +35,12 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Constructor
-        public COAModel() { }
 
-        public COAModel(GlobalService _AppGlobal, MessagesService msgService)
+        public COAModel(GlobalService _AppGlobal)
         {
             AppGlobal = _AppGlobal;
             Source = new(AppGlobal.AppPaths);
-            MsgService = msgService;
+            MsgService = AppGlobal.MsgService;
 
             LoadData();
             GetFirstRecord();
