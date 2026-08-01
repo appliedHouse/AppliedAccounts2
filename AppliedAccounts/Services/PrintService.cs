@@ -62,7 +62,7 @@ namespace AppliedAccounts.Services
 
         #region Print a Report
 
-        public async Task PrintAsync()
+        public async Task<bool> PrintAsync()
         {
 
             Model.OutputReport.ReportType = ReportType;
@@ -75,8 +75,6 @@ namespace AppliedAccounts.Services
             {
                 Model.ReportDataSource = Data;
             }
-
-
 
             //Model.ReportDataSource = Data; // Set the data source for the report
 
@@ -95,17 +93,21 @@ namespace AppliedAccounts.Services
                     case ReportType.HTML: await HTML(); break;
                     default: await Preview(); break;
                 }
+                return true;
             }
-
+            return false;
         }
 
-        public async void Print()
+        public void Print()
         {
             try
             {
-                PrintAsync().GetAwaiter().GetResult();
+                Task.Run(async () =>
+                {
+                    var _result = await PrintAsync();  
+                });
             }
-            catch (InvalidOperationException ex) // ← Catches the actual exception
+            catch (Exception ex) // ← Catches the actual exception
             {
                 MsgService.Error($"Error: {ex.Message}");
                 Console.WriteLine($"Caught: {ex.Message}");
