@@ -10,7 +10,7 @@ namespace AppliedAccounts.Pages.Accounts
 
     public partial class COA
     {
-        public COAModel MyModel { get; set; } = new();
+        public COAModel MyModel { get; set; } 
         public bool IsPageValid { get; set; }
 
         public COA()

@@ -27,6 +27,7 @@ namespace VoucherPosting
         {
             Source = _Source;
             PostingData = _PostingModel;
+            MsgClass = Source.MsgClass;
             GetVouNumber();
 
             if (!string.IsNullOrEmpty(Vou_No))
@@ -39,7 +40,7 @@ namespace VoucherPosting
         {
             Source = _Source;
             PostingData = _PostingModel;
-            MsgClass = msgClass;
+            MsgClass = Source.MsgClass;
             GetVouNumber();
 
             if (!string.IsNullOrEmpty(Vou_No))
@@ -76,6 +77,7 @@ namespace VoucherPosting
         public async Task<bool> PostBook()
         {
             bool result = false;
+            Source.MsgClass.ClearMessages();
 
             // Validation of Voucher
             if (!PostValidate()) { return false; }

@@ -2,7 +2,6 @@
 using AppliedDB;
 using AppliedGlobals;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using static AppliedGlobals.AppValues;
 
@@ -13,7 +12,8 @@ namespace AppliedAccounts.Services
         public readonly IConfiguration Config;
         public readonly NavigationManager NavManager;
         public readonly IJSRuntime JS;
-        public readonly Connections Connections;
+        public Connections Connections;
+        public readonly ILogger<GlobalService> MyLogger;
 
         public AppPath AppPaths { get; set; } = new();
         public AuthorClass Author { get; set; } = new();
@@ -26,32 +26,70 @@ namespace AppliedAccounts.Services
         public string UserID = string.Empty;
         public string UserRole = string.Empty;
 
+        public event Action? OnInitialized;
         public event Action? OnLanguageChanged;
-        public MessagesService MsgService { get; set; } 
+        public MessagesService MsgService { get; set; }
 
+        private readonly UserAuthenticationStateProvider _authStateProvider;
+        private bool _isInitialized = false;
+        private readonly SemaphoreSlim _initLock = new SemaphoreSlim(1, 1);
 
+        #region Constructor
 
-
-        //public GlobalService() { }
-
-        public GlobalService(IConfiguration _Config, NavigationManager _NavManager, IJSRuntime _JS, AuthenticationStateProvider _StateProvider, ILogger<GlobalService> _logger)
+        public GlobalService(
+            IConfiguration _Config,
+            NavigationManager _NavManager,
+            IJSRuntime _JS,
+            UserAuthenticationStateProvider _StateProvider,
+            ILogger<GlobalService> _logger)
         {
             Config = _Config;
             NavManager = _NavManager;
             JS = _JS;
+            _authStateProvider = _StateProvider;
+            MyLogger = _logger;
             MsgService = new(_Config);
 
-            Client = ((UserAuthenticationStateProvider)_StateProvider).AppUser;
+            _ = InitializeAsync();
+            InitializeStaticProperties();
+        }
 
-            var databaseConfig = new DatabaseConfig();  // Get SQLite database default file names from AppliedDB.Connection Class
+        private async Task InitializeAsync()
+        {
+            await _initLock.WaitAsync();
+            try
+            {
+                if (_isInitialized) return;
 
-            var connectionLogger = _logger as ILogger<Connections> ?? LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<Connections>();
-            Connections = new Connections(AppPaths, connectionLogger);
+                var authState = await _authStateProvider.GetAuthenticationStateAsync();
 
-            AppPaths.DBFile = Client.DataFile;
-            UserID = Client.UserID;
-            UserRole = Client.Role;
+                Client = _authStateProvider.AppUser ?? new AppUserModel();
 
+                AppPaths.DBFile = Client.DataFile;
+                UserID = Client.UserID;
+                UserRole = Client.Role;
+
+                var databaseConfig = new DatabaseConfig();
+                var connectionLogger = MyLogger as ILogger<Connections> ??
+                    LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<Connections>();
+                Connections = new Connections(AppPaths, connectionLogger);
+
+                _isInitialized = true;
+
+                OnInitialized?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                MyLogger.LogError(ex, "Error initializing GlobalService");
+            }
+            finally
+            {
+                _initLock.Release();
+            }
+        }
+
+        private void InitializeStaticProperties()
+        {
             AppPaths.BaseUri = NavManager.BaseUri;
             AppPaths.FirstPath = Directory.GetCurrentDirectory();
             AppPaths.RootPath = Config.GetValue<string>("Paths:RootPath") ?? "wwwroot";
@@ -103,8 +141,75 @@ namespace AppliedAccounts.Services
                 ReportTitle = Config.GetValue<string>("Report:ReportTitle") ?? "",
                 ReportLogo = Config.GetValue<string>("Report:ReportLogo") ?? "",
             };
-
         }
+
+        #endregion
+
+      
+        // Public method to ensure initialization
+        public async Task EnsureInitializedAsync()
+        {
+            if (!_isInitialized)
+            {
+                await InitializeAsync();
+            }
+        }
+
+        // Refresh user data after login/logout
+        public async Task RefreshUserDataAsync()
+        {
+            var authState = await _authStateProvider.GetAuthenticationStateAsync();
+            Client = _authStateProvider.AppUser ?? new AppUserModel();
+
+            // Update paths if needed
+            AppPaths.DBFile = Client.DataFile;
+            UserID = Client.UserID;
+            UserRole = Client.Role;
+        }
+
+        #region MinDate and MaxDate
+        public DateTime MinDate() => GetMinDate();
+
+        private DateTime GetMinDate()
+        {
+            var _result = new DateTime(2000, 1, 1);
+            try
+            {
+                if (_isInitialized && Connections != null)
+                {
+                    DataSource Source = new(AppPaths);
+                    _result = Source.GetDate("MinDate");
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLogger?.LogError(ex, "Error getting MinDate");
+                _result = new DateTime(2000, 1, 1);
+            }
+            return _result;
+        }
+
+        public DateTime MaxDate() => GetMaxDate();
+
+        private DateTime GetMaxDate()
+        {
+            var _result = new DateTime(2030, 12, 31);
+            try
+            {
+                if (_isInitialized && Connections != null)
+                {
+                    DataSource Source = new(AppPaths);
+                    _result = Source.GetDate("MaxDate");
+                }
+            }
+            catch (Exception ex)
+            {
+                MyLogger?.LogError(ex, "Error getting MaxDate");
+                _result = new DateTime(2030, 12, 31);
+            }
+            return _result;
+        }
+        #endregion
 
         public void SetLanguage(int id)
         {
@@ -112,15 +217,13 @@ namespace AppliedAccounts.Services
                 return;
 
             Language.ID = id;
-
-            // Notify subscribers (components)
             OnLanguageChanged?.Invoke();
         }
 
         public void Dispose()
         {
-
+            _initLock?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }
-

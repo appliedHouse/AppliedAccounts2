@@ -1,0 +1,41 @@
+﻿@page "/SettingGeneral"
+
+
+@code {
+
+    [Parameter] public string ModelName { get; set; }
+
+    private void HandleButtonClick(string buttonName)
+    {
+        Console.WriteLine($"{buttonName} clicked");
+    }
+    private void OnButton1Click() => HandleButtonClick("Button 1");
+    private void OnButton2Click() => HandleButtonClick("Button 2");
+    private void OnButton3Click() => HandleButtonClick("Button 3");
+    private void OnButton4Click() => HandleButtonClick("Button 4");
+    private void OnSaveClick() => HandleButtonClick("Save Changes");
+}
+
+
+<div class="modal fade" id="@ModelName" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Application Setting</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" class="btn btn-primary" @onclick="OnButton1Click">Button 1</button>
+                    <button type="button" class="btn btn-secondary" @onclick="OnButton2Click">Button 2</button>
+                    <button type="button" class="btn btn-success" @onclick="OnButton3Click">Button 3</button>
+                    <button type="button" class="btn btn-warning" @onclick="OnButton4Click">Button 4</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" @onclick="OnSaveClick">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>

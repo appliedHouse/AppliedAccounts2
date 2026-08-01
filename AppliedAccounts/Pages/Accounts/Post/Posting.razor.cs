@@ -60,6 +60,7 @@ namespace AppliedAccounts.Pages.Accounts.Post
 
         public async void Refresh()
         {
+            MyModel.MsgService.Clear();
             MyModel.Source.SetKey("Post_Type", MyViewModel.PostingType, KeyTypes.Number);
             MyModel.Source.SetKey("Post_dt_From", MyViewModel.Dt_From, KeyTypes.Date);
             MyModel.Source.SetKey("Post_dt_To", MyViewModel.Dt_To, KeyTypes.Date);

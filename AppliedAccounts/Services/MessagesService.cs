@@ -1,5 +1,6 @@
 ﻿using AppMessages;
 using Microsoft.Data.Sqlite;
+using AppliedGlobals;
 using static AppMessages.Enums;
 
 namespace AppliedAccounts.Services
@@ -7,8 +8,9 @@ namespace AppliedAccounts.Services
     public class MessagesService : IMessagesService
     {
         public long LanguageID { get; set; } = 1;            // Default Language 1 is English
-        public MessageClass MsgClass { get; set; } = new();
+        public MessageClass MsgClass { get; set; }
         private SqliteConnection MyConnection { get; set; }
+        public AppValues AppGlobals { get; set; }
 
         public MessagesService(IConfiguration configuration)
         {
@@ -20,6 +22,7 @@ namespace AppliedAccounts.Services
                     var FilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", MsgPath, "Messages.db");
                     var MsgConnectionString = $"Data Source={FilePath}";
                     MyConnection = new SqliteConnection(MsgConnectionString);
+                    MsgClass = new(MyConnection);
                 }
             }
             catch (Exception ex)

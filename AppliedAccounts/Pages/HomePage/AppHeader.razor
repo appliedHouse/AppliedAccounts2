@@ -1,0 +1,232 @@
+﻿@using AppliedAccounts.Pages.Setting
+@inject NavigationManager NavManager
+@inject AuthenticationStateProvider Authorized
+@inject GlobalService AppGlobals
+
+@code {
+    private AppliedGlobals.AppUserModel? AppUser { get; set; }
+    private string? AppUserName { get; set; }
+    private string? CompanyName;
+    private string SelectedLanguage = "en";
+    private bool IsOffcanvasOpen = false;
+
+    // Language Dictionary
+    private Dictionary<string, string> Languages => new Dictionary<string, string>
+    {
+        { "en", "English" },
+        { "ar", "العربية" },
+        { "ur", "اردو" }
+    };
+
+    protected override void OnInitialized()
+    {
+        AppUser = ((UserAuthenticationStateProvider)Authorized).AppUser;
+        CompanyName = AppUser.Company;
+        AppUserName = AppUser.DisplayName;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Task.Run(() =>
+        {
+            AppUser = ((UserAuthenticationStateProvider)Authorized).AppUser;
+            CompanyName = AppUser.Company;
+            AppUserName = AppUser.DisplayName;
+            InvokeAsync(() => StateHasChanged());
+        });
+    }
+
+    private void ChangeLanguage(string lang)
+    {
+        SelectedLanguage = lang;
+    }
+
+    private string GetLanguageName() => SelectedLanguage switch
+    {
+        "en" => "English",
+        "ar" => "العربية",
+        "ur" => "اردو",
+        _ => "English"
+    };
+
+    public string GetCompanyName() { return AppUser!.Company ?? ""; }
+    public string GetAppUserName() => AppUser!.DisplayName ?? "";
+    public void GoHome() { NavManager.NavigateTo("/"); }
+
+    private void ToggleOffcanvas()
+    {
+        IsOffcanvasOpen = !IsOffcanvasOpen;
+    }
+
+    private string EnterKey = "Enter";
+
+    public void NavigateToConfig()
+    {
+        NavManager.NavigateTo("/Config");
+    }
+
+    private void OnOffcanvasStateChanged(bool isOpen)
+    {
+        IsOffcanvasOpen = isOpen;
+        StateHasChanged();
+    }
+}
+
+<header class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow sticky-top" data-bs-theme="dark">
+    <div class="logo-img" @onclick="GoHome">
+        <img src="Images/ASH3.png" class="img-thumbnail brand-Width" alt="..." title="Go Home" />
+    </div>
+    <div class="text-white p-2 fs-3 fw-bold ComTitle">APPLIED ACCOUNTS 2</div>
+
+    <div class="ms-auto d-flex align-items-center gap-2">
+
+        <AuthorizeView>
+            <NotAuthorized>
+                <Btn_Login />
+            </NotAuthorized>
+            <Authorized>
+
+                <div class="justify-content-end text-white d-none d-md-block">
+                    @GetCompanyName()
+                </div>
+
+                <!-- Language Dropdown on Page -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-light btn-sm dropdown-toggle"
+                            type="button"
+                            id="languageDropdown"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        <span class="d-none d-md-inline">@GetLanguageName()</span>
+                        <span class="d-inline d-md-none">🌐</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                        @foreach (var lang in Languages)
+                        {
+                            <li>
+                                <a class="dropdown-item @(SelectedLanguage == lang.Key ? "active" : "")"
+                                   href="#"
+                                   @onclick="() => ChangeLanguage(lang.Key)"
+                                   @onclick:preventDefault="true">
+                                    @lang.Value
+                                    @if (SelectedLanguage == lang.Key)
+                                    {
+                                        <i class="bi bi-check2 ms-2"></i>
+                                    }
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+                <!-- Settings Gear Icon -->
+                <div class="p-1">
+                    <span class="p-2 rounded-circle"
+                          type="button"
+                          data-bs-toggle="offcanvas"
+                          data-bs-target="#offcanvasRight"
+                          aria-controls="offcanvasRight"
+                          role="button"
+                          tabindex="0"
+                          @onclick="ToggleOffcanvas"
+                          @onkeydown="e => { if (e.Code == EnterKey) ToggleOffcanvas(); }">
+                        <i class="bi bi-gear text-white"></i>
+                    </span>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+    </div>
+</header>
+
+<!-- Use the OffcanvasPanel component -->
+<OffcanvasPanel @bind-IsOpen="IsOffcanvasOpen"/>
+
+<style>
+    .navbar {
+        max-height: var(--navbar_Size);
+    }
+
+    .brand-Width {
+        min-height: var(--navbar_Size);
+        max-width: var(--navbar_Size);
+    }
+
+    .sidebar-width {
+        max-height: var(--sidebarMin_Width);
+        max-width: var(--sidebarMax_Width);
+    }
+
+    .ComTitle {
+        font-family: "Exo 2", sans-serif;
+    }
+
+    /* Language dropdown styles */
+    .dropdown-item.active {
+        background-color: #0d6efd;
+        color: #fff;
+    }
+
+        .dropdown-item.active .text-muted {
+            color: rgba(255,255,255,0.7) !important;
+        }
+
+    /* Offcanvas styles */
+    .offcanvas {
+        width: 350px;
+        max-width: 90vw;
+    }
+
+    .offcanvas-header {
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    [data-bs-theme="dark"] .offcanvas {
+        background-color: #1a1d20;
+        color: #dee2e6;
+    }
+
+    /* Modal z-index fix */
+    .modal {
+        z-index: 1060 !important;
+    }
+
+    .modal-backdrop {
+        z-index: 1055 !important;
+    }
+
+    .modal-content {
+        z-index: 1065 !important;
+        position: relative !important;
+    }
+
+    .modal-body, .modal-footer {
+        z-index: 1070 !important;
+        position: relative !important;
+    }
+
+        .modal-body button, .modal-footer button {
+            position: relative;
+            z-index: 1075 !important;
+            pointer-events: auto !important;
+        }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .navbar {
+            padding: 0 0.5rem;
+        }
+
+        .ComTitle {
+            font-size: 0.9rem !important;
+        }
+
+        .brand-Width {
+            min-height: 40px;
+            max-width: 40px;
+        }
+
+        .offcanvas {
+            width: 100%;
+        }
+    }
+</style>

@@ -420,6 +420,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         public async void PrintProject(ReportActionClass PrintAction)
         {
             // Clear all previous messages - refresh
+            MsgService.Clear();
             IsPrinting = true;
             await InvokeAsync(StateHasChanged); await Task.Delay(100);
             try

@@ -13,7 +13,7 @@ namespace AppliedAccounts.Models.Posting
     {
         [Inject] public GlobalService AppGlobal { get; set; } = default!;
         public UnPostViewModel UnPostVM { get; set; } = new();
-        public Services.MessagesService MsgService { get; set; }
+        public MessagesService MsgService { get; set; }
         public List<DataListModel> DataListModelList { get; set; } = new();
         public bool IsPosting { get; set; } = false;
         public DataSource Source { get; set; }
@@ -25,9 +25,13 @@ namespace AppliedAccounts.Models.Posting
 
         public DateTime[] FilterDates { get; set; } = { DateTime.Now, DateTime.Now };
 
-        public UnPostModel()
+        public UnPostModel(GlobalService appGlobal)
         {
-            if (AppGlobal != null) { Source = new(AppGlobal.AppPaths); }
+            
+            if (appGlobal != null) 
+            {
+                AppGlobal = appGlobal;
+                Source = new(AppGlobal.AppPaths); }
             Pages.PageChanged += OnPageChangedInternal;
         }
 

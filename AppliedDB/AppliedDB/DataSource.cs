@@ -36,6 +36,7 @@ namespace AppliedDB
         {
             AppPaths = _AppPaths;
             MyConnections = new Connections(_AppPaths);
+            
 
             if (MyConnections != null)
             {
@@ -45,8 +46,12 @@ namespace AppliedDB
 
                 MsgClass = new MessageClass(MsgConnection);
                 MyCommand = new SqliteCommand("", MyConnection);
+
             }
         }
+
+        
+
 
         #endregion
 

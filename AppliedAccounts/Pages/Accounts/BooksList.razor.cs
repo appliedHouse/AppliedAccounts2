@@ -37,13 +37,6 @@ namespace AppliedAccounts.Pages.Accounts
         }
         #endregion
 
-        //public string GetTitle(List<CodeTitle> _List, int _Value)
-        //{
-        //    if (_List == null || _List.Count == 0) { return string.Empty; }
-        //    return _List.FirstOrDefault(x => x.ID == _Value)!.Title ?? "";
-
-        //}
-
         #region Print
         public async Task Print(ReportActionClass reportAction)
         {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using System.Data;
+using AppliedGlobals;
 using static AppMessages.Enums;
 
 namespace AppMessages
@@ -7,6 +8,7 @@ namespace AppMessages
     public class MessageClass
     {
         #region Variables
+        public AppValues AppGlobal { get; set; }
         public Message MyMessage { get; set; }
         public List<Message> MessageList { get; set; } = [];
         public List<Message> Errors { get; set; } = [];
@@ -15,11 +17,10 @@ namespace AppMessages
         public int Count => MessageList.Count + Errors.Count;
         public int CountError => Errors.Count;
         public int CountMessages => MessageList.Count;
-        public SqliteConnection MsgConnection { get; set; }
-        public long LanguageID { get; set; }
+        public SqliteConnection? MsgConnection { get; set; }
+        public long LanguageID { get; set; } = 1;             // Default Language English, Id = 1
         public string FilePath { get; set; }
 
-        //public object AppliedDB { get; }
         #endregion
 
         #region Constructor
@@ -135,37 +136,44 @@ namespace AppMessages
 
             if (MsgConnection != null)
             {
-                if (MsgConnection.State != ConnectionState.Open) { MsgConnection.Open(); }
-                var _Query = "SELECT * FROM Messages WHERE [Code] = @Code AND [Language] = @Language";
-                using var _Command = new SqliteCommand(_Query, MsgConnection);
-
-                _Command.Parameters.AddWithValue("@Code", _Code.ToString());
-                _Command.Parameters.AddWithValue("@Language", LanguageID);
-
-                using var reader = _Command.ExecuteReader();
-
-                if (reader.Read())
+                try
                 {
-                    _Message.Code = reader["Code"]?.ToString() ?? "";
-                    _Message.MessageText = reader["MessageText"]?.ToString() ?? "";
-                    _Message.MessageClass = (Class)Convert.ToInt64(reader["Class"]);
-                    _Message.MessageID = Convert.ToInt64(reader["ID"]);
+                    if (MsgConnection.State != ConnectionState.Open) { MsgConnection.Open(); }
+                    var _Query = "SELECT * FROM Messages WHERE [Code] = @Code AND [Language] = @Language";
+                    using var _Command = new SqliteCommand(_Query, MsgConnection);
+
+                    _Command.Parameters.AddWithValue("@Code", _Code.ToString());
+                    _Command.Parameters.AddWithValue("@Language", LanguageID);
+
+                    using var reader = _Command.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        _Message.Code = reader["Code"]?.ToString() ?? "";
+                        _Message.MessageText = reader["MessageText"]?.ToString() ?? "";
+                        _Message.MessageClass = (Class)Convert.ToInt64(reader["Class"]);
+                        _Message.MessageID = Convert.ToInt64(reader["ID"]);
+                    }
+
+                    else
+                    {
+                        _Message.Code = _Code.ToString();
+                        _Message.MessageText = $"{_Code} : Not Found in Message List";
+                        _Message.MessageClass = Class.Error;
+                        _Message.MessageID = -1;
+
+                        //_ = InsertDB(_Message); // Add the message to the database if not found
+                    }
                 }
-                else
+                catch (Exception)
                 {
-                    _Message.Code = _Code.ToString();
-                    _Message.MessageText = $"{_Code} : Not Found in Message List";
-                    _Message.MessageClass = Class.Error;
-                    _Message.MessageID = -1;
-
-                    _ = InsertDB(_Message); // Add the message to the database if not found
                 }
             }
             return _Message;
         }
         public Message GetMessage(string _Text, Class _Class)
         {
-            var _Message = new Message();
+            var _Message = new Message(); ;
             _Message.Code = "NoCode";
             _Message.MessageText = _Text;
             _Message.MessageClass = _Class;
@@ -173,7 +181,7 @@ namespace AppMessages
         }
         public Message GetMessage(string _Text)
         {
-            var _Message = new Message();
+            var _Message = new Message(); ;
             _Message.Code = "NoCode";
             _Message.MessageText = _Text;
             _Message.MessageClass = Class.Alert;
@@ -226,7 +234,10 @@ namespace AppMessages
 
         public bool InsertDB(string _Code, string _Text, Class _Class)
         {
+
+            if(MsgConnection == null) { return false; }
             if (string.IsNullOrEmpty(_Code) || string.IsNullOrEmpty(_Text)) { return false; }
+
             var IsExist = GetMessage(_Code, _Class);
             if (IsExist.Code == "NoCode")
             {
