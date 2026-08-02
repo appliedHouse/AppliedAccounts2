@@ -1,8 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
-using AppliedDB;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace AppliedAccounts.Pages.Accounts
 {
@@ -72,7 +70,6 @@ namespace AppliedAccounts.Pages.Accounts
             MyModel.BookID = _BookID; //result;
         }
         #endregion
-
 
         #region Delete record and Voucher
         private void DeleteVoucher(long VoucherID)

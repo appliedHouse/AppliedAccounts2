@@ -8,3 +8,7 @@ AppliedAccounts.Components.
                   Title="company"
                   @bind-Value="MyModel.CompanyID"
                   BrowseList="MyModel.CompanyList" />
+
+
+02-Aug-2026
+It has been depreciated and MyDownDown is latest one for this 

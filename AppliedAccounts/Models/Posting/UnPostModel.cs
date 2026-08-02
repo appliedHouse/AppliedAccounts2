@@ -1,7 +1,6 @@
 ﻿using AppliedAccounts.Pages.Accounts.Post;
 using AppliedAccounts.Services;
 using AppliedDB;
-using Microsoft.AspNetCore.Components;
 using System.Data;
 using VoucherPosting;
 using static AppliedDB.Enums;
@@ -11,7 +10,7 @@ namespace AppliedAccounts.Models.Posting
 {
     public class UnPostModel
     {
-        [Inject] public GlobalService AppGlobal { get; set; } = default!;
+        public GlobalService AppGlobal { get; set; }
         public UnPostViewModel UnPostVM { get; set; } = new();
         public MessagesService MsgService { get; set; }
         public List<DataListModel> DataListModelList { get; set; } = new();
@@ -27,11 +26,12 @@ namespace AppliedAccounts.Models.Posting
 
         public UnPostModel(GlobalService appGlobal)
         {
-            
-            if (appGlobal != null) 
+
+            if (appGlobal != null)
             {
                 AppGlobal = appGlobal;
-                Source = new(AppGlobal.AppPaths); }
+                Source = new(AppGlobal.AppPaths);
+            }
             Pages.PageChanged += OnPageChangedInternal;
         }
 
@@ -71,8 +71,7 @@ namespace AppliedAccounts.Models.Posting
                     {
                         var CashAccIDs = string.Join(",", _CashAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
                         Filter = $"BookID IN ({CashAccIDs}) AND [Status] = 'Posted' AND ";
-                        Filter += AppliedDB.Functions.GetDateFilter(FilterDates);
-
+                        Filter += Functions.GetDateFilter(FilterDates);
                     }
                     var _Sort = Sort + Pages.GetLimit();            // Add pagination filter to select records / rows.
                     var _DataTableCash = Source.GetTable(Tables.Book, Filter, _Sort);
@@ -198,10 +197,10 @@ namespace AppliedAccounts.Models.Posting
                 postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
                 postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
 
-                if(postingModel.MasterTable.Rows.Count == 0)
+                if (postingModel.MasterTable.Rows.Count == 0)
                 {
                     MsgService.Warning(Messages.VoucherNotFound);
-                    return false; 
+                    return false;
                 }
 
                 if (postingModel.DetailTable.Rows.Count == 0)
@@ -266,7 +265,7 @@ namespace AppliedAccounts.Models.Posting
 
                 return false;
             }
-            return false; 
+            return false;
         }
 
         #endregion

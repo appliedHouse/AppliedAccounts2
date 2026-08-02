@@ -23,18 +23,10 @@ namespace AppliedAccounts.Pages.Accounts.Post
             MyViewModel.Dt_To = MyModel.Source.GetDate("UnPost_dt_To");
             MyViewModel.PostingType = (PostingTypes)MyModel.Source.GetNumber("UnPost_Type");
 
-            MyModel.Pages.PageChanged += OnPageChangedInternal;
+            
 
             await MyModel.LoadData(MyViewModel);
         }
-
-        private async void OnPageChangedInternal(int page)
-        {
-            if (MyViewModel is null) { return; }
-            await MyModel.LoadData(MyViewModel);
-            await InvokeAsync(StateHasChanged);
-        }
-
 
         public async void Refresh()
         {
