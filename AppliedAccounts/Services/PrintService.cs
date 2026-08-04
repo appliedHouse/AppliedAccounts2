@@ -93,7 +93,8 @@ namespace AppliedAccounts.Services
                     case ReportType.HTML: await HTML(); break;
                     default: await Preview(); break;
                 }
-                return true;
+
+                return IsError;
             }
             return false;
         }
@@ -105,6 +106,10 @@ namespace AppliedAccounts.Services
                 Task.Run(async () =>
                 {
                     var _result = await PrintAsync();  
+                    if(_result)
+                    {
+                        MsgService.Success("Report printed failed.");
+                    }
                 });
             }
             catch (Exception ex) // ← Catches the actual exception
@@ -171,7 +176,6 @@ namespace AppliedAccounts.Services
             }
             catch (Exception error)
             {
-
                 IsError = true;
                 MyMessage.Add(error.Message);
             }
@@ -193,6 +197,7 @@ namespace AppliedAccounts.Services
                 }
                 else
                 {
+                    IsError = false;
                     MyMessage.Add(Model.ErrorMessage);
                 }
             }
@@ -216,6 +221,7 @@ namespace AppliedAccounts.Services
                 }
                 else
                 {
+                    IsError = false;
                     MyMessage.Add(Model.ErrorMessage);
                 }
             }
@@ -239,6 +245,7 @@ namespace AppliedAccounts.Services
                 }
                 else
                 {
+                    IsError = false;
                     MyMessage.Add(Model.ErrorMessage);
                 }
             }
@@ -262,6 +269,7 @@ namespace AppliedAccounts.Services
                 }
                 else
                 {
+                    IsError = false;
                     MyMessage.Add(Model.ErrorMessage);
                 }
             }
@@ -283,6 +291,7 @@ namespace AppliedAccounts.Services
             }
             else
             {
+                IsError = false;
                 MyMessage.Add(Model.ErrorMessage);
             }
 
@@ -300,6 +309,7 @@ namespace AppliedAccounts.Services
                 }
                 else
                 {
+                    IsError = false;
                     MyMessage.Add(Model.ErrorMessage);
                 }
             }

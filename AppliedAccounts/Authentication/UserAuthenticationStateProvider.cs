@@ -34,35 +34,7 @@ namespace AppliedAccounts.Authentication
                 }
                 else
                 {
-                    var ClaimPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
-                        new List<Claim>
-                            {
-                                new (ClaimTypes.Name, userSession.UserName),
-                                new (ClaimTypes.Role, userSession.Role),
-                                new (ClaimTypes.Actor, userSession.Email),
-                                new ("DBFile",userSession.SqliteFile),
-                                new ("Company",userSession.CompanyName),
-                                new ("Designation",userSession.Designation),
-                                new ("DisplayName",userSession.DisplayName),
-                                new ("PIN",userSession.PIN),
-                                new ("LanguageID",userSession.LanguageID.ToString()),
-                                new ("Session",userSession.SessionGuid.ToString()),
-
-                                new ("AppPath",_navManager.BaseUri),
-                                new ("RootFolder",userSession.RootFolder.ToString()),
-                                new ("UsersFolder",userSession.UsersFolder.ToString()),
-                                new ("ClientsFolder",userSession.ClientsFolder.ToString()),  // Data base Folder
-                                new ("ReportFolder",userSession.ReportFolder.ToString()),
-                                new ("PDFFolder",userSession.PDFFolder.ToString()),
-                                new ("MessageFolder",userSession.MessageFolder.ToString()),
-                                new ("LanguageFolder",userSession.LanguageFolder.ToString()),
-                                new ("ImageFolder",userSession.ImageFolder.ToString()),
-                                new ("SystemFolder",userSession.SystemFolder.ToString()),
-                                new ("SessionFolder",userSession.SessionFolder.ToString()),
-                                new ("TempDBFolder",userSession.TempDBFolder.ToString()),
-
-                            }, "AppliedAuth"));
-
+                    var ClaimPrincipal = CreatePrincipal(userSession);
                     var _Result = await Task.FromResult(new AuthenticationState(ClaimPrincipal));
                     GetAppUser(_Result);
 
@@ -82,31 +54,8 @@ namespace AppliedAccounts.Authentication
             if (userSession != null)
             {
                 await _sessionStorage.SetAsync("UserSession", userSession);
-                claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
-                            {
-                                new (ClaimTypes.Name, userSession.UserName),
-                                new (ClaimTypes.Role, userSession.Role),
-                                new (ClaimTypes.Email, userSession.Email),
-                                new ("DBFile",userSession.SqliteFile),
-                                new ("Company",userSession.CompanyName),
-                                new ("Designation",userSession.Designation),
-                                new ("DisplayName",userSession.DisplayName),
-                                new ("PIN",userSession.PIN),
-                                new ("LanguageID",userSession.LanguageID.ToString()),
-                                new ("Session",userSession.SessionGuid.ToString()),
-
-                                new ("RootFolder",userSession.RootFolder.ToString()),
-                                new ("UsersFolder",userSession.UsersFolder.ToString()),
-                                new ("ClientsFolder",userSession.ClientsFolder.ToString()),  // Data base Folder
-                                new ("ReportFolder",userSession.ReportFolder.ToString()),
-                                new ("PDFFolder",userSession.PDFFolder.ToString()),
-                                new ("MessageFolder",userSession.MessageFolder.ToString()),
-                                new ("LanguageFolder",userSession.LanguageFolder.ToString()),
-                                new ("ImageFolder",userSession.ImageFolder.ToString()),
-                                new ("SystemFolder",userSession.SystemFolder.ToString()),
-                                new ("SessionFolder",userSession.SessionFolder.ToString()),
-                                new ("TempDBFolder",userSession.TempDBFolder.ToString()),
-                            }, "AppliedAuth"));
+                claimsPrincipal = CreatePrincipal(userSession);
+                
             }
             else
             {
@@ -118,25 +67,63 @@ namespace AppliedAccounts.Authentication
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
         }
 
-        public void GetAppUser(AuthenticationState _AuthState)
+
+        private ClaimsPrincipal CreatePrincipal(UserSession user)
         {
-            var claims = _AuthState.User.Identities.First().Claims.ToList();
-            AppUser = new AppUserModel();
+            var claims = new List<Claim>
             {
-                AppUser.UserID = _AuthState.User.Identity?.Name ?? "";
-                AppUser.Password = "";
-                AppUser.DisplayName = claims?.FirstOrDefault(x => x.Type.Equals("DisplayName", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
-                AppUser.Designation = claims?.FirstOrDefault(x => x.Type.Equals("Designation", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
-                AppUser.UserEmail = claims?.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Email, StringComparison.OrdinalIgnoreCase))?.Value ?? "";
-                AppUser.Role = claims?.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Role, StringComparison.OrdinalIgnoreCase))?.Value ?? "";
-                AppUser.LastLogin = claims?.FirstOrDefault(x => x.Type.Equals("Lastlogin", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
-                AppUser.DataFile = claims?.FirstOrDefault(x => x.Type.Equals("DBFile", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
-                AppUser.Company = claims?.FirstOrDefault(x => x.Type.Equals("Company", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
-                AppUser.PIN = claims?.FirstOrDefault(x => x.Type.Equals("PIN", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
-                AppUser.LanguageID = int.Parse(claims?.FirstOrDefault(x => x.Type.Equals("LanguageID", StringComparison.OrdinalIgnoreCase))?.Value ?? "");
-                AppUser.Session = claims?.FirstOrDefault(x => x.Type.Equals("Session", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
-            }
-            ;
+                new (ClaimTypes.Name, user.UserName),
+                new (ClaimTypes.Role, user.Role),
+                new (ClaimTypes.Email, user.Email),
+                new ("DBFile", user.SqliteFile),
+                new ("Company", user.CompanyName),
+                new ("Designation", user.Designation),
+                new ("DisplayName", user.DisplayName),
+                new ("PIN", user.PIN),
+                new ("LanguageID", user.LanguageID.ToString()),
+                new ("Session", user.SessionGuid.ToString()),
+
+                new ("AppPath", _navManager.BaseUri),
+                new ("RootFolder", user.RootFolder.ToString()),
+                new ("UsersFolder", user.UsersFolder.ToString()),
+                new ("ClientsFolder", user.ClientsFolder.ToString()),  // Data base Folder
+                new ("ReportFolder", user.ReportFolder.ToString()),
+                new ("PDFFolder", user.PDFFolder.ToString()),
+                new ("MessageFolder", user.MessageFolder.ToString()),
+                new ("LanguageFolder", user.LanguageFolder.ToString()),
+                new ("ImageFolder", user.ImageFolder.ToString()),
+                new ("SystemFolder", user.SystemFolder.ToString()),
+                new ("SessionFolder", user.SessionFolder.ToString()),
+                new ("TempDBFolder", user.TempDBFolder.ToString())
+            };
+
+            return new ClaimsPrincipal(
+                new ClaimsIdentity(claims, "AppliedAuth"));
+        }
+
+
+        public void GetAppUser(AuthenticationState authState)
+        {
+            var claims = authState.User.Claims.ToList();
+
+            string GetClaim(string type) =>
+                claims.FirstOrDefault(c => c.Type.Equals(type, StringComparison.OrdinalIgnoreCase))?.Value ?? "";
+
+            AppUser = new AppUserModel
+            {
+                UserID = authState.User.Identity?.Name ?? "",
+                Password = "",
+                DisplayName = GetClaim("DisplayName"),
+                Designation = GetClaim("Designation"),
+                UserEmail = GetClaim(ClaimTypes.Email),
+                Role = GetClaim(ClaimTypes.Role),
+                LastLogin = GetClaim("LastLogin"),
+                DataFile = GetClaim("DBFile"),
+                Company = GetClaim("Company"),
+                PIN = GetClaim("PIN"),
+                Session = GetClaim("Session"),
+                LanguageID = int.TryParse(GetClaim("LanguageID"), out var language) ? language : 0
+            };
         }
 
         public async Task LogoutAsync()

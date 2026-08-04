@@ -11,7 +11,7 @@
       <am:Name>MSRB</am:Name>
       <am:Version>15.1.30001.02</am:Version>
     </am:UpdatedBy>
-    <am:LastModifiedTimestamp>2026-05-14T10:06:27.8951923Z</am:LastModifiedTimestamp>
+    <am:LastModifiedTimestamp>2026-08-03T22:36:43.9244232Z</am:LastModifiedTimestamp>
   </am:AuthoringMetadata>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -19,7 +19,7 @@
       <rd:SecurityType>Integrated</rd:SecurityType>
       <ConnectionProperties>
         <DataProvider>ODBC</DataProvider>
-        <ConnectString>Dsn=Mumtaz</ConnectString>
+        <ConnectString>Dsn=ABLMall</ConnectString>
         <IntegratedSecurity>true</IntegratedSecurity>
       </ConnectionProperties>
       <rd:DataSourceID>dcc77904-6776-48e7-97b8-e5943727911f</rd:DataSourceID>
@@ -35,21 +35,17 @@
        [CB].[Vou_Date], 
        [CB].[Ref_No], 
        [CB].[COA], 
-       [A].[Title] AS [TitleCOA], 
-       [CB].[Customer], 
-       [C].[Title] AS [TitleCompany], 
+       [CB].[TitleCOA] AS [TitleCOA], 
+       [CB].[Company] AS [Customer], 
+       [CB].[TitleCompany] AS [CompanyName], 
        [CB].[Employee], 
-       [E].[Title] AS [EmployeeName], 
+       [CB].[TitleEmployee] AS [EmployeeName], 
        [CB].[Project], 
-       [P].[Title] [ProjectName], 
+       [CB].[TitleProject] [ProjectName], 
        [CB].[Description], 
        [CB].[DR], 
        [CB].[CR]
-FROM   [CashBook] AS [CB]
-       LEFT JOIN [COA] [A] ON [A].[ID] = [CB].[COA]
-       LEFT JOIN [Customers] [C] ON [C].[ID] = [CB].[Customer]
-       LEFT JOIN [Employees] [E] ON [E].[ID] = [CB].[Employee]
-       LEFT JOIN [Project] [P] ON [P].[ID] = [CB].[Project]</CommandText>
+FROM   [view_Book] AS [CB]</CommandText>
       </Query>
       <Fields>
         <Field Name="Sheet_No">
@@ -82,7 +78,7 @@ FROM   [CashBook] AS [CB]
         </Field>
         <Field Name="CompanyName">
           <rd:TypeName>System.String</rd:TypeName>
-          <DataField>TitleCompany</DataField>
+          <DataField>CompanyName</DataField>
         </Field>
         <Field Name="Employee">
           <rd:TypeName>System.Int32</rd:TypeName>

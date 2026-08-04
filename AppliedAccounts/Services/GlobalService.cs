@@ -2,7 +2,9 @@
 using AppliedDB;
 using AppliedGlobals;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.JSInterop;
+using Org.BouncyCastle.Utilities.Collections;
 using static AppliedGlobals.AppValues;
 
 namespace AppliedAccounts.Services
@@ -12,8 +14,10 @@ namespace AppliedAccounts.Services
         public readonly IConfiguration Config;
         public readonly NavigationManager NavManager;
         public readonly IJSRuntime JS;
-        public Connections Connections;
         public readonly ILogger<GlobalService> MyLogger;
+
+        public Connections Connections;
+        public ProtectedSessionStorage AppStore;
 
         public AppPath AppPaths { get; set; } = new();
         public AuthorClass Author { get; set; } = new();
@@ -41,7 +45,8 @@ namespace AppliedAccounts.Services
             NavigationManager _NavManager,
             IJSRuntime _JS,
             UserAuthenticationStateProvider _StateProvider,
-            ILogger<GlobalService> _logger)
+            ILogger<GlobalService> _logger,
+            ProtectedSessionStorage _sessionStorage)
         {
             Config = _Config;
             NavManager = _NavManager;
@@ -49,6 +54,7 @@ namespace AppliedAccounts.Services
             _authStateProvider = _StateProvider;
             MyLogger = _logger;
             MsgService = new(_Config);
+            AppStore = _sessionStorage;
 
             _ = InitializeAsync();
             InitializeStaticProperties();
@@ -141,6 +147,13 @@ namespace AppliedAccounts.Services
                 ReportTitle = Config.GetValue<string>("Report:ReportTitle") ?? "",
                 ReportLogo = Config.GetValue<string>("Report:ReportLogo") ?? "",
             };
+
+            AppStore.SetAsync("AppPaths", AppPaths);
+            AppStore.SetAsync("Author", Author);
+            AppStore.SetAsync("Language", Language);
+            AppStore.SetAsync("Currency", Currency);
+            AppStore.SetAsync("Reporting", Reporting);  
+
         }
 
         #endregion
@@ -211,6 +224,7 @@ namespace AppliedAccounts.Services
         }
         #endregion
 
+        #region Language Management
         public void SetLanguage(int id)
         {
             if (Language.ID == id)
@@ -220,10 +234,54 @@ namespace AppliedAccounts.Services
             OnLanguageChanged?.Invoke();
         }
 
+        #endregion
+
+        #region Protected Session Storage
+
+        public async Task StoreSaveAsync<T>(string key, T value)
+        {
+            await AppStore.SetAsync(key, value!);
+        }
+
+        public async Task<T?> StoreLoadAsync<T>(string key)
+        {
+            var result = await AppStore.GetAsync<T>(key);
+            return result.Success ? result.Value : default;
+        }
+
+        public async Task<T> StoreLoadAsync<T>(string key, T defaultValue)
+        {
+            var result = await AppStore.GetAsync<T>(key);
+            return result.Success ? result.Value! : defaultValue;
+        }
+
+        public async Task<bool> StoreExistsAsync(string key)
+        {
+            var result = await AppStore.GetAsync<object>(key);
+            return result.Success;
+        }
+
+        public async Task StoreRemoveAsync(string key)
+        {
+            await AppStore.DeleteAsync(key);
+        }
+
+        public async Task StoreClearAsync(params string[] keys)
+        {
+            foreach (var key in keys)
+            {
+                await AppStore.DeleteAsync(key);
+            }
+        }
+
+        #endregion
+
+        #region Dispose Pattern
         public void Dispose()
         {
             _initLock?.Dispose();
             GC.SuppressFinalize(this);
         }
+        #endregion
     }
 }

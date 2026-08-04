@@ -50,7 +50,12 @@
                 "SaleReturn",
                 "StockInHand",
                 "Taxes",
-                "WriteCheques"
+                "WriteCheques",
+                // Data Views
+                "view_Book",
+                "view_BillPayable",
+                "view_BillReceivable",
+                "View_Ledger"
             };
             return tableNames;
         }

@@ -14,7 +14,6 @@ namespace AppliedAccounts.Pages.Users
         private bool IsUserFound { get; set; } = false;
         private string ErrorMessage { get; set; }
         private int LanguageID { get; set; } = 1;                       // Default Language is 1 = English
-        private string DBFile { get; set; } = string.Empty;
 
         public async void Submit()
         {

@@ -1,7 +1,4 @@
 ﻿
-
-using static AppliedDB.Enums;
-
 namespace AppliedDB.CreateDB
 {
     public static class TableQueries
@@ -55,10 +52,12 @@ namespace AppliedDB.CreateDB
                 case "StockInHand": return CreateStockInHand();
                 case "Taxes": return CreateTaxes();
                 case "WriteCheques": return CreateWriteCheques();
+
+                case "view_Book": return CreateViewBook();
                 default: return string.Empty;
             }
         }
-   
+
         public static string CreateBankBook()
         {
             return @"
@@ -748,5 +747,179 @@ namespace AppliedDB.CreateDB
                     );";
         }
 
+
+        // Create Data View
+
+        public static string CreateViewBook()
+        {
+            return @" CREATE VIEW [view_Book] AS 
+                    SELECT
+                    [B1].[ID] AS [ID1],
+                    [B1].[BookID],
+                    [B].[Title] As [TitleBook],
+                    [B1].[Vou_No],
+                    [B1].[Vou_Date],
+                    [B1].[Amount],
+                    [B1].[Ref_No],
+                    [B1].[SheetNo],
+                    [B1].[Remarks],
+                    [B1].[Status],
+                    [B2].[ID] AS [ID2],
+                    [B2].[TranID],
+                    [B2].[SR_NO],
+                    [B2].[COA],
+                    [A].[Title] As [TitleCOA],
+                    [B2].[Company],
+                    [C].[Title] As [TitleCompany],
+                    [B2].[Employee],
+                    [E].[Title] As [TitleEmployee],
+                    [B2].[Project],
+                    [P].[Title] As [TitleProject],
+                    [B2].[DR],
+                    [B2].[CR],
+                    [B2].[Description],
+                    [B2].[Comments]
+                    FROM [Book2] [B2]
+                    LEFT JOIN [Book]      [B1] ON [B1].[ID] = [B2].[TranID]
+                    LEFT JOIN [Customers] [C]  ON  [C].[ID] = [B2].[Company]
+                    LEFT JOIN [COA]       [A]  ON  [A].[ID] = [B2].[COA]
+                    LEFT JOIN [COA]       [B]  ON  [B].[ID] = [B1].[BookID]
+                    LEFT JOIN [Employees] [E]  ON  [E].[ID] = [B2].[Employee]
+                    LEFT JOIN [Project]   [P]  ON  [P].[ID] = [B2].[Project];"
+            ;
+        }
+
+        public static string Createview_BillReceivable()
+        {
+            return @"
+                    CREATE VIEW [view_BillReceivable]
+                    AS
+                    SELECT 
+                           [BillReceivable].[ID] AS [ID], 
+                           [BillReceivable].[ID] AS [ID1], 
+                           [BillReceivable].[Vou_No], 
+                           [BillReceivable].[Vou_Date], 
+                           [BillReceivable].[Company], 
+                           [BillReceivable].[Employee], 
+                           [BillReceivable].[Ref_No], 
+                           [BillReceivable].[Inv_No], 
+                           [BillReceivable].[Inv_Date], 
+                           [BillReceivable].[Pay_Date], 
+                           [BillReceivable].[Amount], 
+                           [BillReceivable].[Description], 
+                           [BillReceivable].[Comments], 
+                           [BillReceivable].[Status], 
+                           [BillReceivable2].[ID] AS [ID2], 
+                           [BillReceivable2].[Sr_No], 
+                           [BillReceivable2].[TranID], 
+                           [BillReceivable2].[Inventory], 
+                           [BillReceivable2].[Batch], 
+                           [BillReceivable2].[Qty], 
+                           [BillReceivable2].[Rate], 
+                           [BillReceivable2].[Tax], 
+                           [BillReceivable2].[Tax_Rate], 
+                           [BillReceivable2].[Description] AS [Description2], 
+                           [BillReceivable2].[Project]
+                    FROM   [BillReceivable]
+                           LEFT JOIN [BillReceivable2] ON [BillReceivable].[ID] = [BillReceivable2].[TranID];";
+        }
+
+        public static string Createview_BillPayable()
+        {
+            return @"
+                    CREATE VIEW [view_BillPayable]
+                    AS
+                    SELECT 
+                           [BillPayable].[ID] AS [ID], 
+                           [BillPayable].[ID] AS [ID1], 
+                           [BillPayable].[Code], 
+                           [BillPayable].[Vou_No], 
+                           [BillPayable].[Vou_Date], 
+                           [BillPayable].[Company], 
+                           [BillPayable].[Employee], 
+                           [BillPayable].[Ref_No], 
+                           [BillPayable].[Inv_No], 
+                           [BillPayable].[Inv_Date], 
+                           [BillPayable].[Pay_Date], 
+                           [BillPayable].[Amount], 
+                           [BillPayable].[Description], 
+                           [BillPayable].[Comments], 
+                           [BillPayable].[Status], 
+                           [BillPayable2].[ID] AS [ID2], 
+                           [BillPayable2].[Sr_No], 
+                           [BillPayable2].[TranID], 
+                           [BillPayable2].[Inventory], 
+                           [BillPayable2].[Batch], 
+                           [BillPayable2].[Qty], 
+                           [BillPayable2].[Rate], 
+                           [BillPayable2].[Tax], 
+                           [BillPayable2].[Tax_Rate], 
+                           [BillPayable2].[Description] AS [Description2], 
+                           [BillPayable2].[Project]
+                    FROM   [BillPayable]
+                           LEFT JOIN [BillPayable2] ON [BillPayable].[ID] = [BillPayable2].[TranID];";
+        }
+
+        public static string Createview_Receipts()
+        {
+            return @"
+                    CREATE VIEW [view_Receipts] AS
+                    SELECT 
+                    [R1].[Vou_No],
+                    [R1].[Vou_Date],
+                    [R1].[COA],
+                    [A1].[Title] AS[TitleCOA],
+                    [R1].[Ref_No], 
+                    [R1].[Payer], 
+                    [R1].[ID] AS[ID1],
+                     [C].[Title] AS[TitlePayer],
+                    [R1].[Doc_No],
+                    [R1].[Doc_Date],
+                    [R1].[Pay_Mode],
+                    [R1].[Amount],
+                    [R1].[Remarks],
+                    [R1].[Comments],
+                    [R1].[Status],
+                    [R2].[ID] AS[ID2],
+                    [R2].[Sr_No],
+                    [R2].[TranID],
+                    [R2].[Ref_No],
+                    [R2].[Account],
+                    [A2].[Title] AS[TitleAccount],
+                    [R2].[DR],
+                    [R2].[CR],
+                    [R2].[Employee],
+                     [E].[Title] AS[TitleEmployee],
+                    [R2].[Project],
+                     [P].[Title] AS[TitleProject],
+                    [R2].[Description]
+                    FROM [Receipt2] [R2]
+                    LEFT JOIN[Receipt]   [R1] ON [R1].[ID] = [R2].[TranID]
+                    LEFT JOIN[COA]       [A1] ON [A1].[ID] = [R1].[COA]
+                    LEFT JOIN[COA]       [A2] ON [A2].[ID] = [R2].[Account]
+                    LEFT JOIN[Customers]  [C] ON  [C].[ID] = [R1].[Payer]
+                    LEFT JOIN[Employees]  [E] ON  [E].[ID] = [R2].[Employee]
+                    LEFT JOIN[Project]    [P] ON  [P].[ID] = [R2].[Project];";
+        }
+
+        public static string Createview_Ledger()
+        {
+            return @"CREATE VIEW [view_Ledger]
+                    AS
+                    SELECT 
+                           [ID], 
+                           [Vou_Type], 
+                           [Vou_Date], 
+                           [Vou_No],
+                           [SR_NO], 
+                           [Description], 
+                           [DR], 
+                           [CR], 
+                           0 AS [BAL],
+                           "" [Status]
+                    FROM   [Ledger]
+                    WHERE  [ID] < 0;
+                    ";
+        }
     }
 }

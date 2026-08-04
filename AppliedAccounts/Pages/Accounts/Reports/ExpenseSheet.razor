@@ -1,5 +1,5 @@
 ﻿@page "/Accounts/Reports/ExpenseSheet"
-
+@attribute [Authorize]
 @using System.Data
 @using AppliedAccounts.Component.ButtonsDictionery
 @using AppliedAccounts.Component.Libs
@@ -8,15 +8,21 @@
 @inject PrintService ReportService
 @inject GlobalService AppGlobal
 
+
+
 @code{
+    private bool IsPrintWait = false;
     protected override void OnInitialized()
     {
         Source = new(AppGlobal.AppPaths);
+        MsgService = AppGlobal.MsgService;
         LoadSheetList();
     }
 }
 
 <PageHeading Text="Expense Sheet List" />
+<ShowPrintWait Visiable="IsPrintWait" />
+<ShowMessages MsgService="MsgService" />
 
 <EditForm Model="MyModel">
     <div class="container text-md-start">

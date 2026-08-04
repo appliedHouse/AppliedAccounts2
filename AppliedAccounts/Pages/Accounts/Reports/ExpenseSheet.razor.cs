@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Data;
+using AppliedAccounts.Services;
 using AppliedDB;
 using SQLQueries;
 using System.Data;
@@ -22,6 +23,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
 
         private DataRow SelectedRow { get; set; }
         private bool IsModalOpen { get; set; } = false;
+        private MessagesService MsgService { get; set; } 
 
         #endregion
 
@@ -29,8 +31,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #region Constructor
         public ExpenseSheet()
         {
-            //Source = new(AppGlobal.AppPaths);
-            //LoadSheetList();
+           
         }
         #endregion
 
@@ -111,16 +112,30 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         {
             try
             {
+                IsPrintWait = true;
+                StateHasChanged();
 
                 ReportService = new(AppGlobal); ;
                 ReportService.ReportType = PrintAction.PrintType;
                 CreateReportModel().Wait();
                 ReportService.Print();
-
+                if(ReportService.IsError)
+                {
+                    Toaster.ShowError(ReportService.MyMessage.Last());
+                }
+                else
+                {
+                    MsgService.Success("Report printed successfully.");
+                }
             }
             catch (Exception ex)
             {
                 Toaster.ShowError(ex.Message);
+            }
+            finally
+            {
+                IsPrintWait = false;
+                StateHasChanged();
             }
         }
 
