@@ -683,15 +683,20 @@ namespace SQLQueries
         {
             var _Text = new StringBuilder();
 
-            _Text.AppendLine("SELECT");
-            _Text.AppendLine("    [B2].[COA],");
-            _Text.AppendLine("    SUM([B2].[DR]) AS [TotalDR],");
-            _Text.AppendLine("    SUM([B2].[CR]) AS [TotalCR],");
-            _Text.AppendLine("    SUM([B2].[DR] - [B2].[CR]) AS [TotalBalance]");
-            _Text.AppendLine("FROM [Book] AS [CB]");
-            _Text.AppendLine("INNER JOIN [Book2] AS [B2] ON [CB].[ID] = [B2].[TranID]");
-            _Text.AppendLine($"WHERE [CB].[SheetNo] = '{SheetNo}'");
-            _Text.AppendLine("GROUP BY [B2].[COA]");
+            _Text.AppendLine("SELECT ");
+            _Text.AppendLine("    [L].*,");
+            _Text.AppendLine("    [A].[Title]");
+            _Text.AppendLine("FROM (");
+            _Text.AppendLine("    SELECT ");
+            _Text.AppendLine("    [SheetNo],");
+            _Text.AppendLine("    [COA],");
+            _Text.AppendLine("    SUM(DR) AS [DR],");
+            _Text.AppendLine("    SUM(CR) AS [CR]");
+            _Text.AppendLine("    FROM [View_book]");
+            _Text.AppendLine($"   WHERE [SheetNo] = '{SheetNo}'");
+            _Text.AppendLine("    GROUP BY [SheetNo], [COA]");
+            _Text.AppendLine(") AS [L]");
+            _Text.AppendLine("LEFT JOIN [COA] AS [A] ON [A].[ID] = [L].[COA]");
 
             return _Text.ToString();
         }

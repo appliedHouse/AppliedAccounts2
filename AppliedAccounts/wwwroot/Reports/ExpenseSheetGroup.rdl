@@ -1,7 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:am="http://schemas.microsoft.com/sqlserver/reporting/authoringmetadata">
-  <rd:ReportUnitType>Inch</rd:ReportUnitType>
-  <rd:ReportID>908cc238-19a9-47b1-a897-6e673af16ea0</rd:ReportID>
   <am:AuthoringMetadata>
     <am:CreatedBy>
       <am:Name>MSRB</am:Name>
@@ -9,19 +7,19 @@
     </am:CreatedBy>
     <am:UpdatedBy>
       <am:Name>MSRB</am:Name>
-      <am:Version>15.1.30001.02</am:Version>
+      <am:Version>15.0.20283.0</am:Version>
     </am:UpdatedBy>
-    <am:LastModifiedTimestamp>2026-05-14T10:12:31.4144642Z</am:LastModifiedTimestamp>
+    <am:LastModifiedTimestamp>2026-08-05T09:29:35.1567760Z</am:LastModifiedTimestamp>
   </am:AuthoringMetadata>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
     <DataSource Name="ds_ExpenseGroup">
-      <rd:SecurityType>Integrated</rd:SecurityType>
       <ConnectionProperties>
         <DataProvider>ODBC</DataProvider>
-        <ConnectString>Dsn=Mumtaz</ConnectString>
+        <ConnectString>Dsn=ABLMall</ConnectString>
         <IntegratedSecurity>true</IntegratedSecurity>
       </ConnectionProperties>
+      <rd:SecurityType>Integrated</rd:SecurityType>
       <rd:DataSourceID>dcc77904-6776-48e7-97b8-e5943727911f</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -29,88 +27,42 @@
     <DataSet Name="ds_ExpenseGroup">
       <Query>
         <DataSourceName>ds_ExpenseGroup</DataSourceName>
+        <CommandText>SELECT 
+    [L].*,
+    [A].[Title]
+FROM (
+    SELECT 
+    [SheetNo],
+    [COA],
+    SUM(DR) AS [DR],
+    SUM(CR) AS [CR]
+    FROM [View_book]
+   WHERE [SheetNo] = '124'
+    GROUP BY [SheetNo], [COA]
+) AS [L]
+LEFT JOIN [COA] AS [A] ON [A].[ID] = [L].[COA]</CommandText>
         <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
-        <CommandText>SELECT [CB].[SheetNo],
-       [CB].[Vou_No], 
-       [CB].[Vou_Date], 
-       [CB].[Ref_No], 
-       [CB].[COA], 
-       [A].[Title] AS [TitleCOA], 
-       [CB].[Customer], 
-       [C].[Title] AS [TitleCompany], 
-       [CB].[Employee], 
-       [E].[Title] AS [EmployeeName], 
-       [CB].[Project], 
-       [P].[Title] [ProjectName], 
-       [CB].[Description], 
-       [CB].[DR], 
-       [CB].[CR]
-FROM   [CashBook] AS [CB]
-       LEFT JOIN [COA] [A] ON [A].[ID] = [CB].[COA]
-       LEFT JOIN [Customers] [C] ON [C].[ID] = [CB].[Customer]
-       LEFT JOIN [Employees] [E] ON [E].[ID] = [CB].[Employee]
-       LEFT JOIN [Project] [P] ON [P].[ID] = [CB].[Project]</CommandText>
       </Query>
       <Fields>
         <Field Name="Sheet_No">
-          <rd:TypeName>System.String</rd:TypeName>
           <DataField>SheetNo</DataField>
-        </Field>
-        <Field Name="Vou_No">
           <rd:TypeName>System.String</rd:TypeName>
-          <DataField>Vou_No</DataField>
-        </Field>
-        <Field Name="Vou_Date">
-          <rd:TypeName>System.DateTime</rd:TypeName>
-          <DataField>Vou_Date</DataField>
-        </Field>
-        <Field Name="Ref_No">
-          <rd:TypeName>System.String</rd:TypeName>
-          <DataField>Ref_No</DataField>
         </Field>
         <Field Name="COA">
-          <rd:TypeName>System.Int32</rd:TypeName>
           <DataField>COA</DataField>
-        </Field>
-        <Field Name="AccountTitle">
-          <rd:TypeName>System.String</rd:TypeName>
-          <DataField>TitleCOA</DataField>
-        </Field>
-        <Field Name="Customer">
           <rd:TypeName>System.Int32</rd:TypeName>
-          <DataField>Customer</DataField>
         </Field>
-        <Field Name="CompanyName">
+        <Field Name="TITLE">
+          <DataField>TITLE</DataField>
           <rd:TypeName>System.String</rd:TypeName>
-          <DataField>TitleCompany</DataField>
-        </Field>
-        <Field Name="Employee">
-          <rd:TypeName>System.Int32</rd:TypeName>
-          <DataField>Employee</DataField>
-        </Field>
-        <Field Name="EmployeeName">
-          <rd:TypeName>System.String</rd:TypeName>
-          <DataField>EmployeeName</DataField>
-        </Field>
-        <Field Name="Project">
-          <rd:TypeName>System.Int32</rd:TypeName>
-          <DataField>Project</DataField>
-        </Field>
-        <Field Name="ProjectName">
-          <rd:TypeName>System.String</rd:TypeName>
-          <DataField>ProjectName</DataField>
-        </Field>
-        <Field Name="Description">
-          <rd:TypeName>System.String</rd:TypeName>
-          <DataField>Description</DataField>
         </Field>
         <Field Name="DR">
-          <rd:TypeName>System.String</rd:TypeName>
           <DataField>DR</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="CR">
-          <rd:TypeName>System.String</rd:TypeName>
           <DataField>CR</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
         </Field>
       </Fields>
       <rd:DataSetInfo>
@@ -150,7 +102,6 @@ FROM   [CashBook] AS [CB]
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox13">
-                          <rd:DefaultName>Textbox13</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -169,6 +120,7 @@ FROM   [CashBook] AS [CB]
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox13</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>Solid</Style>
@@ -206,7 +158,6 @@ FROM   [CashBook] AS [CB]
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox15">
-                          <rd:DefaultName>Textbox15</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -225,6 +176,7 @@ FROM   [CashBook] AS [CB]
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox15</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>Solid</Style>
@@ -262,7 +214,6 @@ FROM   [CashBook] AS [CB]
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox17">
-                          <rd:DefaultName>Textbox17</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -281,6 +232,7 @@ FROM   [CashBook] AS [CB]
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox17</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>Solid</Style>
@@ -318,7 +270,6 @@ FROM   [CashBook] AS [CB]
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox19">
-                          <rd:DefaultName>Textbox19</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -337,6 +288,7 @@ FROM   [CashBook] AS [CB]
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox19</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>Solid</Style>
@@ -379,7 +331,6 @@ FROM   [CashBook] AS [CB]
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Vou_No3">
-                          <rd:DefaultName>Vou_No</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -399,6 +350,7 @@ FROM   [CashBook] AS [CB]
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Vou_No</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>#e5e7eb</Color>
@@ -418,14 +370,13 @@ FROM   [CashBook] AS [CB]
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="AccountTitle3">
-                          <rd:DefaultName>AccountTitle</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!AccountTitle.Value</Value>
+                                  <Value>=Fields!TITLE.Value</Value>
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -439,6 +390,7 @@ FROM   [CashBook] AS [CB]
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>AccountTitle</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>#e5e7eb</Color>
@@ -458,14 +410,13 @@ FROM   [CashBook] AS [CB]
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="DR4">
-                          <rd:DefaultName>DR</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=IIF(IsNothing(Fields!DR.Value), 0, Fields!DR.Value)</Value>
+                                  <Value>=Fields!DR.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>#,0.00;(#,0.00);'-'</Format>
@@ -479,6 +430,7 @@ FROM   [CashBook] AS [CB]
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>DR</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>#e5e7eb</Color>
@@ -498,14 +450,13 @@ FROM   [CashBook] AS [CB]
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="CR3">
-                          <rd:DefaultName>CR</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=IIF(IsNothing(Fields!CR.Value), 0, Fields!CR.Value)</Value>
+                                  <Value>=Fields!CR.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>#,0.00;(#,0.00);'-'</Format>
@@ -519,6 +470,7 @@ FROM   [CashBook] AS [CB]
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>CR</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>#e5e7eb</Color>
@@ -542,8 +494,7 @@ FROM   [CashBook] AS [CB]
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox25">
-                          <rd:DefaultName>Textbox25</rd:DefaultName>
+                        <Textbox Name="Textbox5">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -563,6 +514,7 @@ FROM   [CashBook] AS [CB]
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox5</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -590,7 +542,6 @@ FROM   [CashBook] AS [CB]
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox51">
-                          <rd:DefaultName>Textbox51</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -610,6 +561,7 @@ FROM   [CashBook] AS [CB]
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox51</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -638,7 +590,6 @@ FROM   [CashBook] AS [CB]
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="DR2">
-                          <rd:DefaultName>DR2</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -659,6 +610,7 @@ FROM   [CashBook] AS [CB]
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>DR2</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -684,7 +636,6 @@ FROM   [CashBook] AS [CB]
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox53">
-                          <rd:DefaultName>Textbox53</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -705,6 +656,7 @@ FROM   [CashBook] AS [CB]
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox53</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -778,7 +730,7 @@ FROM   [CashBook] AS [CB]
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>2.88194in</Height>
+        <Height>1.07986in</Height>
         <Style />
       </Body>
       <Width>7.73125in</Width>
@@ -789,7 +741,6 @@ FROM   [CashBook] AS [CB]
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
             <Textbox Name="Textbox1">
-              <rd:DefaultName>Textbox1</rd:DefaultName>
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
@@ -810,6 +761,7 @@ FROM   [CashBook] AS [CB]
                   </Style>
                 </Paragraph>
               </Paragraphs>
+              <rd:DefaultName>Textbox1</rd:DefaultName>
               <Left>0.00001in</Left>
               <Height>0.25in</Height>
               <Width>7.71041in</Width>
@@ -825,7 +777,6 @@ FROM   [CashBook] AS [CB]
               </Style>
             </Textbox>
             <Textbox Name="Textbox2">
-              <rd:DefaultName>Textbox2</rd:DefaultName>
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
@@ -846,6 +797,7 @@ FROM   [CashBook] AS [CB]
                   </Style>
                 </Paragraph>
               </Paragraphs>
+              <rd:DefaultName>Textbox2</rd:DefaultName>
               <Top>0.26389in</Top>
               <Height>0.25in</Height>
               <Width>7.71041in</Width>
@@ -862,7 +814,6 @@ FROM   [CashBook] AS [CB]
               </Style>
             </Textbox>
             <Textbox Name="Textbox3">
-              <rd:DefaultName>Textbox3</rd:DefaultName>
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
@@ -880,6 +831,7 @@ FROM   [CashBook] AS [CB]
                   </Style>
                 </Paragraph>
               </Paragraphs>
+              <rd:DefaultName>Textbox3</rd:DefaultName>
               <Top>0.54167in</Top>
               <Height>0.25in</Height>
               <Width>7.71041in</Width>
@@ -908,7 +860,6 @@ FROM   [CashBook] AS [CB]
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
             <Textbox Name="ExecutionTime">
-              <rd:DefaultName>ExecutionTime</rd:DefaultName>
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
@@ -926,6 +877,7 @@ FROM   [CashBook] AS [CB]
                   </Style>
                 </Paragraph>
               </Paragraphs>
+              <rd:DefaultName>ExecutionTime</rd:DefaultName>
               <Top>0.19792in</Top>
               <Height>0.25in</Height>
               <Width>2in</Width>
@@ -940,7 +892,6 @@ FROM   [CashBook] AS [CB]
               </Style>
             </Textbox>
             <Textbox Name="Textbox4">
-              <rd:DefaultName>Textbox4</rd:DefaultName>
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
@@ -958,8 +909,9 @@ FROM   [CashBook] AS [CB]
                   </Style>
                 </Paragraph>
               </Paragraphs>
+              <rd:DefaultName>Textbox4</rd:DefaultName>
               <Top>0.19792in</Top>
-              <Left>4.54042in</Left>
+              <Left>5.04042in</Left>
               <Height>0.25in</Height>
               <Width>2.65958in</Width>
               <ZIndex>1</ZIndex>
@@ -974,7 +926,6 @@ FROM   [CashBook] AS [CB]
               </Style>
             </Textbox>
             <Textbox Name="Textbox7">
-              <rd:DefaultName>Textbox7</rd:DefaultName>
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
@@ -987,9 +938,12 @@ FROM   [CashBook] AS [CB]
                       </Style>
                     </TextRun>
                   </TextRuns>
-                  <Style />
+                  <Style>
+                    <TextAlign>Center</TextAlign>
+                  </Style>
                 </Paragraph>
               </Paragraphs>
+              <rd:DefaultName>Textbox7</rd:DefaultName>
               <Top>0.19792in</Top>
               <Left>2.9675in</Left>
               <Height>0.25in</Height>
@@ -999,7 +953,7 @@ FROM   [CashBook] AS [CB]
                 <Border>
                   <Style>None</Style>
                 </Border>
-                <VerticalAlign>Middle</VerticalAlign>
+                <VerticalAlign>Top</VerticalAlign>
                 <PaddingLeft>2pt</PaddingLeft>
                 <PaddingRight>2pt</PaddingRight>
                 <PaddingTop>2pt</PaddingTop>
@@ -1097,4 +1051,6 @@ FROM   [CashBook] AS [CB]
       </CellDefinitions>
     </GridLayoutDefinition>
   </ReportParametersLayout>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>908cc238-19a9-47b1-a897-6e673af16ea0</rd:ReportID>
 </Report>

@@ -108,25 +108,22 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             return Rows;
         }
 
-        public void Print(ReportActionClass PrintAction)
+        public async Task Print(ReportActionClass PrintAction)
         {
             try
             {
                 IsPrintWait = true;
-                StateHasChanged();
+                await InvokeAsync(StateHasChanged);
 
                 ReportService = new(AppGlobal); ;
                 ReportService.ReportType = PrintAction.PrintType;
-                CreateReportModel().Wait();
-                ReportService.Print();
-                if(ReportService.IsError)
+                await CreateReportModel();
+                await ReportService.PrintAsync();
+                if (ReportService.IsError)
                 {
-                    Toaster.ShowError(ReportService.MyMessage.Last());
+                    MsgService.Critical(ReportService.MyMessage.Last());
                 }
-                else
-                {
-                    MsgService.Success("Report printed successfully.");
-                }
+                
             }
             catch (Exception ex)
             {
@@ -135,25 +132,32 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             finally
             {
                 IsPrintWait = false;
-                StateHasChanged();
+                await InvokeAsync(StateHasChanged);
             }
         }
 
-        public async void PrintSummary(ReportActionClass PrintAction)
+        public async Task PrintSummary(ReportActionClass PrintAction)
         {
             try
             {
+                IsPrintWait = true;
+                await InvokeAsync(StateHasChanged);
+
                 ReportService = new(AppGlobal); ;
 
                 ReportService.ReportType = PrintAction.PrintType;
 
                 await CreateSummaryReportModel();
-
-                ReportService.Print();
+                await ReportService.PrintAsync();
             }
             catch (Exception ex)
             {
                 Toaster.ShowError(ex.Message);
+            }
+            finally
+            {
+                IsPrintWait = false;
+                await InvokeAsync(StateHasChanged);
             }
         }
 
@@ -165,6 +169,8 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 DataTable ReportTable = ExpenseTable.Copy();
                 ReportService.Data.DataSetName = "ds_ExpenseSheet";
                 ReportService.Data.ReportTable = ReportTable;
+
+                ReportService.Model.ReportDataSource = ReportService.Data;
                 ReportService.Model.InputReport.FileName = "ExpenseSheet.rdl";
                 ReportService.Model.OutputReport.FileName = "ExpenseSheet";
                 ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
@@ -185,6 +191,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 DataTable SummaryTable = Source.GetTable(Quries.ExpenseSheetSummary(SelectedSheetNo));
                 ReportService.Data.DataSetName = "ds_ExpenseGroup";
                 ReportService.Data.ReportTable = SummaryTable;
+                ReportService.Model.ReportDataSource = ReportService.Data;
                 ReportService.Model.InputReport.FileName = "ExpenseSheetGroup.rdl";
                 ReportService.Model.OutputReport.FileName = "ExpenseSheetSummary";
                 ReportService.Model.OutputReport.ReportType = ReportService.ReportType;
