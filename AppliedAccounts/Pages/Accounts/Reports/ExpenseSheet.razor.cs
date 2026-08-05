@@ -51,6 +51,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 if (SheetTable.Count > 0)
                 {
                     SelectedSheetNo = SheetTable[0].Code;
+                    MyModel.SelectedSheetNo = SelectedSheetNo;
                     LoadExpenseSheet();
                 }
 
@@ -215,14 +216,14 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         #endregion
 
         // Helper method to display selected sheet text
-        private string GetSelectedSheetText()
-        {
-            if (string.IsNullOrEmpty(MyModel?.SelectedSheetNo))
-                return null!;
+        //private string GetSelectedSheetText()
+        //{
+        //    if (string.IsNullOrEmpty(MyModel?.SelectedSheetNo))
+        //        return null!;
 
-            var sheet = SheetTable?.FirstOrDefault(s => s.Code == MyModel.SelectedSheetNo);
-            return sheet?.Title ?? MyModel.SelectedSheetNo;
-        }
+        //    var sheet = SheetTable?.FirstOrDefault(s => s.Code == MyModel.SelectedSheetNo);
+        //    return sheet?.Title ?? MyModel.SelectedSheetNo;
+        //}
 
         private void SelectSheet(string code)
         {
@@ -234,8 +235,6 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 StateHasChanged();
             }
         }
-
-
 
         private void OpenPreviewModal(DataRow row)
         {
@@ -260,23 +259,41 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 : string.Empty;
         }
 
-        private decimal GetDecimalValue(DataRow row, string columnName)
+        private string GetDecimalValue(DataRow row, string columnName)
         {
             if (row?.Table?.Columns?.Contains(columnName) == true && row[columnName] != DBNull.Value)
             {
-                return Convert.ToDecimal(row[columnName]);
+                decimal _Value = Convert.ToDecimal(row[columnName]); //  .ToString("N2")
+                if (_Value != 0)
+                {
+                    return Convert.ToDecimal(row[columnName]).ToString("N2");
+                }
+                else
+                {
+                    return string.Empty;
+                }
             }
-            return 0;
+            return string.Empty;
         }
 
-        private DateTime GetDateTimeValue(DataRow row, string columnName)
-        {
-            if (row?.Table?.Columns?.Contains(columnName) == true && row[columnName] != DBNull.Value)
-            {
-                return Convert.ToDateTime(row[columnName]);
-            }
-            return DateTime.Now;
-        }
+
+        //private decimal GetDecimalValue(DataRow row, string columnName)
+        //{
+        //    if (row?.Table?.Columns?.Contains(columnName) == true && row[columnName] != DBNull.Value)
+        //    {
+        //        return Convert.ToDecimal(row[columnName]);
+        //    }
+        //    return 0;
+        //}
+
+        //private DateTime GetDateTimeValue(DataRow row, string columnName)
+        //{
+        //    if (row?.Table?.Columns?.Contains(columnName) == true && row[columnName] != DBNull.Value)
+        //    {
+        //        return Convert.ToDateTime(row[columnName]);
+        //    }
+        //    return DateTime.Now;
+        //}
 
         public class ExpenseSheetModel
         {

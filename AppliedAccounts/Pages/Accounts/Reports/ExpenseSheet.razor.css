@@ -1,14 +1,27 @@
-﻿.expense-page {
-    background: #f4f6f9;
+﻿
+
+/* Optimized CSS */
+:root {
+    --bg: #f4f6f9;
+    --dark: #0f172a;
+    --dark2: #111827;
+    --accent: #6f8d73;
+    --border: #cbd5e1;
+    --light: #f8fafc;
+    --shadow: 0 4px 18px rgba(0,0,0,.08);
+    --radius-sm: 12px;
+    --radius-lg: 18px;
+}
+
+.expense-page {
+    background: var(--bg);
     min-height: 100vh;
     padding-bottom: 30px;
 }
 
-/* TITLE */
-
 .expense-title {
-    background: linear-gradient(90deg, #0f172a, #334155);
-    color: white;
+    background: linear-gradient(90deg,var(--dark),#334155);
+    color: #fff;
     font-size: 28px;
     font-weight: 700;
     text-align: center;
@@ -17,13 +30,11 @@
     margin-bottom: 20px;
 }
 
-/* TOOLBAR */
-
 .expense-toolbar {
-    background: white;
-    border-radius: 18px;
+    background: #fff;
+    border-radius: var(--radius-lg);
     padding: 24px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    box-shadow: var(--shadow);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -31,8 +42,6 @@
     margin-bottom: 22px;
     flex-wrap: wrap;
 }
-
-/* LEFT RIGHT */
 
 .toolbar-side {
     display: flex;
@@ -45,53 +54,41 @@
     align-items: flex-end;
 }
 
-/* LABELS */
-
 .expense-info-item {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.expense-info-label {
+.expense-info-label,
+.expense-company-text,
+.expense-inline-heading {
     font-size: 18px;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--dark);
 }
-
-/* SELECT */
 
 .expense-sheet-select {
     width: 260px;
     height: 46px;
-    border-radius: 12px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
     padding: 0 12px;
 }
-
-/* COMPANY */
-
-.expense-company-text {
-    font-size: 18px;
-    font-weight: 700;
-    color: #0f172a;
-}
-
-/* SEARCH */
 
 .toolbar-center {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
     flex: 1;
-    justify-content: center;
 }
 
 .expense-search-input {
     width: 360px;
     height: 48px;
-    border-radius: 12px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
     padding: 0 14px;
     font-size: 15px;
 }
@@ -99,91 +96,84 @@
 .expense-clear-btn {
     height: 48px;
     min-width: 95px;
-    border-radius: 12px;
+    border-radius: var(--radius-sm);
     font-weight: 600;
 }
-
-/* REPORT BOX */
 
 .expense-report-group {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #f8fafc;
+    background: var(--light);
     border: 1px solid #dbe3ea;
     border-radius: 14px;
     padding: 12px 16px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 10px rgba(0,0,0,.05);
 }
-
-/* HEADING */
-
-.expense-inline-heading {
-    font-size: 18px;
-    font-weight: 700;
-    color: #0f172a;
-}
-
-/* TABLE */
 
 .expense-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
+    background: #fff;
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    border-radius: 18px;
-    background: white;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    box-shadow: var(--shadow);
 }
 
-    /* TABLE HEAD */
-
     .expense-table thead tr {
-        background: #6f8d73;
+        background: var(--accent);
     }
 
     .expense-table thead th {
-        color: white;
+        color: #fff;
         font-size: 15px;
         font-weight: 700;
         padding: 16px;
         text-align: center;
     }
 
-    /* TABLE BODY */
-
     .expense-table tbody td {
-        background: white;
+        background: #fff;
         padding: 15px;
         border-bottom: 1px solid #edf2f7;
         color: #1e293b;
     }
 
-    /* HOVER */
-
     .expense-table tbody tr:hover td {
-        background: #f8fafc;
+        background: var(--light);
     }
 
-    /* FOOTER */
-
     .expense-table tfoot tr {
-        background: linear-gradient(90deg, #0f172a, #111827);
+        background: linear-gradient(90deg,var(--dark),var(--dark2));
     }
 
     .expense-table tfoot th {
-        color: white;
+        color: #fff;
         padding: 18px;
     }
-
-/* COLORS */
 
 .voucher-text {
     color: #2563eb;
     font-weight: 700;
 }
 
+.debit-text,
+.credit-text {
+    font-weight: 700;
+    text-align: right;
+    padding-inline-end: 12px;
+}
+
 .debit-text {
+    color: #0f766e;
+}
+
+.credit-text {
+    color: #dc2626;
+}
+
+/*.debit-text {
     color: #0f766e;
     font-weight: 700;
     text-align: right;
@@ -193,12 +183,9 @@
     color: #dc2626;
     font-weight: 700;
     text-align: right;
-}
-
-/* MOBILE */
+}*/
 
 @media(max-width:1200px) {
-
     .expense-toolbar {
         flex-direction: column;
         align-items: stretch;
@@ -210,5 +197,159 @@
 
     .right-side {
         align-items: flex-start;
+    }
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    z-index: 1040;
+}
+
+.modal {
+    z-index: 1050;
+}
+
+.modal-content {
+    border: none;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 10px 40px rgba(0,0,0,.2);
+}
+
+.modal-header {
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    padding: 1rem 1.5rem;
+}
+
+    .modal-header .modal-title {
+        font-weight: 600;
+    }
+
+.modal-body {
+    padding: 1.5rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.modal .card {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    transition: .2s;
+}
+
+    .modal .card:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+
+.modal .card-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    font-weight: 500;
+    padding: .5rem 1rem;
+}
+
+.modal .card-body {
+    padding: 1rem;
+}
+
+    .modal .card-body dl {
+        margin-bottom: 0;
+    }
+
+    .modal .card-body dt {
+        color: #495057;
+        font-weight: 600;
+    }
+
+    .modal .card-body dd {
+        color: #212529;
+        margin-bottom: .25rem;
+    }
+
+.modal .border-success {
+    border: 2px solid #28a745 !important;
+}
+
+.modal .border-danger {
+    border: 2px solid #dc3545 !important;
+}
+
+.modal .badge {
+    padding: .35rem .75rem;
+    font-weight: 500;
+}
+
+.modal .btn {
+    padding: .4rem 1rem;
+    border-radius: 6px;
+}
+
+    .modal .btn i {
+        margin-right: 6px;
+    }
+
+.modal .table th {
+    font-weight: 600;
+    color: #495057;
+}
+
+.modal .table-striped tbody tr:nth-of-type(odd) {
+    background: rgba(0,0,0,.02);
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: #c1c7cd;
+    border-radius: 3px;
+}
+
+    .modal-body::-webkit-scrollbar-thumb:hover {
+        background: #a8b0b8;
+    }
+
+.btn-outline-primary i {
+    transition: transform .2s;
+}
+
+.btn-outline-primary:hover i {
+    transform: scale(1.1);
+}
+
+@media(max-width:768px) {
+    .modal-dialog {
+        margin: .5rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .modal .card-body dl.row {
+        flex-direction: column;
+    }
+
+    .modal .card-body dt {
+        width: 100%;
+        margin-bottom: .25rem;
+    }
+
+    .modal .card-body dd {
+        width: 100%;
+        margin-bottom: .75rem;
+        padding-left: .5rem;
     }
 }

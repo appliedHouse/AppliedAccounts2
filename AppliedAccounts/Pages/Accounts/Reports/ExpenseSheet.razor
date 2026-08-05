@@ -10,7 +10,7 @@
 
 
 
-@code{
+@code {
     private bool IsPrintWait = false;
     protected override void OnInitialized()
     {
@@ -27,18 +27,18 @@
 <EditForm Model="MyModel">
     <div class="container text-md-start">
         <div class="row">
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <label for="ddExpenseSheet" class="form-label">Expense Sheets</label>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
+            <div class="hstack gap-3">
+                <div class="p-1">Expense Sheets</div>
+                <div class="p-1">
+                    <div class="dropdown" style="width:150px">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-end"
                                 type="button"
                                 id="ddExpenseSheet"
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false">
-                            @(SheetTable?.FirstOrDefault(s => s.Code == MyModel.SelectedSheetNo)?.Title ?? "Select a sheet...")
+                            @(SheetTable?.FirstOrDefault(s => s.Code == MyModel.SelectedSheetNo)?.Title ?? "Select...")
                         </button>
-                        <ul class="dropdown-menu w-100" aria-labelledby="ddExpenseSheet">
+                        <ul class="dropdown-menu w-100 text-start" aria-labelledby="ddExpenseSheet">
                             @if (SheetTable != null && SheetTable.Count > 0)
                             {
                                 @foreach (var item in SheetTable)
@@ -60,31 +60,44 @@
                         </ul>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="d-flex justify-content-end align-items-end gap-2">
-                    <div class="form-floating" style="width:300px;">
-                        <InputText id="txtSearch"
-                                   class="form-control"
-                                   placeholder="Search"
-                                   @bind-Value="SearchText" />
-                        <label for="txtSearch">Search</label>
+                <div class="p-1 ms-auto">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-auto">
+                            <label for="inputSearch" class="col-form-label">Search</label>
+                        </div>
+                        <div class="col-auto">
+                            <InputText id="inputSearch"
+                                       class="form-control"
+                                       @bind-Value="SearchText" />
+                        </div>
                     </div>
-                    <Btn1_Clear OnClick="ClearSearch" />
                 </div>
+
+                <div class="p-1"><Btn1_ClearSearch OnClick="ClearSearch" /></div>
             </div>
         </div>
+
         <div class="row">
+            <div class="hstack gap-1">
+                <div class="p1">Print Sheet</div>
+                <div class="p1"><ReportingButtons ReturnValue="Print" ID="1" /></div>
+                <div class="p1 ms-auto">Print Summary Sheet</div>
+                <div class="p1"><ReportingButtons ReturnValue="PrintSummary" ID="2" /></div>
+            </div>
+        </div>
+
+        @* <div class="row">
             <div class="col-md-3">Print Sheet</div>
             <div class="col-md-3">
                 <ReportingButtons ReturnValue="Print" ID="1" />
             </div>
+
             <div class="col-md-3">Print Summary Sheet</div>
             <div class="col-md-3">
                 <ReportingButtons ReturnValue="PrintSummary" ID="2" />
             </div>
 
-        </div>
+        </div> *@
     </div>
 </EditForm>
 
@@ -99,10 +112,10 @@
                         <th style="width:5%">Voucher</th>
                         <th style="width:5%">Ref No</th>
                         <th style="width:6%">Date</th>
-                        <th style="width:10%">Account</th>
+                        <th style="width:14%">Account</th>
                         <th style="width:10%">Company / Customer</th>
-                        <th style="width:8%" class="amount">Debit</th>
-                        <th style="width:8%" class="amount">Credit</th>
+                        <th style="width:6%" class="amount">Debit</th>
+                        <th style="width:6%" class="amount">Credit</th>
                         <th style="width:15%">Description</th>
                         <th style="width:4%">Action</th>
                     </tr>
@@ -117,9 +130,9 @@
                             <td>@(Convert.ToDateTime(row["Vou_Date"]).ToString("dd-MMM-yyyy"))</td>
                             <td>@row["TitleCOA"]</td>
                             <td>@row["TitleCompany"]</td>
-                            <td class="debit-text right">@Convert.ToDecimal(row["DR"]).ToString("N2")</td>
-                            <td class="credit-text right">@Convert.ToDecimal(row["CR"]).ToString("N2")</td>
-                            <td class="left">@row["Description"]</td>
+                            <td class="debit-text right">@GetDecimalValue(row, "DR")</td>
+                            <td class="credit-text right">@GetDecimalValue(row, "CR")</td>
+                            <td class="left text-truncate" style="max-width: 150px;">@row["Description"]</td>
                             <td>
                                 <button class="btn btn-sm btn-outline-primary"
                                         @onclick="() => OpenPreviewModal(row)"
@@ -320,7 +333,7 @@
 
 <!-- Add Font Awesome or Bootstrap Icons if not already included -->
 
-<style>
+@* <style>
     .modal-backdrop {
         position: fixed;
         top: 0;
@@ -485,4 +498,4 @@
             padding-left: 0.5rem;
         }
     }
-</style>
+</style> *@
