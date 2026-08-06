@@ -1,26 +1,29 @@
-﻿using AppliedAccounts.Data;
+﻿//using AppliedAccounts.Data;
+//using AppliedAccounts.Models;
+//using AppliedDB;
+//using AppReports;
+//using System.Data;
+//using static AppliedGlobals.AppValues;
+//using MESSAGE = AppMessages.Enums.Messages;
+
+using AppliedAccounts.Data;
+using AppliedAccounts.Data.Mapping;
+using AppliedAccounts.Models;
 using AppliedDB;
 using AppReports;
-using System.Data;
-using static AppliedGlobals.AppValues;
-using MESSAGE = AppMessages.Enums.Messages;
+using Menus;
+using Microsoft.JSInterop;
 
 
 namespace AppliedAccounts.Pages.Sale
 {
     public partial class SaleInvoiceList
     {
-        public Models.SaleInvoiceListModel MyModel { get; set; }
+        public SaleInvoiceListModel MyModel { get; set; }
         public ReportModel PrintClass { get; set; }
-        private bool IsPrinted { get; set; } = false;
         private bool IsPrinting { get; set; } = false;
         private List<string> PrintedReports { get; set; } = new();
         public string PrintingMessage { get; set; }
-
-        public SaleInvoiceList()
-        {
-
-        }
 
         #region Delete
         public async void Delete(long ID)
@@ -70,7 +73,7 @@ namespace AppliedAccounts.Pages.Sale
             {
                 try
                 {
-                    var _Text = DateTime.Now.ToString(Format.YMD);
+                    var _Text = DateTime.Now.ToDisplay();
                     var _RandomNo = (new Random()).Next(1000, 9999);
                     var _FileName = $"SalesInvoice_{_Text}_{_RandomNo}";
 
@@ -164,7 +167,6 @@ namespace AppliedAccounts.Pages.Sale
                     }
                 }
                 IsPrinting = false;
-                IsPrinted = true;
                 await InvokeAsync(StateHasChanged);
 
             }
@@ -234,9 +236,9 @@ namespace AppliedAccounts.Pages.Sale
                 ReportService.Model.AddReportParameter("Heading2", _Heading2);
 
             }
-            catch (Exception)
+            catch (Exception error)
             {
-                MyModel.MsgService.Error(MESSAGE.Default);
+                MyModel.MsgService.Error(error);
             }
 
         }

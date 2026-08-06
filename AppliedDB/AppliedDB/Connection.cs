@@ -24,8 +24,8 @@ namespace AppliedDB
         private readonly DatabaseConfig _config;
 
         // Instance properties
-        public AppValues AppGlobals { get; set; }
-        public AppValues.AppPath AppPaths { get; private set; }
+        public AppValues GlobalValues { get; set; }
+        public AppPath AppPaths { get; private set; }
         public string BaseUrl { get; private set; } = string.Empty;
         public string RootPath { get; private set; } = "wwwroot";
         public string UsersPath { get; private set; } = "SQLiteDB";
@@ -52,7 +52,7 @@ namespace AppliedDB
         public Connections(AppValues appValues)
         {
             _config = new DatabaseConfig();
-            AppGlobals = appValues;
+            GlobalValues = appValues;
             InitializeFromAppPaths(appValues.Paths);
             AppPaths = appValues.Paths;
 
@@ -62,7 +62,7 @@ namespace AppliedDB
         {
             _logger = logger;
             _config = new DatabaseConfig();
-            AppGlobals = appValues;
+            GlobalValues = appValues;
             AppPaths = appValues.Paths;
             InitializeFromAppPaths(appValues.Paths);
         }

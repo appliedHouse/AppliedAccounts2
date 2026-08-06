@@ -28,10 +28,6 @@ namespace AppliedDB
 
         #region Constructor
 
-        public DataSource()
-        {
-        }
-
         public DataSource(AppValues.AppPath _AppPaths)
         {
             AppPaths = _AppPaths;
@@ -1359,12 +1355,41 @@ namespace AppliedDB
         #region Count Record
         public int RecordCound(Tables _Table, string _Filter)
         {
-            string _Query = $"SELECT COUNT(*) FROM {_Table} ";
-            _Query += string.IsNullOrEmpty(_Filter) ? "" : $"WHERE {_Filter}";
-            using var command = new SqliteCommand(_Query, MyConnection);
-            if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
-            var result = Convert.ToInt32(command.ExecuteScalar()); MyConnection.Close();
-            return result;
+            try
+            {
+                string _Query = $"SELECT COUNT(*) FROM {_Table} ";
+                _Query += string.IsNullOrEmpty(_Filter) ? "" : $"WHERE {_Filter}";
+                using var command = new SqliteCommand(_Query, MyConnection);
+                if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
+                var result = Convert.ToInt32(command.ExecuteScalar()); MyConnection.Close();
+                return result;
+            }
+            catch (Exception)
+            {
+
+                return 0;
+            }
+            
+        }
+
+        public int RecordCound(string _Query, string _Filter)
+        {
+            try
+            {
+                
+                _Query += string.IsNullOrEmpty(_Filter) ? "" : $"WHERE {_Filter}";
+                _Query = $"SELECT COUNT(*) FROM ({_Query})";
+                using var command = new SqliteCommand(_Query, MyConnection);
+                if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
+                var result = Convert.ToInt32(command.ExecuteScalar()); MyConnection.Close();
+                return result;
+            }
+            catch (Exception)
+            {
+
+                return 0;
+            }
+
         }
         #endregion
 

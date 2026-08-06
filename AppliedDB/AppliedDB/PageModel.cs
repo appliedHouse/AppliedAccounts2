@@ -1,4 +1,6 @@
-﻿namespace AppliedDB
+﻿using System.Data;
+
+namespace AppliedDB
 {
     public class PageModel
     {

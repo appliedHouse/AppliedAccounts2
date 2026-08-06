@@ -4,45 +4,33 @@
 @using AppliedAccounts.Component.Libs
 @using AppliedAccounts.Models
 @using AppliedAccounts.Services
+@using AppliedAccounts.Component.ButtonsDictionery
 
+@inject AuthenticationStateProvider Authorized
 @inject GlobalService AppGlobal
-@inject PrintService ReportService
-@inject HttpClient Http
+@inject IToastService Toaster
 @inject MessagesService MsgService
+@inject PrintService ReportService
+
 
 @code {
-    private Timer MyTime { get; set; }
-    private string CurrentTime { get; set; }
     private bool IsSearchText { get; set; }
     private bool IsRecords { get; set; }
 
     protected override void OnInitialized()
     {
-        try
-        {
-            MyModel = new(AppGlobal, MsgService);
-            IsDataLoad = true;
-        }
-        catch (Exception)
-        {
-            IsDataLoad = false; ;
-        }
-        IsPrinted = false;
+        AppGlobal.Client = ((UserAuthenticationStateProvider)Authorized).AppUser;
+        MyModel = new(AppGlobal);
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private async Task PageChanged()
     {
-        if (IsPrinted) { await DeletePrintedReports(); }
-
-        IsSearchText = string.IsNullOrEmpty(MyModel.SearchText) ? false : true;
-        IsRecords = MyModel.Records.Count == 0 ? true : false;
-
-        MyModel.Pages.PageChanged += OnPageChangedInternal;
+        if (MyModel is null) { return; }
         MyModel.LoadData();
-
+        await InvokeAsync(StateHasChanged);
     }
 
-
+   
     private async void OnPageChangedInternal(int page)
     {
         if (MyModel is null) { return; }
@@ -61,7 +49,7 @@
                     if (File.Exists(FileName)) { File.Delete(FileName); }
                 });
             }
-            IsPrinted = false;
+            IsPrinting = false;
 
         }
     }
@@ -69,154 +57,139 @@
     bool IsDataLoad = false;
     string NoRecordFound = "No Record Found....";
     string NavToNew = $"/Sale/SaleInvoice/New";
+
+    private void Print()
+    {
+        throw new NotImplementedException();
+    }
 }
 
 
-@if (IsDataLoad)
+<PageHeading Text="List of Sale Invoices" />
+<ShowMessages MsgService="@MyModel.MsgService" />
+<ShowPrintWait Visiable="@IsPrinting" />
+
+@if (MyModel.IsPageValid)
 {
-    <PageHeading Text="List of Sale Invoices" />
-    <ShowMessages MsgService="@MyModel.MsgService" />
-    @if (IsPrinting)
-    {
-        <div class="alert alert-info justify-content-center align-items-center" role="alert" style="height:100px">
-            <div class="d-flex align-items-center">
-
-                <div class="p-1">
-                    <div class="spinner-border text-warning" role="status"></div>
-                </div>
-
-                <div class="p-1 text-success">
-                    <i class="bi bi-printer fs-1"></i>
-                </div>
-
-                <div class="p-1 fw-bolder">
-                    @PrintingMessage
-                </div>
-            </div>
-
-        </div>
-    }
-    else
-    {
-        <EditForm Model=@MyModel>
-
-            <div class="container">
-                <div class="d-flex filter">
-                    <div class="p-2 flex-grow-1">
-                        <div class="p-2">
-                            <InputText @bind-Value="@MyModel.SearchText"
-                                       class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
-
-                        </div>
-                    </div>
-                    <div class="p-2">
-                        <button type="button" class="btn btn-primary btn-sm" @onclick="() => MyModel.Search()">Search</button>
-                    </div>
-                    <div class="p-2">
-                        <button type="button" disabled="@IsSearchText" class="btn btn-primary btn-sm" @onclick="() => MyModel.ClearText()">Clear</button>
-                    </div>
-
-                    <div class="p-2">
-                        <button type="submit" disabled="@IsRecords" class="btn-print" @onclick="(() => PrintAll())"><i class="bi bi-printer-fill"></i> Selected</button>
-                        <button type="submit" disabled="@IsRecords" class="btn-print" @onclick="(() => PrintOnePDF())"><i class="bi bi-printer-fill"></i> One PDF</button>
-                    </div>
-
-                </div>
-            </div>
-        </EditForm>
+    <EditForm Model=@MyModel>
 
         <div class="container">
-            <table class="table-list">
-                <thead>
+            <div class="d-flex filter">
+                <div class="p-2 flex-grow-1">
+                    <div class="p-2">
+                        <InputText @bind-Value="@MyModel.SearchText"
+                                   class="form-control input-sm" id="txtVouNo" placeholder="Type here to search" />
+
+                    </div>
+                </div>
+                <div class="p-2">
+                    <button type="button" class="btn btn-primary btn-sm" @onclick="() => MyModel.Search()">Search</button>
+                </div>
+                <div class="p-2">
+                    <button type="button" disabled="@IsSearchText" class="btn btn-primary btn-sm" @onclick="() => MyModel.ClearText()">Clear</button>
+                </div>
+
+                <div class="p-2">
+                    <button type="submit" disabled="@IsRecords" class="btn-print" @onclick="(() => PrintAll())"><i class="bi bi-printer-fill"></i> Selected</button>
+                    <button type="submit" disabled="@IsRecords" class="btn-print" @onclick="(() => PrintOnePDF())"><i class="bi bi-printer-fill"></i> One PDF</button>
+                </div>
+
+            </div>
+        </div>
+    </EditForm>
+
+    <div class="container">
+        <table class="table-list">
+            <thead>
+                <tr>
+                    <th style="width:6%">Sr. No.</th>
+                    <th style="width:12%">Voucher</th>
+                    <th style="width:5%">Ref No</th>
+                    <th style="width:7%">Vou Date</th>
+                    <th style="width:7%">Inv Date</th>
+                    <th style="width:7%">Pay Date</th>
+                    <th style="width:25%">Client</th>
+                    <th style="width:9%">City</th>
+                    <th style="width:10%">Amount</th>
+                    <th style="width:8%" class="td-btn center-btn">
+                        <button id="btnAdd" class="tb-btn-add" @onclick="() => Edit(0)"><i class="bi bi-plus-circle-fill"></i></button>
+                    </th>
+                    <th style="width:4%; justify-items:center">
+                        All
+                        <input type="checkbox" name="selectRow" value="1" @onclick="SelectAll">
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (MyModel.Records.Count > 0)
+                {
+                    var SRNO = 0;
+                    @foreach (SalesRecord _Record in @MyModel.LoadRecords())
+                    {
+                        var _NavTo = $"/Sale/SaleInvoice/{_Record.Id}";
+                        SRNO++;
+
+                        <tr class="tb-body-row">
+                            <td>@SRNO</td>
+                            <td>@_Record.Vou_No</td>
+                            <td>@_Record.Ref_No</td>
+                            <td>@AppFunctions.Date2Text(_Record.Vou_Date)</td>
+                            <td>@AppFunctions.Date2Text(_Record.Inv_Date)</td>
+                            <td>@AppFunctions.Date2Text(_Record.Pay_Date)</td>
+                            <td class="tb-col-left">@_Record.TitleCustomer</td>
+                            <td class="tb-col-left">@_Record.City</td>
+                            <td class="amount">@_Record.Amount.ToString("###,###,##0.00")</td>
+                            <td>
+                                <EditButton NavTo="@_NavTo" Title="Edit" />
+                                <Btn1_Delete OnClick="() => Delete(_Record.Id)" />
+                                @* <button type="submit" class="btn-Del" @onclick="() => Delete(_Record.Id)"><i class="bi bi-trash-fill"></i></button> *@
+
+                                <PrintButton ReturnValue="Print" VoucherID="@_Record.Id" />
+                            </td>
+                            <td class="tb-col-center">
+                                <input type="checkbox" name="selectRow" @bind="_Record.IsSelected">
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
                     <tr>
-                        <th style="width:6%">Sr. No.</th>
-                        <th style="width:12%">Voucher</th>
-                        <th style="width:5%">Ref No</th>
-                        <th style="width:7%">Vou Date</th>
-                        <th style="width:7%">Inv Date</th>
-                        <th style="width:7%">Pay Date</th>
-                        <th style="width:25%">Client</th>
-                        <th style="width:9%">City</th>
-                        <th style="width:10%">Amount</th>
-                        <th style="width:8%" class="td-btn center-btn">
-                            <button id="btnAdd" class="tb-btn-add" @onclick="() => Edit(0)"><i class="bi bi-plus-circle-fill"></i></button>
-                        </th>
-                        <th style="width:4%; justify-items:center">
-                            All
-                            <input type="checkbox" name="selectRow" value="1" @onclick="SelectAll">
-                        </th>
+                        <td colspan="10">@NoRecordFound</td>
                     </tr>
-                </thead>
-                <tbody>
+                }
+
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="amount">@MyModel.TotalAmount.ToString("###,###,##0.00")</td>
                     @if (MyModel.Records.Count > 0)
                     {
-                        var SRNO = 0;
-                        @foreach (SalesRecord _Record in @MyModel.Records)
-                        {
-                            var _NavTo = $"/Sale/SaleInvoice/{_Record.Id}";
-                            SRNO++;
-
-                            <tr class="tb-body-row">
-                                <td>@SRNO</td>
-                                <td>@_Record.Vou_No</td>
-                                <td>@_Record.Ref_No</td>
-                                <td>@AppFunctions.Date2Text(_Record.Vou_Date)</td>
-                                <td>@AppFunctions.Date2Text(_Record.Inv_Date)</td>
-                                <td>@AppFunctions.Date2Text(_Record.Pay_Date)</td>
-                                <td class="tb-col-left">@_Record.TitleCustomer</td>
-                                <td class="tb-col-left">@_Record.City</td>
-                                <td class="amount">@_Record.Amount.ToString("###,###,##0.00")</td>
-                                <td>
-                                    <EditButton NavTo="@_NavTo" Title="Edit" />
-                                    @* <button type="submit" class="btn-Edit" @onclick="()=>Edit(_Record.Id)"><i class="bi bi-pencil-fill"></i></button> *@
-                                    <button type="submit" class="btn-Del" @onclick="() => Delete(_Record.Id)"><i class="bi bi-trash-fill"></i></button>
-
-                                    <PrintButton ReturnValue="Print" VoucherID="@_Record.Id" />
-                                </td>
-                                <td class="tb-col-center">
-                                    <input type="checkbox" name="selectRow" @bind="_Record.IsSelected">
-                                </td>
-
-                            </tr>
-                        }
+                        <td colspan="2" class="bg-light center-txt"><button type="submit" class="btn-print" @onclick="(() => PrintAll())"><i class="bi bi-printer-fill"></i> All</button></td>
                     }
                     else
                     {
-                        <tr>
-                            <td colspan="10">@NoRecordFound</td>
-                        </tr>
+                        <td></td>
                     }
-
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="amount">@MyModel.TotalAmount.ToString("###,###,##0.00")</td>
-                        @if (MyModel.Records.Count > 0)
-                        {
-                            <td colspan="2" class="bg-light center-txt"><button type="submit" class="btn-print" @onclick="(() => PrintAll())"><i class="bi bi-printer-fill"></i> All</button></td>
-                        }
-                        else
-                        {
-                            <td></td>
-                        }
-                    </tr>
-                </tfoot>
-            </table>
-            <div class="d-flex">
-                <div class="p-1" style="height:40px">
-                    <NavPageBar Paging="MyModel.Pages"></NavPageBar>
-                </div>
+                </tr>
+            </tfoot>
+        </table>
+        <div class="d-flex">
+            <div class="p-1" style="height:40px">
+                <NavPageBar Paging="MyModel.Pages"></NavPageBar>
             </div>
         </div>
-    }
+    </div>
+
 }
 else
 {
