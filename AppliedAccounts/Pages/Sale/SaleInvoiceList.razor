@@ -2,9 +2,9 @@
 @attribute [Authorize]
 
 @using AppliedAccounts.Component.Libs
+@using AppliedAccounts.Data.Mapping
 @using AppliedAccounts.Models
 @using AppliedAccounts.Services
-@using AppliedAccounts.Component.ButtonsDictionery
 
 @inject AuthenticationStateProvider Authorized
 @inject GlobalService AppGlobal
@@ -21,23 +21,20 @@
     {
         AppGlobal.Client = ((UserAuthenticationStateProvider)Authorized).AppUser;
         MyModel = new(AppGlobal);
+        MyModel.Pages.PageChanged += OnPageChanged;
+        MyModel.IsPageValid = true;
+
     }
 
-    private async Task PageChanged()
+    private async void OnPageChanged(int newPage)
     {
-        if (MyModel is null) { return; }
-        MyModel.LoadData();
+        // This will be called whenever the page changes
+        MyModel.MyMessage = $"Page changed to: {newPage}";
+        Console.WriteLine($"Page changed to: {newPage}");
+        MyModel.Records = MyModel.LoadData();
         await InvokeAsync(StateHasChanged);
     }
-
    
-    private async void OnPageChangedInternal(int page)
-    {
-        if (MyModel is null) { return; }
-        MyModel.LoadData();
-        await InvokeAsync(StateHasChanged);
-    }
-
     private async Task DeletePrintedReports()
     {
         if (PrintedReports.Count > 0)
@@ -68,6 +65,7 @@
 <PageHeading Text="List of Sale Invoices" />
 <ShowMessages MsgService="@MyModel.MsgService" />
 <ShowPrintWait Visiable="@IsPrinting" />
+<ShowWaiting MyMessage="@MyModel.MyMessage" />
 
 @if (MyModel.IsPageValid)
 {
@@ -124,7 +122,7 @@
                 @if (MyModel.Records.Count > 0)
                 {
                     var SRNO = 0;
-                    @foreach (SalesRecord _Record in @MyModel.LoadRecords())
+                    @foreach (SalesRecord _Record in @MyModel.Records)
                     {
                         var _NavTo = $"/Sale/SaleInvoice/{_Record.Id}";
                         SRNO++;
@@ -133,17 +131,15 @@
                             <td>@SRNO</td>
                             <td>@_Record.Vou_No</td>
                             <td>@_Record.Ref_No</td>
-                            <td>@AppFunctions.Date2Text(_Record.Vou_Date)</td>
-                            <td>@AppFunctions.Date2Text(_Record.Inv_Date)</td>
-                            <td>@AppFunctions.Date2Text(_Record.Pay_Date)</td>
+                            <td>@_Record.Vou_Date.ToDisplay()</td>
+                            <td>@_Record.Inv_Date.ToDisplay()</td>
+                            <td>@_Record.Pay_Date.ToDisplay()</td>
                             <td class="tb-col-left">@_Record.TitleCustomer</td>
                             <td class="tb-col-left">@_Record.City</td>
                             <td class="amount">@_Record.Amount.ToString("###,###,##0.00")</td>
                             <td>
                                 <EditButton NavTo="@_NavTo" Title="Edit" />
-                                <Btn1_Delete OnClick="() => Delete(_Record.Id)" />
-                                @* <button type="submit" class="btn-Del" @onclick="() => Delete(_Record.Id)"><i class="bi bi-trash-fill"></i></button> *@
-
+                                <Btn_Delete OnClick="() => Delete(_Record.Id)" />
                                 <PrintButton ReturnValue="Print" VoucherID="@_Record.Id" />
                             </td>
                             <td class="tb-col-center">

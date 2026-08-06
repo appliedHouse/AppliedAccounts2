@@ -1,10 +1,8 @@
-﻿using AppliedAccounts.Pages.Accounts;
-using AppliedAccounts.Services;
+﻿using AppliedAccounts.Services;
 using AppliedDB;
 using AppReports;
 using System.Data;
 using static AppliedDB.Enums;
-using static AppliedGlobals.AppValues;
 
 namespace AppliedAccounts.Models
 {
@@ -15,6 +13,7 @@ namespace AppliedAccounts.Models
         public string DBFile { get; set; } = string.Empty;
         public SalesRecord Record { get; set; } = new();
         public List<SalesRecord> Records { get; set; } = new();
+        public List<SalesRecord> PrintingRecords { get; set; } = new();
         public DataTable Data { get; set; } = new();
         public PageModel Pages { get; set; } = new();
 
@@ -24,17 +23,19 @@ namespace AppliedAccounts.Models
         public long VoucherID { get; set; }
         public string SearchText { get; set; } = string.Empty;
         public string Filter { get; set; } = string.Empty;
-        public bool IsPageValid { get; set; } = true;
+        public bool IsPageValid { get; set; } = false;
+        public string MyMessage { get; set; } = string.Empty;
+
 
 
         #region Constructor
         public SaleInvoiceListModel(GlobalService appGlobal)
         {
+            
             appGlobal.AppPaths.DBFile = appGlobal.Client.DataFile;
 
-            if(appGlobal.DBFile.Length == 0)
+            if (appGlobal.DBFile.Length == 0)
             {
-                IsPageValid = false;
                 appGlobal.MsgService.Critical("Database file is not set. Please set the database file path.");
                 return;
             }
@@ -43,23 +44,27 @@ namespace AppliedAccounts.Models
                 AppGlobal = appGlobal;
                 Source = new(AppGlobal.AppPaths);
                 MsgService = AppGlobal.MsgService;
-                LoadData();
+                Records = LoadData();
             }
+
+            IsPageValid = true;
         }
-        
+
         #endregion
 
         #region Load Data
-
-        public void LoadData()
+        public List<SalesRecord> LoadData()
         {
-            var _Query = SQLQuery.SaleInvoiceList();
-            var _Sort = "Vou_Date, Vou_No";
-
-            if (!string.IsNullOrWhiteSpace(SearchText))
+            try
             {
-                string[] columns =
+                MyMessage = "Loading data...";
+                var _Query = SQLQuery.SaleInvoiceList();
+                var _Sort = "Vou_Date, Vou_No";
+
+                if (!string.IsNullOrWhiteSpace(SearchText))
                 {
+                    string[] columns =
+                    {
                     "Company",
                     "Salesman",
                     "City",
@@ -70,17 +75,30 @@ namespace AppliedAccounts.Models
                     "Pay_Date"
                 };
 
-                Filter = string.Join(" OR ", columns.Select(c => $"{c} like '%{SearchText}%'"));
+                    Filter = string.Join(" OR ", columns.Select(c => $"{c} like '%{SearchText}%'"));
+                }
+                else
+                {
+                    Filter = string.Empty;
+                }
+
+                Data = Source!.GetTable(_Query, Filter, _Sort + Pages.GetLimit());
+                Records = [.. Data.AsEnumerable().Select(row => GetRecord(row))];
+                Pages.Refresh(Source.RecordCound(_Query, Filter));
+                MyMessage = string.Empty;
+                return Records;
             }
-            else
+            catch (Exception)
             {
-                Filter = string.Empty;
+                MyMessage = "Error loading data. Please check the database connection and query.";
+                return [];
             }
+        }
 
-            Data = Source!.GetTable(_Query, Filter, _Sort + Pages.GetLimit());
-            Records = Data.AsEnumerable().Select(row => GetRecord(row)).ToList();
-            Pages.Refresh(Source.RecordCound(_Query, Filter));
-
+        public List<SalesRecord> PrintData()
+        {
+            var _Data = Source!.GetTable(SQLQuery.SaleInvoiceList(), Filter);
+            return [.. _Data.AsEnumerable().Select(row => GetRecord(row))];
         }
         #endregion
 
@@ -136,23 +154,17 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Search
-        public async void Search()
-        {
-            await Task.Run(() => LoadData());
-
-        }
-
-        public async void ClearText()
-        {
-            SearchText = string.Empty;
-            await Task.Run(() => LoadData());
-        }
-
-        internal List<SalesRecord> LoadRecords()
+        public void Search()
         {
             LoadData();
-            return Records;
         }
+
+        public void ClearText()
+        {
+            SearchText = string.Empty;
+            LoadData();
+        }
+
         #endregion
 
     }

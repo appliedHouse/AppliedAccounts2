@@ -1,18 +1,9 @@
-﻿//using AppliedAccounts.Data;
-//using AppliedAccounts.Models;
-//using AppliedDB;
-//using AppReports;
-//using System.Data;
-//using static AppliedGlobals.AppValues;
-//using MESSAGE = AppMessages.Enums.Messages;
-
+﻿
 using AppliedAccounts.Data;
 using AppliedAccounts.Data.Mapping;
 using AppliedAccounts.Models;
 using AppliedDB;
 using AppReports;
-using Menus;
-using Microsoft.JSInterop;
 
 
 namespace AppliedAccounts.Pages.Sale
@@ -58,14 +49,27 @@ namespace AppliedAccounts.Pages.Sale
         public async void PrintOnePDF()
         {
             IsPrinting = true;
+            MyModel.MsgService.Clear();
             PrintingMessage = "Wait.... Printing all invoices are in one PDF is being generated.";
             await InvokeAsync(StateHasChanged);
             await Task.Delay(500);
+            
+            if(MyModel.Filter.Length == 0)
+            {
+
+                IsPrinting = false;
+                MyModel.MsgService.Warning("Records must be filtered.");
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            MyModel.PrintingRecords = MyModel.PrintData();
+            MyModel.PrintingRecords.ForEach(e => e.IsSelected = true);
 
             List<long> SaleInvoiceIDList = new List<long>();
 
 
-            foreach (var item in MyModel.Records)
+            foreach (var item in MyModel.PrintingRecords)
             {
                 if (item.IsSelected) { SaleInvoiceIDList.Add(item.Id); }
             }
@@ -224,7 +228,7 @@ namespace AppliedAccounts.Pages.Sale
                 var _Heading2 = $"Invoice No. {_InvoiceNo}";
                 var _ReportOption = ReportType.Excel;
 
-
+                ReportService.Model.ReportDataSource = ReportService.Data;
                 // Input Parameters  (.rdl report file)
                 ReportService.Model.InputReport.FileName = "CDCInvOnePDF.rdl";
 
