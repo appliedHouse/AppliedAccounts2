@@ -99,23 +99,20 @@ namespace AppliedAccounts.Services
             return false;
         }
 
-        public void Print()
+        public async Task Print()
         {
             try
             {
-                Task.Run(async () =>
+                var result = await PrintAsync();
+
+                if (!result)
                 {
-                    var _result = await PrintAsync();  
-                    if(_result)
-                    {
-                        MsgService.Success("Report printed failed.");
-                    }
-                });
+                    MsgService.Success("Report printed successfully.");
+                }
             }
-            catch (Exception ex) // ← Catches the actual exception
+            catch (Exception ex)
             {
                 MsgService.Error($"Error: {ex.Message}");
-                Console.WriteLine($"Caught: {ex.Message}");
             }
         }
 

@@ -39,7 +39,7 @@ namespace AppliedAccounts.Pages.Sale
 
         public void SelectOne(long _ID)
         {
-            var item = MyModel.Records.Where(a => a.Id == _ID).First();
+            var item = MyModel.Records.First(a => a.Id == _ID);
             item.IsSelected = !item.IsSelected;
         }
         #endregion
