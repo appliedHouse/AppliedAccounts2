@@ -135,6 +135,11 @@
         }
     }
     #endregion
+
+    private void OpenEncrypt()
+    {
+        AppGlobals.NavManager.NavigateTo("/Setting/Encrypt");
+    }
 }
 
 <div class="offcanvas offcanvas-end"
@@ -170,6 +175,9 @@
                     <i class="bi bi-gear me-2"></i>Reset Password
                 </button>
 
+                <button class="btn btn-primary" @onclick="OpenEncrypt">
+                    <i class="bi bi-gear me-2"></i>Password Encrypt
+                </button>
                 <!-- Configuration Page Button -->
                 <button class="btn btn-outline-danger" @onclick="NavigateToConfig">
                     <i class="bi bi-box-arrow-right me-2"></i>Configuration Page

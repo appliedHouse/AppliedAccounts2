@@ -1029,25 +1029,28 @@ namespace AppliedDB
             return _Table;
         }
 
-
-
         public List<CodeTitle> GetBookAccounts(long NatureID)
         {
             // Get Book Account list from COA.
+
+            List<CodeTitle> EmptyList = new() { new CodeTitle { ID = 0, Code = "", Title = "No Records" } };
             if (NatureID > 0)
             {
-                return GetTable(Tables.COA, $"Nature={NatureID}", "Title").AsEnumerable().ToList().
+                var _List =GetTable(Tables.COA, $"Nature={NatureID}", "Title").AsEnumerable().ToList().
                     Select(rows => new CodeTitle
                     {
                         ID = rows.Field<long>("ID"),
                         Code = rows.Field<string>("Code") ?? "",
                         Title = rows.Field<string>("Title") ?? ""
                     }).ToList();
-            }
-            List<CodeTitle> EmptyList = new();
-            EmptyList.Add(new CodeTitle { ID = 0, Code = "", Title = "No Records" });
-            return EmptyList;
 
+                if(_List == null || _List.Count == 0)
+                {
+                    _List = EmptyList;
+                }
+                return _List;
+            }
+            return EmptyList;
         }
 
 

@@ -1,39 +1,376 @@
 ﻿@page "/SettingBackup"
-
+@using Microsoft.AspNetCore.SignalR.Client
 @inject IJSRuntime JS
 @inject GlobalService AppGlobals
+@inject FTPBackupService BackupService
+@inject ToastService Toaster
+@inject NavigationManager NavigationManager
 
-@code {
-   
-    [Parameter] public string ModelName { get; set; }
-
-    private void Backup()
-    {
-        throw new NotImplementedException();
-    }
-
-    private void Restore()
-    {
-        throw new NotImplementedException();
-    }
+@if (_isBackingUp)
+{
+    <ShowWaiting MyMessage="Backing up..." />
 }
 
 <div class="modal fade" id="@ModelName" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">Backup Setting</h5>
+                <h5 class="modal-title">
+                    <i class="fas fa-database me-2"></i>Backup & Restore
+                </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="d-flex gap-2 flex-wrap">
-                    <button type="button" class="btn btn-primary" @onclick="Backup">Backup</button>
-                    <button type="button" class="btn btn-secondary" @onclick="Restore">Restore</button>
+                <!-- Controls -->
+                <div class="d-flex gap-2 flex-wrap mb-3 align-items-center">
+                    <button type="button" class="btn btn-primary" @onclick="Backup" disabled="@_isBackingUp">
+                        @if (_isBackingUp)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        }
+                        <i class="fas fa-cloud-upload-alt me-1"></i> Backup
+                    </button>
+                    <button type="button" class="btn btn-secondary" @onclick="Restore" disabled="@_isBackingUp">
+                        <i class="fas fa-cloud-download-alt me-1"></i> Restore
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" @onclick="ClearLogs">
+                        <i class="fas fa-eraser me-1"></i> Clear Logs
+                    </button>
+                    <button type="button" class="btn btn-outline-info" @onclick="ExportLogs">
+                        <i class="fas fa-download me-1"></i> Export
+                    </button>
+
+                    <span class="ms-2 align-self-center">
+                        <span class="badge @GetStatusBadgeClass()">@_statusMessage</span>
+                    </span>
+
+                    @if (!_isConnected)
+                    {
+                        <span class="badge bg-warning ms-2">Reconnecting...</span>
+                    }
+                </div>
+
+                <!-- Log Statistics -->
+                <div class="row mb-2">
+                    <div class="col">
+                        <span class="text-muted small">
+                            <i class="fas fa-list-ul me-1"></i>Logs: @_logs.Count |
+                            <span class="text-danger"><i class="fas fa-times-circle me-1"></i>Errors: @_logs.Count(l => l.Level == "Error")</span> |
+                            <span class="text-warning"><i class="fas fa-exclamation-triangle me-1"></i>Warnings: @_logs.Count(l => l.Level == "Warning")</span> |
+                            <span class="text-success"><i class="fas fa-check-circle me-1"></i>Success: @_logs.Count(l => l.Level == "Success")</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Logs Display -->
+                <div id="logContainer" class="border rounded p-2 bg-dark text-light" style="height: 400px; overflow-y: auto; font-family: 'Consolas', 'Courier New', monospace; font-size: 13px;">
+                    @if (_logs.Any())
+                    {
+                        @foreach (var log in _logs)
+                        {
+                            <div class="log-line @GetLogClass(log.Level)">
+                                <span class="text-muted timestamp">[@log.Timestamp.ToString("HH:mm:ss.fff")]</span>
+                                <span class="level-@log.Level.ToLower()">[ @log.Level.ToUpper() ]</span>
+                                <span class="message">@log.Message</span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>No logs available. Click Backup to start.
+                        </div>
+                    }
+                </div>
+
+                <!-- Auto-scroll toggle -->
+                <div class="mt-2 d-flex align-items-center">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" @bind="_autoScroll" id="autoScroll" />
+                        <label class="form-check-label small text-muted" for="autoScroll">
+                            <i class="fas fa-arrow-down me-1"></i>Auto-scroll to latest
+                        </label>
+                    </div>
+                    <span class="ms-3 text-muted small">
+                        <i class="fas fa-plug me-1"></i>SignalR: @(_isConnected ? "🟢 Connected" : "🔴 Disconnected")
+                    </span>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Close
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .log-line {
+        padding: 2px 4px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+
+        .log-line:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+    .timestamp {
+        opacity: 0.7;
+    }
+
+    .level-info {
+        color: #0dcaf0;
+    }
+
+    .level-success {
+        color: #28a745;
+    }
+
+    .level-warning {
+        color: #ffc107;
+    }
+
+    .level-error {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .text-warning {
+        color: #ffc107 !important;
+    }
+
+    .text-success {
+        color: #28a745 !important;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+
+    .text-light {
+        color: #f8f9fa !important;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+</style>
+
+@code {
+    [Parameter] public string? ModelName { get; set; }
+
+    private bool _isBackingUp = false;
+    private string _statusMessage = "Ready";
+    private bool _autoScroll = true;
+    private bool _isConnected = false;
+    private HubConnection? _hubConnection;
+
+    private List<LogEntry> _logs = new();
+
+    public class LogEntry
+    {
+        public string Message { get; set; } = string.Empty;
+        public string Level { get; set; } = "Info";
+        public DateTime Timestamp { get; set; } = DateTime.Now;
+    }
+
+    protected override void OnInitialized()
+    {
+        ModelName ??= "settingBackup";
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await InitializeSignalR();
+        }
+
+        // Auto-scroll to bottom
+        if (_autoScroll && _logs.Any())
+        {
+            try
+            {
+                await JS.InvokeVoidAsync("scrollToBottom", "logContainer");
+            }
+            catch { /* Ignore */ }
+        }
+    }
+
+    private async Task InitializeSignalR()
+    {
+        try
+        {
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/loghub"))
+                .WithAutomaticReconnect(new RetryPolicy())
+                .Build();
+
+            _hubConnection.On<string, string, DateTime>("ReceiveLog", (message, level, timestamp) =>
+            {
+                InvokeAsync(() =>
+                {
+                    _logs.Add(new LogEntry
+                    {
+                        Message = message,
+                        Level = level,
+                        Timestamp = timestamp
+                    });
+
+                    // Keep only last 1000 logs
+                    if (_logs.Count > 1000)
+                    {
+                        _logs.RemoveRange(0, _logs.Count - 1000);
+                    }
+
+                    // Update status based on logs
+                    if (level == "Error")
+                    {
+                        _statusMessage = "Error occurred";
+                    }
+                    else if (level == "Success" && message.Contains("completed"))
+                    {
+                        _statusMessage = "Backup completed";
+                    }
+                    else if (level == "Info" && message.Contains("Starting"))
+                    {
+                        _statusMessage = "Backup in progress...";
+                    }
+
+                    StateHasChanged();
+                });
+            });
+
+            _hubConnection.Closed += async (error) =>
+            {
+                _isConnected = false;
+                await InvokeAsync(StateHasChanged);
+            };
+
+            _hubConnection.Reconnected += async (connectionId) =>
+            {
+                _isConnected = true;
+                await InvokeAsync(StateHasChanged);
+            };
+
+            _hubConnection.Reconnecting += async (error) =>
+            {
+                _isConnected = false;
+                await InvokeAsync(StateHasChanged);
+            };
+
+            await _hubConnection.StartAsync();
+            _isConnected = true;
+
+            _logs.Add(new LogEntry
+            {
+                Message = "✅ Connected to real-time log server",
+                Level = "Success",
+                Timestamp = DateTime.Now
+            });
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _logs.Add(new LogEntry
+            {
+                Message = $"❌ Failed to connect to log server: {ex.Message}",
+                Level = "Error",
+                Timestamp = DateTime.Now
+            });
+            _isConnected = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task Backup()
+    {
+        if (_isBackingUp) return;
+
+        _isBackingUp = true;
+        _statusMessage = "Backing up...";
+        StateHasChanged();
+
+        try
+        {
+            await BackupService.PerformBackupAsync();
+            Toaster.ShowSuccess("Backup completed successfully.");
+        }
+        catch (Exception ex)
+        {
+            _statusMessage = $"Backup failed: {ex.Message}";
+            Toaster.ShowError($"Backup failed: {ex.Message}");
+        }
+        finally
+        {
+            _isBackingUp = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task Restore()
+    {
+        Toaster.ShowInfo("Restore functionality coming soon.");
+        await Task.CompletedTask;
+    }
+
+    private void ClearLogs()
+    {
+        _logs.Clear();
+        _statusMessage = "Logs cleared";
+        StateHasChanged();
+    }
+
+    private async Task ExportLogs()
+    {
+        var logText = string.Join("\n", _logs.Select(l =>
+            $"[{l.Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{l.Level.ToUpper()}] {l.Message}"));
+
+        await JS.InvokeVoidAsync("downloadTextFile", $"backup_logs_{DateTime.Now:yyyyMMdd_HHmmss}.txt", logText);
+        Toaster.ShowSuccess("Logs exported successfully.");
+    }
+
+    private string GetLogClass(string level)
+    {
+        return level?.ToLower() switch
+        {
+            "error" => "text-danger",
+            "warning" => "text-warning",
+            "success" => "text-success",
+            _ => "text-light"
+        };
+    }
+
+    private string GetStatusBadgeClass()
+    {
+        return _statusMessage switch
+        {
+            var s when s.Contains("completed") || s.Contains("success") => "bg-success",
+            var s when s.Contains("failed") || s.Contains("error") => "bg-danger",
+            var s when s.Contains("Backing up") || s.Contains("in progress") => "bg-warning text-dark",
+            _ => "bg-secondary"
+        };
+    }
+
+    private class RetryPolicy : IRetryPolicy
+    {
+        public TimeSpan? NextRetryDelay(RetryContext retryContext)
+        {
+            // Exponential backoff: 2, 4, 8, 16, 32 seconds
+            var delay = Math.Min(32, Math.Pow(2, retryContext.PreviousRetryCount + 1));
+            return TimeSpan.FromSeconds(delay);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
+    }
+}

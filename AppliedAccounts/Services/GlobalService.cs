@@ -302,6 +302,12 @@ namespace AppliedAccounts.Services
             _initLock?.Dispose();
             GC.SuppressFinalize(this);
         }
+
+        internal string GetDatabasePath()
+        {
+            string _Path = Path.Combine(Directory.GetCurrentDirectory(),  AppPaths.RootPath, AppPaths.ClientPath);
+            return _Path;
+        }
         #endregion
     }
 }

@@ -3,14 +3,14 @@ using System.Net;
 
 public class BackupByFTP : BackgroundService
 {
-    private readonly ILogger<DatabaseBackupService> _logger;
+    private readonly ILogger<BackupByFTP> _logger;
     private readonly string _dbFolder = @"C:\inetpub\wwwroot\AppliedDB"; // Your SQLite DB folder
     private readonly string _backupTemp = @"C:\BackupTemp"; // Temporary backup folder
     private readonly string _ftpHost = "ftp.jahangir.com"; // FTP server
     private readonly string _ftpUser = "ftpusername";       // FTP username
     private readonly string _ftpPass = "ftppassword";       // FTP password
 
-    public BackupByFTP(ILogger<DatabaseBackupService> logger)
+    public BackupByFTP(ILogger<BackupByFTP> logger)
     {
         _logger = logger;
     }
