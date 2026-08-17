@@ -102,6 +102,12 @@ namespace AppMessages
         {
             Errors.Add(GetMessage(_Code, Class.Error));
         }
+
+        public void Error(Exception error)
+        {
+            Errors.Add(GetMessage(error.Message, Class.Error));
+        }
+
         #endregion
 
         #region Danger

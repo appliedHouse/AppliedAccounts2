@@ -41,7 +41,7 @@ namespace AppliedDB.CreateDB
                 MyConnection = new SqliteConnection(connectionString);
 
                 // Open the connection
-                await MyConnection.OpenAsync();
+                MyConnection.Open();
 
                 if (MyConnection.State == System.Data.ConnectionState.Open)
                 {
@@ -97,7 +97,6 @@ namespace AppliedDB.CreateDB
                     {
                         status = "Failed";
                         Log.AppendLine($"Failed to create table {tableName}.");
-                        
                     }
                 }
                 else

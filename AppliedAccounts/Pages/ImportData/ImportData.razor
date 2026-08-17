@@ -1,0 +1,45 @@
+﻿@page "/ImportData"
+
+@using AppliedAccounts.Component.Libs
+@using AppliedAccounts.Services
+@using ToastNotificationLibrary.Services
+@using AppliedDB
+
+@inject GlobalService AppGlobals
+@inject NavigationManager NavManager
+@inject ToastService Toaster
+@inject IJSRuntime JSRuntime
+
+@code {
+    private DataSource? Source { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Source = new(AppGlobals.AppPaths);
+    }
+}
+
+<PageHeading Text="Import Data" />
+
+<div class="container">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-accounts" data-bs-toggle="tab" data-bs-target="#tab-accounts-pane" type="button" role="tab" aria-controls="tab-accounts-pane" aria-selected="true">Accounts</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-Stock" data-bs-toggle="tab" data-bs-target="#tab-Stock-pane" type="button" role="tab" aria-controls="tab-Stock-pane" aria-selected="false">Inventory</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-StockPrice" data-bs-toggle="tab" data-bs-target="#tab-StockPrice-pane" type="button" role="tab" aria-controls="tab-StockPrice-pane" aria-selected="false">Inventory Price</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="tab-accounts-pane" role="tabpanel" aria-labelledby="tab-accounts" tabindex="0">
+            <ImportCOA></ImportCOA>
+        </div>
+        <div class="tab-pane fade" id="tab-Stock-pane" role="tabpanel" aria-labelledby="tab-Stock" tabindex="0">
+            <ImportStock></ImportStock>
+        </div>
+        <div class="tab-pane fade" id="tab-StockPrice-pane" role="tabpanel" aria-labelledby="tab-StockPrice" tabindex="0">3</div>
+    </div>
+</div>

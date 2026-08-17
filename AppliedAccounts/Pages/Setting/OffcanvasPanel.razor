@@ -15,16 +15,16 @@
         {
             if (firstRender)
             {
-                await AppGlobals.JS.InvokeVoidAsync("initializeOffcanvas", "offcanvasRight");
+                await JS.InvokeVoidAsync("initializeOffcanvas", "offcanvasRight");
             }
 
             if (IsOpen)
             {
-                await AppGlobals.JS.InvokeVoidAsync("openOffcanvas", "offcanvasRight");
+                await JS.InvokeVoidAsync("openOffcanvas", "offcanvasRight");
             }
             else
             {
-                await AppGlobals.JS.InvokeVoidAsync("closeOffcanvas", "offcanvasRight");
+                await JS.InvokeVoidAsync("closeOffcanvas", "offcanvasRight");
             }
         }
         catch (Exception)
@@ -88,6 +88,19 @@
             JS.InvokeVoidAsync("closeOffcanvas", "offcanvasRight");
             JS.InvokeVoidAsync("openModal", "Setting2");
             AppGlobals.NavManager.NavigateTo("/SettingGeneral");
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+
+    private void OpenImportData()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("closeOffcanvas", "offcanvasRight");
+            AppGlobals.NavManager.NavigateTo("/ImportData");
         }
         catch (Exception)
         {
@@ -173,6 +186,10 @@
 
                 <button class="btn btn-primary" @onclick="OpenResetPassword">
                     <i class="bi bi-gear me-2"></i>Reset Password
+                </button>
+
+                <button class="btn btn-primary" @onclick="OpenImportData">
+                    <i class="bi bi-gear me-2"></i>Import Data
                 </button>
 
                 <button class="btn btn-primary" @onclick="OpenEncrypt">
