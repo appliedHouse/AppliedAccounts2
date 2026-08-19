@@ -72,9 +72,9 @@ namespace AppliedAccounts.Pages.Accounts
         #endregion
 
         #region Delete record and Voucher
-        private void DeleteVoucher(long VoucherID)
+        private async Task DeleteVoucher(long VoucherID)
         {
-            if (MyModel.DeleteAll(VoucherID))
+            if (await MyModel.DeleteAll(VoucherID))
             {
                 Toaster.ShowInfo($"Voucher Deleted Successfully {VoucherID}");
             }
