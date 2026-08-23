@@ -3,6 +3,7 @@ using AppliedAccounts.Services;
 using AppliedDB;
 using System.Data;
 using VoucherPosting;
+using static AppliedAccounts.Pages.Accounts.Post.Posting;
 using static AppliedDB.Enums;
 using static AppMessages.Enums;
 
@@ -19,6 +20,9 @@ namespace AppliedAccounts.Models.Posting
         public string Filter { get; set; } = string.Empty;
         public string Sort { get; set; } = "Vou_Date, Vou_No";
         public int PostType { get; set; } = 0;
+        private Dictionary<long, string> _coaCache = new();
+        private List<long> _cashIds;
+        private List<long> _bankIds;
 
         public PageModel Pages { get; set; } = new();
 
@@ -50,88 +54,179 @@ namespace AppliedAccounts.Models.Posting
         }
 
 
-        public async Task LoadData(UnPostViewModel _UnPostVM)
+        public async Task LoadData(UnPostViewModel model)
         {
-            Source ??= new(AppGlobal.AppPaths);
-            UnPostVM = _UnPostVM;
+            Init();
 
-            FilterDates[0] = UnPostVM.Dt_From;
-            FilterDates[1] = UnPostVM.Dt_To;
-
-
-            if (UnPostVM.PostingType == 0) { return; }
-
-            switch (UnPostVM.PostingType)
+            if (model.PostingType == 0)
             {
-                // Cash Books
-                case PostingTypes.CashBook:
-                    Filter = "";
-                    var _CashAccList = Source.GetTable(SQLQueries.Quries.GetCashAccounts());
-                    if (_CashAccList.Rows.Count > 0)
-                    {
-                        var CashAccIDs = string.Join(",", _CashAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
-                        Filter = $"BookID IN ({CashAccIDs}) AND [Status] = 'Posted' AND ";
-                        Filter += Functions.GetDateFilter(FilterDates);
-                    }
-                    var _Sort = Sort + Pages.GetLimit();            // Add pagination filter to select records / rows.
-                    var _DataTableCash = Source.GetTable(Tables.Book, Filter, _Sort);
-                    DataListModelList = GetPostingTable(_DataTableCash);
-                    Pages.Refresh(Source.GetCount(Tables.Book, Filter));
-
-                    break;
-
-                // Bank Books
-                case PostingTypes.BankBook:
-                    Filter = "";
-                    var _BankAccList = Source.GetTable(SQLQueries.Quries.GetBankAccounts());
-                    if (_BankAccList.Rows.Count > 0)
-                    {
-                        var BankAccIDs = string.Join(",", _BankAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
-                        Filter = $"BookID IN ({BankAccIDs}) AND [Status] = 'Posted' AND ";
-                        Filter += AppliedDB.Functions.GetDateFilter(FilterDates);
-
-
-                    }
-                    _Sort = Sort + Pages.GetLimit();            // Add pagination filter to select records / rows.
-                    var _DataTableBank = Source.GetTable(Tables.Book, Filter, _Sort);
-                    DataListModelList = GetPostingTable(_DataTableBank);
-                    Pages.Refresh(Source.GetCount(Tables.Book, Filter));
-
-                    break;
-                case PostingTypes.WriteCheques:
-                    DataListModelList.Clear();
-                    break;
-
-                case PostingTypes.BillPayable:
-                    DataListModelList.Clear();
-                    break;
-
-                case PostingTypes.BillReceivable:
-                    DataListModelList.Clear();
-                    break;
-
-                case PostingTypes.Receipt:
-                    DataListModelList.Clear();
-                    break;
-
-                case PostingTypes.Payment:
-                    DataListModelList.Clear();
-                    break;
-
-                case PostingTypes.SalesReturn:
-                    DataListModelList.Clear();
-                    break;
-
-                case PostingTypes.Production:
-                    DataListModelList.Clear();
-                    break;
-
-
-                default:
-                    DataListModelList.Clear();
-                    break;
+                DataListModelList.Clear();
+                return;
             }
+
+            string filter = BuildFilter(model);
+            string paging = BuildPaging();
+
+            List<long> ids = model.PostingType switch
+            {
+                PostingTypes.CashBook => _cashIds,
+                PostingTypes.BankBook => _bankIds,
+                _ => null
+            };
+
+            if (ids == null || ids.Count == 0)
+            {
+                DataListModelList.Clear();
+                return;
+            }
+
+            string finalFilter = $"BookID IN ({string.Join(",", ids)}) AND {filter} {paging}";
+
+            var table = Source.GetTable(Tables.Book, finalFilter);
+
+            DataListModelList = Map(table);
+
+            Pages.Refresh(Source.GetCount(Tables.Book, $"BookID IN ({string.Join(",", ids)}) AND {filter}"));
+
+            //Source ??= new(AppGlobal.AppPaths);
+            //UnPostVM = _UnPostVM;
+
+            //FilterDates[0] = UnPostVM.Dt_From;
+            //FilterDates[1] = UnPostVM.Dt_To;
+
+
+            //if (UnPostVM.PostingType == 0) { return; }
+
+            //switch (UnPostVM.PostingType)
+            //{
+            //    // Cash Books
+            //    case PostingTypes.CashBook:
+            //        Filter = "";
+            //        var _CashAccList = Source.GetTable(SQLQueries.Quries.GetCashAccounts());
+            //        if (_CashAccList.Rows.Count > 0)
+            //        {
+            //            var CashAccIDs = string.Join(",", _CashAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
+            //            Filter = $"BookID IN ({CashAccIDs}) AND [Status] = 'Posted' AND ";
+            //            Filter += Functions.GetDateFilter(FilterDates);
+            //        }
+            //        var _Sort = Sort + Pages.GetLimit();            // Add pagination filter to select records / rows.
+            //        var _DataTableCash = Source.GetTable(Tables.Book, Filter, _Sort);
+            //        DataListModelList = GetPostingTable(_DataTableCash);
+            //        Pages.Refresh(Source.GetCount(Tables.Book, Filter));
+
+            //        break;
+
+            //    // Bank Books
+            //    case PostingTypes.BankBook:
+            //        Filter = "";
+            //        var _BankAccList = Source.GetTable(SQLQueries.Quries.GetBankAccounts());
+            //        if (_BankAccList.Rows.Count > 0)
+            //        {
+            //            var BankAccIDs = string.Join(",", _BankAccList.AsEnumerable().Select(r => r.Field<long>("ID")));
+            //            Filter = $"BookID IN ({BankAccIDs}) AND [Status] = 'Posted' AND ";
+            //            Filter += AppliedDB.Functions.GetDateFilter(FilterDates);
+
+
+            //        }
+            //        _Sort = Sort + Pages.GetLimit();            // Add pagination filter to select records / rows.
+            //        var _DataTableBank = Source.GetTable(Tables.Book, Filter, _Sort);
+            //        DataListModelList = GetPostingTable(_DataTableBank);
+            //        Pages.Refresh(Source.GetCount(Tables.Book, Filter));
+
+            //        break;
+
+
+
+                //case PostingTypes.WriteCheques:
+                //    DataListModelList.Clear();
+                //    break;
+
+                //case PostingTypes.BillPayable:
+                //    DataListModelList.Clear();
+                //    break;
+
+                //case PostingTypes.BillReceivable:
+                //    DataListModelList.Clear();
+                //    break;
+
+                //case PostingTypes.Receipt:
+                //    DataListModelList.Clear();
+                //    break;
+
+                //case PostingTypes.Payment:
+                //    DataListModelList.Clear();
+                //    break;
+
+                //case PostingTypes.SalesReturn:
+                //    DataListModelList.Clear();
+                //    break;
+
+                //case PostingTypes.Production:
+                //    DataListModelList.Clear();
+                //    break;
+
+
+                //default:
+                //    DataListModelList.Clear();
+                //    break;
+            //}
+
+            await Task.CompletedTask;
             //await Task.Delay(100);
+        }
+
+        private string BuildFilter(UnPostViewModel model)
+        {
+            var conditions = new List<string>();
+
+            if (model.PostingStatus == 1)
+                conditions.Add($"Status='{PostingStatus.Submitted}'");
+
+            if (model.PostingStatus == 2)
+                conditions.Add($"Status='{PostingStatus.Posted}'");
+
+            var from = model.Dt_From.Date;
+            var to = model.Dt_To.Date.AddDays(1);
+
+            conditions.Add($"Vou_Date >= '{from:yyyy-MM-dd HH:mm:ss}'");
+            conditions.Add($"Vou_Date < '{to:yyyy-MM-dd HH:mm:ss}'");
+
+            return string.Join(" AND ", conditions);
+        }
+
+        private string BuildPaging()
+        {
+            return $"ORDER BY Vou_Date, Vou_No LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
+        }
+
+        public void Init()
+        {
+            Source ??= new DataSource(AppGlobal.AppPaths);
+
+            if (_coaCache.Count == 0)
+                LoadCOA();
+
+            _cashIds ??= LoadAccountIds(SQLQueries.Quries.GetCashAccounts());
+            _bankIds ??= LoadAccountIds(SQLQueries.Quries.GetBankAccounts());
+        }
+
+        private void LoadCOA()
+        {
+            var table = Source.GetTable(Tables.COA);
+
+            _coaCache = table.AsEnumerable()
+                .ToDictionary(
+                    r => r.Field<long>("ID"),
+                    r => r.Field<string>("Title") ?? ""
+                );
+        }
+
+        private List<long> LoadAccountIds(string query)
+        {
+            return Source.GetTable(query)
+                .AsEnumerable()
+                .Select(r => r.Field<long>("ID"))
+                .ToList();
         }
 
         private List<DataListModel> GetPostingTable(DataTable dataTable)
@@ -178,6 +273,30 @@ namespace AppliedAccounts.Models.Posting
 
         }
 
+        private List<DataListModel> Map(DataTable table)
+        {
+            var list = new List<DataListModel>(table.Rows.Count);
+
+            foreach (DataRow row in table.Rows)
+            {
+                long bookId = row.Field<long>("BookID");
+                decimal amount = row.Field<decimal>("Amount");
+
+                list.Add(new DataListModel
+                {
+                    ID = row.Field<long>("ID"),
+                    Vou_No = row.Field<string>("Vou_No") ?? "",
+                    Vou_Date = row.Field<DateTime>("Vou_Date"),
+                    Title = _coaCache.TryGetValue(bookId, out var title) ? title : "",
+                    DR = amount <= 0 ? amount : 0,
+                    CR = amount > 0 ? amount : 0,
+                    Status = row.Field<string>("Status") ?? "Submitted",
+                    Selected = false
+                });
+            }
+
+            return list;
+        }
 
         #endregion
 

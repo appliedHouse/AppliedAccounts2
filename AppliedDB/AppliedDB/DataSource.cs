@@ -1193,6 +1193,8 @@ namespace AppliedDB
         }
         public void SetKey(string Key, object KeyValue, KeyTypes keytype, string _Title)
         {
+            if(MyConnection == null) { return; }    // retun if DB connection is null.
+
             if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
 
             DataTable TB_Registry = GetTable(Tables.Registry, $"Code = '{Key}'");
