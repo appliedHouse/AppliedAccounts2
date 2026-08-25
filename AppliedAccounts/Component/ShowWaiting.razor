@@ -1,14 +1,18 @@
 ﻿@code {
-    [Parameter] public string MyMessage { get; set; }
+    [Parameter] public string MyMessage { get; set; } = string.Empty;
 
 
     protected override void OnInitialized()
     {
-        MyMessage ??= "Title";
+        MyMessage ??= string.Empty;
     }
 }
 
 
-<div class="alert alert-info" role="alert">
-    <p><strong>@MyMessage</strong></p>
-</div>
+@if(!string.IsNullOrEmpty(MyMessage))
+{
+    <div class="alert alert-warning" role="alert">
+        <p><strong>@MyMessage</strong></p>
+    </div>
+}
+

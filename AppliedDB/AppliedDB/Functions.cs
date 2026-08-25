@@ -73,7 +73,7 @@ namespace AppliedDB
             }
             return table;
         }
-                
+
         public static string GetTitle(string DBFile, Tables _Table, long Id)
         {
             if (Id > 0)
@@ -138,24 +138,67 @@ namespace AppliedDB
 
         public static DataRow RemoveDBNull(this DataRow row)
         {
-            var row2 = row;
             try
             {
                 foreach (DataColumn column in row.Table.Columns)
                 {
-                    if (row[column] == DBNull.Value)
-                    {
-                        row[column] = null;
-                    }
+                    if (row[column] != DBNull.Value)
+                        continue;
+
+                    Type type = Nullable.GetUnderlyingType(column.DataType) ?? column.DataType;
+
+                    if (type == typeof(string))
+                        row[column] = string.Empty;
+                    else if (type == typeof(bool))
+                        row[column] = false;
+                    else if (type == typeof(byte))
+                        row[column] = (byte)0;
+                    else if (type == typeof(sbyte))
+                        row[column] = (sbyte)0;
+                    else if (type == typeof(short))
+                        row[column] = (short)0;
+                    else if (type == typeof(ushort))
+                        row[column] = (ushort)0;
+                    else if (type == typeof(int))
+                        row[column] = 0;
+                    else if (type == typeof(uint))
+                        row[column] = 0U;
+                    else if (type == typeof(long))
+                        row[column] = 0L;
+                    else if (type == typeof(ulong))
+                        row[column] = 0UL;
+                    else if (type == typeof(float))
+                        row[column] = 0f;
+                    else if (type == typeof(double))
+                        row[column] = 0d;
+                    else if (type == typeof(decimal))
+                        row[column] = 0m;
+                    else if (type == typeof(char))
+                        row[column] = '\0';
+                    else if (type == typeof(DateTime))
+                        row[column] = DateTime.MinValue;
+                    else if (type == typeof(DateTimeOffset))
+                        row[column] = DateTimeOffset.MinValue;
+                    else if (type == typeof(TimeSpan))
+                        row[column] = TimeSpan.Zero;
+                    else if (type == typeof(Guid))
+                        row[column] = Guid.Empty;
+                    else if (type == typeof(byte[]))
+                        row[column] = Array.Empty<byte>();
+                    else if (type.IsEnum)
+                        row[column] = Enum.GetValues(type).GetValue(0)!;
+                    else
+                        row[column] = Activator.CreateInstance(type) ?? DBNull.Value;
                 }
+
                 return row;
             }
-            catch (Exception)
+            catch
             {
-
-                return row2;
+                return row;
             }
-            
         }
+
     }
 }
+

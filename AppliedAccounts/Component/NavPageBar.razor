@@ -6,7 +6,11 @@
 <nav aria-label="Page navigation example">
     <ul class="pagination">
         <li class="page-item @(Paging.Current == 1 ? "disabled" : "")">
-            <button class="page-link" @onclick="() => Paging.ChangePage(Paging.Current - 1)">Previous</button>
+            <button class="page-link" @onclick="() => Paging.FirstPage()">-</button>
+        </li>
+
+        <li class="page-item @(Paging.Current == 1 ? "disabled" : "")">
+            <button class="page-link" @onclick="() => Paging.ChangePage(Paging.Current - 1)">Back</button>
         </li>
 
         @foreach (var pageNum in Paging.PageList)
@@ -18,6 +22,9 @@
 
         <li class="page-item @(Paging.Current == Paging.Count ? "disabled" : "")">
             <button class="page-link" @onclick="() => Paging.ChangePage(Paging.Current + 1)">Next</button>
+        </li>
+        <li class="page-item @(Paging.Current == Paging.Count ? "disabled" : "")">
+            <button class="page-link" @onclick="() => Paging.LastPage()">+</button>
         </li>
     </ul>
 </nav>

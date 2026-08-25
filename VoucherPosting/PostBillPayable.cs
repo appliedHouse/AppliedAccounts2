@@ -14,7 +14,7 @@ namespace VoucherPosting
 
 
         #region Bill Payable / Purchase Invoices
-        public async Task<bool> BillPayable(string UserName, int id)
+        public async Task<bool> BillPayable(string UserName, long id)
         {
             if (Source == null)
             {

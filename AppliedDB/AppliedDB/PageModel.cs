@@ -1,4 +1,6 @@
-﻿namespace AppliedDB
+﻿using System.Data;
+
+namespace AppliedDB
 {
     public class PageModel
     {
@@ -59,6 +61,16 @@
         public string GetLimit()
         {
             return $" LIMIT {Size} OFFSET {(Current - 1) * Size}";
+        }
+
+        public void FirstPage()
+        {
+            ChangePage(1);
+        }
+
+        public void LastPage()
+        {
+            ChangePage(Count);
         }
     }
 }

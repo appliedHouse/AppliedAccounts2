@@ -100,7 +100,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         }
         #endregion
 
-        #region Print
+        #region Print General Ledger
         public async void Print(ReportActionClass PrintAction)
         {
             // Clear all previous messages - refresh

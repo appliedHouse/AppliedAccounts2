@@ -68,7 +68,7 @@ namespace AppliedAccounts.Pages.Accounts.Post
             MyModel.Source.SetKey("PostBank", false, KeyTypes.Boolean);    // Reset Post Bank Voucher Status
             MyModel.Source.SetKey("PostReceipt", false, KeyTypes.Boolean);
 
-            MyModel.Pages = new();
+            //MyModel.Pages = new();
             await MyModel.LoadData(MyViewModel);
             await InvokeAsync(StateHasChanged);
         }

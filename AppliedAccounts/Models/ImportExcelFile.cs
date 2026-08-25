@@ -31,6 +31,7 @@ namespace AppliedAccounts.Models
 
         public ImportExcelFile(IBrowserFile excelFile, GlobalService _AppGlobal, string _FileGuid)
         {
+            Source = new(_AppGlobal.AppPaths);
             AppGlobal = _AppGlobal;
             ExcelFile = excelFile;
             ExcelImportRegistry = _FileGuid;

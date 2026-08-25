@@ -24,10 +24,10 @@ namespace AppliedAccounts.Models
 
         public BrowseModel BrowseClass { get; set; } = new();
 
-        public StockListModel(GlobalService _AppGlobal, MessagesService msgService)
+        public StockListModel(GlobalService _AppGlobal)
         {
             AppGlobal = _AppGlobal;
-            MsgService = msgService;
+            MsgService = AppGlobal.MsgService;
             Source = new(AppGlobal.AppPaths);
             GetKeys();
             LoadData();

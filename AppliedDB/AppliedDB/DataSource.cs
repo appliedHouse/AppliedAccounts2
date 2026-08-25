@@ -28,10 +28,6 @@ namespace AppliedDB
 
         #region Constructor
 
-        public DataSource()
-        {
-        }
-
         public DataSource(AppValues.AppPath _AppPaths)
         {
             AppPaths = _AppPaths;
@@ -1033,25 +1029,28 @@ namespace AppliedDB
             return _Table;
         }
 
-
-
         public List<CodeTitle> GetBookAccounts(long NatureID)
         {
             // Get Book Account list from COA.
+
+            List<CodeTitle> EmptyList = new() { new CodeTitle { ID = 0, Code = "", Title = "No Records" } };
             if (NatureID > 0)
             {
-                return GetTable(Tables.COA, $"Nature={NatureID}", "Title").AsEnumerable().ToList().
+                var _List =GetTable(Tables.COA, $"Nature={NatureID}", "Title").AsEnumerable().ToList().
                     Select(rows => new CodeTitle
                     {
                         ID = rows.Field<long>("ID"),
                         Code = rows.Field<string>("Code") ?? "",
                         Title = rows.Field<string>("Title") ?? ""
                     }).ToList();
-            }
-            List<CodeTitle> EmptyList = new();
-            EmptyList.Add(new CodeTitle { ID = 0, Code = "", Title = "No Records" });
-            return EmptyList;
 
+                if(_List == null || _List.Count == 0)
+                {
+                    _List = EmptyList;
+                }
+                return _List;
+            }
+            return EmptyList;
         }
 
 
@@ -1194,6 +1193,8 @@ namespace AppliedDB
         }
         public void SetKey(string Key, object KeyValue, KeyTypes keytype, string _Title)
         {
+            if(MyConnection == null) { return; }    // retun if DB connection is null.
+
             if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
 
             DataTable TB_Registry = GetTable(Tables.Registry, $"Code = '{Key}'");
@@ -1359,12 +1360,41 @@ namespace AppliedDB
         #region Count Record
         public int RecordCound(Tables _Table, string _Filter)
         {
-            string _Query = $"SELECT COUNT(*) FROM {_Table} ";
-            _Query += string.IsNullOrEmpty(_Filter) ? "" : $"WHERE {_Filter}";
-            using var command = new SqliteCommand(_Query, MyConnection);
-            if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
-            var result = Convert.ToInt32(command.ExecuteScalar()); MyConnection.Close();
-            return result;
+            try
+            {
+                string _Query = $"SELECT COUNT(*) FROM {_Table} ";
+                _Query += string.IsNullOrEmpty(_Filter) ? "" : $"WHERE {_Filter}";
+                using var command = new SqliteCommand(_Query, MyConnection);
+                if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
+                var result = Convert.ToInt32(command.ExecuteScalar()); MyConnection.Close();
+                return result;
+            }
+            catch (Exception)
+            {
+
+                return 0;
+            }
+            
+        }
+
+        public int RecordCound(string _Query, string _Filter)
+        {
+            try
+            {
+                
+                _Query += string.IsNullOrEmpty(_Filter) ? "" : $"WHERE {_Filter}";
+                _Query = $"SELECT COUNT(*) FROM ({_Query})";
+                using var command = new SqliteCommand(_Query, MyConnection);
+                if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
+                var result = Convert.ToInt32(command.ExecuteScalar()); MyConnection.Close();
+                return result;
+            }
+            catch (Exception)
+            {
+
+                return 0;
+            }
+
         }
         #endregion
 

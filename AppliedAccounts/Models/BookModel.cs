@@ -1,11 +1,13 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models.Interface;
 using AppliedAccounts.Services;
+using AppliedAccounts.Data.Mapping;
 using AppliedDB;
 using Microsoft.AspNetCore.Components;
 using System.Data;
 using MESSAGE = AppMessages.Enums.Messages;
 using Tables = AppliedDB.Enums.Tables;
+using FluentFTP.Helpers;
 
 namespace AppliedAccounts.Models
 {
@@ -623,7 +625,51 @@ namespace AppliedAccounts.Models
             throw new NotImplementedException();
         }
 
+        #endregion
 
+        #region Delete Complete Voucher
+        internal bool DeleteVoucher()
+        {
+            #region Validation
+            if (MyVoucher.Master.Vou_No.ToLower() == "new")
+            {
+                return false;
+            }
+
+            //if (MyVoucher.Master.Vou_No.Length != 11)
+            //{
+            //    return false;
+            //}
+
+            if (MyVoucher.Master.Status.Equals(AppliedDB.Enums.Status.Submitted))
+            {
+                return false;
+            }
+            #endregion
+
+            Source.BeginTransaction();
+            DataRow? _Row2 = Source.GetNewRow(Tables.Book2);
+
+            foreach (Detail item in MyVoucher.Details)
+            {
+                if (!Source.Delete(item.ToDataRow(_Row2)))
+                {
+                    Source.RollbackTransaction();
+                    return false;
+                }
+            }
+
+            DataRow? _Row1 = Source.GetDataRow(Tables.Book, VoucherID);
+
+            if (_Row1 == null) { Source.RollbackTransaction(); return false; }
+            if (Source.Delete(MyVoucher.Master.ToDataRow(_Row1)))
+            {
+                Source.CommitTransaction(); return true;
+            }
+
+            Source.RollbackTransaction();
+            return false;
+        }
         #endregion
 
         #region Models

@@ -1,7 +1,7 @@
 ﻿@page "/Stock/Stocklist"
 
-@layout PageLayout;
-@attribute [Authorize];
+@layout PageLayout
+@attribute [Authorize]
 
 @using AppliedAccounts.Component
 @using AppliedAccounts.Component.Libs
@@ -9,7 +9,6 @@
 
 @inject GlobalService AppGlobal
 @inject IToastService Toaster
-@inject MessagesService MsgService
 
 @code {
     private string UserRoll;
@@ -20,16 +19,14 @@
 
     protected override void OnInitialized()
     {
-        MyModel = new(AppGlobal, MsgService);   // BookID and UserProfile.
-        MyModel.MsgService = MsgService;
+        MyModel = new(AppGlobal);   // BookID and UserProfile.
         ShowList = true;
         ShowForm = false;
     }
 }
 
 <PageHeading Text="Inventory / Stock / Services" />
-
-<ShowMessages MsgClass="MyModel.MsgService.MsgClass" />
+<ShowMessages MsgService="MyModel.MsgService" />
 
 <EditForm Model="MyModel">
     @if (ShowForm)
@@ -66,30 +63,6 @@
                                         Value="MyModel.Record.SubCategory"
                                         ValueChanged="@((e) => SubCategoryChanged(e))"
                                         Items="MyModel.SubCategory"/>
-
-
-
-
-                            @* <InputSelect id="ddSubCategory" class="form-control item-height flex-grow-1"
-                                         TValue="long"
-                                         Value="@MyModel.Record.SubCategory"
-                                         ValueChanged="@((e) => SubCategoryChanged(e))"
-                                         ValueExpression="@(() => MyModel.Record.SubCategory)">
-                                @if (MyModel.SubCategory?.Any() == true)
-                                {
-                                    @foreach (var item in MyModel.SubCategory)
-                                    {
-                                        <option value="@item.ID">@item.Title</option>
-                                    }
-                                }
-                                else
-                                {
-                                    <option value="0">No Records - SubCategory</option>
-                                }
-                            </InputSelect>
-                            <Dropdown_Search @onclick="() => BrowseWindow(2)" />
-                            <label for="ddSubCategory">Category</label>
- *@
                         </div>
                     }
                 </div>
@@ -102,27 +75,6 @@
                                         Value="MyModel.Record.Packing"
                                         ValueChanged="@((e) => PackingChanged(e))"
                                         Items="MyModel.Packing" />
-
-
-                            @* <InputSelect id="ddSubCategory" class="form-control item-height flex-grow-1"
-                                         TValue="long"
-                                         Value="@MyModel.Record.Packing"
-                                         ValueChanged="@((e) => PackingChanged(e))"
-                                         ValueExpression="@(() => MyModel.Record.Packing)">
-                                @if (MyModel.Packing?.Any() == true)
-                                {
-                                    @foreach (var item in MyModel.Packing)
-                                    {
-                                        <option value="@item.ID">@item.Title</option>
-                                    }
-                                }
-                                else
-                                {
-                                    <option value="0">No Records - Packing</option>
-                                }
-                            </InputSelect>
-                            <Dropdown_Search @onclick="() => BrowseWindow(3)" />
-                            <label for="ddPacking">Packing</label> *@
                         </div>
                     }
                 </div>
@@ -135,27 +87,6 @@
                                         Value="MyModel.Record.Size"
                                         ValueChanged="@((e) => SizeChanged(e))"
                                         Items="MyModel.Size" />
-
-
-                            @* <InputSelect id="ddSubSize" class="form-control item-height flex-grow-1"
-                                         TValue="long"
-                                         Value="@MyModel.Record.Size"
-                                         ValueChanged="@((e) => SizeChanged(e))"
-                                         ValueExpression="@(() => MyModel.Record.Size)">
-                                @if (MyModel.Size?.Any() == true)
-                                {
-                                    @foreach (var item in MyModel.Size)
-                                    {
-                                        <option value="@item.ID">@item.Title</option>
-                                    }
-                                }
-                                else
-                                {
-                                    <option value="0">No Records - Size</option>
-                                }
-                            </InputSelect>
-                            <Dropdown_Search @onclick="() => BrowseWindow(3)" />
-                            <label for="ddSize">Size</label> *@
                         </div>
                     }
                 </div>
@@ -168,27 +99,6 @@
                                         Value="MyModel.Record.UOM"
                                         ValueChanged="@((e) => UOMChanged(e))"
                                         Items="MyModel.UOM" />
-
-
-                            @* <InputSelect id="ddSubSize" class="form-control item-height flex-grow-1"
-                                         TValue="long"
-                                         Value="@MyModel.Record.UOM"
-                                         ValueChanged="@((e) => UOMChanged(e))"
-                                         ValueExpression="@(() => MyModel.Record.UOM)">
-                                @if (MyModel.UOM?.Any() == true)
-                                {
-                                    @foreach (var item in MyModel.UOM)
-                                    {
-                                        <option value="@item.ID">@item.Title</option>
-                                    }
-                                }
-                                else
-                                {
-                                    <option value="0">No Records - Unit of Measurement</option>
-                                }
-                            </InputSelect>
-                            <Dropdown_Search @onclick="() => BrowseWindow(1)" />
-                            <label for="ddSize">Unit of Measure</label> *@
                         </div>
                     }
                 </div>
@@ -199,13 +109,11 @@
                     <div class="row">
                         <div class="col d-flex justify-content-between align-items-center">
                             <div class="d-flex gap-2">
-                                <Btn_Save @onclick="Save" />
-                                <Btn_Add @onclick="Add" />
-                                <Btn_Delete @onclick="()=>Delete(MyModel.Record.ID)" />
+                                <Btn_Save Onclick="Save" />
+                                <Btn_Add Onclick="Add" />
+                                <Btn_Delete Onclick="()=>Delete(MyModel.Record.ID)" />
                             </div>
-                            <button class="btn btn-link btn-sm" title="Back" @onclick="BackPage">
-                                <i class="bi bi-arrow-left-circle"></i>
-                            </button>
+                            <Btn_Back NavTo="/"/>"
 
                         </div>
                     </div>
@@ -223,9 +131,9 @@
                    <div class="col d-flex justify-content-between align-items-center">
                        <div class="d-flex gap-2">
                            <InputText @bind-Value="MyModel.SearchText" />
-                           <Btn_Search @onclick="MyModel.Search" />
-                           <Btn_Refresh @onclick="MyModel.ClearSearch" />
-                           <Btn_Add @onclick="Add" />
+                           <Btn_Search Onclick="MyModel.Search" />
+                           <Btn_Refresh Onclick="MyModel.ClearSearch" />
+                           <Btn_Add Onclick="Add" />
 
 
                        </div>
@@ -247,7 +155,7 @@
                         <th style="width:10px">Sub Category</th>
                         <th style="width:10px">Unit</th>
                         <th style="width:10px">Size</th>
-                        <th style="width:10px"><Btn_Add @onclick="Add" /></th>
+                        <th style="width:10px"><Btn_Add Onclick="Add" /></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -263,8 +171,8 @@
                                 <td class="left">@item.TitleUOM</td>
                                 <td class="left">@item.TitleSize</td>
                                 <td>
-                                    <Btn_Edit onClick="(()=>Edit(item.ID))" />
-                                    <Btn_Delete @onclick="(()=>Delete(item.ID))" />
+                                    <Btn_Edit OnClick="(()=>Edit(item.ID))" />
+                                    <Btn_Delete OnClick="(() => Delete(item.ID))" />
 
                                 </td>
                             </tr>
@@ -274,15 +182,12 @@
             </table>
         </div>
     }
-
-
-
 </EditForm>
 
 
 
 <!-- Browse Windows -->
-<div class="modal fade" id="winBrowse" tabindex="-1" aria-labelledby="browseModalLabel" aria-hidden="true">
+@* <div class="modal fade" id="winBrowse" tabindex="-1" aria-labelledby="browseModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -326,3 +231,4 @@
         </div>
     </div>
 </div>
+ *@

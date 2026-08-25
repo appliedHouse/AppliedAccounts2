@@ -37,6 +37,7 @@ namespace AppliedDB.CreateDB
                 case "Inv_Size": return CreateInv_Size();
                 case "Inv_SubCategory": return CreateInv_SubCategory();
                 case "Inv_UOM": return CreateInv_UOM();
+                case "Inv_Price": return CreateInv_Price();
                 case "Ledger": return CreateLedger();
                 case "OBALCompany": return CreateOBALCompany();
                 case "OBALStock": return CreateOBALStock();
@@ -53,11 +54,19 @@ namespace AppliedDB.CreateDB
                 case "Taxes": return CreateTaxes();
                 case "WriteCheques": return CreateWriteCheques();
 
+
+                // Data Views
                 case "view_Book": return CreateViewBook();
+                case "view_BillPayable": return CreateView_BillPayable();
+                case "view_BillReceivable": return CreateView_BillReceivable();
+                case "view_Ledger": return CreateView_Ledger();
+                case "view_Purchased":return CreateView_Purchased();
+                case "view_Sold": return CreateView_Sold();
+                case "view_Receipts": return CreateView_Receipts();
+                
                 default: return string.Empty;
             }
         }
-
         public static string CreateBankBook()
         {
             return @"
@@ -78,7 +87,6 @@ namespace AppliedDB.CreateDB
                     [Comments] NVARCHAR(500), 
                     [Status] NVARCHAR(10) NOT NULL DEFAULT Submitted);";
         }
-
         public static string CreateEmployees()
         {
             return @"
@@ -97,7 +105,6 @@ namespace AppliedDB.CreateDB
                         [CNIC] NVARCHAR(14)
                     );";
         }
-
         public static string CreateBillPayable()
         {
             return @"
@@ -119,38 +126,7 @@ namespace AppliedDB.CreateDB
                     );";
         }
 
-        public static string CreateInv_Packing()
-        {
-            return @"
-                    CREATE TABLE [Inv_Packing](
-                        [ID] INT64 PRIMARY KEY NOT NULL UNIQUE,
-                        [Code] NVARCHAR(6) NOT NULL UNIQUE,
-                        [Title] NVARCHAR(30) NOT NULL UNIQUE,
-                        [Qty] INT
-                    );";
-        }
-
-        public static string CreateInv_SubCategory()
-        {
-            return @"
-                    CREATE TABLE [Inv_SubCategory](
-                        [ID] INT64 PRIMARY KEY NOT NULL UNIQUE,
-                        [Code] NVARCHAR(6) NOT NULL UNIQUE,
-                        [Title] NVARCHAR(30) NOT NULL UNIQUE,
-                        [Category] INT
-                    );";
-        }
-
-        public static string CreateInv_UOM()
-        {
-            return @"
-                    CREATE TABLE [Inv_UOM](
-                        [ID] INT PRIMARY KEY NOT NULL UNIQUE,
-                        [Code] NVARCHAR(6) NOT NULL UNIQUE,
-                        [Title] NVARCHAR(15) NOT NULL UNIQUE
-                    );";
-        }
-
+        #region Inventory and allied
         public static string CreateInventory()
         {
             return @"
@@ -165,6 +141,68 @@ namespace AppliedDB.CreateDB
                         [Notes] NVARCHAR(500)
                     );";
         }
+        public static string CreateInv_Packing()
+        {
+            return @"
+                    CREATE TABLE [Inv_Packing](
+                        [ID] INT64 PRIMARY KEY NOT NULL UNIQUE,
+                        [Code] NVARCHAR(6) NOT NULL UNIQUE,
+                        [Title] NVARCHAR(30) NOT NULL UNIQUE,
+                        [Qty] INT
+                    );";
+        }
+        public static string CreateInv_SubCategory()
+        {
+            return @"
+                    CREATE TABLE [Inv_SubCategory](
+                        [ID] INT64 PRIMARY KEY NOT NULL UNIQUE,
+                        [Code] NVARCHAR(6) NOT NULL UNIQUE,
+                        [Title] NVARCHAR(30) NOT NULL UNIQUE,
+                        [Category] INT
+                    );";
+        }
+        public static string CreateInv_UOM()
+        {
+            return @"
+                    CREATE TABLE [Inv_UOM](
+                        [ID] INT PRIMARY KEY NOT NULL UNIQUE,
+                        [Code] NVARCHAR(6) NOT NULL UNIQUE,
+                        [Title] NVARCHAR(15) NOT NULL UNIQUE
+                    );";
+        }
+        public static string CreateInv_Category()
+        {
+            return @"
+                    CREATE TABLE [Inv_Category](
+                        [ID] INT64 PRIMARY KEY NOT NULL UNIQUE,
+                        [Code] NVARCHAR(6) NOT NULL UNIQUE,
+                        [Title] NVARCHAR(30) NOT NULL UNIQUE
+                    );";
+        }
+        public static string CreateInv_Size()
+        {
+            return @"
+                    CREATE TABLE [Inv_Size](
+                        [ID] INT64 PRIMARY KEY NOT NULL UNIQUE,
+                        [Code] NVARCHAR(6) NOT NULL UNIQUE,
+                        [Title] NVARCHAR(30) NOT NULL UNIQUE
+                    );";
+        }
+        public static string CreateInv_Price()
+        {
+            return @"
+                    CREATE TABLE[Inv_Price](
+                      [ID] INT64 NOT NULL UNIQUE,
+                      [StockID] INT64 NOT NULL, 
+                      [PriceDate] DATETIME NOT NULL, 
+                      [MRP] DECIMAL NOT NULL, 
+                      [TPRate] DECIMAL NOT NULL, 
+                      [Discount] DECIMAL, 
+                      [Bonus] INT);";
+
+        }
+        #endregion
+
 
         public static string CreateProject()
         {
@@ -186,7 +224,6 @@ namespace AppliedDB.CreateDB
                         Terms NVARCHAR
                     );";
         }
-
         public static string CreateCOA_CLASS()
         {
             return @"
@@ -196,7 +233,6 @@ namespace AppliedDB.CreateDB
                         [TITLE] VARCHAR(100) NOT NULL UNIQUE
                     );";
         }
-
         public static string CreateCOA_NATURE()
         {
             return @"
@@ -206,7 +242,6 @@ namespace AppliedDB.CreateDB
                         [TITLE] VARCHAR(100)
                     );";
         }
-
         public static string CreateCOA_NOTES()
         {
             return @"
@@ -216,7 +251,6 @@ namespace AppliedDB.CreateDB
                         [TITLE] VARCHAR(100) NOT NULL UNIQUE
                     );";
         }
-
         public static string CreateCOA()
         {
             return @"
@@ -230,7 +264,6 @@ namespace AppliedDB.CreateDB
                         [OPENING_BALANCE] DECIMAL DEFAULT (0.00)
                     );";
         }
-
         public static string CreateTaxes()
         {
             return @"
@@ -243,7 +276,6 @@ namespace AppliedDB.CreateDB
                         [COA] INT64 REFERENCES [COA]([ID])
                     );";
         }
-
         public static string CreateBillPayable2()
         {
             return @"
@@ -262,7 +294,6 @@ namespace AppliedDB.CreateDB
                         [Unit] INT64
                     );";
         }
-
         public static string CreateBillReceivable()
         {
             return @"
@@ -282,7 +313,6 @@ namespace AppliedDB.CreateDB
                         [Status] NVARCHAR(12) NOT NULL DEFAULT 'Submitted'
                     );";
         }
-
         public static string CreateBillReceivable2()
         {
             return @"
@@ -301,7 +331,6 @@ namespace AppliedDB.CreateDB
                         [Unit] INT64
                     );";
         }
-
         public static string CreateBOMProfile()
         {
             return @"
@@ -312,7 +341,6 @@ namespace AppliedDB.CreateDB
                         [Status] NVARCHAR(15) NOT NULL
                     );";
         }
-
         public static string CreateBOMProfile2()
         {
             return @"
@@ -327,7 +355,6 @@ namespace AppliedDB.CreateDB
                         [Westage] DECIMAL DEFAULT 0
                     );";
         }
-
         public static string CreateBook()
         {
             return @"
@@ -343,7 +370,6 @@ namespace AppliedDB.CreateDB
                         [Status] NVARCHAR(10) NOT NULL DEFAULT 'Submitted'
                     );";
         }
-
         public static string CreateBook2()
         {
             return @"
@@ -361,7 +387,6 @@ namespace AppliedDB.CreateDB
                         [Comments] NVARCHAR
                     );";
         }
-
         public static string CreateCashBook()
         {
             return @"
@@ -383,7 +408,6 @@ namespace AppliedDB.CreateDB
                         [Status] NVARCHAR(10) NOT NULL DEFAULT 'Submitted'
                     );";
         }
-
         public static string CreateChequeStatus()
         {
             return @"
@@ -393,7 +417,6 @@ namespace AppliedDB.CreateDB
                         [Title] NVARCHAR(60) NOT NULL UNIQUE
                     );";
         }
-
         public static string CreateChequeTranType()
         {
             return @"
@@ -403,7 +426,6 @@ namespace AppliedDB.CreateDB
                         [Title] NVARCHAR(60) NOT NULL UNIQUE
                     );";
         }
-
         public static string CreateCity()
         {
             return @"
@@ -413,7 +435,6 @@ namespace AppliedDB.CreateDB
                         [Country] NVARCHAR(30)
                     );";
         }
-
         public static string CreateCOA_Map()
         {
             return @"
@@ -423,7 +444,6 @@ namespace AppliedDB.CreateDB
                         [Stock] INT64 NOT NULL REFERENCES [Inventory]([ID])
                     );";
         }
-
         public static string CreateCountry()
         {
             return @"
@@ -434,7 +454,6 @@ namespace AppliedDB.CreateDB
                         [CountryCode] TEXT(2) NOT NULL UNIQUE
                     );";
         }
-
         public static string CreateCustomers()
         {
             return @"
@@ -457,7 +476,6 @@ namespace AppliedDB.CreateDB
                         [Address3] NVARCHAR(60)
                     );";
         }
-
         public static string CreateDirectories()
         {
             return @"
@@ -468,7 +486,6 @@ namespace AppliedDB.CreateDB
                         [Value] NVARCHAR NOT NULL
                     );";
         }
-
         public static string CreateFinishedGoods()
         {
             return @"
@@ -488,33 +505,12 @@ namespace AppliedDB.CreateDB
                         [Status] NVARCHAR(12)
                     );";
         }
-
         public static string CreateIdGenerator()
         {
             return @"
                     CREATE TABLE IdGenerator (
                         TableName TEXT PRIMARY KEY,
                         LastId INTEGER NOT NULL
-                    );";
-        }
-
-        public static string CreateInv_Category()
-        {
-            return @"
-                    CREATE TABLE [Inv_Category](
-                        [ID] INT64 PRIMARY KEY NOT NULL UNIQUE,
-                        [Code] NVARCHAR(6) NOT NULL UNIQUE,
-                        [Title] NVARCHAR(30) NOT NULL UNIQUE
-                    );";
-        }
-
-        public static string CreateInv_Size()
-        {
-            return @"
-                    CREATE TABLE [Inv_Size](
-                        [ID] INT64 PRIMARY KEY NOT NULL UNIQUE,
-                        [Code] NVARCHAR(6) NOT NULL UNIQUE,
-                        [Title] NVARCHAR(30) NOT NULL UNIQUE
                     );";
         }
 
@@ -542,7 +538,6 @@ namespace AppliedDB.CreateDB
                         [Status] NVARCHAR(10)
                     );";
         }
-
         public static string CreateOBALCompany()
         {
             return @"
@@ -555,7 +550,6 @@ namespace AppliedDB.CreateDB
                         [Employee] INT64
                     );";
         }
-
         public static string CreateOBALStock()
         {
             return @"
@@ -569,7 +563,6 @@ namespace AppliedDB.CreateDB
                         [Amount] DECIMAL
                     );";
         }
-
         public static string CreateProduction2()
         {
             return @"
@@ -584,7 +577,6 @@ namespace AppliedDB.CreateDB
                         [Remarks] NVARCHAR(100)
                     );";
         }
-
         public static string CreateProfile()
         {
             return @"
@@ -601,7 +593,6 @@ namespace AppliedDB.CreateDB
                         [FiscalTo] DATETIME
                     );";
         }
-
         public static string CreateReceipt()
         {
             return @"
@@ -621,7 +612,6 @@ namespace AppliedDB.CreateDB
                         [Status] NVARCHAR(10)
                     );";
         }
-
         public static string CreateReceipt2()
         {
             return @"
@@ -639,7 +629,6 @@ namespace AppliedDB.CreateDB
                         [Description] NVARCHAR NOT NULL
                     );";
         }
-
         public static string CreateReceipts()
         {
             return @"
@@ -658,7 +647,6 @@ namespace AppliedDB.CreateDB
                         [Status] NVARCHAR(10) NOT NULL
                     );";
         }
-
         public static string CreateRegistry()
         {
             return @"
@@ -676,7 +664,6 @@ namespace AppliedDB.CreateDB
                         [To] DATETIME
                     );";
         }
-
         public static string CreateRole()
         {
             return @"
@@ -687,7 +674,6 @@ namespace AppliedDB.CreateDB
                         [Description] NVARCHAR NOT NULL
                     );";
         }
-
         public static string CreateSaleReturn()
         {
             return @"
@@ -700,7 +686,6 @@ namespace AppliedDB.CreateDB
                         [Status] TEXT(12) NOT NULL DEFAULT 'Submitted'
                     );";
         }
-
         public static string CreateStockInHand()
         {
             return @"
@@ -722,7 +707,6 @@ namespace AppliedDB.CreateDB
                         [SoldCost] DECIMAL
                     );";
         }
-
         public static string CreateWriteCheques()
         {
             return @"
@@ -746,7 +730,6 @@ namespace AppliedDB.CreateDB
                         [Employee] INT64 REFERENCES [Employees]([ID])
                     );";
         }
-
 
         // Create Data View
 
@@ -788,8 +771,7 @@ namespace AppliedDB.CreateDB
                     LEFT JOIN [Project]   [P]  ON  [P].[ID] = [B2].[Project];"
             ;
         }
-
-        public static string Createview_BillReceivable()
+        public static string CreateView_BillReceivable()
         {
             return @"
                     CREATE VIEW [view_BillReceivable]
@@ -823,8 +805,7 @@ namespace AppliedDB.CreateDB
                     FROM   [BillReceivable]
                            LEFT JOIN [BillReceivable2] ON [BillReceivable].[ID] = [BillReceivable2].[TranID];";
         }
-
-        public static string Createview_BillPayable()
+        public static string CreateView_BillPayable()
         {
             return @"
                     CREATE VIEW [view_BillPayable]
@@ -859,8 +840,7 @@ namespace AppliedDB.CreateDB
                     FROM   [BillPayable]
                            LEFT JOIN [BillPayable2] ON [BillPayable].[ID] = [BillPayable2].[TranID];";
         }
-
-        public static string Createview_Receipts()
+        public static string CreateView_Receipts()
         {
             return @"
                     CREATE VIEW [view_Receipts] AS
@@ -901,8 +881,7 @@ namespace AppliedDB.CreateDB
                     LEFT JOIN[Employees]  [E] ON  [E].[ID] = [R2].[Employee]
                     LEFT JOIN[Project]    [P] ON  [P].[ID] = [R2].[Project];";
         }
-
-        public static string Createview_Ledger()
+        public static string CreateView_Ledger()
         {
             return @"CREATE VIEW [view_Ledger]
                     AS
@@ -920,6 +899,40 @@ namespace AppliedDB.CreateDB
                     FROM   [Ledger]
                     WHERE  [ID] < 0;
                     ";
+        }
+        public static string CreateView_Purchased()
+        {
+            return @"
+                        CREATE VIEW [view_Purchased] AS 
+                        SELECT 
+                        [B1].[Vou_No], 
+                        [B1].[Vou_Date], 
+                        [B2].[Inventory], 
+                        [B2].[Qty], 
+                        [B2].[Rate], 
+                        [B2].[Qty] *[B2].[Rate] AS [Amount], 
+                        [T].[Rate] AS [TaxRate], 
+                        CAST(([B2].[Qty] *[B2].[Rate]) * [T].[Rate] AS Float) AS [TaxAmount] 
+                        FROM [BillPayable] [B1] 
+                        LEFT JOIN [BillPayable2] [B2] ON [B2].[TranID] = [B1].[ID] 
+                        LEFT JOIN [Taxes] [T] ON [T].[ID] = [B2].[Tax];";
+        }
+        public static string CreateView_Sold()
+        {
+            return @"
+                        CREATE VIEW [view_Purchased] AS 
+                        SELECT 
+                        [B1].[Vou_No], 
+                        [B1].[Vou_Date], 
+                        [B2].[Inventory], 
+                        [B2].[Qty], 
+                        [B2].[Rate], 
+                        [B2].[Qty] *[B2].[Rate] AS [Amount], 
+                        [T].[Rate] AS [TaxRate], 
+                        CAST(([B2].[Qty] *[B2].[Rate]) * [T].[Rate] AS Float) AS [TaxAmount] 
+                        FROM [BillPayable] [B1] 
+                        LEFT JOIN [BillPayable2] [B2] ON [B2].[TranID] = [B1].[ID] 
+                        LEFT JOIN [Taxes] [T] ON [T].[ID] = [B2].[Tax];";
         }
     }
 }

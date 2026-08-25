@@ -12,11 +12,8 @@ namespace VoucherPosting
         public MessageClass MsgClass { get; set; }
         public DataSource Source { get; set; }
 
-
-
-
         #region Bill Receivable / Sales Invoices
-        public async Task<bool> BillReceivable(string UserName, int id)
+        public async Task<bool> BillReceivable(string UserName, long id)
         {
             if (Source == null)
             {

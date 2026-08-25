@@ -1,26 +1,20 @@
-﻿using AppliedAccounts.Data;
+﻿
+using AppliedAccounts.Data;
+using AppliedAccounts.Data.Mapping;
+using AppliedAccounts.Models;
 using AppliedDB;
 using AppReports;
-using System.Data;
-using static AppliedGlobals.AppValues;
-using MESSAGE = AppMessages.Enums.Messages;
 
 
 namespace AppliedAccounts.Pages.Sale
 {
     public partial class SaleInvoiceList
     {
-        public Models.SaleInvoiceListModel MyModel { get; set; }
+        public SaleInvoiceListModel MyModel { get; set; }
         public ReportModel PrintClass { get; set; }
-        private bool IsPrinted { get; set; } = false;
         private bool IsPrinting { get; set; } = false;
         private List<string> PrintedReports { get; set; } = new();
         public string PrintingMessage { get; set; }
-
-        public SaleInvoiceList()
-        {
-
-        }
 
         #region Delete
         public async void Delete(long ID)
@@ -45,7 +39,7 @@ namespace AppliedAccounts.Pages.Sale
 
         public void SelectOne(long _ID)
         {
-            var item = MyModel.Records.Where(a => a.Id == _ID).First();
+            var item = MyModel.Records.First(a => a.Id == _ID);
             item.IsSelected = !item.IsSelected;
         }
         #endregion
@@ -55,14 +49,27 @@ namespace AppliedAccounts.Pages.Sale
         public async void PrintOnePDF()
         {
             IsPrinting = true;
+            MyModel.MsgService.Clear();
             PrintingMessage = "Wait.... Printing all invoices are in one PDF is being generated.";
             await InvokeAsync(StateHasChanged);
             await Task.Delay(500);
+            
+            if(MyModel.Filter.Length == 0)
+            {
+
+                IsPrinting = false;
+                MyModel.MsgService.Warning("Records must be filtered.");
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            MyModel.PrintingRecords = MyModel.PrintData();
+            MyModel.PrintingRecords.ForEach(e => e.IsSelected = true);
 
             List<long> SaleInvoiceIDList = new List<long>();
 
 
-            foreach (var item in MyModel.Records)
+            foreach (var item in MyModel.PrintingRecords)
             {
                 if (item.IsSelected) { SaleInvoiceIDList.Add(item.Id); }
             }
@@ -70,7 +77,7 @@ namespace AppliedAccounts.Pages.Sale
             {
                 try
                 {
-                    var _Text = DateTime.Now.ToString(Format.YMD);
+                    var _Text = DateTime.Now.ToDisplay();
                     var _RandomNo = (new Random()).Next(1000, 9999);
                     var _FileName = $"SalesInvoice_{_Text}_{_RandomNo}";
 
@@ -164,7 +171,6 @@ namespace AppliedAccounts.Pages.Sale
                     }
                 }
                 IsPrinting = false;
-                IsPrinted = true;
                 await InvokeAsync(StateHasChanged);
 
             }
@@ -222,7 +228,7 @@ namespace AppliedAccounts.Pages.Sale
                 var _Heading2 = $"Invoice No. {_InvoiceNo}";
                 var _ReportOption = ReportType.Excel;
 
-
+                ReportService.Model.ReportDataSource = ReportService.Data;
                 // Input Parameters  (.rdl report file)
                 ReportService.Model.InputReport.FileName = "CDCInvOnePDF.rdl";
 
@@ -234,9 +240,9 @@ namespace AppliedAccounts.Pages.Sale
                 ReportService.Model.AddReportParameter("Heading2", _Heading2);
 
             }
-            catch (Exception)
+            catch (Exception error)
             {
-                MyModel.MsgService.Error(MESSAGE.Default);
+                MyModel.MsgService.Error(error);
             }
 
         }

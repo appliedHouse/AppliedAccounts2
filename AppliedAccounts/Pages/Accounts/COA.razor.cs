@@ -2,22 +2,15 @@
 using Menus;
 using Microsoft.JSInterop;
 
-
-
 namespace AppliedAccounts.Pages.Accounts
 {
-
-
     public partial class COA
     {
         public COAModel MyModel { get; set; } 
         public bool IsPageValid { get; set; }
 
-        public COA()
-        {
-
-        }
-
+        public COA() { }
+        
         public bool GetPageIsValid()
         {
             var _Valid = true;

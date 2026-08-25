@@ -30,16 +30,6 @@ namespace AppliedAccounts.Models.Posting
             AppGlobal = appGlobal;
             Source = new(appGlobal.AppPaths);
             MsgService = appGlobal.MsgService;
-
-            
-           
-        }
-
-        public PostingModel(GlobalService appGlobal, MessagesService msgService)
-        {
-            AppGlobal = appGlobal;
-            MsgService = msgService;
-            Source = new(appGlobal.AppPaths);
         }
 
         public void Init()
@@ -75,6 +65,7 @@ namespace AppliedAccounts.Models.Posting
         #endregion
 
         #region Load Data
+              
 
         public async Task LoadData(PostingViewModel model)
         {

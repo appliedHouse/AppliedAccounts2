@@ -1,7 +1,6 @@
 ﻿using AppliedAccounts.Services;
 using AppliedDB;
 using AppReports;
-using Microsoft.AspNetCore.Components;
 using System.Data;
 using static AppliedDB.Enums;
 
@@ -9,11 +8,12 @@ namespace AppliedAccounts.Models
 {
     public class SaleInvoiceListModel
     {
-        [Inject] public GlobalService AppGlobal { get; set; } = default!;
-        public DataSource Source { get; set; }
+        public GlobalService AppGlobal { get; set; }
+        public DataSource? Source { get; set; }
         public string DBFile { get; set; } = string.Empty;
         public SalesRecord Record { get; set; } = new();
         public List<SalesRecord> Records { get; set; } = new();
+        public List<SalesRecord> PrintingRecords { get; set; } = new();
         public DataTable Data { get; set; } = new();
         public PageModel Pages { get; set; } = new();
 
@@ -23,32 +23,50 @@ namespace AppliedAccounts.Models
         public long VoucherID { get; set; }
         public string SearchText { get; set; } = string.Empty;
         public string Filter { get; set; } = string.Empty;
+        public bool IsPageValid { get; set; } = false;
+        public string MyMessage { get; set; } = string.Empty;
+
 
 
         #region Constructor
-        public SaleInvoiceListModel(GlobalService _AppGlobal, MessagesService msgService)
+        public SaleInvoiceListModel(GlobalService appGlobal)
         {
-            AppGlobal = _AppGlobal;
-            MsgService = msgService;
-            Source = new(AppGlobal.AppPaths);
-            LoadData();
+            
+            appGlobal.AppPaths.DBFile = appGlobal.Client.DataFile;
+
+            if (appGlobal.DBFile.Length == 0)
+            {
+                appGlobal.MsgService.Critical("Database file is not set. Please set the database file path.");
+                return;
+            }
+            else
+            {
+                AppGlobal = appGlobal;
+                Source = new(AppGlobal.AppPaths);
+                MsgService = AppGlobal.MsgService;
+                Records = LoadData();
+            }
+
+            IsPageValid = true;
         }
 
         #endregion
 
         #region Load Data
-
-        public void LoadData()
+        public List<SalesRecord> LoadData()
         {
-            var _Query = SQLQuery.SaleInvoiceList();
-            var _Sort = "Vou_Date, Vou_No";
-
-            if (!string.IsNullOrWhiteSpace(SearchText))
+            try
             {
-                string[] columns =
+                MyMessage = "Loading data...";
+                var _Query = SQLQuery.SaleInvoiceList();
+                var _Sort = "Vou_Date, Vou_No";
+
+                if (!string.IsNullOrWhiteSpace(SearchText))
                 {
+                    string[] columns =
+                    {
                     "Company",
-                    "Employee",
+                    "Salesman",
                     "City",
                     "Description",
                     "Vou_No",
@@ -57,17 +75,30 @@ namespace AppliedAccounts.Models
                     "Pay_Date"
                 };
 
-                Filter = string.Join(" OR ", columns.Select(c => $"{c} like '%{SearchText}%'"));
+                    Filter = string.Join(" OR ", columns.Select(c => $"{c} like '%{SearchText}%'"));
+                }
+                else
+                {
+                    Filter = string.Empty;
+                }
+
+                Data = Source!.GetTable(_Query, Filter, _Sort + Pages.GetLimit());
+                Records = [.. Data.AsEnumerable().Select(row => GetRecord(row))];
+                Pages.Refresh(Source.RecordCound(_Query, Filter));
+                MyMessage = string.Empty;
+                return Records;
             }
-            else
+            catch (Exception)
             {
-                Filter = string.Empty;
+                MyMessage = "Error loading data. Please check the database connection and query.";
+                return [];
             }
+        }
 
-            Data = Source.GetTable(_Query, Filter, _Sort + Pages.GetLimit());
-            Records = Data.AsEnumerable().Select(row => GetRecord(row)).ToList();
-            Pages.Refresh(Source.RecordCound(Tables.BillReceivable, Filter));
-
+        public List<SalesRecord> PrintData()
+        {
+            var _Data = Source!.GetTable(SQLQuery.SaleInvoiceList(), Filter);
+            return [.. _Data.AsEnumerable().Select(row => GetRecord(row))];
         }
         #endregion
 
@@ -78,17 +109,17 @@ namespace AppliedAccounts.Models
             SalesRecord _Record = new();
             {
                 _Record.Id = (long)_Row["ID"];
-                _Record.Vou_No = (string)_Row["Vou_No"];
-                _Record.Ref_No = (string)_Row["Ref_No"];
+                _Record.Vou_No = (string)_Row["Vou_No"] ?? "";
+                _Record.Ref_No = (string)_Row["Ref_No"] ?? "";
                 //_Record.Batch = (string)_Row["Batch"];
                 _Record.Vou_Date = (DateTime)_Row["Vou_Date"];
                 _Record.Inv_Date = (DateTime)_Row["Inv_Date"];
                 _Record.Pay_Date = (DateTime)_Row["Pay_Date"];
-                _Record.TitleCustomer = (string)_Row["Company"];
-                _Record.TitleSalesman = (string)_Row["Salesman"];
-                _Record.City = (string)_Row["City"];
+                _Record.TitleCustomer = (string)_Row["Company"] ?? "";
+                _Record.TitleSalesman = (string)_Row["Salesman"] ?? "";
+                _Record.City = (string)_Row["City"] ?? "";
                 _Record.Amount = (decimal)_Row["Amount"];
-                _Record.Description = (string)_Row["Description"];
+                _Record.Description = (string)_Row["Description"] ?? "";
 
             }
             return _Record;
@@ -96,7 +127,6 @@ namespace AppliedAccounts.Models
 
         public SalesRecord GetRecord(long _ID)
         {
-
             foreach (SalesRecord _Record in Records)
             {
                 if (_Record.Id == _ID)
@@ -124,17 +154,17 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Search
-        public async void Search()
+        public void Search()
         {
-            await Task.Run(() => LoadData());
-
+            LoadData();
         }
 
-        public async void ClearText()
+        public void ClearText()
         {
             SearchText = string.Empty;
-            await Task.Run(() => LoadData());
+            LoadData();
         }
+
         #endregion
 
     }

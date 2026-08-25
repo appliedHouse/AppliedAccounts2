@@ -4,7 +4,7 @@ using AppliedGlobals;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.JSInterop;
-using Org.BouncyCastle.Utilities.Collections;
+using System.Security.Claims;  
 using static AppliedGlobals.AppValues;
 
 namespace AppliedAccounts.Services
@@ -67,9 +67,29 @@ namespace AppliedAccounts.Services
             {
                 if (_isInitialized) return;
 
+                //var authState = await _authStateProvider.GetAuthenticationStateAsync();
+                //Client = _authStateProvider.AppUser ?? new AppUserModel();
+
                 var authState = await _authStateProvider.GetAuthenticationStateAsync();
 
-                Client = _authStateProvider.AppUser ?? new AppUserModel();
+                var claims = authState.User.Claims.ToList();
+
+                string GetClaim(string type) =>
+                    claims.FirstOrDefault(c => c.Type.Equals(type, StringComparison.OrdinalIgnoreCase))?.Value ?? "";
+
+                Client = new AppUserModel
+                {
+                    UserID = authState.User.Identity?.Name ?? "",
+                    DisplayName = GetClaim("DisplayName"),
+                    Designation = GetClaim("Designation"),
+                    UserEmail = GetClaim(ClaimTypes.Email),
+                    Role = GetClaim(ClaimTypes.Role),
+                    DataFile = GetClaim("DBFile"),
+                    Company = GetClaim("Company"),
+                    PIN = GetClaim("PIN"),
+                    Session = GetClaim("Session"),
+                    LanguageID = int.TryParse(GetClaim("LanguageID"), out var id) ? id : 0
+                };
 
                 AppPaths.DBFile = Client.DataFile;
                 UserID = Client.UserID;
@@ -281,6 +301,12 @@ namespace AppliedAccounts.Services
         {
             _initLock?.Dispose();
             GC.SuppressFinalize(this);
+        }
+
+        internal string GetDatabasePath()
+        {
+            string _Path = Path.Combine(Directory.GetCurrentDirectory(),  AppPaths.RootPath, AppPaths.ClientPath);
+            return _Path;
         }
         #endregion
     }

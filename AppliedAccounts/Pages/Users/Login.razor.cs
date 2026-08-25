@@ -119,6 +119,10 @@ namespace AppliedAccounts.Pages.Users
 
                 var updateDB = new AppliedDB.CreateDB.UpdateDB(dbPath, AppGlobal.AppPaths);
                 await updateDB.UpdateDatabaseAsync(); // Assuming async version exists
+               
+                AppliedDB.CreateDB.DBPatches dbPatches = new(AppGlobal.AppPaths);
+                await dbPatches.ExecutePatches();
+                
 
                 return true;
             }

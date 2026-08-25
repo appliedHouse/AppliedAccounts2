@@ -1,5 +1,4 @@
 ﻿@page "/ImportCOA"
-@using AppliedAccounts.Component.Libs
 @using AppliedAccounts.Models
 @using AppliedAccounts.Services
 @using System.Data
@@ -29,7 +28,12 @@
     }
 }
 
-<PageHeading Text="Import Chart of Accounts" />
+@* <PageHeading Text="Import Chart of Accounts" /> *@
+
+<div class="alert alert-light" role="alert">
+    Import Chart of Accounts
+</div>
+
 
 @if (ShowSpinner)
 {

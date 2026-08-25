@@ -252,63 +252,64 @@ namespace VoucherPosting
 
         #region Cash or Bank Voucher Unpost
 
-        public async Task DoCashUnPost()
+        public async Task<bool> DoCashUnPost()
         {
             MsgClass = new();
 
             Vou_No ??= string.Empty;
-            await Task.Run(() =>
+            try
             {
-                try
+                if (Vou_No.Length > 0)
                 {
-                    if (Vou_No.Length > 0)
+                    var _Ledger = Source.GetTable(AppliedDB.Enums.Tables.Ledger, $"Vou_No='{Vou_No}'");
+                    if (_Ledger.Rows.Count > 0)
                     {
-                        var _Ledger = Source.GetTable(AppliedDB.Enums.Tables.Ledger, $"Vou_No='{Vou_No}'");
-                        if (_Ledger.Rows.Count > 0)
+                        Source.BeginTransaction();
+                        #region Delete Voucher
+                        foreach (DataRow Row in _Ledger.Rows)
                         {
-                            Source.BeginTransaction();
-                            #region Delete Voucher
-                            foreach (DataRow Row in _Ledger.Rows)
-                            {
-                                if (!Source.Delete(Row))
-                                {
-                                    UnPostSuccessful = false;
-                                    MsgClass.Warning(Messages.TransactionRollback);
-                                    Source.RollbackTransaction();               // Delete the row successfully Otherwsie rollback
-                                }
-                            }
-                            #endregion
-
-                            #region Mark as Posted
-
-                            DataRow _PostedRow = Source.GetDataRow(AppliedDB.Enums.Tables.Book, Vou_ID)!;
-                            if (_PostedRow != null)
-                            {
-                                _PostedRow["Status"] = "Submitted";
-                                Source.Save(_PostedRow);
-                                Source.CommitTransaction();                 // At the end commit the transaction
-                                UnPostSuccessful = true;
-                                MsgClass.Success(Messages.TransactionCommited);
-                            }
-                            else
+                            if (!Source.Delete(Row))
                             {
                                 UnPostSuccessful = false;
                                 MsgClass.Warning(Messages.TransactionRollback);
-                                Source.RollbackTransaction();               // Otherwsie rollback
+                                Source.RollbackTransaction();               // Delete the row successfully Otherwsie rollback
                             }
-
-                            #endregion
                         }
+                        #endregion
+
+                        #region Mark as Posted
+
+                        DataRow _PostedRow = Source.GetDataRow(AppliedDB.Enums.Tables.Book, Vou_ID)!;
+                        if (_PostedRow != null)
+                        {
+                            _PostedRow["Status"] = "Submitted";
+                            Source.Save(_PostedRow);
+                            Source.CommitTransaction();                 // At the end commit the transaction
+                            UnPostSuccessful = true;
+                            MsgClass.Success(Messages.TransactionCommited);
+                            return true;
+                        }
+                        else
+                        {
+                            UnPostSuccessful = false;
+                            MsgClass.Warning(Messages.TransactionRollback);
+                            Source.RollbackTransaction();               // Otherwsie rollback
+                        }
+
+                        #endregion
                     }
                 }
-                catch (Exception ex)
-                {
-                    MsgClass.Danger(ex.Message);
-                    Source.RollbackTransaction();
-                }
-            });
+            }
+
+            catch (Exception ex)
+            {
+                MsgClass.Danger(ex.Message);
+                Source.RollbackTransaction();
+            }
+        
+            return false;
         }
 
         #endregion
-    }
+}
 }

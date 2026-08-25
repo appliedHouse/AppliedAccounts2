@@ -26,6 +26,24 @@ namespace AppReports
         #endregion
 
         #region Constructor
+        public ReportModel(ReportData reportDataSource)
+        {
+
+            InputReport = new InputReport();
+            OutputReport = new OutputReport();
+            ReportDataSource = reportDataSource;
+
+            Messages = [];
+            ReportParameters = [];
+            ReportBytes = [];
+
+            Messages.Add($"{DateTimeNow}: Report Class Started.");
+            Messages.Add($"{DateTimeNow}: InputReport.BasePath {InputReport.BasePath}");
+            Messages.Add($"{DateTimeNow}: OutputReport.BasePath {OutputReport.ReportUrl}");
+            Messages.Add($"{DateTimeNow}: DataSource DataSet {ReportDataSource.DataSetName}");
+            Messages.Add($"{DateTimeNow}: DataSource DataTable {ReportDataSource.ReportTable.TableName}");
+        }
+
         public ReportModel()
         {
 
@@ -38,14 +56,9 @@ namespace AppReports
             ReportBytes = [];
 
             Messages.Add($"{DateTimeNow}: Report Class Started.");
-
-            //InputReport.BasePath = Directory.GetCurrentDirectory();
-            //OutputReport.BasePath = Directory.GetCurrentDirectory();
-
             Messages.Add($"{DateTimeNow}: InputReport.BasePath {InputReport.BasePath}");
             Messages.Add($"{DateTimeNow}: OutputReport.BasePath {OutputReport.ReportUrl}");
         }
-
 
         #endregion
 

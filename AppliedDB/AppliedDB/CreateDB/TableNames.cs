@@ -36,6 +36,7 @@
                 "Inv_Size",
                 "Inv_SubCategory",
                 "Inv_UOM",
+                "Inv_Price",
                 "Ledger",
                 "OBALCompany",
                 "OBALStock",
@@ -55,7 +56,10 @@
                 "view_Book",
                 "view_BillPayable",
                 "view_BillReceivable",
-                "View_Ledger"
+                "view_Ledger",
+                "view_Purchased",
+                "view_sold",
+                "view_Receipts"
             };
             return tableNames;
         }

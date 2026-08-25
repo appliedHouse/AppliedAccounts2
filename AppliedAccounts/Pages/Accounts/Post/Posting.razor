@@ -102,7 +102,7 @@
                         var _RowID = item.ID;
                         var _DR = item.DR.ToString(Format.Digit);
                         var _CR = item.CR.ToString(Format.Digit);
-                        var _Posted = item.Status == "Posted" ? true : false;
+                        var _Posted = item.Status == Status.Posted.ToString() ? true : false;
 
                         <tr>
                             <td class="TextCenter">@item.Vou_No</td>

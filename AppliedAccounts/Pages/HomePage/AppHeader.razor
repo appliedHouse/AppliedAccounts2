@@ -25,16 +25,16 @@
         AppUserName = AppUser.DisplayName;
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await Task.Run(() =>
-        {
-            AppUser = ((UserAuthenticationStateProvider)Authorized).AppUser;
-            CompanyName = AppUser.Company;
-            AppUserName = AppUser.DisplayName;
-            InvokeAsync(() => StateHasChanged());
-        });
-    }
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     await Task.Run(() =>
+    //     {
+    //         AppUser = ((UserAuthenticationStateProvider)Authorized).AppUser;
+    //         CompanyName = AppUser.Company;
+    //         AppUserName = AppUser.DisplayName;
+    //         InvokeAsync(() => StateHasChanged());
+    //     });
+    // }
 
     private void ChangeLanguage(string lang)
     {

@@ -1,14 +1,17 @@
-﻿using AppliedAccounts.Data;
+﻿using AppliedAccounts.Component;
+using AppliedAccounts.Data;
 using AppliedAccounts.Pages.Accounts;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppReports;
+using Microsoft.JSInterop;
 using System.Data;
+using static AppliedAccounts.Models.BookModel;
 using Enums = AppliedDB.Enums;
-using Status = AppliedDB.Enums.Status;
 using Format = AppliedGlobals.AppValues.Format;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
 using Messages = AppMessages.Enums.Messages;
+using Status = AppliedDB.Enums.Status;
 
 namespace AppliedAccounts.Models
 {
@@ -43,42 +46,6 @@ namespace AppliedAccounts.Models
         {
             AppGlobals = _AppGlobal;
             MsgService = AppGlobals.MsgService;
-            Source = new(AppGlobals.AppPaths);
-            GetKeys();
-
-            try
-            {
-                if (_BookID == 0) { BookID = 1; } else { BookID = _BookID; }
-                var result = Source?.SeekValue(Enums.Tables.COA, BookID, "Nature") ?? 0;
-                if (result.GetType() == typeof(DBNull)) { BookNatureID = 1; }        // Use Dafault ID
-                if (result.GetType() == typeof(long)) { BookNatureID = (long)result; }        // Use Dafault ID
-                if (result.GetType() != typeof(long))
-                {
-                    long.TryParse(result.ToString(), out long _Value);
-                    BookNatureID = _Value;
-                }
-
-                BookID = _BookID;
-
-                NatureAccountsList =
-                [
-                    new() { ID = 1, Code = "01", Title = "Cash" },
-                    new() { ID = 2, Code = "02", Title = "Bank" },
-                ];
-
-                PageIsValid = LoadData();
-            }
-            catch (Exception error)
-            {
-                MsgService!.Error(error);
-            }
-        }
-
-
-        public BookListModel(int _BookID, GlobalService _AppGlobal, MessagesService msgService)
-        {
-            AppGlobals = _AppGlobal;
-            MsgService = msgService;
             Source = new(AppGlobals.AppPaths);
             GetKeys();
 
@@ -307,9 +274,19 @@ namespace AppliedAccounts.Models
             }
         }
 
-        internal bool DeleteAll(long VoucherID)
+        public async Task<bool> DeleteAll(long VoucherID)
         {
-            throw new NotImplementedException();
+            if (AppGlobals.Client.Role == "Administrator")
+            {
+                BookModel bookModel = new(VoucherID,BookID,AppGlobals,MsgService);
+                var IsDeleted = bookModel.DeleteVoucher();
+                return IsDeleted;
+            }
+            else
+            {
+                await AppGlobals.JS.InvokeVoidAsync("alert", "You are not authorized to delete voucher");
+            }
+            return false;
         }
         #endregion
 

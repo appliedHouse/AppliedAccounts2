@@ -1,0 +1,90 @@
+﻿@page "/crypto"
+
+
+<div class="container mt-3 bg-light">
+    <h3>🔐 AES Encryption / Decryption Tester</h3>
+
+    <EditForm Model="@Model" OnValidSubmit="@HandleEncrypt">
+        <div class="row mt-5 mb-3">
+            <div class="col-4">
+                <label class="form-label">Plain Text:</label>
+                <InputText class="form-control" @bind-Value="Model.PlainText" />
+            </div>
+            <div class="col-4">
+                <label class="form-label">Passphrase:</label>
+                <InputText class="form-control" type="password" @bind-Value="Model.Passphrase" />
+            </div>
+            <div class="col-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Encrypt</button>
+            </div>
+        </div>
+    </EditForm>
+
+    <EditForm Model="@Model" OnValidSubmit="@HandleDecrypt">
+        <div class="row mb-3">
+            <div class="col-4">
+                <label class="form-label">Encrypted Text:</label>
+                <InputText class="form-control" @bind-Value="Model.EncryptedText" />
+            </div>
+            <div class="col-4">
+                <label class="form-label">Passphrase:</label>
+                <InputText class="form-control" type="password" @bind-Value="Model.Passphrase" />
+            </div>
+            <div class="col-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-secondary">Decrypt</button>
+            </div>
+        </div>
+    </EditForm>
+
+    <div class="row">
+        <div class="col-6">
+            <label class="form-label">Encrypted (Base64):</label>
+            <textarea class="form-control" rows="3" readonly>@Model.EncryptedText</textarea>
+        </div>
+        <div class="col-6">
+            <label class="form-label">Decrypted Text:</label>
+            <textarea class="form-control" rows="3" readonly>@Model.DecryptedText</textarea>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CryptoModel Model { get; set; } = new();
+
+    private void HandleEncrypt()
+    {
+        if (string.IsNullOrEmpty(Model.PlainText) || string.IsNullOrEmpty(Model.Passphrase))
+        {
+            Model.EncryptedText = "Please provide both plain text and a passphrase.";
+            return;
+        }
+
+        try
+        {
+            Model.EncryptedText = CryptoHelper.MyEncrypt(Model.PlainText, Model.Passphrase);
+            Model.DecryptedText = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            Model.EncryptedText = $"Error: {ex.Message}";
+        }
+    }
+
+    private void HandleDecrypt()
+    {
+        if (string.IsNullOrEmpty(Model.EncryptedText) || string.IsNullOrEmpty(Model.Passphrase))
+        {
+            Model.DecryptedText = "Please provide encrypted text and the correct passphrase.";
+            return;
+        }
+
+        try
+        {
+            Model.DecryptedText = CryptoHelper.MyDecrypt(Model.EncryptedText, Model.Passphrase);
+        }
+        catch (Exception ex)
+        {
+            Model.DecryptedText = $"Error: {ex.Message}";
+        }
+    }
+}

@@ -15,16 +15,16 @@
         {
             if (firstRender)
             {
-                await AppGlobals.JS.InvokeVoidAsync("initializeOffcanvas", "offcanvasRight");
+                await JS.InvokeVoidAsync("initializeOffcanvas", "offcanvasRight");
             }
 
             if (IsOpen)
             {
-                await AppGlobals.JS.InvokeVoidAsync("openOffcanvas", "offcanvasRight");
+                await JS.InvokeVoidAsync("openOffcanvas", "offcanvasRight");
             }
             else
             {
-                await AppGlobals.JS.InvokeVoidAsync("closeOffcanvas", "offcanvasRight");
+                await JS.InvokeVoidAsync("closeOffcanvas", "offcanvasRight");
             }
         }
         catch (Exception)
@@ -95,6 +95,19 @@
         }
     }
 
+    private void OpenImportData()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("closeOffcanvas", "offcanvasRight");
+            AppGlobals.NavManager.NavigateTo("/ImportData");
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+
     private void NavigateToConfig()
     {
         try
@@ -135,6 +148,11 @@
         }
     }
     #endregion
+
+    private void OpenEncrypt()
+    {
+        AppGlobals.NavManager.NavigateTo("/Setting/Encrypt");
+    }
 }
 
 <div class="offcanvas offcanvas-end"
@@ -170,6 +188,13 @@
                     <i class="bi bi-gear me-2"></i>Reset Password
                 </button>
 
+                <button class="btn btn-primary" @onclick="OpenImportData">
+                    <i class="bi bi-gear me-2"></i>Import Data
+                </button>
+
+                <button class="btn btn-primary" @onclick="OpenEncrypt">
+                    <i class="bi bi-gear me-2"></i>Password Encrypt
+                </button>
                 <!-- Configuration Page Button -->
                 <button class="btn btn-outline-danger" @onclick="NavigateToConfig">
                     <i class="bi bi-box-arrow-right me-2"></i>Configuration Page
