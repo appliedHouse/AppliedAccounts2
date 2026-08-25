@@ -23,8 +23,6 @@ namespace AppliedAccounts.Pages.Accounts.Post
             MyViewModel.Dt_To = MyModel.Source.GetDate("UnPost_dt_To");
             MyViewModel.PostingType = (PostingTypes)MyModel.Source.GetNumber("UnPost_Type");
 
-            MyModel.Pages.Size = 100;
-
             MyModel.Pages.PageChanged += OnPageChangedInternal;
 
             await MyModel.LoadData(MyViewModel);
@@ -51,9 +49,6 @@ namespace AppliedAccounts.Pages.Accounts.Post
             MyModel.Source.SetKey("UnPostBank", false, KeyTypes.Boolean);    // Reset Post Bank Voucher Status
             MyModel.Source.SetKey("UnPostReceipt", false, KeyTypes.Boolean);
 
-            MyModel.Pages = new();
-            MyModel.Pages.Size = 100;
-
             await MyModel.LoadData(MyViewModel);
             await InvokeAsync(StateHasChanged);
         }
@@ -76,7 +71,7 @@ namespace AppliedAccounts.Pages.Accounts.Post
             MyModel.IsPosting = true;
 
             await AppGlobals.JS.InvokeVoidAsync("showModal", "SaveVoucher");
-            await MyModel.DoVoucherUnPost(id, MyViewModel.PostingType);
+            await MyModel.DoVoucherUnPost(id, MyViewModel);
             await AppGlobals.JS.InvokeVoidAsync("hideModal", "SaveVoucher");
             MyModel.IsPosting = false;
 

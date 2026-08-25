@@ -47,11 +47,6 @@ namespace AppliedAccounts.Models.Posting
         }
 
         #region Load Data
-        //public async Task LoadData()
-        //{
-        //    await LoadData(UnPostVM);
-        //}
-
 
         public async Task LoadData(UnPostViewModel model)
         {
@@ -296,7 +291,7 @@ namespace AppliedAccounts.Models.Posting
 
         #region Voucher UnPost
 
-        public async Task<bool> DoVoucherPosting(long vouId, UnPostViewModel model)
+        public async Task<bool> DoVoucherUnPost(long vouId, UnPostViewModel model)
         {
             MsgService.Clear();
 
@@ -324,149 +319,117 @@ namespace AppliedAccounts.Models.Posting
                 return false;
             }
 
-            var post = new PostCashBook(Source, postingModel, MsgService.MsgClass);
-            var result = false;
-
-            switch (model.PostingType)
+            #region Cash and Bank Unpost
+            if (model.PostingType == PostingTypes.CashBook || model.PostingType == PostingTypes.BankBook)
             {
-                case PostingTypes.CashBook:
-                    result = await post.DoCashUnPost();
-                    break;
 
-                case PostingTypes.BankBook:
-                    result = await post.DoCashUnPost();
-                    break;
+                var post = new PostCashBook(Source, postingModel, MsgService.MsgClass);
+                var result = false;
 
-                default:
+                switch (model.PostingType)
+                {
+                    case PostingTypes.CashBook:
+                        result = await post.DoCashUnPost();
+                        break;
+
+                    case PostingTypes.BankBook:
+                        result = await post.DoCashUnPost();
+                        break;
+                    default:
+                        return false;
+                }
+
+                MsgService.MsgClass.AddRange(post.MsgClass);
+
+                if (result)
+                {
+                    MsgService.Clear();
+                    MsgService.Success(Messages.Posted);
+                    await LoadData(model);
+                    return true;
+                }
+                else
+                {
+                    MsgService.AddRange(post.MsgClass);
+                    MsgService.Critical(Messages.NotSave);
                     return false;
+                }
+
             }
+            #endregion
 
-            MsgService.MsgClass.AddRange(post.MsgClass);
 
-            if (result)
+
+            #region Unpost Receivable
+            if (model.PostingType.Equals(PostingTypes.BillReceivable))
             {
-                MsgService.Clear();
-                MsgService.Success(Messages.Posted);
-                await LoadData(model);
-                return true;
+                var post = new PostBillReceivable();
+                post.MsgClass = MsgService.MsgClass;
+                post.Source = Source;
+
+                var IsPosted = await post.BillReceivable(Source.DBFile, vouId);
+                if (IsPosted)
+                {
+                    MsgService.Success(Messages.VoucherPosted);
+                }
+                else
+                {
+                    MsgService.Success(Messages.VoucherNotPosted);
+                }
             }
-            else
+
+            #endregion
+
+            #region Unpost Payable
+            if (model.PostingType.Equals(PostingTypes.BillPayable))
             {
-                MsgService.AddRange(post.MsgClass);
-                MsgService.Critical(Messages.NotSave);
-                return false;
+                var post = new PostBillPayable();
+                post.MsgClass = MsgService.MsgClass;
+                post.Source = Source;
+
+                var IsPosted = await post.BillPayable(Source.DBFile, vouId);
+                if (IsPosted)
+                {
+                    MsgService.Success(Messages.VoucherPosted);
+                }
+                else
+                {
+                    MsgService.Success(Messages.VoucherNotPosted);
+                }
             }
-        }
 
-        internal async Task DoVoucherUnPost(long id, PostingTypes postingType)
-        {
-            throw new NotImplementedException();
-        }
+            #endregion
 
-        //public async Task<bool> DoVoucherUnPost(long _VouID, PostingTypes _PostType)
-        //{
-        //    if (_PostType == 0) { return false; }         // Return if type not assigned.
-
-        //    // Cash Book Posting
-        //    if (_PostType == PostingTypes.CashBook)
-        //    {
-        //        VoucherPostingModel postingModel = new(); ;
-
-        //        postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
-        //        postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
-
-        //        if (postingModel.MasterTable.Rows.Count == 0)
-        //        {
-        //            MsgService.Warning(Messages.VoucherNotFound);
-        //            return false;
-        //        }
-
-        //        if (postingModel.DetailTable.Rows.Count == 0)
-        //        {
-        //            MsgService.Warning(Messages.PostingDetailRecordNotFound);
-        //            return false;
-        //        }
+            #region Unpost Receipt
+            #endregion
 
 
-        //        MsgService.Clear();                            // Clear all previous messages. 
-        //        PostCashBook postCashBook = new(Source, postingModel);
-        //        await postCashBook.DoCashUnPost();                  // Cash Posting main method.
-        //        //if (postCashBook.UnPostSuccessful)
-        //        //{
-        //        //    MsgService.Success(Messages.Saved);        // add message after Save selected Vouchers.
-        //        //    await LoadData();                          // Refresh display Data afger save voucher.
-        //        //    return true;
-        //        //}
-        //        //else
-        //        //{
-        //        //    MsgService.MsgClass.AddRange(postCashBook.MsgClass);
-        //        //    return false;
-        //        //}
-        //    }
-
-        //    // Bank Book Posting
-        //    if (_PostType == PostingTypes.BankBook)
-        //    {
-        //        VoucherPostingModel postingModel = new();
-
-        //        postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
-        //        postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
-
-        //        if (postingModel.MasterTable.Rows.Count == 0)
-        //        {
-        //            MsgService.Warning(Messages.VoucherNotFound);
-        //            return false;
-        //        }
-
-
-        //        MsgService.Clear();                           // Clear all previous messages. 
-        //        PostCashBook postBankBook = new(Source, postingModel);
-        //        // Cash & Bank Voucher data table is same. so here using same fucntion as using for cash
-        //        await postBankBook.DoCashUnPost();
-        //        if (postBankBook.PostSuccessful)
-        //        {
-        //            MsgService.Success(Messages.Saved);        // add message after Save selected Vouchers.
-        //            await LoadData();                          // Refresh display Data afger save voucher.
-        //            return true;
-        //        }
-        //        else
-        //        {
-        //            MsgService.MsgClass.AddRange(postBankBook.MsgClass);
-        //            return false;
-        //        }
-        //    }
-
-        //    // Bill Receivable Posting  
-        //    if (_PostType == PostingTypes.BillReceivable)
-        //    {
-        //        PostBillReceivable UnPostBillReceivable = new();
-
-        //        return false;
-        //    }
-        //    return false;
-        //}
-
-        #endregion
-
-
-        #region Model  razor page view in Table Tax
-
-        public class DataListModel
-        {
-            public long ID { get; set; }
-            public string Vou_No { get; set; }
-            public DateTime Vou_Date { get; set; }
-
-            public string Title { get; set; }
-            public decimal DR { get; set; }
-            public decimal CR { get; set; }
-            public decimal Amount { get; set; }
-
-            public string Status { get; set; }
-            public bool Active { get; set; }
-            public bool Selected { get; set; }
-
+            return false;
         }
         #endregion
     }
+
+
+
+
+    #region Model  razor page view in Table Tax
+
+    public class DataListModel
+    {
+        public long ID { get; set; }
+        public string Vou_No { get; set; }
+        public DateTime Vou_Date { get; set; }
+
+        public string Title { get; set; }
+        public decimal DR { get; set; }
+        public decimal CR { get; set; }
+        public decimal Amount { get; set; }
+
+        public string Status { get; set; }
+        public bool Active { get; set; }
+        public bool Selected { get; set; }
+
+    }
+    #endregion
 }
+
