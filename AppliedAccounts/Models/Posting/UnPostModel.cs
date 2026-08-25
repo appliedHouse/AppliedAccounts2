@@ -30,28 +30,27 @@ namespace AppliedAccounts.Models.Posting
 
         public UnPostModel(GlobalService appGlobal)
         {
-
-            if (appGlobal != null)
-            {
-                AppGlobal = appGlobal;
-                Source = new(AppGlobal.AppPaths);
-            }
-            Pages.PageChanged += OnPageChangedInternal;
+            AppGlobal = appGlobal;
+            Source = new(appGlobal.AppPaths);
+            MsgService = appGlobal.MsgService;
         }
 
-
-        private async void OnPageChangedInternal(int page)
+        public void Init()
         {
-            if (UnPostVM is null) { return; }
-            await LoadData();
+            Source ??= new DataSource(AppGlobal.AppPaths);
 
+            if (_coaCache.Count == 0)
+                LoadCOA();
+
+            _cashIds ??= LoadAccountIds(SQLQueries.Quries.GetCashAccounts());
+            _bankIds ??= LoadAccountIds(SQLQueries.Quries.GetBankAccounts());
         }
 
         #region Load Data
-        public async Task LoadData()
-        {
-            await LoadData(UnPostVM);
-        }
+        //public async Task LoadData()
+        //{
+        //    await LoadData(UnPostVM);
+        //}
 
 
         public async Task LoadData(UnPostViewModel model)
@@ -88,6 +87,8 @@ namespace AppliedAccounts.Models.Posting
 
             Pages.Refresh(Source.GetCount(Tables.Book, $"BookID IN ({string.Join(",", ids)}) AND {filter}"));
 
+
+            #region Temp
             //Source ??= new(AppGlobal.AppPaths);
             //UnPostVM = _UnPostVM;
 
@@ -137,39 +138,41 @@ namespace AppliedAccounts.Models.Posting
 
 
 
-                //case PostingTypes.WriteCheques:
-                //    DataListModelList.Clear();
-                //    break;
+            //case PostingTypes.WriteCheques:
+            //    DataListModelList.Clear();
+            //    break;
 
-                //case PostingTypes.BillPayable:
-                //    DataListModelList.Clear();
-                //    break;
+            //case PostingTypes.BillPayable:
+            //    DataListModelList.Clear();
+            //    break;
 
-                //case PostingTypes.BillReceivable:
-                //    DataListModelList.Clear();
-                //    break;
+            //case PostingTypes.BillReceivable:
+            //    DataListModelList.Clear();
+            //    break;
 
-                //case PostingTypes.Receipt:
-                //    DataListModelList.Clear();
-                //    break;
+            //case PostingTypes.Receipt:
+            //    DataListModelList.Clear();
+            //    break;
 
-                //case PostingTypes.Payment:
-                //    DataListModelList.Clear();
-                //    break;
+            //case PostingTypes.Payment:
+            //    DataListModelList.Clear();
+            //    break;
 
-                //case PostingTypes.SalesReturn:
-                //    DataListModelList.Clear();
-                //    break;
+            //case PostingTypes.SalesReturn:
+            //    DataListModelList.Clear();
+            //    break;
 
-                //case PostingTypes.Production:
-                //    DataListModelList.Clear();
-                //    break;
+            //case PostingTypes.Production:
+            //    DataListModelList.Clear();
+            //    break;
 
 
-                //default:
-                //    DataListModelList.Clear();
-                //    break;
+            //default:
+            //    DataListModelList.Clear();
+            //    break;
             //}
+            #endregion
+
 
             await Task.CompletedTask;
             //await Task.Delay(100);
@@ -197,17 +200,6 @@ namespace AppliedAccounts.Models.Posting
         private string BuildPaging()
         {
             return $"ORDER BY Vou_Date, Vou_No LIMIT {Pages.Size} OFFSET {(Pages.Current - 1) * Pages.Size}";
-        }
-
-        public void Init()
-        {
-            Source ??= new DataSource(AppGlobal.AppPaths);
-
-            if (_coaCache.Count == 0)
-                LoadCOA();
-
-            _cashIds ??= LoadAccountIds(SQLQueries.Quries.GetCashAccounts());
-            _bankIds ??= LoadAccountIds(SQLQueries.Quries.GetBankAccounts());
         }
 
         private void LoadCOA()
@@ -304,88 +296,155 @@ namespace AppliedAccounts.Models.Posting
 
         #region Voucher UnPost
 
-        public async Task<bool> DoVoucherUnPost(long _VouID, PostingTypes _PostType)
+        public async Task<bool> DoVoucherPosting(long vouId, UnPostViewModel model)
         {
-            if (_PostType == 0) { return false; }         // Return if type not assigned.
+            MsgService.Clear();
 
-            // Cash Book Posting
-            if (_PostType == PostingTypes.CashBook)
+            if (model.PostingType == 0)
             {
-                VoucherPostingModel postingModel = new(); ;
-
-                postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
-                postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
-
-                if (postingModel.MasterTable.Rows.Count == 0)
-                {
-                    MsgService.Warning(Messages.VoucherNotFound);
-                    return false;
-                }
-
-                if (postingModel.DetailTable.Rows.Count == 0)
-                {
-                    MsgService.Warning(Messages.PostingDetailRecordNotFound);
-                    return false;
-                }
-
-
-                MsgService.Clear();                            // Clear all previous messages. 
-                PostCashBook postCashBook = new(Source, postingModel);
-                await postCashBook.DoCashUnPost();                  // Cash Posting main method.
-                if (postCashBook.UnPostSuccessful)
-                {
-                    MsgService.Success(Messages.Saved);        // add message after Save selected Vouchers.
-                    await LoadData();                          // Refresh display Data afger save voucher.
-                    return true;
-                }
-                else
-                {
-                    MsgService.MsgClass.AddRange(postCashBook.MsgClass);
-                    return false;
-                }
-            }
-
-            // Bank Book Posting
-            if (_PostType == PostingTypes.BankBook)
-            {
-                VoucherPostingModel postingModel = new();
-
-                postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
-                postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
-
-                if (postingModel.MasterTable.Rows.Count == 0)
-                {
-                    MsgService.Warning(Messages.VoucherNotFound);
-                    return false;
-                }
-
-
-                MsgService.Clear();                           // Clear all previous messages. 
-                PostCashBook postBankBook = new(Source, postingModel);
-                // Cash & Bank Voucher data table is same. so here using same fucntion as using for cash
-                await postBankBook.DoCashUnPost();
-                if (postBankBook.PostSuccessful)
-                {
-                    MsgService.Success(Messages.Saved);        // add message after Save selected Vouchers.
-                    await LoadData();                          // Refresh display Data afger save voucher.
-                    return true;
-                }
-                else
-                {
-                    MsgService.MsgClass.AddRange(postBankBook.MsgClass);
-                    return false;
-                }
-            }
-
-            // Bill Receivable Posting  
-            if (_PostType == PostingTypes.BillReceivable)
-            {
-                PostBillReceivable UnPostBillReceivable = new();
-
+                MsgService.Danger(Messages.PostingTypeNotDefined);
                 return false;
             }
-            return false;
+
+            var postingModel = new VoucherPostingModel
+            {
+                MasterTable = Source.GetTable(Tables.Book, $"ID={vouId}"),
+                DetailTable = Source.GetTable(Tables.Book2, $"TranID={vouId}")
+            };
+
+            if (postingModel.MasterTable.Rows.Count == 0)
+            {
+                MsgService.Danger(Messages.PostingMasterRecordNotFound);
+                return false;
+            }
+
+            if (postingModel.DetailTable.Rows.Count == 0)
+            {
+                MsgService.Danger(Messages.PostingDetailRecordNotFound);
+                return false;
+            }
+
+            var post = new PostCashBook(Source, postingModel, MsgService.MsgClass);
+            var result = false;
+
+            switch (model.PostingType)
+            {
+                case PostingTypes.CashBook:
+                    result = await post.DoCashUnPost();
+                    break;
+
+                case PostingTypes.BankBook:
+                    result = await post.DoCashUnPost();
+                    break;
+
+                default:
+                    return false;
+            }
+
+            MsgService.MsgClass.AddRange(post.MsgClass);
+
+            if (result)
+            {
+                MsgService.Clear();
+                MsgService.Success(Messages.Posted);
+                await LoadData(model);
+                return true;
+            }
+            else
+            {
+                MsgService.AddRange(post.MsgClass);
+                MsgService.Critical(Messages.NotSave);
+                return false;
+            }
         }
+
+        internal async Task DoVoucherUnPost(long id, PostingTypes postingType)
+        {
+            throw new NotImplementedException();
+        }
+
+        //public async Task<bool> DoVoucherUnPost(long _VouID, PostingTypes _PostType)
+        //{
+        //    if (_PostType == 0) { return false; }         // Return if type not assigned.
+
+        //    // Cash Book Posting
+        //    if (_PostType == PostingTypes.CashBook)
+        //    {
+        //        VoucherPostingModel postingModel = new(); ;
+
+        //        postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
+        //        postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
+
+        //        if (postingModel.MasterTable.Rows.Count == 0)
+        //        {
+        //            MsgService.Warning(Messages.VoucherNotFound);
+        //            return false;
+        //        }
+
+        //        if (postingModel.DetailTable.Rows.Count == 0)
+        //        {
+        //            MsgService.Warning(Messages.PostingDetailRecordNotFound);
+        //            return false;
+        //        }
+
+
+        //        MsgService.Clear();                            // Clear all previous messages. 
+        //        PostCashBook postCashBook = new(Source, postingModel);
+        //        await postCashBook.DoCashUnPost();                  // Cash Posting main method.
+        //        //if (postCashBook.UnPostSuccessful)
+        //        //{
+        //        //    MsgService.Success(Messages.Saved);        // add message after Save selected Vouchers.
+        //        //    await LoadData();                          // Refresh display Data afger save voucher.
+        //        //    return true;
+        //        //}
+        //        //else
+        //        //{
+        //        //    MsgService.MsgClass.AddRange(postCashBook.MsgClass);
+        //        //    return false;
+        //        //}
+        //    }
+
+        //    // Bank Book Posting
+        //    if (_PostType == PostingTypes.BankBook)
+        //    {
+        //        VoucherPostingModel postingModel = new();
+
+        //        postingModel.MasterTable = Source.GetTable(Tables.Book, $"ID={_VouID}");
+        //        postingModel.DetailTable = Source.GetTable(Tables.Book2, $"TranID={_VouID}");
+
+        //        if (postingModel.MasterTable.Rows.Count == 0)
+        //        {
+        //            MsgService.Warning(Messages.VoucherNotFound);
+        //            return false;
+        //        }
+
+
+        //        MsgService.Clear();                           // Clear all previous messages. 
+        //        PostCashBook postBankBook = new(Source, postingModel);
+        //        // Cash & Bank Voucher data table is same. so here using same fucntion as using for cash
+        //        await postBankBook.DoCashUnPost();
+        //        if (postBankBook.PostSuccessful)
+        //        {
+        //            MsgService.Success(Messages.Saved);        // add message after Save selected Vouchers.
+        //            await LoadData();                          // Refresh display Data afger save voucher.
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            MsgService.MsgClass.AddRange(postBankBook.MsgClass);
+        //            return false;
+        //        }
+        //    }
+
+        //    // Bill Receivable Posting  
+        //    if (_PostType == PostingTypes.BillReceivable)
+        //    {
+        //        PostBillReceivable UnPostBillReceivable = new();
+
+        //        return false;
+        //    }
+        //    return false;
+        //}
 
         #endregion
 

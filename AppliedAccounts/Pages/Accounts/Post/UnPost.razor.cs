@@ -23,6 +23,8 @@ namespace AppliedAccounts.Pages.Accounts.Post
             MyViewModel.Dt_To = MyModel.Source.GetDate("UnPost_dt_To");
             MyViewModel.PostingType = (PostingTypes)MyModel.Source.GetNumber("UnPost_Type");
 
+            MyModel.Pages.Size = 100;
+
             MyModel.Pages.PageChanged += OnPageChangedInternal;
 
             await MyModel.LoadData(MyViewModel);
@@ -42,17 +44,15 @@ namespace AppliedAccounts.Pages.Accounts.Post
         public async void Refresh()
         {
             MyModel.MsgService.Clear();
-            MyModel.Source.GetNumber("UnPost_Type");
-            MyModel.Source.GetDate("UnPost_dt_From");
-            MyModel.Source.GetDate("UnPost_dt_To");
-            MyModel.Source.GetBoolean("UnPostCash");    // Reset Post Cash Voucher Status
-            MyModel.Source.GetBoolean("UnPostBank");    // Reset Post Bank Voucher Status
-            MyModel.Source.GetBoolean("UnPostReceipt");
+            MyModel.Source.SetKey("UnPost_Type", MyViewModel.PostingType, KeyTypes.Number);
+            MyModel.Source.SetKey("UnPost_dt_From", MyViewModel.Dt_From, KeyTypes.Date);
+            MyModel.Source.SetKey("UnPost_dt_To", MyViewModel.Dt_To, KeyTypes.Date);
+            MyModel.Source.SetKey("UnPostCash", false, KeyTypes.Boolean);    // Reset Post Cash Voucher Status
+            MyModel.Source.SetKey("UnPostBank", false, KeyTypes.Boolean);    // Reset Post Bank Voucher Status
+            MyModel.Source.SetKey("UnPostReceipt", false, KeyTypes.Boolean);
 
             MyModel.Pages = new();
-
-            MyModel.FilterDates[0] = MyViewModel.Dt_From;
-            MyModel.FilterDates[1] = MyViewModel.Dt_To;
+            MyModel.Pages.Size = 100;
 
             await MyModel.LoadData(MyViewModel);
             await InvokeAsync(StateHasChanged);
@@ -75,8 +75,6 @@ namespace AppliedAccounts.Pages.Accounts.Post
         {
             MyModel.IsPosting = true;
 
-            //StateHasChanged();
-
             await AppGlobals.JS.InvokeVoidAsync("showModal", "SaveVoucher");
             await MyModel.DoVoucherUnPost(id, MyViewModel.PostingType);
             await AppGlobals.JS.InvokeVoidAsync("hideModal", "SaveVoucher");
@@ -84,10 +82,6 @@ namespace AppliedAccounts.Pages.Accounts.Post
 
             await MyModel.LoadData(MyViewModel);
             await InvokeAsync(StateHasChanged);
-
-
-
-
 
         }
     }
