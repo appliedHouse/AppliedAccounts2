@@ -1,8 +1,9 @@
 ﻿@page "/ImportData/ImportSalesInvoice"
 
 @attribute [Authorize]
-@using AppliedAccounts.Services
+@using System.Data
 @using AppliedAccounts.Component
+@using AppliedAccounts.Services
 @using Microsoft.AspNetCore.Components.Forms
 
 
@@ -22,7 +23,30 @@
     protected override void OnInitialized()
     {
         Stopwatch.Start();
+
+        if(string.IsNullOrWhiteSpace(AppGlobal.DBFile))
+        {
+            var AppUser = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
+            AppGlobal.AppPaths.DBFile = AppUser.DataFile;
+        }
+
         Source = new(AppGlobal.AppPaths);
+
+        MyModel = new();
+        Source = new(AppGlobal.AppPaths);
+        MyModel.IsClientUpdate = true;             // true if client info update in DB
+
+        ClientList = Source.GetCustomers();
+        EmployeeList = Source.GetEmployees();
+        InventoryList = Source.GetInventory();
+        ProjectList = Source.GetProjects();
+        TaxList = Source.GetTable(Tables.Taxes).AsEnumerable().ToList();
+
+        if (ClientList.Count == 0 || EmployeeList.Count == 0 || InventoryList.Count == 0 || ProjectList.Count == 0 || TaxList.Count == 0)
+        {
+            MyModel.IsError = true;
+            MyModel.ErrorMessage = "Required data is missing in database. Please check Customers, Employees, Inventory, Projects and Taxes data.";
+        }
         
     }
 

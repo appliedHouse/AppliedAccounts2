@@ -310,6 +310,7 @@ namespace AppliedDB
             catch (Exception)
             {
 
+                
                 return new DataTable();
             }
             return new DataTable();
@@ -1061,7 +1062,7 @@ namespace AppliedDB
         {
             if (receiptID > 0)
             {
-                var QueryText = $"SELECT * FROM [view_Receipts] WHERE [TranID] = {receiptID}";
+                var QueryText = SQLQuery.View_Receipts($"[TranID] = {receiptID}");
                 using var _Table = GetDataTable(DBFile, QueryText, "view_Receipt");
                 if (_Table != null && _Table.Columns.Count > 0)
                 {

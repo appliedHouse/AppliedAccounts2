@@ -17,29 +17,35 @@
     {
         Source = new(AppGlobals.AppPaths);
     }
+
+    private void ImportAccount()
+    {
+        NavManager.NavigateTo("/ImportCOA");
+    }
+    private void ImportStock()
+    {
+        NavManager.NavigateTo("/ImportInventory");
+    }
+    private void ImportStockPrice()
+    {
+        NavManager.NavigateTo("/ImportStockPrice");
+    }
 }
 
 <PageHeading Text="Import Data" />
 
+
 <div class="container">
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="tab-accounts" data-bs-toggle="tab" data-bs-target="#tab-accounts-pane" type="button" role="tab" aria-controls="tab-accounts-pane" aria-selected="true">Accounts</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="tab-Stock" data-bs-toggle="tab" data-bs-target="#tab-Stock-pane" type="button" role="tab" aria-controls="tab-Stock-pane" aria-selected="false">Inventory</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="tab-StockPrice" data-bs-toggle="tab" data-bs-target="#tab-StockPrice-pane" type="button" role="tab" aria-controls="tab-StockPrice-pane" aria-selected="false">Inventory Price</button>
-        </li>
-    </ul>
-    <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="tab-accounts-pane" role="tabpanel" aria-labelledby="tab-accounts" tabindex="0">
-            <ImportCOA></ImportCOA>
+    <div class="row">
+        <div class="col">
+            <button class="btn btn-primary" @onclick="ImportAccount">Import COA</button>
         </div>
-        <div class="tab-pane fade" id="tab-Stock-pane" role="tabpanel" aria-labelledby="tab-Stock" tabindex="0">
-            <ImportStock></ImportStock>
+        <div class="col">
+            <button class="btn btn-primary" @onclick="ImportStock">Import Inventory</button>
         </div>
-        <div class="tab-pane fade" id="tab-StockPrice-pane" role="tabpanel" aria-labelledby="tab-StockPrice" tabindex="0">3</div>
+        <div class="col">
+            <button class="btn btn-primary" @onclick="ImportStockPrice">Import Stock Price</button>
+        </div>
+
     </div>
 </div>

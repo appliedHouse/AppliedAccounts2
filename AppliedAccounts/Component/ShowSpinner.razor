@@ -1,11 +1,13 @@
 ﻿@code {
-    [Parameter]  public string? Message {get; set;} 
+    [Parameter]    public string? Message { get; set; }
+    [Parameter]    public string? Type { get; set; } = "info"; 
 }
-
 
 @if (!string.IsNullOrEmpty(Message))
 {
-    <div class="alert alert-warning" role="alert">
-        @Message....
+    var alertType = Type ?? "info";
+
+    <div class="alert alert-@alertType" role="alert">
+        @Message
     </div>
 }

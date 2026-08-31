@@ -1,4 +1,5 @@
-﻿using AppliedAccounts.Data;
+﻿using AppliedAccounts.Authentication;
+using AppliedAccounts.Data;
 using AppliedAccounts.Models;
 using AppliedAccounts.Services;
 using AppliedDB;
@@ -59,24 +60,18 @@ namespace AppliedAccounts.Pages.ImportData
         #region Constructor
         //public ImportSaleInvoice() { }
 
-        public ImportSaleInvoice(GlobalService _AppGlobal)
+        public ImportSaleInvoice()
         {
-            AppGlobal = _AppGlobal;
-            MyModel = new();
-            Source = new(AppGlobal.AppPaths);
-            MyModel.IsClientUpdate = true;             // true if client info update in DB
+            //AppGlobal = _AppGlobal;
 
-            ClientList = Source.GetCustomers();
-            EmployeeList = Source.GetEmployees();
-            InventoryList = Source.GetInventory();
-            ProjectList = Source.GetProjects();
-            TaxList = Source.GetTable(Tables.Taxes).AsEnumerable().ToList();
+            //if (string.IsNullOrWhiteSpace(AppGlobal.DBFile))
+            //{
+            //    var AppUser = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
+            //    AppGlobal.AppPaths.DBFile = AppUser.DataFile;
+            //}
 
-            if (ClientList.Count == 0 || EmployeeList.Count == 0 || InventoryList.Count == 0 || ProjectList.Count == 0 || TaxList.Count == 0)
-            {
-                MyModel.IsError = true;
-                MyModel.ErrorMessage = "Required data is missing in database. Please check Customers, Employees, Inventory, Projects and Taxes data.";
-            }
+
+            
 
         }
         #endregion

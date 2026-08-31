@@ -10,10 +10,11 @@ namespace AppliedAccounts.Models.Import
         public GlobalService AppGlobal { get; set; }
         public string ExcelFileName { get; set; } = "";
         public bool IsExcelLoaded { get; set; } = false;
+        public bool IsDataLoaded { get; set; } = false;
         public string ExcelImportRegistry { get; set; }
         public DataSource Source { get; set; }
         public List<string> TableNames { get; } = ["Inventory", "Inv_Category", "Inv_SubCategory", "Inv_UOM", "Inv_Size", "Inv_Packing"];
-        public string SelectedTable { get; set; }
+        public string SelectedTable { get; set; } = "Inventory";
         public List<DataRow> ImportedData { get; set; } = [];
         public List<DataRow> FilterData { get; set; } = [];
         public MessagesService MsgService { get; set; }
@@ -36,13 +37,13 @@ namespace AppliedAccounts.Models.Import
 
         public void LoadImportedData()
         {
-
+            IsDataLoaded = false;
             string _Path = Source.MyConnections.GetTempDBPath();                         // Connections.GetTempDBPath();                               // Temp DB Path
             string _File = Source.GetText(ExcelImportRegistry);                          // Imported DB File for Stock
             string _ImportDBPath = Path.Combine(_Path, _File + ".db");                   // Connection string Path
             SqliteConnection _TempDBConnection = new($"Data Source={_ImportDBPath}");
             ImportedData = [.. DataSource.GetDataTable(SelectedTable, _TempDBConnection).AsEnumerable()];
-            IsExcelLoaded = true;       // Data Successcully loaded.
+            IsDataLoaded = true;       // Data Successcully loaded.
         }
 
     }

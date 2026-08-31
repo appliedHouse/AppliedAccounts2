@@ -44,23 +44,23 @@ namespace AppliedAccounts.Data.Mapping
                 }
 
                 // Populate Detail for each row
-                var detail = new Detail
+                var detail = new Detail();
                 {
-                    ID2 = Row.Field<long>("ID2"),
-                    Sr_No = Row.Field<int>("Sr_No"),
-                    TranID = Row.Field<long>("TranID"),
-                    Ref_No = Row.Field<string>("Ref_No2") ?? "",
-                    Inv_No = Row.Field<long>("Inv_No"),
-                    Account = Row.Field<long>("Account"),
-                    DR = Row.Field<decimal>("DR"),
-                    CR = Row.Field<decimal>("CR"),
-                    Employee = Row.Field<long>("Employee"),
-                    Project = Row.Field<long>("Project"),
-                    Description = Row.Field<string>("Description") ?? "",
-                    TitleAccount = Row.Field<string>("TitleAccount") ?? "",
-                    TitleProject = Row.Field<string>("TitleProject") ?? "",
-                    TitleEmployee = Row.Field<string>("TitleEmployee") ?? "",
-                    Action = "Found"
+                    detail.ID2 = Row.Field<long>("ID2");
+                    detail.Sr_No = Row.Field<int>("Sr_No");
+                    detail.TranID = Row.Field<long>("TranID");
+                    detail.Ref_No = Row.Field<string>("Ref_No2") ?? "";
+                    detail.Inv_No = Row.Field<long>("Inv_No");
+                    detail.Account = Row.Field<long>("Account");
+                    detail.DR = Row.Field<decimal>("DR");
+                    detail.CR = Row.Field<decimal>("CR");
+                    detail.Employee = Row.Field<long>("Employee");
+                    detail.Project = Row.Field<long>("Project");
+                    detail.Description = Row.Field<string>("Description") ?? "";
+                    detail.TitleAccount = Row.Field<string>("TitleAccount") ?? "";
+                    detail.TitleProject = Row.Field<string>("TitleProject") ?? "";
+                    detail.TitleEmployee = Row.Field<string>("TitleEmployee") ?? "";
+                    detail.Action = "Found";
                 };
 
                 modelVoucher.Details.Add(detail);
