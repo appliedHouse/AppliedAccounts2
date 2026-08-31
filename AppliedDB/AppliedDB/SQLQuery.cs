@@ -616,26 +616,60 @@ namespace AppliedDB
             var _Text = new StringBuilder();
             return "SELECT * FROM [ledger] [L]";
         }
+        #endregion
 
-        public static string View_JV()
+        #region Receipts
+        public static string View_Receipts(string _Filter)
         {
             var _Text = new StringBuilder();
-            _Text.AppendLine("SELECT[L].*,");
-            _Text.AppendLine("[A].[Title] [TitleAccount],");
-            _Text.AppendLine("[C].[Title] [TitleCompany],");
-            _Text.AppendLine("[E].[Title] [TitleEmployee],");
-            _Text.AppendLine("[P].[Title] [TitleProject],");
-            _Text.AppendLine("[I].[Title] [TitleStock]");
-            _Text.AppendLine("FROM [ledger] [L] ");
-            _Text.AppendLine("LEFT JOIN[COA]       [A] ON[A].[ID] = [L].[COA]");
-            _Text.AppendLine("LEFT JOIN[Customers] [C] ON[C].[ID] = [L].[Customer]");
-            _Text.AppendLine("LEFT JOIN[Employees] [E] ON[E].[ID] = [L].[Employee]");
-            _Text.AppendLine("LEFT JOIN[Project]   [P] ON[P].[ID] = [L].[Project]");
-            _Text.AppendLine("LEFT JOIN[Inventory] [I] ON[I].[ID] = [L].[Inventory]");
+            _Text.AppendLine("SELECT");
+            _Text.AppendLine("[R1].[Vou_No],");
+            _Text.AppendLine("[R1].[Vou_Date],");
+            _Text.AppendLine("[R1].[COA],");
+            _Text.AppendLine("[A1].[Title] AS [TitleCOA],");
+            _Text.AppendLine("[R1].[Ref_No],");
+            _Text.AppendLine("[R1].[Payer],");
+            _Text.AppendLine("[R1].[ID] AS [ID1],");
+            _Text.AppendLine("[C].[Title] AS [TitlePayer],");
+            _Text.AppendLine("[R1].[Doc_No],");
+            _Text.AppendLine("[R1].[Doc_Date],");
+            _Text.AppendLine("[R1].[Pay_Mode],");
+            _Text.AppendLine("[R1].[Amount],");
+            _Text.AppendLine("[R1].[Remarks],");
+            _Text.AppendLine("[R1].[Comments],");
+            _Text.AppendLine("[R1].[Status],");
+            _Text.AppendLine("[R2].[ID] AS [ID2],");
+            _Text.AppendLine("[R2].[Sr_No],");
+            _Text.AppendLine("[R2].[TranID],");
+            _Text.AppendLine("[R2].[Ref_No] [Ref_No2],");
+            _Text.AppendLine("[R2].[Inv_No],");
+            _Text.AppendLine("[R2].[Account],");
+            _Text.AppendLine("[A2].[Title] AS [TitleAccount],");
+            _Text.AppendLine("[R2].[DR],");
+            _Text.AppendLine("[R2].[CR],");
+            _Text.AppendLine("[R2].[Employee],");
+            _Text.AppendLine("[E].[Title] AS [TitleEmployee],");
+            _Text.AppendLine("[R2].[Project],");
+            _Text.AppendLine("[P].[Title] AS [TitleProject],");
+            _Text.AppendLine("[R2].[Description]");
+            _Text.AppendLine("FROM [Receipt2] [R2]");
+            _Text.AppendLine("LEFT JOIN [Receipt]   [R1] ON [R1].[ID] = [R2].[TranID]");
+            _Text.AppendLine("LEFT JOIN [COA]       [A1] ON [A1].[ID] = [R1].[COA]");
+            _Text.AppendLine("LEFT JOIN [COA]       [A2] ON [A2].[ID] = [R2].[Account]");
+            _Text.AppendLine("LEFT JOIN [Customers]  [C] ON [C].[ID] = [R1].[Payer]");
+            _Text.AppendLine("LEFT JOIN [Employees]  [E] ON [E].[ID] = [R2].[Employee]");
+            _Text.AppendLine("LEFT JOIN [Project]    [P] ON [P].[ID] = [R2].[Project]");
+            
+            if(string.IsNullOrEmpty(_Filter))
+            {
+                _Text.AppendLine($"WHERE {_Filter}");
+            }
+            
+            
             return _Text.ToString();
         }
-
         #endregion
+
 
         public static QueryClass GetQuery(Query _SQLQuery)
         {

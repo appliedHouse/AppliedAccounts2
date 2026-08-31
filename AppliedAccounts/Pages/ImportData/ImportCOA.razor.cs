@@ -16,6 +16,7 @@ namespace AppliedAccounts.Pages.ImportData
         public async Task GetExcelFile(InputFileChangeEventArgs e)
         {
             ShowSpinner = true;
+            MyModel.IsExcelLoaded = false;
             MyModel.ExcelFileName = e.File.Name;
             SpinnerMessage = $"Loading Excel file: [{e.File.Name}]. Please wait...";
             await InvokeAsync(StateHasChanged);

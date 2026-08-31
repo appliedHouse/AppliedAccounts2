@@ -29,16 +29,12 @@
         MyModel.RecordFound = true;
     }
 
-    // private void HandleValueChanged(string newValue)
-    // {
-    //     OutputValue = newValue;
-    //     Console.WriteLine($"Value updated in parent: {OutputValue}");
-    // }
+ 
 
 }
 
 <PageHeading Text="Receipt" />
-<PageErrors Messages="MyModel.MsgClass"></PageErrors>
+<ShowMessages MsgService="@MyModel.MsgService" />
 <ShowPrintWait Visiable="MyModel.IsWaiting" />
 <ShowSpinner Message="@SpinnerMessage"/>
 

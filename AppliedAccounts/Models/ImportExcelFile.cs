@@ -78,6 +78,9 @@ namespace AppliedAccounts.Models
             }
         }
 
+        // In your ImportExcelFile.SaveInTable method
+       
+
         #endregion
 
 
@@ -105,7 +108,8 @@ namespace AppliedAccounts.Models
             }
             catch (Exception) { }
 
-            AppRegistry.SetKey(AppGlobal.DBFile, ExcelImportRegistry, _GUID, KeyType.Text, _Title);
+            Source.SetKey(ExcelImportRegistry, _GUID, KeyType.Text, _Title);
+            //AppRegistry.SetKey(AppGlobal.DBFile, ExcelImportRegistry, _GUID, KeyType.Text, _Title);
 
             //string _ConnText = $"";
             string _ImportDBPath = Path.Combine(_Path, _GUID + ".db");

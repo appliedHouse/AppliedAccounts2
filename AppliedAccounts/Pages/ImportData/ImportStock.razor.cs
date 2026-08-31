@@ -1,4 +1,5 @@
-﻿using AppliedAccounts.Models;
+﻿using AppliedAccounts.Component;
+using AppliedAccounts.Models;
 using AppliedAccounts.Models.Import;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Data;
@@ -9,24 +10,29 @@ namespace AppliedAccounts.Pages.ImportData
     public partial class ImportStock
     {
 
-        public ImportCOAModel MyModel { get; set; } = new();
+        public ImportStockModel MyModel { get; set; } = new();
         public ImportExcelFile ImportCOAModel { get; set; }
-        public bool ShowSpinner { get; set; } = false;
-        public string SpinnerMessage { get; set; } = "Loading... Please wait...";
+        public string SpinnerMessage { get; set; } = string.Empty;
+        public string SpinnerType { get; set; }
 
         public async Task GetExcelFile(InputFileChangeEventArgs e)
         {
-            ShowSpinner = true;
             MyModel.ExcelFileName = e.File.Name;
             SpinnerMessage = $"Loading Excel file: [{e.File.Name}]. Please wait...";
             await InvokeAsync(StateHasChanged);
 
             await Task.Delay(100); // Simulate delay for spinner
-            ImportCOAModel = new ImportExcelFile(e.File, AppGlobal, "ImportCOA");
+            ImportCOAModel = new ImportExcelFile(e.File, AppGlobal, "ImportStock");
             await ImportCOAModel.ImportDataAsync();            // ImportExcelFile.cs Function
 
-            ShowSpinner = false;
-            MyModel.IsExcelLoaded = true;                              // Excel file has been loaded successfully.
+            SpinnerMessage = $"Excel file: [{e.File.Name}] has been loaded sucessfully";
+            SpinnerType = "success";
+            MyModel.IsExcelLoaded = true;      // Excel file has been loaded successfully.
+
+            Step1 = false;
+
+            MyModel.LoadImportedData();
+            Step2 = true;
         }
 
         public List<DataRow> GetFilteredData(string _TableName)
@@ -39,5 +45,7 @@ namespace AppliedAccounts.Pages.ImportData
             }
             return [.. MyModel.ImportedData.Skip(MyModel.Pages.Current).Take(MyModel.Pages.Size)];                // Copy Imported Data to Filter Data
         }
+
+        
     }
 }

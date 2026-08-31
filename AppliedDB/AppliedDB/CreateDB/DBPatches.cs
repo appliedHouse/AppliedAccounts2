@@ -31,6 +31,8 @@ namespace AppliedDB.CreateDB
             BillPayable2_AddUnit();
             BillReceivable2_AddUnit();
             InventoryPatches();
+            DropViewIfExists("view_Receipts");
+            AlterReceipt2Columns();
 
         }
         #endregion
@@ -270,6 +272,69 @@ namespace AppliedDB.CreateDB
 
             if (_result1 && _result2 && _result3) { return true; }
             return false;
+        }
+
+        /// <summary>
+        /// Drops the view if it exists
+        /// </summary>
+        private bool DropViewIfExists(string viewName)
+        {
+            try
+            {
+                if (Source.MyConnection == null)
+                {
+                    MsgClass.Danger("Database connection is not available.");
+                    return false;
+                }
+
+                string query = $"DROP VIEW IF EXISTS {viewName}";
+                return QueryExecutor(query, $"View '{viewName}' dropped successfully.");
+            }
+            catch (Exception ex)
+            {
+                MsgClass.Error($"Error dropping view '{viewName}': {ex.Message}");
+                return false;
+            }
+        }
+        public bool AlterReceipt2Columns()
+        {
+            try
+            {
+                if (Source.MyConnection == null)
+                {
+                    MsgClass.Danger("Database connection is not available.");
+                    return false;
+                }
+
+                // Try to alter Inv_No column
+                try
+                {
+                    string alterQuery = "ALTER TABLE Receipt2 ALTER COLUMN Inv_No INT64";
+                    QueryExecutor(alterQuery, "Altered Inv_No to INT64");
+                }
+                catch (Exception ex)
+                {
+                    MsgClass.Warning($"Could not alter Inv_No: {ex.Message}");
+                }
+
+                // Try to alter Account column
+                try
+                {
+                    string alterQuery = "ALTER TABLE Receipt2 ALTER COLUMN Account INT64";
+                    QueryExecutor(alterQuery, "Altered Account to INT64");
+                }
+                catch (Exception ex)
+                {
+                    MsgClass.Warning($"Could not alter Account: {ex.Message}");
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MsgClass.Error(ex);
+                return false;
+            }
         }
 
         #endregion
