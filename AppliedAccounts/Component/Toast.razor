@@ -5,22 +5,25 @@
 
 @inject IToastService Toaster
 
-@if (CurrentMessage != null && CurrentMessage.IsVisible)
+@if (CurrentMessage != null)
 {
-    <div class="toast-notification-container position-fixed @CurrentMessage.GetPositionClass() p-3" style="z-index: 1080">
-        <div class="toast show @CurrentMessage.GetCssClass()" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <div class="toast-icon @CurrentMessage.GetCssClass()">@CurrentMessage.GetIcon()</div>
-                <strong class="me-auto">@GetTitle()</strong>
-                <small>@GetTimeAgo()</small>
-                <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="HideToast"></button>
+    if (CurrentMessage.IsVisible)
+    {
+        <div class="toast-notification-container position-fixed @CurrentMessage.GetPositionClass() p-3" style="z-index: 1080">
+            <div class="toast show @CurrentMessage.GetCssClass()" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <div class="toast-icon @CurrentMessage.GetCssClass()">@CurrentMessage.GetIcon()</div>
+                    <strong class="me-auto">@GetTitle()</strong>
+                    <small>@GetTimeAgo()</small>
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="HideToast"></button>
+                </div>
+                <div class="toast-body">
+                    @CurrentMessage.Message
+                </div>
+                <div class="toast-progress" style="animation-duration: @(CurrentMessage.Duration)ms"></div>
             </div>
-            <div class="toast-body">
-                @CurrentMessage.Message
-            </div>
-            <div class="toast-progress" style="animation-duration: @(CurrentMessage.Duration)ms"></div>
         </div>
-    </div>
+    }
 }
 
 @code {
@@ -59,10 +62,6 @@
 
     private void HideToast()
     {
-        // _cancellationTokenSource?.Cancel();
-        // _cancellationTokenSource?.Dispose();
-        // _cancellationTokenSource = null;
-
         if (CurrentMessage != null)
         {
             CurrentMessage.IsVisible = false;
