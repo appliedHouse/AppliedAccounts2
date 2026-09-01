@@ -24,6 +24,7 @@ namespace AppliedAccounts.Models
         public ImportExcelFile(IBrowserFile excelFile, GlobalService _AppGlobal)
         {
             AppGlobal = _AppGlobal;
+            Source = new(AppGlobal.AppPaths);
             ExcelFile = excelFile;
             ExcelImportRegistry = "ExcelImport";  // Default Name. From Registry it will change.
 
@@ -31,8 +32,8 @@ namespace AppliedAccounts.Models
 
         public ImportExcelFile(IBrowserFile excelFile, GlobalService _AppGlobal, string _FileGuid)
         {
-            Source = new(_AppGlobal.AppPaths);
             AppGlobal = _AppGlobal;
+            Source = new(AppGlobal.AppPaths);
             ExcelFile = excelFile;
             ExcelImportRegistry = _FileGuid;
         }
