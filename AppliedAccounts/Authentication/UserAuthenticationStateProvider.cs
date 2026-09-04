@@ -73,26 +73,6 @@ namespace AppliedAccounts.Authentication
             NotifyAuthenticationStateChanged(Task.FromResult(authState));
         }
 
-        //public async Task UpdateAuthenticateState(UserSession? userSession)
-        //{
-        //    ClaimsPrincipal claimsPrincipal;
-        //    if (userSession != null)
-        //    {
-        //        await _sessionStorage.SetAsync("UserSession", userSession);
-        //        claimsPrincipal = CreatePrincipal(userSession);
-                
-        //    }
-        //    else
-        //    {
-        //        await _sessionStorage.DeleteAsync("UserSession");
-        //        claimsPrincipal = AnyOne;
-        //    }
-
-
-        //    NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
-        //}
-
-
         private ClaimsPrincipal CreatePrincipal(UserSession user)
         {
             var claims = new List<Claim>

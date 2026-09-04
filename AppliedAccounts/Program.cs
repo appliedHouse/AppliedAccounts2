@@ -41,9 +41,9 @@ builder.Services.AddServerSideBlazor();
 
 // 5. Add other services
 builder.Services.AddSingleton<UserProfile>();
+builder.Services.AddScoped<GlobalService>();
 builder.Services.AddScoped<PrintService>();
 builder.Services.AddScoped<MessagesService>();
-builder.Services.AddScoped<GlobalService>();
 builder.Services.AddScoped<IMenuDatabaseInitializer, MenuDatabaseInitializer>();
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<ProgressService>();

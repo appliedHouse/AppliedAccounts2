@@ -7,13 +7,13 @@ namespace AppliedAccounts.Pages.Accounts
 {
     public partial class Projects
     {
-
-
         public ProjectsViewModel MyModel { get; set; }
         public DataTable ProjectList { get; set; }
         public List<CodeTitle> Clients { get; set; }
         public List<CodeTitle> Employees { get; set; }
         public DataSource Source { get; set; }
+        public bool IsPageValid { get; set; } = true;
+        public string DBFile { get; set; } = string.Empty;
 
 
         protected override void OnInitialized()
@@ -122,9 +122,7 @@ namespace AppliedAccounts.Pages.Accounts
                 Client = 0,
                 ProjectManager = 0,
             };
-
-            InvokeAsync(StateHasChanged);
-
+           StateHasChanged();
         }
 
         public void Edit(long _ID)
@@ -162,6 +160,8 @@ namespace AppliedAccounts.Pages.Accounts
                 {
                     Toaster.ShowWarning($"Projct Id {_ID} not found to edit.");
                 }
+                StateHasChanged();
+
             }
         }
 
@@ -178,7 +178,6 @@ namespace AppliedAccounts.Pages.Accounts
                         if (DelValidaded(_ID))
                         {
                             Source.Delete(_Row);
-                            //MsgService.AddRange(MyModel.Source.MsgClass);
                             LoadData();
                             Toaster.ShowSuccess($"Project {_Row["Title"]} deleted successfully.");
                         }
@@ -197,9 +196,10 @@ namespace AppliedAccounts.Pages.Accounts
             }
             catch (Exception error)
             {
-                //MsgService.MsgService.AddReange(Source.MsgClass);
                 MsgService.Error(error);
             }
+            StateHasChanged();
+
         }
 
         private bool DelValidaded(long _ID)
@@ -212,7 +212,7 @@ namespace AppliedAccounts.Pages.Accounts
             _Row = Source.GetDataRow($"SELECT * FROM [CashBook] WHERE [Project] = {_ID} LIMIT 1;"); if (_Row != null) { return false; }
             _Row = Source.GetDataRow($"SELECT * FROM [Receipt2] WHERE [Project] = {_ID} LIMIT 1;"); if (_Row != null) { return false; }
             _Row = Source.GetDataRow($"SELECT * FROM [BankBook] WHERE [Project] = {_ID} LIMIT 1;"); if (_Row != null) { return false; }
-            _Row = Source.GetDataRow($"SELECT * FROM [CashBook] WHERE [Project] = {_ID} LIMIT 1;"); if (_Row != null) { return false; }
+            _Row = Source.GetDataRow($"SELECT * FROM [Book2] WHERE [Project] = {_ID} LIMIT 1;"); if (_Row != null) { return false; }
             _Row = Source.GetDataRow($"SELECT * FROM [FinishedGoods] WHERE [Project] = {_ID} LIMIT 1;"); if (_Row != null) { return false; }
 
             return _Result;
