@@ -65,6 +65,13 @@ namespace AppliedDB
         }
         public DataTable GetTable(Tables _Table)
         {
+            if(MyConnection == null)
+            {
+                var Stop = true;
+            }
+
+            MyCommand.Connection ??= MyConnection;
+
             if (MyCommand is not null)
             {
                 MyCommand.CommandText = $"SELECT * FROM [{_Table}]";

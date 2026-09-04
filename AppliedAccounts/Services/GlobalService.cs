@@ -15,6 +15,8 @@ namespace AppliedAccounts.Services
         public readonly NavigationManager NavManager;
         public readonly IJSRuntime JS;
         public readonly ILogger<GlobalService> MyLogger;
+        private UserAuthenticationStateProvider _authStateProvider;
+        public UserProfile AppUser;
 
         public Connections Connections;
         public ProtectedSessionStorage AppStore;
@@ -34,7 +36,6 @@ namespace AppliedAccounts.Services
         public event Action? OnLanguageChanged;
         public MessagesService MsgService { get; set; }
 
-        private readonly UserAuthenticationStateProvider _authStateProvider;
         private bool _isInitialized = false;
         private readonly SemaphoreSlim _initLock = new SemaphoreSlim(1, 1);
 
@@ -46,7 +47,8 @@ namespace AppliedAccounts.Services
             IJSRuntime _JS,
             UserAuthenticationStateProvider _StateProvider,
             ILogger<GlobalService> _logger,
-            ProtectedSessionStorage _sessionStorage)
+            ProtectedSessionStorage _sessionStorage,
+            UserProfile _userProfile)
         {
             Config = _Config;
             NavManager = _NavManager;
@@ -55,7 +57,7 @@ namespace AppliedAccounts.Services
             MyLogger = _logger;
             MsgService = new(_Config);
             AppStore = _sessionStorage;
-
+            
             _ = InitializeAsync();
             InitializeStaticProperties();
         }
@@ -113,7 +115,7 @@ namespace AppliedAccounts.Services
                 _initLock.Release();
             }
         }
-
+        
         private void InitializeStaticProperties()
         {
             AppPaths.BaseUri = NavManager.BaseUri;
@@ -173,7 +175,6 @@ namespace AppliedAccounts.Services
             AppStore.SetAsync("Language", Language);
             AppStore.SetAsync("Currency", Currency);
             AppStore.SetAsync("Reporting", Reporting);  
-
         }
 
         #endregion
@@ -189,16 +190,16 @@ namespace AppliedAccounts.Services
         }
 
         // Refresh user data after login/logout
-        public async Task RefreshUserDataAsync()
-        {
-            var authState = await _authStateProvider.GetAuthenticationStateAsync();
-            Client = _authStateProvider.AppUser ?? new AppUserModel();
+        //public async Task RefreshUserDataAsync()
+        //{
+        //    var authState = await _authStateProvider.GetAuthenticationStateAsync();
+        //    Client = _authStateProvider.AppUser ?? new AppUserModel();
 
-            // Update paths if needed
-            AppPaths.DBFile = Client.DataFile;
-            UserID = Client.UserID;
-            UserRole = Client.Role;
-        }
+        //    // Update paths if needed
+        //    AppPaths.DBFile = Client.DataFile;
+        //    UserID = Client.UserID;
+        //    UserRole = Client.Role;
+        //}
 
         #region MinDate and MaxDate
         public DateTime MinDate() => GetMinDate();
