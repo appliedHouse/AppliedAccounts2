@@ -1,8 +1,8 @@
 ﻿@page "/ImportInventory"
 @using System.Data
+@using AppliedAccounts.Component.ButtonsDictionery
 @using AppliedAccounts.Component.Libs
 @using AppliedAccounts.Models.Import
-@using AppliedAccounts.Pages.Accounts
 @using AppliedAccounts.Services
 
 @attribute [Authorize]
@@ -14,10 +14,11 @@
     private string MyMessage { get; set; } = string.Empty;
     public string ExcelFileName { get; set; } = "";
 
-    public bool Step1 { get; set; } = true; // Step 1: Loading Excel file
+    public bool Step1 { get; set; } = true;  // Step 1: Loading Excel file
     public bool Step2 { get; set; } = false; // Step 2: Loaded Excel file data
     public bool Step3 { get; set; } = false; // Step 3: Display Excel file data
     public bool Step4 { get; set; } = false; // Step 4: Post / Save invoices to Database
+    public bool StepError { get; set; } = false;
 
     protected override void OnInitialized()
     {
@@ -34,11 +35,16 @@
         await AppGlobal.JS.InvokeVoidAsync("triggerFileUpload");
 
     }
+
+    private async Task ViewStock()
+    {
+        // show bootstrap model.
+    }
 }
 
 <PageHeading Text="Import Inventory (Stock) List" />
+<ShowMessages MsgService="MyModel.MsgService" />
 
-<ShowSpinner Message="@SpinnerMessage" Type="@SpinnerType" />
 
 
 @if (Step1)
@@ -70,14 +76,23 @@
 
 @if (Step2)
 {
+    <ShowSpinner Message="@SpinnerMessage" Type="@SpinnerType" />
+}
+
+
+@if (Step3)
+{
     if (MyModel.IsDataLoaded)
     {
-        <div class="container">
+        <div class="table-container">
             <table class="table-list">
                 <thead>
                     <tr>
-                        <td>Code</td>
-                        <td>Title</td>
+                        <th>Code</th>
+                        <th>Title</th>
+                        <th>
+                            <Btn1_Post OnClick="MyModel.ImportInDB" />
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -88,21 +103,22 @@
                             <tr>
                                 <td>@row["Code"]</td>
                                 <td>@row["Title"]</td>
+                                <td><Btn1_View OnClick="ViewStock" /></td>
+
                             </tr>
                         }
                     }
                     else
                     {
-                       <tr>
-                           <td>
-                               <p>No Records Found....</p>
-                           </td>
-                       </tr>
+                        <tr>
+                            <td>
+                                <p>No Records Found....</p>
+                            </td>
+                        </tr>
                     }
                 </tbody>
             </table>
         </div>
-
     }
     else
     {
@@ -110,4 +126,17 @@
         SpinnerType = "Warrning";
     }
 
+}
+
+@if (Step4)
+{
+    <p>Shows messages of import data</p>
+}
+
+@if (StepError)
+{
+    <div class="alert alert-danger" role="alert">
+        Data Import has error. 
+        Check Excel Data File or contect to administrator
+    </div>
 }

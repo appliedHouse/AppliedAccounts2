@@ -17,7 +17,7 @@ namespace AppliedAccounts.Models
         public GlobalService AppGlobal { get; set; }
         public DataSet ImportDataSet { get; set; }
         public bool IsImported { get; set; } = false;
-        public string MyMessages { get; set; }
+        public string MyMessage { get; set; }
         public string ExcelImportRegistry { get; set; }       // Default Name. From Registry it will change.
 
         #region Constructors
@@ -43,6 +43,7 @@ namespace AppliedAccounts.Models
 
         public async Task ImportDataAsync()
         {
+            IsImported = false;
             try
             {
                 var _Path = Path.Combine(AppGlobal.AppPaths.FirstPath, AppGlobal.AppPaths.RootPath);
@@ -74,13 +75,10 @@ namespace AppliedAccounts.Models
             }
             catch (Exception error)
             {
-                var _Message = error.Message;
-                throw;
+                IsImported = false;
+                MyMessage = error.Message;
             }
         }
-
-        // In your ImportExcelFile.SaveInTable method
-       
 
         #endregion
 
@@ -89,6 +87,7 @@ namespace AppliedAccounts.Models
 
         public bool SaveInTable(DataSet importDataSet)
         {
+            MyMessage = string.Empty;
             bool _Result = false;
             int _Records = 0;
             string _Path = Source.MyConnections.GetTempDBPath(); // Connections.GetTempDBPath();
@@ -107,7 +106,14 @@ namespace AppliedAccounts.Models
                     if (File.Exists(_OldFilePath)) { File.Delete(_OldFilePath); }
                 }
             }
-            catch (Exception) { }
+            catch (Exception error) 
+            {
+                IsImported = false;
+                MyMessage = error.Message;
+                return false;
+                    
+            
+            }
 
             Source.SetKey(ExcelImportRegistry, _GUID, KeyType.Text, _Title);
             //AppRegistry.SetKey(AppGlobal.DBFile, ExcelImportRegistry, _GUID, KeyType.Text, _Title);

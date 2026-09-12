@@ -22,6 +22,8 @@
 .table-container {
     flex: 1; /* 👈 takes remaining space */
     overflow-y: auto; /* 👈 only table scrolls */
+    margin-right:70px;
+    margin-left:70px;
 }
 
 .pagination-bar {

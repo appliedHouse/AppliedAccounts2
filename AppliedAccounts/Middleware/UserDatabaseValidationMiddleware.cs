@@ -16,10 +16,6 @@ namespace AppliedAccounts.Middleware
 
         public async Task InvokeAsync(HttpContext context, UserAuthenticationStateProvider authProvider)
         {
-
-
-
-
             // Run validation only once per application startup
             if (!_validationPerformed)
             {
@@ -33,10 +29,6 @@ namespace AppliedAccounts.Middleware
 
                 lock (_lock)
                 {
-
-
-
-
                     if (!_validationPerformed)
                     {
                         try

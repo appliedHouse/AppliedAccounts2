@@ -27,6 +27,8 @@ namespace AppliedAccounts.Pages.ImportData
 
             ShowSpinner = false;
             MyModel.IsExcelLoaded = true;                              // Excel file has been loaded successfully.
+            await InvokeAsync(StateHasChanged);
+
         }
 
         public List<DataRow> GetFilteredData(string _TableName)
