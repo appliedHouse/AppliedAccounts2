@@ -58,21 +58,9 @@ namespace AppliedAccounts.Pages.ImportData
         #endregion
 
         #region Constructor
-        //public ImportSaleInvoice() { }
-
         public ImportSaleInvoice()
         {
-            //AppGlobal = _AppGlobal;
-
-            //if (string.IsNullOrWhiteSpace(AppGlobal.DBFile))
-            //{
-            //    var AppUser = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
-            //    AppGlobal.AppPaths.DBFile = AppUser.DataFile;
-            //}
-
-
             
-
         }
         #endregion
 
@@ -240,44 +228,53 @@ namespace AppliedAccounts.Pages.ImportData
                 if (ClientData != null && Source != null)
                 {
                     MyModel.SpinnerMessage = "Sales invoice data is being Process... Customer Data Updating..";
-                    //var tb_Client = Source.GetTable(Tables.Customers);
-                    //var tb_ClientList = tb_Client.AsEnumerable().ToList();
                     var ExcelColumn = "BP Name";
-                    var DataColumn = "Title";
+                    //var DataColumn = "Title";
 
                     MyModel.TotalRec = ClientData.Rows.Count;
                     MyModel.Counter = 0;
 
-                    foreach (DataRow Row in ClientData.Rows)
+                    try
                     {
-
-                        //if ((int)Row["ID"]==0) { continue; }
-                        if (string.IsNullOrEmpty((string)Row["BP CODE"])) { continue; }
-                        if (string.IsNullOrEmpty((string)Row["BP Name"])) { continue; }
-
-                        var _Title = Row[ExcelColumn].ToString()?.Trim() ?? "";
-                        var _RowID = ClientList.Where(e => e.Code == (string)Row["BP CODE"]).Select(row => row.ID).FirstOrDefault();
-
-                        //var _RowID = tb_ClientList.Where(row => _Title == row.Field<string>(DataColumn)).Select(row => row.Field<long>("ID")).FirstOrDefault();
-
-                        if (_RowID == 0)
+                        foreach (DataRow Row in ClientData.Rows)
                         {
-                            Log.Add(_Title, false);
-                        }
-                        else
-                        {
-                            Log.Add(_Title, true);
-                        }
 
-                        // Process Bar Calculation
-                        MyModel.Counter++;
-                        double _Counter = double.Parse(MyModel.Counter.ToString());
-                        double _TotalRec = double.Parse(MyModel.TotalRec.ToString());
-                        MyModel.BarPercent = Math.Round((_Counter / _TotalRec) * 100, 2);
-                        await UpdateClient(Row, _RowID);            // Step 2.2.1
-                        await InvokeAsync(StateHasChanged);
+                            if (string.IsNullOrEmpty((string)Row["BP CODE"])) { continue; }
+                            if (string.IsNullOrEmpty((string)Row["BP Name"])) { continue; }
+
+                            var _Title = Row[ExcelColumn].ToString()?.Trim() ?? "";
+                            var _RowID = ClientList.Where(e => e.Code == (string)Row["BP CODE"]).Select(row => row.ID).FirstOrDefault();
+
+
+                            if (_RowID == 0)
+                            {
+                                Log.Add(_Title, false);
+                            }
+                            else
+                            {
+                                Log.Add(_Title, true);
+                            }
+
+                            // Process Bar Calculation
+                            MyModel.Counter++;
+                            double _Counter = double.Parse(MyModel.Counter.ToString());
+                            double _TotalRec = double.Parse(MyModel.TotalRec.ToString());
+                            MyModel.BarPercent = Math.Round((_Counter / _TotalRec) * 100, 2);
+                            await UpdateClient(Row, _RowID);            // Step 2.2.1
+                            await InvokeAsync(StateHasChanged);
+                        }
                     }
+                    catch (Exception error)
+                    {
+                        MyModel.IsError = true;
+                        MyModel.ErrorMessage = error.Message;
+                        MsgService.Error(error);
 
+                    }
+                    finally
+                    {
+                        ClientList = Source.GetCustomers();     // Update Client List from DB after update new clients from Excel file.
+                    }
                 }
             }
             catch (Exception error)
@@ -329,7 +326,7 @@ namespace AppliedAccounts.Pages.ImportData
         public async Task<ImportSaleInvoiceModel> GenerateSalesInvoiceAsync()           // Step 2.3 
         {
             MyModel.SpinnerMessage = "Sales invoice data is being Process... Getting Data table";
-            ImportSaleInvoiceModel _Result = new();
+            ImportSaleInvoiceModel _Result = new(); ;
             _Result.DBFile = AppGlobal.DBFile;
             MyModel.IsProgressBar = true;
             MyModel.Counter = 0;
@@ -398,8 +395,6 @@ namespace AppliedAccounts.Pages.ImportData
 
 
                 DataRow _Row1 = Sale1.NewRow();
-                //long _CompanyID = AppliedDB.Functions.Code2long(AppGlobal.DBFile, Tables.Customers, (string)Row["Code"]);
-                //long _EmployeeID = AppliedDB.Functions.Code2long(AppGlobal.DBFile, Tables.Employees, (string)Row["Employee"]);
 
                 long _CompanyID = ClientList.Where(e => e.Code == Row.Field<string>("Code")).Select(e => e.ID).FirstOrDefault();
                 long _EmployeeID = EmployeeList.Where(e => e.Code == Row.Field<string>("Code")).Select(e => e.ID).FirstOrDefault();
