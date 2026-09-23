@@ -515,6 +515,22 @@ namespace AppliedDB
             // return an empty row with same schema
             return table.NewRow();
         }
+        public long? SeekID(Tables _Table, string Code)
+        {
+            var table = GetTable(_Table);       // <-- real DataTable
+            var list = table.AsEnumerable().ToList();
+
+            if (!string.IsNullOrEmpty(Code) && list.Count > 0)
+            {
+                var row = list
+                    .FirstOrDefault(r => r.Field<string>("Code") == Code);
+
+                if (row != null)
+                    return row.Field<long>("ID");
+            }
+
+            return null;
+        }
 
         public List<DataRow> List(Tables _Table, long ID)
         {

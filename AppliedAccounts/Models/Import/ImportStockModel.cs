@@ -103,7 +103,7 @@ namespace AppliedAccounts.Models.Import
         }
 
         #region Import Tables
-        private bool ImportUOM()
+        public bool ImportUOM()
         {
             try
             {
@@ -139,7 +139,7 @@ namespace AppliedAccounts.Models.Import
 
 
         }
-        private bool ImportSize()
+        public bool ImportSize()
         {
             try
             {
@@ -175,7 +175,7 @@ namespace AppliedAccounts.Models.Import
 
 
         }
-        private bool ImportPacking()
+        public bool ImportPacking()
         {
             try
             {
@@ -211,7 +211,7 @@ namespace AppliedAccounts.Models.Import
 
 
         }
-        private bool ImportCategory()
+        public bool ImportCategory()
         {
             try
             {
@@ -247,7 +247,7 @@ namespace AppliedAccounts.Models.Import
 
 
         }
-        private bool ImportSubCategory()
+        public bool ImportSubCategory()
         {
             try
             {
@@ -282,6 +282,61 @@ namespace AppliedAccounts.Models.Import
             }
 
 
+        }
+
+        public bool ImportInventory()
+        {
+            try
+            {
+                string selectedTable = TableNames[(int)tbName.Inventory];            // UOM
+                var ImportedUOM = DataSource.GetDataTable(selectedTable, TempConnection);
+                var TargetTable = Source.GetTable(Tables.Inventory);
+                var TargetList = Source.GetTable(Tables.Inventory).AsEnumerable();
+                var NewRow = TargetTable.NewRow();
+
+                if (ImportedUOM.TableName != selectedTable)
+                {
+                    return false;
+                }
+
+                foreach (DataRow Row in ImportedUOM.Rows)
+                {
+                    NewRow["ID"] = 0;
+
+                    if (TargetList.Any(e => e.Field<long>("ID") == Row.Field<long>("ID")))
+                    { NewRow["ID"] = Row["ID"]; }
+                    
+                    var _UOM = Source.SeekID(Tables.Inv_UOM,Row.Field<string>("UOM")!) ?? 0;
+                    var _Packing = Source.SeekID(Tables.Inv_Packing, Row.Field<string>("Packing")!) ?? 0; 
+                    var _Size = Source.SeekID(Tables.Inv_Packing, Row.Field<string>("Size")!) ?? 0 ;
+                    //var _Category = Source.SeekID(Tables.Inv_Packing, Row.Field<string>("Category")!) ?? 0;
+                    var _SubCategory = Source.SeekID(Tables.Inv_Packing, Row.Field<string>("SubCategory")!) ?? 0;
+
+                    NewRow["Code"] = Row["Code"];
+                    NewRow["Title"] = Row["Title"];
+                    NewRow["Brand"] = Row["Brand"];
+                    NewRow["Model"] = Row["Model"];
+
+                    NewRow["UOM"] = 1; // _UOM;
+                    NewRow["Packing"] = 1; // _Packing;
+                    NewRow["Size"] = 1; // _Size;
+                    //NewRow["Category"] = _Category;
+                    NewRow["SubCategory"] = 1; // _SubCategory;
+                    Source.Save(NewRow);
+
+                    if(!Source.IsSaved)
+                    {
+                        MsgService.Critical($"{Row["Title"]} not saved...");
+                    }
+
+                }
+                return true;
+            }
+            catch (Exception error)
+            {
+                MsgService.Error(error);
+                return false;
+            }
         }
         #endregion
     }
