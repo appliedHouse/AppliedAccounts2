@@ -105,11 +105,13 @@ namespace AppliedDB.CreateDB
                         [CNIC] NVARCHAR(14)
                     );";
         }
+
+        #region BILL PAYABLE
         public static string CreateBillPayable()
         {
             return @"
                     CREATE TABLE [BillPayable](
-                        [ID] INT64 NOT NULL UNIQUE,
+                        [ID] INT64 PRIMARY KEY NOT NULL UNIQUE,
                         [Code] NVARCHAR(12) NOT NULL,
                         [Vou_No] NVARCHAR(12) NOT NULL,
                         [Vou_Date] DATETIME NOT NULL,
@@ -125,6 +127,25 @@ namespace AppliedDB.CreateDB
                         [Status] NVARCHAR(12) NOT NULL DEFAULT 'Submitted'
                     );";
         }
+        public static string CreateBillPayable2()
+        {
+            return @"
+                    CREATE TABLE [BillPayable2](
+                        [ID] INT64 PRIMARY KEY NOT NULL UNIQUE,
+                        [Sr_No] INT NOT NULL,
+                        [TranID] INT64 NOT NULL,
+                        [Inventory] INT64 NOT NULL REFERENCES [Inventory]([ID]),
+                        [Batch] NVARCHAR(20) NOT NULL,
+                        [Qty] DECIMAL NOT NULL,
+                        [Rate] DECIMAL NOT NULL,
+                        [Tax] INT64 REFERENCES [Taxes]([ID]),
+                        [Tax_Rate] DECIMAL,
+                        [Description] NVARCHAR(100),
+                        [Project] INT64 REFERENCES [Project]([ID]),
+                        [Unit] INT64
+                    );";
+        }
+        #endregion
 
         #region Inventory and allied
         public static string CreateInventory()
@@ -203,7 +224,6 @@ namespace AppliedDB.CreateDB
         }
         #endregion
 
-
         public static string CreateProject()
         {
             return @"
@@ -224,6 +244,8 @@ namespace AppliedDB.CreateDB
                         Terms NVARCHAR
                     );";
         }
+
+        #region chart of Accounts
         public static string CreateCOA_CLASS()
         {
             return @"
@@ -264,6 +286,7 @@ namespace AppliedDB.CreateDB
                         [OPENING_BALANCE] DECIMAL DEFAULT (0.00)
                     );";
         }
+        #endregion
         public static string CreateTaxes()
         {
             return @"
@@ -276,29 +299,13 @@ namespace AppliedDB.CreateDB
                         [COA] INT64 REFERENCES [COA]([ID])
                     );";
         }
-        public static string CreateBillPayable2()
-        {
-            return @"
-                    CREATE TABLE [BillPayable2](
-                        [ID] INT64 PRIMARY KEY NOT NULL UNIQUE,
-                        [Sr_No] INT NOT NULL,
-                        [TranID] INT64 NOT NULL,
-                        [Inventory] INT64 NOT NULL REFERENCES [Inventory]([ID]),
-                        [Batch] NVARCHAR(20) NOT NULL,
-                        [Qty] DECIMAL NOT NULL,
-                        [Rate] DECIMAL NOT NULL,
-                        [Tax] INT64 REFERENCES [Taxes]([ID]),
-                        [Tax_Rate] DECIMAL,
-                        [Description] NVARCHAR(100),
-                        [Project] INT64 REFERENCES [Project]([ID]),
-                        [Unit] INT64
-                    );";
-        }
+
+        #region BILL RECEIVABLE
         public static string CreateBillReceivable()
         {
             return @"
                     CREATE TABLE [BillReceivable](
-                        [ID] INT64 NOT NULL UNIQUE,
+                        [ID] PRIMARY KEY INT64 NOT NULL UNIQUE,
                         [Vou_No] NVARCHAR(12) NOT NULL,
                         [Vou_Date] DATETIME NOT NULL,
                         [Company] INT64 NOT NULL,
@@ -331,6 +338,7 @@ namespace AppliedDB.CreateDB
                         [Unit] INT64
                     );";
         }
+        #endregion
         public static string CreateBOMProfile()
         {
             return @"

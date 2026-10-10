@@ -1,6 +1,7 @@
 ﻿@page "/Sale/SaleInvoiceList"
 @attribute [Authorize]
 
+@using AppliedAccounts.Component.ButtonsDictionery
 @using AppliedAccounts.Component.Libs
 @using AppliedAccounts.Data.Mapping
 @using AppliedAccounts.Models
@@ -81,10 +82,17 @@
                     </div>
                 </div>
                 <div class="p-2">
-                    <button type="button" class="btn btn-primary btn-sm" @onclick="() => MyModel.Search()">Search</button>
+                    <Btn_Search OnClick="() => MyModel.Search()"/>
+                    @* <button type="button" class="btn btn-primary btn-sm" @onclick="() => MyModel.Search()">Search</button> *@
                 </div>
                 <div class="p-2">
-                    <button type="button" disabled="@IsSearchText" class="btn btn-primary btn-sm" @onclick="() => MyModel.ClearText()">Clear</button>
+                    <Btn_SearchClear OnClick="() => MyModel.ClearText()"/>
+                    @* <button type="button" disabled="@IsSearchText" class="btn btn-primary btn-sm" @onclick="() => MyModel.ClearText()">Clear</button> *@
+                </div>
+
+                <div class="p-2">
+                    <Btn1_Report OnClick="() => MyModel.ClearText()" />
+                    @* <button type="button" disabled="@IsSearchText" class="btn btn-primary btn-sm" @onclick="() => MyModel.ClearText()">Clear</button> *@
                 </div>
 
                 <div class="p-2">

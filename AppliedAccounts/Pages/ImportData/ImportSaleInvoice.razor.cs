@@ -62,16 +62,6 @@ namespace AppliedAccounts.Pages.ImportData
 
         public ImportSaleInvoice()
         {
-            //AppGlobal = _AppGlobal;
-
-            //if (string.IsNullOrWhiteSpace(AppGlobal.DBFile))
-            //{
-            //    var AppUser = ((UserAuthenticationStateProvider)authStateProvider).AppUser;
-            //    AppGlobal.AppPaths.DBFile = AppUser.DataFile;
-            //}
-
-
-            
 
         }
         #endregion
@@ -277,7 +267,6 @@ namespace AppliedAccounts.Pages.ImportData
                         await UpdateClient(Row, _RowID);            // Step 2.2.1
                         await InvokeAsync(StateHasChanged);
                     }
-
                 }
             }
             catch (Exception error)
@@ -285,8 +274,12 @@ namespace AppliedAccounts.Pages.ImportData
                 MyModel.IsError = true;
                 MyModel.ErrorMessage = error.Message;
                 MsgService.Error(error);
-            }
 
+            }
+            finally
+            {
+                ClientList = Source.GetCustomers();     // Update Client List from DB after update new clients from Excel file.
+            }
         }
 
         private async Task UpdateClient(DataRow _Row, long _RowID)              // Step 2.2.1
