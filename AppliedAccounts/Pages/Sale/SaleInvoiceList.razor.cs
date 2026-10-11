@@ -1,9 +1,11 @@
-﻿
-using AppliedAccounts.Data;
+﻿using AppliedAccounts.Data;
 using AppliedAccounts.Data.Mapping;
 using AppliedAccounts.Models;
+using AppliedAccounts.Pages.Sale.Reports;
 using AppliedDB;
 using AppReports;
+using Microsoft.JSInterop;
+using MESSAGE = AppMessages.Enums.Messages;
 
 
 namespace AppliedAccounts.Pages.Sale
@@ -248,6 +250,124 @@ namespace AppliedAccounts.Pages.Sale
         }
         #endregion
 
+        private async Task DownloadExcel()
+        {
+            MsgService.Clear();
+            var IsError = false;
+
+            // --- Validation (bail early) ---
+            if (string.IsNullOrWhiteSpace(MyModel.SearchText))
+            {
+                MsgService.Alert(MESSAGE.SearchTextIsNull);
+                IsError = true;
+            }
+            if (MyModel.Source == null)
+            {
+                MsgService.Alert(MESSAGE.DataSourceIsNull);
+                IsError = true;
+            }
+            if (IsError) return;   // don't build the sheet at all
+
+            // --- Build bytes ---
+            byte[]? _Bytes = null;
+            try
+            {
+                var SalesData = new SalesPivotSheet(MyModel.Source!, MyModel.SearchText);
+                _Bytes = SalesData.GetPivotBytes();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DOWNLOAD] Build failed: {ex}");
+                MsgService.Critical($"Excel build failed: {ex.Message}");
+                return;
+            }
+
+            if (_Bytes == null || _Bytes.Length == 0)
+            {
+                MsgService.Critical(MESSAGE.ExcelNoBytesfound);
+                return;
+            }
+
+            // Sanity check: .xlsx is a ZIP, first bytes are 50 4B 03 04
+            Console.WriteLine($"[DOWNLOAD] bytes={_Bytes.Length}, first4={_Bytes[0]:X2} {_Bytes[1]:X2} {_Bytes[2]:X2} {_Bytes[3]:X2}");
+
+            // --- Download via JS (guarded) ---
+            try
+            {
+                var base64 = Convert.ToBase64String(_Bytes);
+                var fileName = $"SalesPivot_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+
+
+
+                await AppGlobal.JS.InvokeVoidAsync("downloadExcelFile", fileName, base64);
+
+                Toaster.ShowSuccess($"File [{fileName}] downloaded.");
+
+                Console.WriteLine("[DOWNLOAD] InvokeVoidAsync returned OK");
+            }
+            catch (JSException jsEx)
+            {
+                Console.WriteLine($"[DOWNLOAD] JSException: {jsEx.Message}");
+                MsgService.Error($"JS error: {jsEx.Message}");
+            }
+            catch (TaskCanceledException)
+            {
+                Console.WriteLine("[DOWNLOAD] Circuit cancelled");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DOWNLOAD] Exception: {ex}");
+                MsgService.Error($"Download failed: {ex.Message}");
+            }
+        }
+
+
+        //private async Task DownloadExcel()
+        //{
+        //    #region Validation
+        //    MsgService.Clear();
+        //    var IsError = false;
+            
+        //    if(MyModel.SearchText.Length == 0)
+        //    {
+        //        MsgService.Alert(MESSAGE.SearchTextIsNull);
+        //        IsError = true; 
+        //    }
+        //    if(MyModel.Source == null)
+        //    {
+        //        MsgService.Alert(MESSAGE.DataSourceIsNull);
+        //        IsError = true;
+        //    }
+        //    #endregion
+
+        //    var SalesData = new SalesPivotSheet(MyModel.Source!, MyModel.SearchText);
+        //    var _Bytes = SalesData.GetPivotBytes();
+            
+        //    if(_Bytes == null) 
+        //    {
+        //        MsgService.Critical(MESSAGE.ExcelNoBytesfound);
+        //        IsError = true;
+
+        //    }
+        //    else
+        //    {
+        //        if (_Bytes.Length == 0)
+        //        {
+        //            MyModel.MsgService.Error(MESSAGE.ExcelNoBytesfound);
+        //            IsError = true;
+        //        }
+        //    }
+
+        //    if (!IsError)
+        //    {
+        //        var base64 = Convert.ToBase64String(_Bytes!);
+        //        var fileName = $"SalesPivot_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+
+        //        await AppGlobal.JS.InvokeVoidAsync("downloadExcelFile", fileName, base64);
+        //    }
+
+            
+        //}
 
     }
 }

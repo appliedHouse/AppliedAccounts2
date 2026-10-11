@@ -31,7 +31,7 @@ namespace AppliedAccounts.Models
         #region Constructor
         public SaleInvoiceListModel(GlobalService appGlobal)
         {
-            
+
             appGlobal.AppPaths.DBFile = appGlobal.Client.DataFile;
 
             if (appGlobal.DBFile.Length == 0)
@@ -158,35 +158,33 @@ namespace AppliedAccounts.Models
         {
             LoadData();
         }
-
         public void ClearText()
         {
             SearchText = string.Empty;
             LoadData();
         }
-
         #endregion
 
+        
+
+        public class SalesRecord
+        {
+            public long Id { get; set; } = 0;
+            public string Vou_No { get; set; } = string.Empty;
+            public string Ref_No { get; set; } = string.Empty;
+            public DateTime Vou_Date { get; set; } = DateTime.Now;
+            public DateTime Inv_Date { get; set; } = DateTime.Now;
+            public DateTime Pay_Date { get; set; } = DateTime.Now;
+            public string TitleCustomer { get; set; } = string.Empty;
+            public string TitleSalesman { get; set; } = string.Empty;
+            public string City { get; set; } = string.Empty;
+            public string Description { get; set; } = string.Empty;
+            public decimal Amount { get; set; } = 0.00M;
+            public ReportModel Report { get; set; } = new();
+            public bool IsSelected { get; set; } = false;       // Record is selected for bulk print.
+
+        }
+
     }
-
-    public class SalesRecord
-    {
-        public long Id { get; set; } = 0;
-        public string Vou_No { get; set; } = string.Empty;
-        public string Ref_No { get; set; } = string.Empty;
-        public DateTime Vou_Date { get; set; } = DateTime.Now;
-        public DateTime Inv_Date { get; set; } = DateTime.Now;
-        public DateTime Pay_Date { get; set; } = DateTime.Now;
-        public string TitleCustomer { get; set; } = string.Empty;
-        public string TitleSalesman { get; set; } = string.Empty;
-        public string City { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public decimal Amount { get; set; } = 0.00M;
-        public ReportModel Report { get; set; } = new();
-        public bool IsSelected { get; set; } = false;       // Record is selected for bulk print.
-
-    }
-
-
 
 }

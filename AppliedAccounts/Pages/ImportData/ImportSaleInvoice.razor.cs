@@ -230,8 +230,6 @@ namespace AppliedAccounts.Pages.ImportData
                 if (ClientData != null && Source != null)
                 {
                     MyModel.SpinnerMessage = "Sales invoice data is being Process... Customer Data Updating..";
-                    //var tb_Client = Source.GetTable(Tables.Customers);
-                    //var tb_ClientList = tb_Client.AsEnumerable().ToList();
                     var ExcelColumn = "BP Name";
                     var DataColumn = "Title";
 
