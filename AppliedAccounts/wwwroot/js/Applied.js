@@ -58,7 +58,6 @@ window.triggerFileUpload = function () {
     document.getElementById("inputFile").click();
 };
 
-
 function adjustPageHeight() {
     const tableContainer = document.getElementById("FullContainer");
     if (tableContainer != null) {
@@ -68,9 +67,6 @@ function adjustPageHeight() {
         tableContainer.style.maxHeight = maxHeight + "px";
     }
 }
-
-
-
 
 // Table List Height Auto Adjust
 function adjustTableHeight() {
@@ -107,10 +103,33 @@ function printPDF(pdfUrl) {
     };
 }
 
-
 window.playBeep = function () {
     const audio = new Audio('/Sound/beep.mp3');
     audio.play();
 };
 
+// Download Excel file, Generated CloseXML.Excel
+window.downloadExcelFile = (fileName, base64, mime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') => {
+ 
+    //console.log("=== downloadExcelFile called ===");
+    //console.log("fileName:", fileName);
+    //console.log("base64 length:", base64 ? base64.length : "NULL/UNDEFINED");
+    //console.log("base64 first 50 chars:", base64 ? base64.substring(0, 50) : "N/A");
+    //console.log("mime:", mime);
 
+    const byteChars = atob(base64);
+    const byteNumbers = new Uint8Array(byteChars.length);
+    for (let i = 0; i < byteChars.length; i++) {
+        byteNumbers[i] = byteChars.charCodeAt(i);
+    }
+    const blob = new Blob([byteNumbers], { type: mime });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);   // free memory
+};

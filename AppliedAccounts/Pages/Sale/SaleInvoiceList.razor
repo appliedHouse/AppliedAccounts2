@@ -1,10 +1,11 @@
 ﻿@page "/Sale/SaleInvoiceList"
 @attribute [Authorize]
 
+@using AppliedAccounts.Component.ButtonsDictionery
 @using AppliedAccounts.Component.Libs
 @using AppliedAccounts.Data.Mapping
-@using AppliedAccounts.Models
 @using AppliedAccounts.Services
+@using static AppliedAccounts.Models.SaleInvoiceListModel
 
 @inject AuthenticationStateProvider Authorized
 @inject GlobalService AppGlobal
@@ -81,10 +82,14 @@
                     </div>
                 </div>
                 <div class="p-2">
-                    <button type="button" class="btn btn-primary btn-sm" @onclick="() => MyModel.Search()">Search</button>
+                    <Btn_Search OnClick="MyModel.Search"/>
                 </div>
                 <div class="p-2">
-                    <button type="button" disabled="@IsSearchText" class="btn btn-primary btn-sm" @onclick="() => MyModel.ClearText()">Clear</button>
+                    <Btn_SearchClear OnClick="MyModel.ClearText"/>
+                </div>
+
+                <div class="p-2">
+                    <Btn1_Report OnClick="DownloadExcel" />
                 </div>
 
                 <div class="p-2">

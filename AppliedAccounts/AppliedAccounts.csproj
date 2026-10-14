@@ -55,6 +55,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AppliedCrypto\AppliedCrypto.csproj" />
     <ProjectReference Include="..\AppliedDB\AppliedDB\AppliedDB.csproj" />
+    <ProjectReference Include="..\AppliedExcel\AppliedExcel.csproj" />
     <ProjectReference Include="..\AppliedGlobals\AppliedGlobals\AppliedGlobals.csproj" />
     <ProjectReference Include="..\AppliedLanguage\AppLanguages.csproj" />
     <ProjectReference Include="..\AppliedMessages\AppMessages\AppMessages.csproj" />

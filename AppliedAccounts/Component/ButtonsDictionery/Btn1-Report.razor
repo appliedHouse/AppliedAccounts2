@@ -1,0 +1,19 @@
+﻿@using Microsoft.AspNetCore.Components
+
+@code
+{
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    private async Task HandleClick(MouseEventArgs e)
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(e);
+        }
+    }
+}
+
+<button id = "btn1-Report" type = "button" class= "btn btn-sm w1 btn-primary" title = "Report" @onclick = "HandleClick" >
+    <i class="bi bi-receipt-cutoff" ></i>
+</button >

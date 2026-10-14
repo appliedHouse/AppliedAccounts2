@@ -156,6 +156,7 @@
             DetailRecordsAreZero = 1054,
             AmountNotEqual = 1055,
             GlobalValueIsNull = 1056,
+            SearchTextIsNull = 1057,
 
             VouNoIsNull = 1101,
             VouNoNotDefine = 1102,
@@ -207,7 +208,11 @@
             CompanyLedgerAC_Notdefined = 1609,
             RefNoIsNull = 1610,
             Unknown = 1611,
-           
+            
+            
+            // Excel Model AppliedExcel Error
+            ExcelNoBytesfound = 20001,
+            
         }
 
 
