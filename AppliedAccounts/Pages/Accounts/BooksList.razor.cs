@@ -12,6 +12,7 @@ namespace AppliedAccounts.Pages.Accounts
 
         protected override void OnInitialized()
         {
+            Nature ??= 1;
             MyModel = new(); ;
             MyModel.Source = new(AppGlobal.AppPaths);
             MyModel.MsgService = AppGlobal.MsgService;
