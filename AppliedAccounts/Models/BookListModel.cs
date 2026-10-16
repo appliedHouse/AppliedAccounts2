@@ -1,12 +1,10 @@
-﻿using AppliedAccounts.Component;
-using AppliedAccounts.Data;
+﻿using AppliedAccounts.Data;
 using AppliedAccounts.Pages.Accounts;
 using AppliedAccounts.Services;
 using AppliedDB;
 using AppReports;
 using Microsoft.JSInterop;
 using System.Data;
-using static AppliedAccounts.Models.BookModel;
 using Enums = AppliedDB.Enums;
 using Format = AppliedGlobals.AppValues.Format;
 using KeyType = AppliedGlobals.AppErums.KeyTypes;
@@ -19,7 +17,6 @@ namespace AppliedAccounts.Models
     {
         public GlobalService AppGlobals { get; set; }
         public List<CodeTitle> BookList { get; set; }
-        public List<CodeTitle> NatureAccountsList { get; set; }
         public DataSource Source { get; set; }
         public MessagesService MsgService { get; set; }
         public PrintService ReportService { get; set; }
@@ -36,45 +33,91 @@ namespace AppliedAccounts.Models
         public bool PageIsValid { get; set; } = false;
         public bool IsWaiting { get; set; } = false;
 
-        #region Constructor
-        public BookListModel()
-        {
-
-        }
-
-        public BookListModel(int _BookID, GlobalService _AppGlobal)
-        {
-            AppGlobals = _AppGlobal;
-            MsgService = AppGlobals.MsgService;
-            Source = new(AppGlobals.AppPaths);
-            GetKeys();
-
-            try
-            {
-                if (_BookID == 0) { BookID = 1; } else { BookID = _BookID; }
-                var result = Source?.SeekValue(Enums.Tables.COA, BookID, "Nature") ?? 0;
-                if (result.GetType() == typeof(DBNull)) { BookNatureID = 1; }        // Use Dafault ID
-                if (result.GetType() == typeof(long)) { BookNatureID = (long)result; }        // Use Dafault ID
-                if (result.GetType() != typeof(long))
-                {
-                    long.TryParse(result.ToString(), out long _Value);
-                    BookNatureID = _Value;
-                }
-
-                BookID = _BookID;
-
-                NatureAccountsList =
+        public List<CodeTitle> NatureAccountsList =
                 [
-                    new() { ID = 1, Code = "01", Title = "Cash" },
-                    new() { ID = 2, Code = "02", Title = "Bank" },
+                    new () { ID = 1, Code = "01", Title = "Cash" },
+                    new () { ID = 2, Code = "02", Title = "Bank" },
                 ];
 
-                PageIsValid = LoadData();
-            }
-            catch (Exception error)
-            {
-                MsgService!.Error(error);
-            }
+
+        #region Constructor
+
+        //public BookListModel(GlobalService _AppGlobal)
+        //{
+        //    AppGlobals = _AppGlobal;
+        //    MsgService = AppGlobals.MsgService;
+        //    Source = new(AppGlobals.AppPaths);
+
+        //    NatureAccountsList =
+        //        [
+        //            new() { ID = 1, Code = "01", Title = "Cash" },
+        //            new() { ID = 2, Code = "02", Title = "Bank" },
+        //        ];
+
+        //    try
+        //    {
+        //        BookNatureID = Source.GetNumber("BkNatureID")  ;
+        //        GetKeys(BookNatureID);
+
+        //        //if (_BookID == 0) { BookID = 1; } else { BookID = _BookID; }
+        //        //var result = Source?.SeekValue(Enums.Tables.COA, BookID, "Nature") ?? 0;
+        //        //if (result.GetType() == typeof(DBNull)) { BookNatureID = 1; }        // Use Dafault ID
+        //        //if (result.GetType() == typeof(long)) { BookNatureID = (long)result; }        // Use Dafault ID
+        //        //if (result.GetType() != typeof(long))
+        //        //{
+        //        //    long.TryParse(result.ToString(), out long _Value);
+        //        //    BookNatureID = _Value;
+        //        //}
+
+        //        //BookID = _BookID;
+
+
+        //        PageIsValid = LoadData();
+        //    }
+        //    catch (Exception error)
+        //    {
+        //        MsgService!.Error(error);
+        //    }
+        //}
+
+
+        //public BookListModel(int _BookID, GlobalService _AppGlobal)
+        //{
+        //    AppGlobals = _AppGlobal;
+        //    MsgService = AppGlobals.MsgService;
+        //    Source = new(AppGlobals.AppPaths);
+        //    //GetKeys();
+
+        //    try
+        //    {
+        //        if (_BookID == 0) { BookID = 1; } else { BookID = _BookID; }
+        //        var result = Source?.SeekValue(Enums.Tables.COA, BookID, "Nature") ?? 0;
+        //        if (result.GetType() == typeof(DBNull)) { BookNatureID = 1; }        // Use Dafault ID
+        //        if (result.GetType() == typeof(long)) { BookNatureID = (long)result; }        // Use Dafault ID
+        //        if (result.GetType() != typeof(long))
+        //        {
+        //            long.TryParse(result.ToString(), out long _Value);
+        //            BookNatureID = _Value;
+        //        }
+
+        //        BookID = _BookID;
+
+        //        NatureAccountsList =
+        //        [
+        //            new() { ID = 1, Code = "01", Title = "Cash" },
+        //            new() { ID = 2, Code = "02", Title = "Bank" },
+        //        ];
+
+        //        PageIsValid = LoadData();
+        //    }
+        //    catch (Exception error)
+        //    {
+        //        MsgService!.Error(error);
+        //    }
+        //}
+
+        public BookListModel()
+        {
         }
         #endregion
 
@@ -84,6 +127,7 @@ namespace AppliedAccounts.Models
             try
             {
                 LoadBookRecords(BookID);
+                SetKeys(BookNatureID);
                 return true;
             }
             catch (Exception)
@@ -244,33 +288,54 @@ namespace AppliedAccounts.Models
         #region Edit Book Voucher Re-direct to Book Page
         public void Edit(long _ID)
         {
-            SetKeys();
+            //SetKeys(BookNatureID);
             AppGlobals.NavManager.NavigateTo($"/Accounts/Books/{BookID}/{BookNatureID}");
         }
         #endregion
 
         #region Get & Set Keys
-        internal void SetKeys()
+        internal void SetKeys(long natureID)
         {
             if (Source != null)
             {
-                Source.SetKey("BkNatureID", BookNatureID, KeyType.Number);
-                Source.SetKey("BkBook", BookID, KeyType.Number);
-                Source.SetKey("BkBook", DT_Start, KeyType.From);
-                Source.SetKey("BkBook", DT_End, KeyType.To);
-                Source.SetKey("BkBook", SearchText, KeyType.Text);
+                if (natureID == NatureAccountsList.Select(e => e.ID).First())
+                {
+                    Source.SetKey("BkNatureID", BookNatureID, KeyType.Number);
+                    Source.SetKey("CashBook", BookID, KeyType.Number);
+                    Source.SetKey("CashBook", DT_Start, KeyType.From);
+                    Source.SetKey("CashBook", DT_End, KeyType.To);
+                    Source.SetKey("CashBook", SearchText, KeyType.Text);
+                }
+                else
+                {
+                    Source.SetKey("BkNatureID", BookNatureID, KeyType.Number);
+                    Source.SetKey("BankBook", BookID, KeyType.Number);
+                    Source.SetKey("BankBook", DT_Start, KeyType.From);
+                    Source.SetKey("BankBook", DT_End, KeyType.To);
+                    Source.SetKey("BankBook", SearchText, KeyType.Text);
+                }
             }
         }
 
-        internal void GetKeys()
+        internal void GetKeys(long natureID)
         {
-            if (!string.IsNullOrEmpty(Source.DBFile))
+            if (Source != null)
             {
-                BookNatureID = Source.GetNumber("BkNatureID");
-                BookID = Source.GetNumber("BkBook");
-                DT_Start = Source.GetFrom("BkBook");
-                DT_End = Source.GetTo("BkBook");
-                SearchText = Source.GetText("BkBook");
+                BookNatureID = natureID;
+                if(natureID == NatureAccountsList.Select(e=> e.ID).First())
+                {
+                    BookID = Source.GetNumber("CashBook");
+                    DT_Start = Source.GetFrom("CashBook");
+                    DT_End = Source.GetTo("CashBook");
+                    SearchText = Source.GetText("CashBook");
+                }
+                else
+                {
+                    BookID = Source.GetNumber("BankBook");
+                    DT_Start = Source.GetFrom("BankBook");
+                    DT_End = Source.GetTo("BankBook");
+                    SearchText = Source.GetText("BankBook");
+                }
             }
         }
 
@@ -278,7 +343,7 @@ namespace AppliedAccounts.Models
         {
             if (AppGlobals.Client.Role == "Administrator")
             {
-                BookModel bookModel = new(VoucherID,BookID,AppGlobals,MsgService);
+                BookModel bookModel = new(VoucherID, BookID, AppGlobals, MsgService);
                 var IsDeleted = bookModel.DeleteVoucher();
                 return IsDeleted;
             }

@@ -15,16 +15,10 @@ namespace AppliedAccounts.Pages.Accounts
 
         public bool IsPageValid { get; set; } = true;
 
-
         private decimal Tot_DR = 0.0M;
         private decimal Tot_CR = 0.0M;
         private string ErrorMessage = string.Empty;
-
-
-
-        public Books()
-        {
-        }
+        
         public void Start()
         {
             MyModel = new(ID, BookID, AppGlobal, MsgService); ;
@@ -122,7 +116,5 @@ namespace AppliedAccounts.Pages.Accounts
             MyModel.IsWaiting = false; await InvokeAsync(StateHasChanged);
         }
         #endregion
-
-
     }
 }

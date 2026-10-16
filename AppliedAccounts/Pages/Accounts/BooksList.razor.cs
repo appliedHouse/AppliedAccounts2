@@ -7,10 +7,19 @@ namespace AppliedAccounts.Pages.Accounts
     public partial class BooksList
     {
 
-        public BookListModel MyModel { get; set; } = new();
+        public BookListModel MyModel { get; set; }
         public NavigationManager NavManager { get; set; }
 
-        public BooksList() { }
+        protected override void OnInitialized()
+        {
+            MyModel = new(); ;
+            MyModel.Source = new(AppGlobal.AppPaths);
+            MyModel.MsgService = AppGlobal.MsgService;
+            MyModel.GetKeys((long)Nature!);
+            MyModel.LoadData();
+
+            NavManager = AppGlobal.NavManager;
+        }
 
         #region Back Page
         public void Back() { AppGlobal.NavManager.NavigateTo("/Menu/Accounts"); }
@@ -29,7 +38,7 @@ namespace AppliedAccounts.Pages.Accounts
         #region Refresh Page
         public async void Refresh()
         {
-            MyModel.SetKeys();              // Save the current page setting in Registry 
+            MyModel.SetKeys(MyModel.BookNatureID);              // Save the current page setting in Registry 
             MyModel.Pages = new();          // Reset the page model
             await InvokeAsync(StateHasChanged);
         }
@@ -68,6 +77,7 @@ namespace AppliedAccounts.Pages.Accounts
         private void BookListChanged(long _BookID)
         {
             MyModel.BookID = _BookID; //result;
+            MyModel.SetKeys(MyModel.BookNatureID);
         }
         #endregion
 
@@ -86,7 +96,6 @@ namespace AppliedAccounts.Pages.Accounts
         #endregion
 
     }
-
     #region book view Model
 
     public class BookView

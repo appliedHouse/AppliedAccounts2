@@ -5,6 +5,7 @@ using System.Data;
 using System.Text;
 using static AppliedDB.Enums;
 using static AppliedGlobals.AppErums;
+using static AppliedGlobals.AppValues;
 using Tables = AppliedDB.Enums.Tables;
 
 namespace AppliedDB
@@ -28,11 +29,35 @@ namespace AppliedDB
 
         #region Constructor
 
-        public DataSource(AppValues.AppPath _AppPaths)
+        public DataSource(AppValues _appValies)
+        {
+            AppPaths = _appValies.Paths;
+            Start();
+        }
+
+
+        public DataSource(AppPath _AppPaths)
         {
             AppPaths = _AppPaths;
-            MyConnections = new Connections(_AppPaths);
+            Start();
+            //MyConnections = new Connections(_AppPaths);
             
+
+            //if (MyConnections != null)
+            //{
+            //    MyConnection = MyConnections.GetSqliteClient()!;
+            //    MsgConnection = MyConnections.GetSqliteMessage()!;
+            //    SysConnection = MyConnections.GetSqliteSystem()!;
+
+            //    MsgClass = new MessageClass(MsgConnection);
+            //    MyCommand = new SqliteCommand("", MyConnection);
+
+            //}
+        }
+
+        private void Start()
+        {
+            MyConnections = new Connections(AppPaths);
 
             if (MyConnections != null)
             {
@@ -42,10 +67,8 @@ namespace AppliedDB
 
                 MsgClass = new MessageClass(MsgConnection);
                 MyCommand = new SqliteCommand("", MyConnection);
-
             }
         }
-
         
 
 

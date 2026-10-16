@@ -62,6 +62,7 @@ namespace AppliedAccounts.Models
         {
             AppGlobal = _AppGlobal;
             MsgService = msgService;
+            Source = new(AppGlobal.AppPaths);
             MyVoucher = new();
 
             try
@@ -70,13 +71,13 @@ namespace AppliedAccounts.Models
                 VoucherID = _VoucherID;
                 DataFile = AppGlobal.DBFile;
 
-                CashNatureID = AppRegistry.GetNumber(DataFile, "CashBKNature");
-                BankNatureID = AppRegistry.GetNumber(DataFile, "BankBKNature");
+                CashNatureID = Source.GetNumber("CashBKNature");
+                BankNatureID = Source.GetNumber("BankBKNature");
 
                 if (AppGlobal.AppPaths != null)
                 {
                     Source = new(AppGlobal.AppPaths);
-                    LastVoucherDate = AppRegistry.GetDate(Source.DBFile, "LastBKDate");
+                    LastVoucherDate = Source.GetDate("LastBKDate");
 
                     if (VoucherID == 0) { MyVoucher = NewVoucher(); }   // Create a new voucher;
                     if (VoucherID > 0)
