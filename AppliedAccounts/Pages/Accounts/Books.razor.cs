@@ -40,34 +40,29 @@ namespace AppliedAccounts.Pages.Accounts
         {
             MyModel.MyVoucher.Detail.COA = _ID;
             MyModel.MyVoucher.Detail.TitleAccount = MyModel.Accounts
-                .Where(e => e.ID == MyModel.MyVoucher.Detail.COA)
-                .Select(e => e.Title)
-                .First() ?? "";
+                .FirstOrDefault(e => e.ID == _ID)?.Title ?? "";
+                //.Where(e => e.ID == MyModel.MyVoucher.Detail.COA)
+                //.Select(e => e.Title)
+                //.First() ?? "";
         }
         private void CompanyIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Company = _ID;
             MyModel.MyVoucher.Detail.TitleCompany = MyModel.Companies
-                .Where(e => e.ID == MyModel.MyVoucher.Detail.Company)
-                .Select(e => e.Title)
-                .First() ?? "";
+                .FirstOrDefault(e => e.ID == _ID)?.Title ?? "";
         }
         private void ProjectIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Project = _ID;
             MyModel.MyVoucher.Detail.TitleProject = MyModel.Projects
-                .Where(e => e.ID == MyModel.MyVoucher.Detail.Project)
-                .Select(e => e.Title)
-                .First() ?? "";
+                .FirstOrDefault(e => e.ID == _ID)?.Title ?? "";
 
         }
         private void EmployeeIDChanged(long _ID)
         {
             MyModel.MyVoucher.Detail.Employee = _ID;
             MyModel.MyVoucher.Detail.TitleEmployee = MyModel.Employees
-                .Where(e => e.ID == MyModel.MyVoucher.Detail.Employee)
-                .Select(e => e.Title)
-                .First() ?? "";
+                .FirstOrDefault(e => e.ID == _ID)?.Title ?? "";
         }
         #endregion
 

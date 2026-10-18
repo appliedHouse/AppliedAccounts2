@@ -7,10 +7,11 @@
 @using AppliedAccounts.Component.Libs;
 @using AppliedAccounts.Services
 
+@inject GlobalService AppGlobal
 @inject IToastService Toaster
 @inject PrintService ReportService
-@inject GlobalService AppGlobal
 @inject MessagesService MsgService
+@inject AuthenticationStateProvider authStateProvider
 
 @code {
 
