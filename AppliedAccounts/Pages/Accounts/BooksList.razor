@@ -18,26 +18,25 @@
     private string CurrFormat = Format.Currency;
 }
 
-<PageHeading Text="@MyModel.BookNatureTitle"/>
-<ShowMessages MsgService="MyModel.MsgService"/>
-<ShowPrintWait Visiable="@MyModel.IsWaiting"/>
+<PageHeading Text="@MyModel.BookNatureTitle" />
+<ShowMessages MsgService="MyModel.MsgService" />
+<ShowPrintWait Visiable="@MyModel.IsWaiting" />
 
 <EditForm Model="@MyModel">
     <div class="d-flex flex-row mb-3 filter">
-        <div class="p-2">
+        <div class="p-2 ddwidth1">
             <MyDropDown id="ddNature"
                         Label="Account Nature"
                         Value="@MyModel.BookNatureID"
                         ValueChanged="@((e) => BookNatureChanged(e))"
-                        Items="@MyModel.NatureAccountsList"
-                        />
+                        Items="@MyModel.NatureAccountsList" />
         </div>
-        <div class="p-2">
+        <div class="p-2 ddwidth2">
             <MyDropDown id="ddBook"
                         Label="Book"
                         Value="@MyModel.BookID"
                         ValueChanged="@((e) => BookListChanged(e))"
-                        Items="@MyModel.Source.GetBookAccounts(MyModel.BookNatureID)"/>
+                        Items="@MyModel.Source.GetBookAccounts(MyModel.BookNatureID)" />
         </div>
         <div class="p-2">
             <InputDate id="dateStat" class="item-height" @bind-Value="MyModel.DT_Start"></InputDate>
@@ -54,61 +53,85 @@
             </label>
         </div>
         <div class="p-2">
-            <Btn_Refresh OnClick="Refresh"/>
-            <Btn_Add OnClick="New"/>
+            <Btn_Refresh OnClick="Refresh" />
+            <Btn_Add OnClick="New" />
         </div>
-        
+
     </div>
 
     <div class="container">
-       
-            <table class="table-list">
-                <thead>
+
+        <table class="table-list">
+            <thead>
+                <tr>
+                    <th style="width:10%">Voucher</th>
+                    <th style="width:10%">Date</th>
+                    <th style="width:5%">Sr.No</th>
+                    <th style="width:35%">Description</th>
+                    <th style="width:10%">Received</th>
+                    <th style="width:10%">Paid</th>
+                    <th style="width:10%">Balance</th>
+                    <th style="width:10%">
+                        <button class="btn btn-Add"><i class="bi bi-pencil-fill"></i></button>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (BookView Record in MyModel.LoadBookRecords(MyModel.BookID))
+                {
+                    string _NavTo = $"/Accounts/Books/{Record.ID}/{MyModel.BookID}";
                     <tr>
-                        <th style="width:10%">Voucher</th>
-                        <th style="width:10%">Date</th>
-                        <th style="width:5%">Sr.No</th>
-                        <th style="width:35%">Description</th>
-                        <th style="width:10%">Received</th>
-                        <th style="width:10%">Paid</th>
-                        <th style="width:10%">Balance</th>
-                        <th style="width:10%">
-                            <button class="btn btn-Add"><i class="bi bi-pencil-fill"></i></button>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (BookView Record in MyModel.LoadBookRecords(MyModel.BookID))
-                    {
-                        string _NavTo = $"/Accounts/Books/{Record.ID}/{MyModel.BookID}";
-                        <tr>
-                            <td>@Record.Vou_No</td>
-                            <td>@Record.Vou_Date.ToString(Format.DDMMMYY)</td>
-                            <td class="center">@Record.Sr_No</td>
-                            <td class="left">@Record.Description</td>
-                            <td class="amount">@Record.TReceived</td>
-                            <td class="amount">@Record.TPaid</td>
-                            <td class="amount">@Record.TBalance</td>
-                            <td>
-                                <EditButton NavTo=@_NavTo Title="Edit Voucher" />
-                                <PrintButton ReturnValue="Print" VoucherID=Record.ID />
+                        <td>@Record.Vou_No</td>
+                        <td>@Record.Vou_Date.ToString(Format.DDMMMYY)</td>
+                        <td class="center">@Record.Sr_No</td>
+                        <td class="left">@Record.Description</td>
+                        <td class="amount">@Record.TReceived</td>
+                        <td class="amount">@Record.TPaid</td>
+                        <td class="amount">@Record.TBalance</td>
+                        <td>
+                            <EditButton NavTo=@_NavTo Title="Edit Voucher" />
+                            <PrintButton ReturnValue="Print" VoucherID=Record.ID />
 
-                                @if (Record.Status == Status.Submitted.ToString())
-                                {
-                                    <DeleteButton OnClick="@(()=>DeleteVoucher(Record.ID))" UserRole="@AppGlobal.UserRole"  />
-                                }
+                            @if (Record.Status == Status.Submitted.ToString())
+                            {
+                                <DeleteButton OnClick="@(() => DeleteVoucher(Record.ID))" UserRole="@AppGlobal.UserRole" />
+                            }
                         </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                    </tr>
+                }
+            </tbody>
+        </table>
 
-             <div class="d-flex">
-                   <div class="p-1" style="height:40px">
-                       <NavPageBar Paging="MyModel.Pages"></NavPageBar>
-                   </div>
+        <div class="d-flex">
+            <div class="p-1" style="height:40px">
+                <NavPageBar Paging="MyModel.Pages"></NavPageBar>
             </div>
-       
+        </div>
+
     </div>
-    
+
 </EditForm>
+
+
+<style>
+    .filter {
+        background-color: antiquewhite;
+        margin-left: 15px;
+        margin-right: 15px;
+        margin-top: 3px;
+        margin-bottom: 3px;
+        padding: 5px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+    }
+
+    .ddwidth1
+    {
+        width: 175px
+    }
+    .ddwidth2
+    {
+        width: 275px
+    }
+</style>

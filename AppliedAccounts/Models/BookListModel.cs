@@ -322,7 +322,7 @@ namespace AppliedAccounts.Models
             if (Source != null)
             {
                 BookNatureID = natureID;
-                if(natureID == NatureAccountsList.Select(e=> e.ID).First())
+                if (natureID == NatureAccountsList.Select(e => e.ID).First())
                 {
                     BookID = Source.GetNumber("CashBook");
                     DT_Start = Source.GetFrom("CashBook");
@@ -341,6 +341,12 @@ namespace AppliedAccounts.Models
 
         public async Task<bool> DeleteAll(long VoucherID)
         {
+            if (AppGlobals == null)
+            {
+                MsgService.Critical(Messages.GlobalValueIsNull);
+                    return false;
+            }
+
             if (AppGlobals.Client.Role == "Administrator")
             {
                 BookModel bookModel = new(VoucherID, BookID, AppGlobals, MsgService);

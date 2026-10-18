@@ -634,16 +634,13 @@ namespace AppliedAccounts.Models
             #region Validation
             if (MyVoucher.Master.Vou_No.ToLower() == "new")
             {
+                MsgService.Alert("Book Voucher is new. Can not be deleted.");
                 return false;
             }
 
-            //if (MyVoucher.Master.Vou_No.Length != 11)
-            //{
-            //    return false;
-            //}
-
-            if (MyVoucher.Master.Status.Equals(AppliedDB.Enums.Status.Submitted))
+            if (MyVoucher.Master.Status.Equals(AppliedDB.Enums.Status.Posted))
             {
+                MsgService.Alert("Book Voucher is posted to the Main Ledger. Unpost it before deleting.");
                 return false;
             }
             #endregion
