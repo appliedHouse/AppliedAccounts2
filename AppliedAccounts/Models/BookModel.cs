@@ -126,7 +126,6 @@ namespace AppliedAccounts.Models
         #region Load Data
         public bool LoadData()
         {
-
             if (Source != null)
             {
                 try
@@ -180,6 +179,7 @@ namespace AppliedAccounts.Models
                             return true;
                         }
                     }
+                    
                 }
                 catch (Exception error)
                 {

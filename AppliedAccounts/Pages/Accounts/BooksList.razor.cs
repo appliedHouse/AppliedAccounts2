@@ -1,6 +1,7 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace AppliedAccounts.Pages.Accounts
 {
@@ -37,7 +38,7 @@ namespace AppliedAccounts.Pages.Accounts
         #endregion
 
         #region Refresh Page
-        public async void Refresh()
+        public async Task Refresh()
         {
             MyModel.SetKeys(MyModel.BookNatureID);              // Save the current page setting in Registry 
             MyModel.Pages = new();          // Reset the page model
@@ -82,21 +83,58 @@ namespace AppliedAccounts.Pages.Accounts
         }
         #endregion
 
-        #region Delete record and Voucher
-        private async Task DeleteVoucher(long VoucherID)
-        {
-            if(MyModel.AppGlobals == null) { MyModel.AppGlobals = AppGlobal; }
 
-            if (await MyModel.DeleteAll(VoucherID))
+        #region Delete record and Voucher
+
+        private async Task ShowDeleteModal(long voucherID)
+        {
+            SelectedVoucherID = voucherID;
+
+            await js.InvokeVoidAsync("showModol", "DeleteVoucher");
+        }
+
+        private async Task DeleteVoucher()
+        {
+            if (MyModel.AppGlobals == null)
+                MyModel.AppGlobals = AppGlobal;
+
+            
+            bool result = await MyModel.DeleteAll(SelectedVoucherID);
+
+            if (result)
             {
-                Toaster.ShowInfo($"Voucher Deleted Successfully {VoucherID}");
+                Toaster.ShowInfo(
+                    $"Voucher Deleted Successfully {SelectedVoucherID}");
             }
             else
             {
-                Toaster.ShowError($"Voucher Deletion Failed {VoucherID}");
+                Toaster.ShowError(
+                    $"Voucher Deletion Failed {SelectedVoucherID}");
             }
+
+            await js.InvokeVoidAsync("closeModal", "DeleteVoucher");
+            await Refresh();
         }
+
         #endregion
+
+
+
+        //#region Delete record and Voucher
+        //private async Task DeleteVoucher(long VoucherID)
+        //{
+        //    if(MyModel.AppGlobals == null) { MyModel.AppGlobals = AppGlobal; }
+
+        //    if (await MyModel.DeleteAll(VoucherID))
+        //    {
+        //        Toaster.ShowInfo($"Voucher Deleted Successfully {VoucherID}");
+        //    }
+        //    else
+        //    {
+        //        Toaster.ShowError($"Voucher Deletion Failed {VoucherID}");
+        //    }
+        //}
+        //#endregion
 
     }
     #region book view Model

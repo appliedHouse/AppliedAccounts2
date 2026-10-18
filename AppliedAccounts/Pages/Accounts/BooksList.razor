@@ -16,6 +16,7 @@
     [Parameter] public int? Nature { get; set; } = 1;
     private string DateFormat = Format.DDMMYY;
     private string CurrFormat = Format.Currency;
+    private long SelectedVoucherID { get; set; }
 }
 
 <PageHeading Text="@MyModel.BookNatureTitle" />
@@ -94,7 +95,8 @@
 
                             @if (Record.Status == Status.Submitted.ToString())
                             {
-                                <DeleteButton OnClick="@(() => DeleteVoucher(Record.ID))" UserRole="@AppGlobal.UserRole" />
+                                <DeleteButton OnClick="@(() => ShowDeleteModal(Record.ID))"
+                                              UserRole="@AppGlobal.UserRole" />
                             }
                         </td>
                     </tr>
@@ -110,7 +112,61 @@
 
     </div>
 
+
 </EditForm>
+
+
+<div class="modal fade"
+     id="DeleteVoucher"
+     tabindex="-1"
+     aria-labelledby="DeleteVoucherLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="DeleteVoucherLabel">
+                    Confirm Voucher Deletion
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                Are you sure you want to delete voucher
+                <strong>@SelectedVoucherID</strong>?
+
+                <p class="text-danger mt-2 mb-0">
+                    This action cannot be undone.
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-secondary btn-sm"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button type="button"
+                        class="btn btn-danger btn-sm"
+                        @onclick="DeleteVoucher">
+                    <i class="bi bi-trash"></i>
+                    Delete
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
 
 
 <style>
@@ -126,12 +182,11 @@
         align-items: center;
     }
 
-    .ddwidth1
-    {
+    .ddwidth1 {
         width: 175px
     }
-    .ddwidth2
-    {
+
+    .ddwidth2 {
         width: 275px
     }
 </style>
