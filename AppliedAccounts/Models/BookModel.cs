@@ -280,7 +280,7 @@ namespace AppliedAccounts.Models
         {
             if (IsTransValidated())
             {
-                var IsSrNo = MyVoucher.Details.Where(e => e.Sr_No == MyVoucher.Detail.Sr_No).Any();
+                var IsSrNo = MyVoucher.Details.Any(e => e.Sr_No == MyVoucher.Detail.Sr_No);
                 if (!IsSrNo)
                 {
                     MyVoucher.Detail.action = "save";
@@ -291,7 +291,6 @@ namespace AppliedAccounts.Models
 
         public async Task<bool> SaveAllAsync()
         {
-
             IsSaved = true;
 
             if (!IsWaiting)
@@ -471,35 +470,97 @@ namespace AppliedAccounts.Models
         #endregion
 
         #region Validation
+
         public bool IsVoucherValidated()
         {
             MsgService.Clear();
             bool IsValid = true;
 
-            if (MyVoucher.Master.BookID == 0) { MsgService!.Error(MESSAGE.BookIDIsZero); }
-            if (MyVoucher.Master.Vou_No.Length == 0) { MsgService!.Error(MESSAGE.VouNoNotDefine); }
-            if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate) { MsgService!.Error(MESSAGE.VouDateLess); }
-            if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate) { MsgService!.Error(MESSAGE.VouDateMore); }
-            if (MyVoucher.Master.Remarks.Length == 0) { MsgService!.Error(MESSAGE.Row_NoRemarks); }
-            if (MyVoucher.Master.Status.Length == 0) { MsgService!.Error(MESSAGE.Row_NoStatus); }
+            // Validate Voucher Master
+            if (MyVoucher.Master.BookID == 0)
+            {
+                MsgService!.Error(MESSAGE.BookIDIsZero);
+                IsValid = false;
+            }
 
+            if (string.IsNullOrWhiteSpace(MyVoucher.Master.Vou_No))
+            {
+                MsgService!.Error(MESSAGE.VouNoNotDefine);
+                IsValid = false;
+            }
+
+            if (MyVoucher.Master.Vou_Date < AppRegistry.MinVouDate)
+            {
+                MsgService!.Error(MESSAGE.VouDateLess);
+                IsValid = false;
+            }
+
+            if (MyVoucher.Master.Vou_Date > AppRegistry.MaxVouDate)
+            {
+                MsgService!.Error(MESSAGE.VouDateMore);
+                IsValid = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(MyVoucher.Master.Remarks))
+            {
+                MsgService!.Error(MESSAGE.Row_NoRemarks);
+                IsValid = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(MyVoucher.Master.Status))
+            {
+                MsgService!.Error(MESSAGE.Row_NoStatus);
+                IsValid = false;
+            }
+
+            // Validate Voucher Details
             foreach (var Trans in MyVoucher.Details)
             {
-                if (Trans.Sr_No == 0) { MsgService!.Error(MESSAGE.SerialNoIsZero); }
-                if (Trans.COA == 0) { MsgService!.Error(MESSAGE.Row_COAIsZero); }
-                if (Trans.DR > 0 && Trans.CR > 0) { MsgService!.Error(MESSAGE.DRnCRHaveValue); }
-                if (Trans.DR == 0 && Trans.CR == 0) { MsgService!.Error(MESSAGE.DRnCRAreZero); }
-                if (string.IsNullOrEmpty(Trans.Description)) { MsgService!.Error(MESSAGE.DescriptionIsNothing); }
+                if (Trans.Sr_No == 0)
+                {
+                    MsgService!.Error(MESSAGE.SerialNoIsZero);
+                    IsValid = false;
+                }
 
+                if (Trans.COA == 0)
+                {
+                    MsgService!.Error(MESSAGE.Row_COAIsZero);
+                    IsValid = false;
+                }
+
+                if (Trans.DR > 0 && Trans.CR > 0)
+                {
+                    MsgService!.Error(MESSAGE.DRnCRHaveValue);
+                    IsValid = false;
+                }
+
+                if (Trans.DR == 0 && Trans.CR == 0)
+                {
+                    MsgService!.Error(MESSAGE.DRnCRAreZero);
+                    IsValid = false;
+                }
+
+                if (string.IsNullOrWhiteSpace(Trans.Description))
+                {
+                    MsgService!.Error(MESSAGE.DescriptionIsNothing);
+                    IsValid = false;
+                }
             }
-            return IsValid;
 
+            // Validate Book Nature
+            if (CashNatureID == 0)
+            {
+                MsgService!.Error(MESSAGE.BookNatureIsNull);
+                IsValid = false;
+            }
+
+            return IsValid;
         }
 
         public bool IsTransValidated()
         {
             bool IsValid = true;
-
+            MsgService.Clear();
 
             //
             if (MyVoucher.Master.BookID == 0) { MsgService.Alert(MESSAGE.BookIDIsZero); }

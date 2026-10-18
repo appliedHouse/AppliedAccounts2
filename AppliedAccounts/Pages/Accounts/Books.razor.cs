@@ -1,5 +1,6 @@
 ﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
+using AppliedDB;
 using Microsoft.AspNetCore.Components;
 using System.Data;
 
@@ -21,6 +22,7 @@ namespace AppliedAccounts.Pages.Accounts
         
         public void Start()
         {
+            
             MyModel = new(ID, BookID, AppGlobal, MsgService); ;
             MyModel.ReportService = ReportService;
 

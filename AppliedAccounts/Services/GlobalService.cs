@@ -17,7 +17,6 @@ namespace AppliedAccounts.Services
         public readonly ILogger<GlobalService> MyLogger;
         private UserAuthenticationStateProvider _authStateProvider;
         public UserProfile AppUser;
-
         public Connections Connections;
         public ProtectedSessionStorage AppStore;
 
@@ -189,17 +188,17 @@ namespace AppliedAccounts.Services
             }
         }
 
-        // Refresh user data after login/logout
-        //public async Task RefreshUserDataAsync()
-        //{
-        //    var authState = await _authStateProvider.GetAuthenticationStateAsync();
-        //    Client = _authStateProvider.AppUser ?? new AppUserModel();
+        //Refresh user data after login / logout
+        public async Task RefreshUserDataAsync()
+        {
+            var authState = await _authStateProvider.GetAuthenticationStateAsync();
+            Client = _authStateProvider.AppUser ?? new AppUserModel();
 
-        //    // Update paths if needed
-        //    AppPaths.DBFile = Client.DataFile;
-        //    UserID = Client.UserID;
-        //    UserRole = Client.Role;
-        //}
+            // Update paths if needed
+            AppPaths.DBFile = Client.DataFile;
+            UserID = Client.UserID;
+            UserRole = Client.Role;
+        }
 
         #region MinDate and MaxDate
         public DateTime MinDate() => GetMinDate();

@@ -1,5 +1,5 @@
-﻿@layout PageLayout;
-@page "/Accounts/Books";
+﻿@layout PageLayout
+@page "/Accounts/Books"
 @page "/Accounts/Books/{ID:long}"
 @page "/Accounts/Books/{ID:long}/{BookID:long}"
 @attribute [Authorize]
@@ -11,9 +11,11 @@
 @inject IToastService Toaster
 @inject PrintService ReportService
 @inject MessagesService MsgService
-@inject AuthenticationStateProvider authStateProvider
+@inject AuthenticationStateProvider AuthState
 
 @code {
+
+    //private UserService = (UserAuthenticationStateProvider)AuthState;
 
     private string DateFormat = Format.DDMMYY;
     private string CurrFormat = Format.Currency;
@@ -23,6 +25,18 @@
 
     protected override void OnInitialized()
     {
+        var UserProfile = ((UserAuthenticationStateProvider)AuthState).AppUser;
+        if(string.IsNullOrWhiteSpace(AppGlobal.DBFile)) 
+        { 
+            AppGlobal.AppUser = new()
+            {
+                Profile = UserProfile,
+            };
+
+            AppGlobal.AppPaths.DBFile = UserProfile.DataFile;
+            
+        }
+
         Start();
         MyModel.MsgService = MsgService;
     }
