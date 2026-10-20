@@ -4,6 +4,7 @@ const screenHeight = screen.height;
 document.documentElement.style.setProperty('--hight-screen', `${screenHeight}px`)
 
 
+
 // Show Bootstrap Modol Class.
 function showModol(ModalID) {
     var myModal = new bootstrap.Modal(document.getElementById(ModalID));

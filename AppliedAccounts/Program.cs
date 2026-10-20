@@ -33,7 +33,8 @@ builder.Services.AddHttpClient();
 builder.Services.AddAuthenticationCore();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<UserAuthenticationStateProvider>();
-builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
+builder.Services.AddScoped< AuthenticationStateProvider, UserAuthenticationStateProvider > ();
+
 
 // 4. Add Razor Pages and Blazor
 builder.Services.AddRazorPages();
