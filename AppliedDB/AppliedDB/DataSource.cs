@@ -17,6 +17,7 @@ namespace AppliedDB
         public SqliteConnection MyConnection { get; set; } //= MyConnections.GetSqliteClient()!;
         public SqliteConnection MsgConnection { get; set; } //= MyConnections.GetSqliteMessage()!;
         public SqliteConnection SysConnection { get; set; } //= MyConnections.GetSqliteSystem()!;
+        public SqliteConnection MenuConnection { get; set; } //= MyConnections.GetSqliteSystem()!;
         public SqliteCommand MyCommand { get; set; }
         public CommandClass MyCommands { get; set; } = new();
         public string DBFile => GetDataFile();
@@ -40,24 +41,53 @@ namespace AppliedDB
         {
             AppPaths = _AppPaths;
             Start();
-            //MyConnections = new Connections(_AppPaths);
-            
 
-            //if (MyConnections != null)
-            //{
-            //    MyConnection = MyConnections.GetSqliteClient()!;
-            //    MsgConnection = MyConnections.GetSqliteMessage()!;
-            //    SysConnection = MyConnections.GetSqliteSystem()!;
+        }
 
-            //    MsgClass = new MessageClass(MsgConnection);
-            //    MyCommand = new SqliteCommand("", MyConnection);
+        public DataSource(string _ConnectionString)
+        {
+            string _MessageConnection = $"Data Source={Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Messages", "Messages.db")}";
+            string _LanguageConnection = $"Data Source={Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Languages", "Messages.db")}";
+            string _SystemConnection = $"Data Source={Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "System", "System.db")}";
+            string _MenuConnection = $"Data Source={Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "System", "MenusDB.db")}";
 
-            //}
+            MyConnection = new SqliteConnection(_ConnectionString);
+            MsgConnection = new SqliteConnection(_MessageConnection);
+            SysConnection = new SqliteConnection(_SystemConnection);
+            MenuConnection = new SqliteConnection(_MenuConnection);
+
+        }
+
+        public DataSource(SqliteConnection _Connection)
+        {
+            if (_Connection != null)
+            {
+                string _MessageConnection = $"Data Source={Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Messages", "Messages.db")}";
+                string _LanguageConnection = $"Data Source={Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Languages", "Messages.db")}";
+                string _SystemConnection = $"Data Source={Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "System", "System.db")}";
+                string _MenuConnection = $"Data Source={Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "System", "MenusDB.db")}";
+
+                MyConnection = _Connection;
+                MsgConnection = new SqliteConnection(_MessageConnection);
+                SysConnection = new SqliteConnection(_SystemConnection);
+                MenuConnection = new SqliteConnection(_MenuConnection);
+
+                MyCommand = new(MyConnection.ConnectionString);
+            }
+
         }
 
         private void Start()
         {
             MyConnections = new Connections(AppPaths);
+
+            if (string.IsNullOrEmpty(AppPaths.DBFile))
+            {
+                MsgClass.Error(AppMessages.Enums.Messages.ConnectionsIsNull);
+                return;
+
+            }
+
 
             if (MyConnections != null)
             {
@@ -69,7 +99,7 @@ namespace AppliedDB
                 MyCommand = new SqliteCommand("", MyConnection);
             }
         }
-        
+
 
 
         #endregion
@@ -88,7 +118,7 @@ namespace AppliedDB
         }
         public DataTable GetTable(Tables _Table)
         {
-            if(MyConnection == null)
+            if (MyConnection == null)
             {
                 var Stop = true;
             }
@@ -340,7 +370,7 @@ namespace AppliedDB
             catch (Exception)
             {
 
-                
+
                 return new DataTable();
             }
             return new DataTable();
@@ -1083,7 +1113,7 @@ namespace AppliedDB
             List<CodeTitle> EmptyList = new() { new CodeTitle { ID = 0, Code = "", Title = "No Records" } };
             if (NatureID > 0)
             {
-                var _List =GetTable(Tables.COA, $"Nature={NatureID}", "Title").AsEnumerable().ToList().
+                var _List = GetTable(Tables.COA, $"Nature={NatureID}", "Title").AsEnumerable().ToList().
                     Select(rows => new CodeTitle
                     {
                         ID = rows.Field<long>("ID"),
@@ -1091,7 +1121,7 @@ namespace AppliedDB
                         Title = rows.Field<string>("Title") ?? ""
                     }).ToList();
 
-                if(_List == null || _List.Count == 0)
+                if (_List == null || _List.Count == 0)
                 {
                     _List = EmptyList;
                 }
@@ -1240,7 +1270,7 @@ namespace AppliedDB
         }
         public void SetKey(string Key, object KeyValue, KeyTypes keytype, string _Title)
         {
-            if(MyConnection == null) { return; }    // retun if DB connection is null.
+            if (MyConnection == null) { return; }    // retun if DB connection is null.
 
             if (MyConnection.State != ConnectionState.Open) { MyConnection.Open(); }
 
@@ -1421,14 +1451,14 @@ namespace AppliedDB
 
                 return 0;
             }
-            
+
         }
 
         public int RecordCound(string _Query, string _Filter)
         {
             try
             {
-                
+
                 _Query += string.IsNullOrEmpty(_Filter) ? "" : $"WHERE {_Filter}";
                 _Query = $"SELECT COUNT(*) FROM ({_Query})";
                 using var command = new SqliteCommand(_Query, MyConnection);

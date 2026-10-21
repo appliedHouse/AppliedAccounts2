@@ -1,6 +1,5 @@
 ﻿using AppliedAccounts.Authentication;
 using AppliedAccounts.Services;
-using Microsoft.Data.Sqlite;
 
 namespace AppliedAccounts.Middleware
 {
@@ -37,26 +36,6 @@ namespace AppliedAccounts.Middleware
                             var _connection = AppliedUsersService.CreateConnection();
 
                             if(_connection != null) { _validationPerformed = true; }
-
-                            //var dataFile = authProvider.AppUser.DataFile;
-                            //if (string.IsNullOrEmpty(dataFile))
-                            //    throw new Exception("User DataFile not assigned.");
-
-                            //var dbPath = Path.Combine(
-                            //    Directory.GetCurrentDirectory(),
-                            //    "wwwroot",
-                            //    "SqliteDB",
-                            //    dataFile
-                            //);
-
-                            //if (!File.Exists(dbPath))
-                            //    throw new Exception($"User database file '{dataFile}' not found.");
-
-                            //// Try opening a connection
-                            //using var conn = new SqliteConnection($"Data Source={dbPath}");
-                            //conn.Open(); // Will throw if invalid/corrupt
-
-                            //_validationPerformed = true; // mark success
                         }
                         catch
                         {

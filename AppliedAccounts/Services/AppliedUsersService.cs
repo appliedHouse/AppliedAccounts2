@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using System.Data;
+using System.Net.Quic;
 
 namespace AppliedAccounts.Services
 {
@@ -50,6 +51,31 @@ namespace AppliedAccounts.Services
             return null;
         }
 
+        public static SqliteConnection? ClientConnection(string _ClientID)
+        {
+            if(string.IsNullOrEmpty(_ClientID)) { return null; }
+
+            DataRow? _Row = GetUserRow(_ClientID);
+            if (_Row != null)
+            {
+                
+                var _File = _Row.Field<string>("DataFile"); if(string.IsNullOrEmpty(_File)) { return null; }
+                var _DataFile = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SQLiteDB", _File);
+                var conn = new SqliteConnection(new SqliteConnectionStringBuilder
+                {
+                    DataSource = _DataFile,
+                    Mode = SqliteOpenMode.ReadWrite,
+                    Cache = SqliteCacheMode.Shared,
+                    Pooling = true,
+                    DefaultTimeout = 15
+                }.ToString());
+
+                conn.Open();
+                return conn;
+            }
+            return null;
+        }
+
         public static DataRow? GetUserRow(string UserID)
         {
             try
@@ -57,7 +83,7 @@ namespace AppliedAccounts.Services
                 if (string.IsNullOrWhiteSpace(UserID)) { return null; }
 
                 using var _connection = CreateConnection();
-                if(_connection != null)
+                if (_connection != null)
                 {
                     using var cmd = _connection.CreateCommand();
                     cmd.CommandText = "SELECT * FROM [Users] WHERE UserID = @UserID LIMIT 1";

@@ -30,7 +30,7 @@ public class ClientDatabase
             || dataFile.Contains(Path.AltDirectorySeparatorChar))
             throw new InvalidOperationException($"Invalid DataFile: {dataFile}");
 
-        var fullPath = Path.Combine(env.ContentRootPath, "Clients", dataFile);
+        var fullPath = Path.Combine(env.ContentRootPath, "wwwroot", "SQLiteDB", dataFile);
 
         if (!File.Exists(fullPath))
             throw new FileNotFoundException($"Client DB not found: {fullPath}");

@@ -3,34 +3,42 @@
 @inject IJSRuntime JS
 
 @code {
-    [Parameter]
-    public bool IsOpen { get; set; }
-
-    [Parameter]
-    public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
 
     protected override async void OnAfterRender(bool firstRender)
     {
+
         try
         {
             if (firstRender)
-            {
                 await JS.InvokeVoidAsync("initializeOffcanvas", "offcanvasRight");
-            }
 
-            if (IsOpen)
-            {
-                await JS.InvokeVoidAsync("openOffcanvas", "offcanvasRight");
-            }
-            else
-            {
-                await JS.InvokeVoidAsync("closeOffcanvas", "offcanvasRight");
-            }
+            if (IsOpen) await JS.InvokeVoidAsync("openOffcanvas", "offcanvasRight");
+            else await JS.InvokeVoidAsync("closeOffcanvas", "offcanvasRight");
         }
-        catch (Exception)
-        {
+        catch (Exception ex) { Console.Error.WriteLine(ex); }
 
-        }
+        // try
+        // {
+        //     if (firstRender)
+        //     {
+        //         await JS.InvokeVoidAsync("initializeOffcanvas", "offcanvasRight");
+        //     }
+
+        //     if (IsOpen)
+        //     {
+        //         await JS.InvokeVoidAsync("openOffcanvas", "offcanvasRight");
+        //     }
+        //     else
+        //     {
+        //         await JS.InvokeVoidAsync("closeOffcanvas", "offcanvasRight");
+        //     }
+        // }
+        // catch (Exception)
+        // {
+
+        // }
     }
 
     #region Close and open offcanvas
@@ -81,19 +89,26 @@
         }
     }
 
-    private void OpenGeneralSetting()
-    {
-        try
-        {
-            JS.InvokeVoidAsync("closeOffcanvas", "offcanvasRight");
-            JS.InvokeVoidAsync("openModal", "Setting2");
-            AppGlobals.NavManager.NavigateTo("/SettingGeneral");
-        }
-        catch (Exception)
-        {
 
-        }
+    private async Task OpenGeneralSetting()
+    {
+        await JS.InvokeVoidAsync("closeOffcanvas", "offcanvasRight");
+        await JS.InvokeVoidAsync("showModol", "Setting2");
     }
+    
+    // private void OpenGeneralSetting()
+    // {
+    //     try
+    //     {
+    //         JS.InvokeVoidAsync("closeOffcanvas", "offcanvasRight");
+    //         JS.InvokeVoidAsync("openModal", "Setting2");
+    //         AppGlobals.NavManager.NavigateTo("/SettingGeneral");
+    //     }
+    //     catch (Exception)
+    //     {
+
+    //     }
+    // }
 
     private void OpenImportData()
     {

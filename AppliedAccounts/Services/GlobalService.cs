@@ -4,6 +4,7 @@ using AppliedGlobals;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.JSInterop;
+using System.Data;
 using System.Security.Claims;  
 using static AppliedGlobals.AppValues;
 
@@ -98,6 +99,15 @@ namespace AppliedAccounts.Services
                     LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<Connections>();
                 Connections = new Connections(AppPaths, connectionLogger);
 
+                if(string.IsNullOrEmpty(AppPaths.DBFile))
+                {
+                    var _ClientRow = AppliedUsersService.GetUserRow(AppPaths.DBFile);
+                    if(_ClientRow != null)
+                    {
+                        AppPaths.DBFile = _ClientRow.Field<string>("DataFile")!;
+                    }
+                }
+
                 _isInitialized = true;
 
                 OnInitialized?.Invoke();
@@ -114,6 +124,8 @@ namespace AppliedAccounts.Services
         
         private void InitializeStaticProperties()
         {
+
+
             AppPaths.BaseUri = NavManager.BaseUri;
             AppPaths.FirstPath = Directory.GetCurrentDirectory();
             AppPaths.RootPath = Config.GetValue<string>("Paths:RootPath") ?? "wwwroot";

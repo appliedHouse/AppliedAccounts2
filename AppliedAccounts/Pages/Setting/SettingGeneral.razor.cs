@@ -1,9 +1,29 @@
-﻿namespace AppliedAccounts.Pages.Setting
+﻿using AppliedAccounts.Authentication;
+using AppliedAccounts.Services;
+using AppliedDB;
+
+namespace AppliedAccounts.Pages.Setting
 {
     public partial class SettingGeneral
     {
-        
+        private DataSource? Source { get; set; }
+        public GeneralSettngModel MyModel { get; set; } = new();
+
+        protected override void OnInitialized()
+        {
+            var _User = ((UserAuthenticationStateProvider)AuthState).AppUser;
+
+            Source = new(AppliedUsersService.ClientConnection(_User.UserID)!);
+
+            MyModel.NatureList = Source.GetAccNature();
+            MyModel.AccountsList = Source.GetAccounts();
+
+            MyModel.CashNatureID = Source.GetNumber("CaskBkNature");
+            MyModel.BankNatureID = Source.GetNumber("BankBkNature");
+
+        }
     }
+
 
     public class GeneralSettngModel
     {
@@ -20,8 +40,14 @@
         public DateTime VoucherDate2 { get; set; }
         public DateTime OpeningDate { get; set; }
 
+        public string CashNatureTitleAccount { get; set; }
+        public string BankNatureTitleAccount { get; set; }
+
         public AccountsPurchase PayableAccounts { get; set; }
         public AccountsReceivable ReceivableAccounts { get; set; }
+
+        public List<CodeTitle> NatureList { get; set; }
+        public List<CodeTitle> AccountsList { get; set; }
 
     }
 
