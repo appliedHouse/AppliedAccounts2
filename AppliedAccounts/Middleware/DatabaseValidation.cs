@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using AppliedAccounts.Services;
+using Microsoft.Data.Sqlite;
 
 namespace AppliedAccounts.Middleware
 {
@@ -24,21 +25,25 @@ namespace AppliedAccounts.Middleware
                 {
                     if (!_validationPerformed)
                     {
-                        string dbPath = Path.Combine(
-                            Directory.GetCurrentDirectory(),
-                            "wwwroot",
-                            "SqliteDB",
-                            "AppliedUsers2.db"
-                        );
+                        
+
+                        //string dbPath = Path.Combine(
+                        //    Directory.GetCurrentDirectory(),
+                        //    "wwwroot",
+                        //    "SqliteDB",
+                        //    "AppliedUsers2.db"
+                        //);
 
                         try
                         {
+                            var _Connection = AppliedUsersService.CreateConnection();
+
                             // Check file exists
-                            if (File.Exists(dbPath))
+                            if (_Connection != null)
                             {
                                 // Check SQLite connection
-                                using var conn = new SqliteConnection($"Data Source={dbPath}");
-                                conn.Open();
+                                //using var conn = new SqliteConnection($"Data Source={dbPath}");
+                                //conn.Open();
 
                                 _isDatabaseValid = true;
                             }

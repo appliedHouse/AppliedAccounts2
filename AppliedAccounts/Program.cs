@@ -64,6 +64,8 @@ builder.Services.AddToastNotification(options =>
 
 var app = builder.Build();
 
+AppliedUsersService.Initialize(app.Environment);
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -71,12 +73,13 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
 app.UseMiddleware<DatabaseValidation>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-app.UseUserDatabaseValidation();
+//app.UseUserDatabaseValidation();
 
 app.MapBlazorHub();
 app.MapHub<LogHub>("/loghub");

@@ -1,4 +1,5 @@
 ﻿using AppliedAccounts.Authentication;
+using AppliedAccounts.Services;
 using Microsoft.Data.Sqlite;
 
 namespace AppliedAccounts.Middleware
@@ -33,25 +34,29 @@ namespace AppliedAccounts.Middleware
                     {
                         try
                         {
-                            var dataFile = authProvider.AppUser.DataFile;
-                            if (string.IsNullOrEmpty(dataFile))
-                                throw new Exception("User DataFile not assigned.");
+                            var _connection = AppliedUsersService.CreateConnection();
 
-                            var dbPath = Path.Combine(
-                                Directory.GetCurrentDirectory(),
-                                "wwwroot",
-                                "SqliteDB",
-                                dataFile
-                            );
+                            if(_connection != null) { _validationPerformed = true; }
 
-                            if (!File.Exists(dbPath))
-                                throw new Exception($"User database file '{dataFile}' not found.");
+                            //var dataFile = authProvider.AppUser.DataFile;
+                            //if (string.IsNullOrEmpty(dataFile))
+                            //    throw new Exception("User DataFile not assigned.");
 
-                            // Try opening a connection
-                            using var conn = new SqliteConnection($"Data Source={dbPath}");
-                            conn.Open(); // Will throw if invalid/corrupt
+                            //var dbPath = Path.Combine(
+                            //    Directory.GetCurrentDirectory(),
+                            //    "wwwroot",
+                            //    "SqliteDB",
+                            //    dataFile
+                            //);
 
-                            _validationPerformed = true; // mark success
+                            //if (!File.Exists(dbPath))
+                            //    throw new Exception($"User database file '{dataFile}' not found.");
+
+                            //// Try opening a connection
+                            //using var conn = new SqliteConnection($"Data Source={dbPath}");
+                            //conn.Open(); // Will throw if invalid/corrupt
+
+                            //_validationPerformed = true; // mark success
                         }
                         catch
                         {

@@ -68,9 +68,6 @@ namespace AppliedAccounts.Services
             {
                 if (_isInitialized) return;
 
-                //var authState = await _authStateProvider.GetAuthenticationStateAsync();
-                //Client = _authStateProvider.AppUser ?? new AppUserModel();
-
                 var authState = await _authStateProvider.GetAuthenticationStateAsync();
 
                 var claims = authState.User.Claims.ToList();

@@ -1,6 +1,7 @@
 ﻿@layout NotAuthorizedLayout
 @inject NavigationManager NavManager
 
+@using System.Data
 @using AppliedAccounts.Services;
 @inject GlobalService AppGlobal
 @inject NavigationManager NavManager
@@ -9,16 +10,12 @@
 
     public string? BusinessPic { get; set; }
     public bool UserDBFileExist { get; set; }
+    public DataRow ClientDataRow { get; set; } 
 
     protected override void OnInitialized()
     {
         BusinessPic = Path.Combine(AppGlobal.AppPaths.ImagesPath, "Accounts3.jpg");
-        string UserDB = Path.Combine(AppGlobal.AppPaths.FirstPath,
-                                     AppGlobal.AppPaths.RootPath,
-                                     AppGlobal.AppPaths.ClientPath,
-                                     "AppliedUsers2.db");
-
-        UserDBFileExist = File.Exists(UserDB);
+        UserDBFileExist = AppliedUsersService.IsReady;
     }
 
     string BasePath => AppGlobal.AppPaths.BaseUri;
