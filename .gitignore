@@ -373,3 +373,11 @@ FodyWeavers.xsd
 /AppliedAccounts/wwwroot/ExcelFiles/2025-05 - May CDC.xlsx
 *.zip
 /AppliedAccounts/wwwroot/SQLiteDB/Emaar3A
+/AppliedAccounts/wwwroot/SQLiteDB/ESA.db-shm
+/AppliedAccounts/wwwroot/SQLiteDB/ESA.db-wal
+/AppliedAccounts/wwwroot/SQLiteDB/HFSSteel.db-shm
+/AppliedAccounts/wwwroot/SQLiteDB/HFSSteel.db-wal
+/AppliedAccounts/wwwroot/SQLiteDB/CDC.db-shm
+/AppliedAccounts/wwwroot/SQLiteDB/CDC.db-wal
+/AppliedAccounts/wwwroot/System/AppliedUsers2.db-shm
+/AppliedAccounts/wwwroot/System/AppliedUsers2.db-wal
