@@ -1,68 +1,51 @@
-﻿@* @page "/GeneralSetting" *@
+﻿@* AppSetting.razor *@
+@page "/Setting/General"
+@using AppliedAccounts.Component.Libs
 
+@attribute [Authorize]
+@inject NavigationManager NavManager
 @inject GlobalService AppGlobal
-@inject AuthenticationStateProvider AuthState
+
+<PageHeading Text="General Setting" />
 
 @code {
 
-    [Parameter] public string ModelName { get; set; }
-    
-    private void OnSaveClick() { }
+}
 
-    private void BankNatureIDChanged(long _ID)
-    {
-        MyModel.BankNatureID = _ID;
-        MyModel.BankNatureTitleAccount = MyModel.NatureList
-        .FirstOrDefault(e => e.ID == _ID)?.Title ?? "";
-    }
+@if (IsAuthorized)
+{
+    <EditForm Model="MyModel" OnSubmit="SaveAsync">
 
-    private void CashNatureIDChanged(long _ID)
-    {
-        MyModel.CashNatureID = _ID;
-        MyModel.CashNatureTitleAccount = MyModel.NatureList
-        .FirstOrDefault(e => e.ID == _ID)?.Title ?? "";
-    }
+        <div class="container">
+            <div class="row">
+                <div class="col-3">
+                    <MyDropDown Id="ddCashNature"
+                                Label="Cash Nature Account"
+                                Value="@MyModel.CashNatureID"
+                                ValueChanged="CashNatureValueChange"
+                                Items="NatureList">
+                    </MyDropDown>
+                </div>
+                <div class="col-3">
+                    <MyDropDown Id="ddBankNature"
+                                Label="Bank Nature Account"
+                                Value="@MyModel.BankNatureID"
+                                ValueChanged="BankNatureValueChange"
+                                Items="NatureList">
+                    </MyDropDown>
+                </div>
+            </div>
+        </div>
+
+    </EditForm>
+}
+else
+{
+    <div class="alert alert-warning" role="alert">
+        <p> User : [<strong>@UserName</strong>] is not authorized to edit application general setting</p>
+    </div>
 }
 
 
-<div class="modal fade" id="@ModelName" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <EditForm Model="MyModel" OnSubmit="OnSaveClick">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">Application Setting</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="gap-2 flex-wrap">
-                        <div class="row">
-                            <div class="col-3">
-                                <MyDropDown Id="ddCashNature"
-                                            Label="Accounts"
-                                            Value="@MyModel.CashNatureID"
-                                            ValueChanged="@CashNatureIDChanged"
-                                            Items="@MyModel.NatureList" />
-
-                            </div>
-                            <div class="col-3">
-                                <MyDropDown Id="BankNature"
-                                            Label="Accounts"
-                                            Value="@MyModel.BankNatureID"
-                                            ValueChanged="@BankNatureIDChanged"
-                                            Items="@MyModel.NatureList" />
-
-                            </div>
-                        </div>
 
 
-                        
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" @onclick="OnSaveClick">Save Changes</button>
-                </div>
-            </EditForm>
-        </div>
-    </div>
-</div>

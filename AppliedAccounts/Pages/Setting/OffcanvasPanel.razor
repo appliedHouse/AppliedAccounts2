@@ -90,11 +90,11 @@
     }
 
 
-    private async Task OpenGeneralSetting()
-    {
-        await JS.InvokeVoidAsync("closeOffcanvas", "offcanvasRight");
-        await JS.InvokeVoidAsync("showModol", "Setting2");
-    }
+    // private async Task OpenGeneralSetting()
+    // {
+    //     await JS.InvokeVoidAsync("closeOffcanvas", "offcanvasRight");
+    //     await JS.InvokeVoidAsync("showModol", "Setting2");
+    // }
     
     // private void OpenGeneralSetting()
     // {
@@ -191,9 +191,9 @@
                     <i class="bi bi-gear me-2"></i>User Profile
                 </button>
                 <!-- General Setting Button -->
-                <button class="btn btn-primary" @onclick="OpenGeneralSetting">
+                @* <button class="btn btn-primary" @onclick="OpenGeneralSetting">
                     <i class="bi bi-gear me-2"></i>General Setting
-                </button>
+                </button> *@
 
                 <button class="btn btn-primary" @onclick="OpenBackup">
                     <i class="bi bi-gear me-2"></i>Backup
@@ -220,7 +220,6 @@
 </div>
 
 <SettingUser ModelName="Setting1"></SettingUser>
-<SettingGeneral ModelName="Setting2"></SettingGeneral>
 <SettingBackup ModelName="Setting3"></SettingBackup>
 
 <script>

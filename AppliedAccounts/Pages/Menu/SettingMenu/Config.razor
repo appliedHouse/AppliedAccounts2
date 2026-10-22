@@ -1,0 +1,27 @@
+﻿@page "/Menu/Setting/Config"
+
+@attribute [Authorize]
+@inject GlobalService AppGlobal
+
+
+@code {
+    public Menus.MenusClass MenusClass { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        MenusClass.SecondLevel(MenusClass.GetMenu(Menus.MenuID.Config)!);
+    }
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="part-1">
+            <MainMenu MenuClass="MenusClass" />
+        </div>
+        <div class="part-2">
+
+            <p>Welcome Applied Accounts V2<a href="#"></a></p>
+            <p>Accounts Dictionery Page Authorized<a href="#"></a></p>
+        </div>
+    </div>
+</div>

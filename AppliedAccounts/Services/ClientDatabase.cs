@@ -18,39 +18,64 @@ public class ClientDatabase
         _connectionString = "";
         _dataFile = "";
         env = _env;
+        
     }
+
 
     public void Configure(string dataFile)
     {
         if (string.IsNullOrWhiteSpace(dataFile))
-            throw new ArgumentException("DataFile is required.", nameof(dataFile));
+            throw new ArgumentException(
+                "DataFile is required.", nameof(dataFile));
 
-        // SECURITY: DataFile comes from the DB, but sanitize anyway
-        if (dataFile.Contains("..") || dataFile.Contains(Path.DirectorySeparatorChar)
-            || dataFile.Contains(Path.AltDirectorySeparatorChar))
-            throw new InvalidOperationException($"Invalid DataFile: {dataFile}");
+        // Validate the filename
+        if (dataFile.Contains("..") ||
+            dataFile.Contains(Path.DirectorySeparatorChar) ||
+            dataFile.Contains(Path.AltDirectorySeparatorChar) ||
+            dataFile.Contains(Path.VolumeSeparatorChar))
+        {
+            throw new InvalidOperationException(
+                $"Invalid DataFile: {dataFile}");
+        }
 
-        var fullPath = Path.Combine(env.ContentRootPath, "wwwroot", "SQLiteDB", dataFile);
+        var fullPath = Path.Combine(
+            env.ContentRootPath,
+            "wwwroot",
+            "SQLiteDB",
+            dataFile);
 
         if (!File.Exists(fullPath))
-            throw new FileNotFoundException($"Client DB not found: {fullPath}");
+            throw new FileNotFoundException(
+                $"Client DB not found: {fullPath}");
 
-        _connectionString = new SqliteConnectionStringBuilder
+        var connectionString =
+            new SqliteConnectionStringBuilder
+            {
+                DataSource = fullPath,
+                Mode = SqliteOpenMode.ReadWrite,
+                Cache = SqliteCacheMode.Private,
+                Pooling = true,
+                DefaultTimeout = 15
+            }.ToString();
+
+        // Verify the database connection and configure WAL
+        using (var connection =
+            new SqliteConnection(connectionString))
         {
-            DataSource = fullPath,
-            Mode = SqliteOpenMode.ReadWrite,
-            Cache = SqliteCacheMode.Private,   // per-file, no cross-tenant leak
-            Pooling = true,
-            DefaultTimeout = 15
-        }.ToString();
+            connection.Open();
 
-        // WAL per client DB, one-time
-        using var _connection = new SqliteConnection(_connectionString);
-        _connection.Open();
-        using var cmd = _connection.CreateCommand();
-        cmd.CommandText = "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;";
-        cmd.ExecuteNonQuery();
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText =
+                "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;";
+
+            cmd.ExecuteNonQuery();
+        }
+
+        // Mark the database as configured only after success
+        _connectionString = connectionString;
+        _dataFile = dataFile;
     }
+
 
     // Every operation gets a fresh, pooled connection. Thread-safe.
     public SqliteConnection CreateConnection()

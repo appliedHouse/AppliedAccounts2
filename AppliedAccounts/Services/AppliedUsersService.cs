@@ -8,8 +8,9 @@ namespace AppliedAccounts.Services
     {
         // Path is set once at startup — see Initialize() below
         private static string _usersDbFile = "";
-
+        private static string _clientDbFile = "";
         public static string UsersDBFile => _usersDbFile;
+        public static string ClientDBFile => _clientDbFile;
         public static bool IsReady => GetStatus();
 
         private static bool GetStatus()
@@ -21,7 +22,6 @@ namespace AppliedAccounts.Services
         public static void Initialize(IWebHostEnvironment env)
         {
             _usersDbFile = Path.Combine(env.ContentRootPath, "wwwroot", "System", "AppliedUsers2.db");
-
         }
 
         public static SqliteConnection? CreateConnection()
@@ -106,6 +106,20 @@ namespace AppliedAccounts.Services
                 _usersDbFile = string.Empty;
             }
             return null;
+        }
+
+        public static string GetDBFile(string UserID)
+        {
+            var _row = GetUserRow(UserID);
+            if(_row != null)
+            {
+                var _DBFile = _row.Field<string>("DataFile") ?? string.Empty;
+                return _DBFile; 
+            }
+
+            return string.Empty;
+
+
         }
 
         /// <summary>

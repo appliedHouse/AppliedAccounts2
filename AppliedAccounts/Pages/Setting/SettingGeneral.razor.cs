@@ -1,29 +1,44 @@
-﻿using AppliedAccounts.Authentication;
-using AppliedAccounts.Services;
+﻿// SettingGeneral.razor.cs
 using AppliedDB;
-
 namespace AppliedAccounts.Pages.Setting
 {
     public partial class SettingGeneral
     {
-        private DataSource? Source { get; set; }
         public GeneralSettngModel MyModel { get; set; } = new();
+        private string UserName => AppGlobal.UserID;
+        private bool IsAuthorized => AppGlobal.UserRole.Equals("Administrator") ? true : false;
+        private DataSource Source;
+
+        private List<CodeTitle> NatureList;
+        private List<CodeTitle> AccountList;
+
 
         protected override void OnInitialized()
         {
-            var _User = ((UserAuthenticationStateProvider)AuthState).AppUser;
+            Source = new(AppGlobal.AppPaths);
 
-            Source = new(AppliedUsersService.ClientConnection(_User.UserID)!);
 
-            MyModel.NatureList = Source.GetAccNature();
-            MyModel.AccountsList = Source.GetAccounts();
+            NatureList = Source.GetAccNature();
+            AccountList = Source.GetAccounts();
+        }
 
-            MyModel.CashNatureID = Source.GetNumber("CaskBkNature");
-            MyModel.BankNatureID = Source.GetNumber("BankBkNature");
+        private void SaveAsync()
+        {
+            throw new NotImplementedException();
+        }
 
+        private void CashNatureValueChange(long _ID)
+        {
+            MyModel.CashNatureID = _ID;
+            MyModel.CashNatureTitleAccount = NatureList.FirstOrDefault(e => e.ID == _ID)?.Title ?? "";
+        }
+
+        private void BankNatureValueChange(long _ID)
+        {
+            MyModel.BankNatureID = _ID;
+            MyModel.BankNatureTitleAccount = NatureList.FirstOrDefault(e => e.ID == _ID)?.Title ?? "";
         }
     }
-
 
     public class GeneralSettngModel
     {

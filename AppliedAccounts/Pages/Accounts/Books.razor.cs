@@ -43,9 +43,6 @@ namespace AppliedAccounts.Pages.Accounts
             MyModel.MyVoucher.Detail.COA = _ID;
             MyModel.MyVoucher.Detail.TitleAccount = MyModel.Accounts
                 .FirstOrDefault(e => e.ID == _ID)?.Title ?? "";
-                //.Where(e => e.ID == MyModel.MyVoucher.Detail.COA)
-                //.Select(e => e.Title)
-                //.First() ?? "";
         }
         private void CompanyIDChanged(long _ID)
         {

@@ -7,8 +7,17 @@ document.documentElement.style.setProperty('--hight-screen', `${screenHeight}px`
 
 // Show Bootstrap Modol Class.
 function showModol(ModalID) {
-    var myModal = new bootstrap.Modal(document.getElementById(ModalID));
-    myModal.show();
+    var el = document.getElementById(ModalID);
+    if (!el) { console.error("Modal not found: " + ModalID); return; }
+
+    // Move to <body> so no parent stacking context can hide it behind the backdrop
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+
+    bootstrap.Modal.getOrCreateInstance(el).show();
+
+
+    // var myModal = new bootstrap.Modal(document.getElementById(ModalID));
+    // myModal.show();
 }
 
 // Close Bootstrap Modal Class.

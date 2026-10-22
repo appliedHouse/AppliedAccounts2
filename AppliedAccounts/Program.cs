@@ -50,6 +50,7 @@ builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<ProgressService>();
 builder.Services.AddScoped<ToastService>();
 
+
 // 6. Add FTP Backup Service
 builder.Services.AddSingleton<FTPBackupService>();
 builder.Services.Configure<BackupModel>(builder.Configuration.GetSection("FTPBackup"));

@@ -80,6 +80,8 @@ namespace AppliedDB
         private void Start()
         {
             MyConnections = new Connections(AppPaths);
+            MsgClass ??= new();
+
 
             if (string.IsNullOrEmpty(AppPaths.DBFile))
             {

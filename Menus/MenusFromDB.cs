@@ -9,7 +9,7 @@ namespace Menus
         {
             return Get2();                  // Temporary return data for development
 
-
+            #region Temporary disable, in final production it will be active.
             try
             {
                 var _Menus = new List<MenuItem>();
@@ -51,6 +51,7 @@ namespace Menus
             {
                 return Get2();
             }
+            #endregion
         }
 
         public static List<MenuItem> Get2()

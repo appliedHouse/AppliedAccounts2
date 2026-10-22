@@ -10,12 +10,8 @@
         HR = 5,
         Admin = 6,
         Taxation = 7,
-        Logout = 8,
-
-        // Sub Menu Home
-        Setting = 11,
-        Config = 12,
-        Import = 13,
+        Setting = 8,
+        Logout = 9,
 
         // Sub Menu Accounts
         AccountsDictionery = 21,
@@ -50,6 +46,12 @@
         OutputTax = 72,
         FBRReturn = 73,
         SRBReturn = 74,
+
+        // Sub Menu Sutteing
+
+        General = 81,
+        Config = 82,
+        Import = 83,
 
         // Accounts - Dictionery
         COA = 2101,
@@ -88,5 +90,7 @@
         Packing = 4104,
         Size = 4105,
         Measurement = 4106
+
+        
     }
 }

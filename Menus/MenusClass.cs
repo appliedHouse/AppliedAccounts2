@@ -32,7 +32,7 @@ namespace Menus
         {
             List<MenuItem> _Menus = [];
             TopMenuLevel = 1;
-            var _HomeBtn = FullMenus.Where(m => m.Title.ToUpper().Equals("HOME")).First();
+            var _HomeBtn = FullMenus.First(m => m.Title.ToUpper().Equals("HOME"));
             _HomeBtn.Level = TopMenuLevel;
 
             foreach (var menu in FullMenus)
@@ -55,7 +55,7 @@ namespace Menus
             List<MenuItem> _Menus = [];
             TopMenuLevel = 1;
             _Menus = [.. FullMenus.Where(m => m.Level == 1)];
-            _Menus.Where(mnu => mnu.Title.ToUpper().Equals("HOME")).First().Level = TopMenuLevel;
+            _Menus.First(mnu => mnu.Title.ToUpper().Equals("HOME")).Level = TopMenuLevel;
             MyMenus = _Menus;
         }
 
@@ -84,10 +84,10 @@ namespace Menus
             List<MenuItem> _Menus = [];
             TopMenuLevel = MenuItem.Level;
 
-            _Menus.Add(FullMenus.FirstOrDefault(m => m.Title.ToUpper().Equals("HOME"))!); // Home menu always show
+            _Menus.Add(FullMenus.FirstOrDefault(m => m.Title.ToUpper().Equals("HOME"))!);       // Home menu always show
             _Menus.Add(MenuItem);
-            _Menus.AddRange(FullMenus.Where(mnu=> mnu.ParentID==MenuItem.ID)); // Other top level menu
-            _Menus.Where(mnu => mnu.Title.ToUpper().Equals("HOME")).First()!.Level = TopMenuLevel;
+            _Menus.AddRange(FullMenus.Where(mnu=> mnu.ParentID==MenuItem.ID));                  // Other top level menu
+            _Menus.First(mnu => mnu.Title.ToUpper().Equals("HOME"))!.Level = TopMenuLevel;
             
             MyMenus = _Menus;
 
