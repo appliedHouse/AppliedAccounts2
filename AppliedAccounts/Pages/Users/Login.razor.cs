@@ -165,14 +165,41 @@ namespace AppliedAccounts.Pages.Users
                     return userProfile;
                 }
 
-                var userData = AppliedUsersService.GetUserRow(userModel.UserID); //  dataTable.Rows[0];
+                var usersDBFile = Path.Combine(
+                    AppGlobal.AppPaths.FirstPath,
+                    AppGlobal.AppPaths.RootPath,
+                    AppGlobal.AppPaths.UsersPath,
+                    "AppliedUsers2.db");
 
-                if(userData == null) 
+                // Verify database file exists
+                if (!File.Exists(usersDBFile))
                 {
                     IsLogin = false;
                     ErrorMessage = "User database not found";
                     return userProfile;
                 }
+
+                const string commandText = "SELECT * FROM [Users] WHERE [UserID] = @UserID";
+
+                using var connection = new SqliteConnection($"Data Source={usersDBFile}");
+                connection.Open();
+
+                using var command = new SqliteCommand(commandText, connection);
+                command.Parameters.AddWithValue("@UserID", userModel.UserID);
+
+                using var reader = command.ExecuteReader();
+                var dataTable = new DataTable();
+                dataTable.Load(reader);
+
+                // Check if we got any results
+                if (dataTable.Rows.Count == 0)
+                {
+                    IsLogin = false;
+                    ErrorMessage = "User not found";
+                    return userProfile;
+                }
+
+                var userData = dataTable.Rows[0];
 
                 // Create user profile with null checks
                 userProfile.Profile = new AppliedGlobals.AppUserModel

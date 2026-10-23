@@ -54,9 +54,10 @@
             _Menus.Add(new MenuItem { ID = 74, Title = "SRB Return", Active = true, Icon = "bi bi-file-earmark-text", Level = 2, ParentID = 7, NavigateTo = "/Menu/Taxation/SRB" });
 
             // Sub Menu Setting
-            _Menus.Add(new MenuItem { ID = 81, Title = "Setting", Active = true, Icon = "bi bi-gear", Level = 2, ParentID = 8, NavigateTo = "/Menu/Setting/General" });
-            _Menus.Add(new MenuItem { ID = 82, Title = "Config", Active = true, Icon = "bi bi-sliders", Level = 2, ParentID = 8, NavigateTo = "/Menu/Setting/Config" });
-            _Menus.Add(new MenuItem { ID = 83, Title = "Import", Active = true, Icon = "bi bi-database-down", Level = 2, ParentID = 8, NavigateTo = "/Menu/Setting/Import" });
+            _Menus.Add(new MenuItem { ID = 81, Title = "Setting", Active = true, Icon = "bi bi-gear", Level = 2, ParentID = 8, NavigateTo = "/Setting/General" });
+            //_Menus.Add(new MenuItem { ID = 81, Title = "Setting", Active = true, Icon = "bi bi-gear", Level = 2, ParentID = 8, NavigateTo = "/Menu/Setting/General" });
+            //_Menus.Add(new MenuItem { ID = 82, Title = "Config", Active = true, Icon = "bi bi-sliders", Level = 2, ParentID = 8, NavigateTo = "/Menu/Setting/Config" });
+            //_Menus.Add(new MenuItem { ID = 83, Title = "Import", Active = true, Icon = "bi bi-database-down", Level = 2, ParentID = 8, NavigateTo = "/Menu/Setting/Import" });
 
             // Accounts - Dictionery
 

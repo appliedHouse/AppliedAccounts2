@@ -1266,6 +1266,45 @@ namespace AppliedDB
 
         #region Get Registry Keys
 
+
+        public void SetKey(string Key, object KeyValue)
+        {
+            if (KeyValue == null)
+                return;
+
+            KeyTypes _KeyType = KeyTypes.Text;
+            Type _ValueType = KeyValue.GetType();
+
+            if (_ValueType == typeof(int) ||
+                _ValueType == typeof(long) ||
+                _ValueType == typeof(short))
+            {
+                _KeyType = KeyTypes.Number;
+            }
+            else if (_ValueType == typeof(string))
+            {
+                _KeyType = KeyTypes.Text;
+            }
+            else if (_ValueType == typeof(decimal) ||
+                     _ValueType == typeof(double) ||
+                     _ValueType == typeof(float))
+            {
+                _KeyType = KeyTypes.Currency;
+            }
+            else if (_ValueType == typeof(bool))
+            {
+                _KeyType = KeyTypes.Boolean;
+            }
+            else if (_ValueType == typeof(DateTime) ||
+                     _ValueType == typeof(DateOnly))
+            {
+                _KeyType = KeyTypes.Date;
+            }
+
+            SetKey(Key, KeyValue, _KeyType);
+        }
+
+
         public void SetKey(string Key, object KeyValue, KeyTypes keytype)
         {
             SetKey(Key, KeyValue, keytype, string.Empty);

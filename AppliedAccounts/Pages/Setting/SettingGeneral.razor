@@ -1,24 +1,25 @@
-﻿@* AppSetting.razor *@
+﻿```razor
+@* AppSetting.razor *@
 @page "/Setting/General"
+
 @using AppliedAccounts.Component.Libs
 
 @attribute [Authorize]
+
 @inject NavigationManager NavManager
 @inject GlobalService AppGlobal
+@inject IToastService Toaster
 
 <PageHeading Text="General Setting" />
 
-@code {
-
-}
-
 @if (IsAuthorized)
 {
-    <EditForm Model="MyModel" OnSubmit="SaveAsync">
+    <EditForm Model="MyModel" OnValidSubmit="@SaveAsync">
 
         <div class="container">
             <div class="row">
-                <div class="col-3">
+
+                <div class="col-md-3 col-12">
                     <MyDropDown Id="ddCashNature"
                                 Label="Cash Nature Account"
                                 Value="@MyModel.CashNatureID"
@@ -26,7 +27,8 @@
                                 Items="NatureList">
                     </MyDropDown>
                 </div>
-                <div class="col-3">
+
+                <div class="col-md-3 col-12">
                     <MyDropDown Id="ddBankNature"
                                 Label="Bank Nature Account"
                                 Value="@MyModel.BankNatureID"
@@ -34,7 +36,31 @@
                                 Items="NatureList">
                     </MyDropDown>
                 </div>
+
             </div>
+
+            @* Control Buttons *@
+            <div class="container mt-2 mb-2 control-buttons">
+                <div class="row ctrl">
+                    <div class="col d-flex gap-2">
+
+                        <button type="submit"
+                                class="ctrl ctrl-save"
+                                title="Save">
+                            <i class="bi bi-floppy2-fill"></i>
+                        </button>
+
+                        <button type="button"
+                                class="ctrl ctrl-back ms-auto"
+                                title="Back"
+                                @onclick="Back">
+                            <i class="bi bi-arrow-left-circle-fill"></i>
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </EditForm>
@@ -42,10 +68,9 @@
 else
 {
     <div class="alert alert-warning" role="alert">
-        <p> User : [<strong>@UserName</strong>] is not authorized to edit application general setting</p>
+        <p>
+            User: [<strong>@UserName</strong>] is not authorized
+            to edit application general settings.
+        </p>
     </div>
 }
-
-
-
-

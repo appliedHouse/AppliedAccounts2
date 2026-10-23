@@ -19,7 +19,7 @@ namespace AppliedAccounts.Models
         public long BookID { get; set; }
         public long BookNature { get; set; }
         public string BookNatureTitle { get; set; }
-
+        public DateTime LastVoucherDate { get; set; }
         public Voucher MyVoucher { get; set; }
         public List<Detail> Deleted { get; set; } = [];
         public List<CodeTitle> Companies { get; set; } = [];
@@ -30,7 +30,6 @@ namespace AppliedAccounts.Models
         public GlobalService AppGlobal { get; set; }
         public DataSource Source { get; set; }
         public MessagesService MsgService { get; set; }
-        public DateTime LastVoucherDate { get; set; }
         public DateTime MinVouDate = AppRegistry.MinDate;
         public DateTime MaxVouDate { get; set; }
         public int Index { get; set; } = 0;
@@ -77,12 +76,15 @@ namespace AppliedAccounts.Models
                 if (AppGlobal.AppPaths != null)
                 {
                     Source = new(AppGlobal.AppPaths);
-                    LastVoucherDate = Source.GetDate("LastBKDate");
-
-                    if (VoucherID == 0) { MyVoucher = NewVoucher(); }   // Create a new voucher;
+                    
+                    if (VoucherID == 0)
+                    {
+                        MyVoucher = NewVoucher();
+                        GetValues();                // Create a new voucher
+                    }   
                     if (VoucherID > 0)
                     {
-                        LoadData();
+                        LoadData();                 // Load existing voucher data
                     }
 
 
@@ -179,7 +181,11 @@ namespace AppliedAccounts.Models
                             return true;
                         }
                     }
-                    
+                    else
+                    {
+                        GetValues();
+                    }
+
                 }
                 catch (Exception error)
                 {
@@ -379,8 +385,6 @@ namespace AppliedAccounts.Models
                                             if (!save2)
                                             {
                                                 MsgService.Error(MESSAGE.NotSave);
-                                                //var stop = true;
-                                                // roll Bank master record from Data Table
                                             }
                                         }
 
@@ -408,6 +412,7 @@ namespace AppliedAccounts.Models
                     }
                 });
                 IsWaiting = false;
+                SetValues();                // Save Registry values.
             }
             return IsSaved;
         }
@@ -728,6 +733,18 @@ namespace AppliedAccounts.Models
 
             Source.RollbackTransaction();
             return false;
+        }
+        #endregion
+
+        #region Get / Set Registry Values
+        public void GetValues()
+        {
+            MyVoucher.Master.Vou_Date = Source.GetDate("LastBKDate");
+        }
+
+        public void SetValues()
+        {
+            Source.SetKey("LastBKDate", MyVoucher.Master.Vou_Date);
         }
         #endregion
 

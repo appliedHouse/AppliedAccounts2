@@ -1,5 +1,6 @@
 ﻿// SettingGeneral.razor.cs
 using AppliedDB;
+using Menus;
 namespace AppliedAccounts.Pages.Setting
 {
     public partial class SettingGeneral
@@ -20,11 +21,23 @@ namespace AppliedAccounts.Pages.Setting
 
             NatureList = Source.GetAccNature();
             AccountList = Source.GetAccounts();
+
+            GetValues();
+        }
+
+        private void GetValues()
+        {
+            MyModel.CashNatureID = Source.GetNumber("CashBkNature");
+            MyModel.BankNatureID = Source.GetNumber("BankBkNature");
         }
 
         private void SaveAsync()
         {
-            throw new NotImplementedException();
+            Source.SetKey("CashBkNature", MyModel.CashNatureID);
+            Source.SetKey("BankBkNature", MyModel.BankNatureID);
+
+            Toaster.ShowSuccess("Setting values saved.");
+
         }
 
         private void CashNatureValueChange(long _ID)
@@ -38,6 +51,8 @@ namespace AppliedAccounts.Pages.Setting
             MyModel.BankNatureID = _ID;
             MyModel.BankNatureTitleAccount = NatureList.FirstOrDefault(e => e.ID == _ID)?.Title ?? "";
         }
+
+        protected void Back() { AppGlobal.NavManager.GoTo(MenuID.Setting); }
     }
 
     public class GeneralSettngModel
