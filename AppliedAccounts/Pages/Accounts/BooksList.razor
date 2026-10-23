@@ -3,6 +3,7 @@
 @page "/Accounts/BooksList/{Nature:int}"
 @attribute [Authorize]
 
+@using AppliedAccounts.Component.ButtonsDictionery
 @using AppliedAccounts.Component.Libs;
 @using AppliedAccounts.Services
 
@@ -17,6 +18,8 @@
     private string DateFormat = Format.DDMMYY;
     private string CurrFormat = Format.Currency;
     private long SelectedVoucherID { get; set; }
+
+    
 }
 
 <PageHeading Text="@MyModel.BookNatureTitle" />
@@ -90,7 +93,8 @@
                         <td class="amount">@Record.TPaid</td>
                         <td class="amount">@Record.TBalance</td>
                         <td>
-                            <EditButton NavTo=@_NavTo Title="Edit Voucher" />
+                            <Btn1_Edit OnClick="(()=>Edit(Record.ID))"/>
+                            @* <EditButton NavTo=@_NavTo Title="Edit Voucher" /> *@
                             <PrintButton ReturnValue="Print" VoucherID=Record.ID />
 
                             @if (Record.Status == Status.Submitted.ToString())

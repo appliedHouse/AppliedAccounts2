@@ -147,6 +147,11 @@ namespace AppliedAccounts.Models
             decimal _OBal = 0.00M; // Opening Balance
             List<BookView> _List = [];
 
+            if (DT_End.Date < DT_Start.Date)
+            {
+                _Date2 = _Date1; // If To date is earlier than From date, use the From date.
+            }
+
             // Get Opening Balance
             #region Opening Balance
             string _QueryOB = $"{_Query} [BookID] = {_BookID} AND (Date([Vou_Date]) BETWEEN '{_Date1}' AND '{_Date2})'";
@@ -288,7 +293,7 @@ namespace AppliedAccounts.Models
         #region Edit Book Voucher Re-direct to Book Page
         public void Edit(long _ID)
         {
-            //SetKeys(BookNatureID);
+            SetKeys(BookNatureID);
             AppGlobals.NavManager.NavigateTo($"/Accounts/Books/{BookID}/{BookNatureID}");
         }
         #endregion

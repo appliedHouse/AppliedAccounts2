@@ -37,6 +37,12 @@ namespace AppliedAccounts.Pages.Accounts
         }
         #endregion
 
+        private void Edit(long ID)
+        {
+            MyModel.SetKeys(MyModel.BookNatureID);
+            NavManager.NavigateTo($"/Accounts/Books/{ID}/{MyModel.BookID}");
+        }
+
         #region Refresh Page
         public async Task Refresh()
         {
@@ -117,24 +123,6 @@ namespace AppliedAccounts.Pages.Accounts
         }
 
         #endregion
-
-
-
-        //#region Delete record and Voucher
-        //private async Task DeleteVoucher(long VoucherID)
-        //{
-        //    if(MyModel.AppGlobals == null) { MyModel.AppGlobals = AppGlobal; }
-
-        //    if (await MyModel.DeleteAll(VoucherID))
-        //    {
-        //        Toaster.ShowInfo($"Voucher Deleted Successfully {VoucherID}");
-        //    }
-        //    else
-        //    {
-        //        Toaster.ShowError($"Voucher Deletion Failed {VoucherID}");
-        //    }
-        //}
-        //#endregion
 
     }
     #region book view Model
