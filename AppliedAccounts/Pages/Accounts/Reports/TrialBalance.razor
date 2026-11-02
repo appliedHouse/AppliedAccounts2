@@ -6,8 +6,6 @@
 
 @code {
 
-	
-	
 }
 
 <PageHeading Text="Trial Balance" />
@@ -20,14 +18,23 @@
 
             <div class="col-md-3">
                 <div class="form-floating">
-                    <InputDate id="DateFrom" class="form-control" @bind-Value="MyModel.TB_From"></InputDate>
+                    <InputDate id="DateFrom"
+                               class="form-control"
+                               @bind-Value="MyModel.TB_From"
+                               @bind-Value:after="DisplayList"
+                               disabled="@(MyModel.TB_Type != 2)" />
                     <label for="DateFrom">From</label>
                 </div>
             </div>
+
             <div class="col-md-3">
                 <div class="form-floating">
-                    <InputDate id="DateTo" class="form-control" @bind-Value="MyModel.TB_To"></InputDate>
-                    <label for="DateFrom">To</label>
+                    <InputDate id="DateTo"
+                               class="form-control"
+                               @bind-Value="MyModel.TB_To"
+                               @bind-Value:after="DisplayList"
+                               disabled="@(MyModel.TB_Type != 2)" />
+                    <label for="DateTo">To</label>
                 </div>
             </div>
             <div class="col-md-2">

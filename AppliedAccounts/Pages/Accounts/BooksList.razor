@@ -94,7 +94,6 @@
                         <td class="amount">@Record.TBalance</td>
                         <td>
                             <Btn1_Edit OnClick="(()=>Edit(Record.ID))"/>
-                            @* <EditButton NavTo=@_NavTo Title="Edit Voucher" /> *@
                             <PrintButton ReturnValue="Print" VoucherID=Record.ID />
 
                             @if (Record.Status == Status.Submitted.ToString())
