@@ -25,6 +25,7 @@ namespace AppliedDB
             _Text.AppendLine("[B1].[Description], ");
             _Text.AppendLine("[B2].[Sr_No], ");
 
+
             _Text.AppendLine("[SC].[Code] AS [SCatCode], ");
             _Text.AppendLine("[SC].[Title] AS [SCatTitle], ");
 
