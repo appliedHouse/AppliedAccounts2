@@ -13,10 +13,9 @@ namespace AppliedAccounts.Pages.Accounts.Reports
     public partial class TrialBalance
     {
         public string DBFile { get; set; }
-        public TBModel MyModel { get; set; }
-        public List<TBListModel> AccList { get; set; }
+        public TBModel MyModel { get; set; } = new();
+        public List<TBListModel> AccList { get; set; } = [];
         public DataSource Source { get; set; }
-        private EditContext? EditContext;
         bool IsPageValidate = false;
         bool IsPrinting = false;
 
@@ -46,8 +45,6 @@ namespace AppliedAccounts.Pages.Accounts.Reports
         protected override async Task OnInitializedAsync()
         {
             MyModel = new();
-            EditContext = new EditContext(MyModel);
-            EditContext.OnFieldChanged += async (sender, e) => await DisplayList();
             Source = new(AppGlobal.AppPaths);
             DBFile = AppGlobal.DBFile;
 
@@ -55,7 +52,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             MyModel.Employees = Source.GetEmployees();
             MyModel.Projects = Source.GetProjects();
 
-            _ = GetKeys();
+            await GetKeys();
             await DisplayList();
         }
 
@@ -73,12 +70,6 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                     _ => await TB_All()
                 };
 
-                if (reportTable == null || reportTable.Rows.Count == 0)
-                {
-                    AccList = new List<TBListModel>();
-                    return;
-                }
-
                 AccList = reportTable.AsEnumerable()
                     .Select(row => new TBListModel
                     {
@@ -90,23 +81,16 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                     })
                     .ToList();
 
-
-                if (AccList.Count > 0)
-                {
-                    IsPageValidate = true;
-                }
-                else
-                {
-                    IsPageValidate = false;
-                }
-
+                IsPageValidate = true;
             }
             catch (Exception error)
             {
-                MsgService.Error(error.Message);
+                AccList = [];
+                IsPageValidate = false;
+                MsgService?.Error(error.Message);
             }
-            await InvokeAsync(StateHasChanged);
         }
+
         #endregion
 
         #region Print Trial Balance
@@ -126,7 +110,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 await CreateReportModel();
                 if (!ReportService.IsError)
                 {
-                    ReportService.Print();
+                    await ReportService.Print();
                     MsgService = ReportService.MsgService;
                 }
 
@@ -191,7 +175,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
             }
             else if (MyModel.TB_Type == 2)           // From Date to Date
             {
-                _Filter = $"Date(Vou_Date) >= Date({MyModel.TB_From.QueryDate()}) AND Date(Vou_Date) <= Date({MyModel.TB_To.QueryDate()})";
+                _Filter = $"Date(Vou_Date) >= Date('{MyModel.TB_From.QueryDate()}') AND Date(Vou_Date) <= Date('{MyModel.TB_To.QueryDate()}')";
             }
             else if (MyModel.TB_Type == 3)           // Opening Balances
             {
@@ -290,7 +274,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 .Select(e => e.Title)
                 .First() ?? "";
 
-            await DisplayList();
+            //await DisplayList();
         }
         private async Task ProjectIDChanged(long _ID)
         {
@@ -300,7 +284,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 .Select(e => e.Title)
                 .First() ?? "";
 
-            await DisplayList();
+            //await DisplayList();
         }
         private async Task EmployeeIDChanged(long _ID)
         {
@@ -309,7 +293,7 @@ namespace AppliedAccounts.Pages.Accounts.Reports
                 .Where(e => e.ID == MyModel.EmployeeID)
                 .Select(e => e.Title)
                 .First() ?? "";
-            await DisplayList();
+            //await DisplayList();
         }
         #endregion
     }

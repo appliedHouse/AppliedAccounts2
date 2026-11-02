@@ -14,10 +14,21 @@ namespace AppliedAccounts.Pages.Accounts
         protected override void OnInitialized()
         {
             Nature ??= 1;
-            MyModel = new(); ;
+            MyModel = new();
             MyModel.Source = new(AppGlobal.AppPaths);
             MyModel.MsgService = AppGlobal.MsgService;
+            MyModel.AppGlobals = AppGlobal;                 
             MyModel.GetKeys((long)Nature!);
+
+            // ===== Default dates =====
+            if (MyModel.DT_Start == DateTime.MinValue)
+                MyModel.DT_Start = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+
+            if (MyModel.DT_End == DateTime.MinValue)
+                MyModel.DT_End = DateTime.Today;
+
+            MyModel.SearchText ??= "";                      
+
             MyModel.LoadData();
 
             NavManager = AppGlobal.NavManager;
@@ -32,6 +43,7 @@ namespace AppliedAccounts.Pages.Accounts
         {
             if (MyModel.BookID > 0)
             {
+                MyModel.SetKeys(MyModel.BookNatureID);
                 NavManager.NavigateTo($"/Accounts/Books/{MyModel.VoucherID}/{MyModel.BookID}");
             }
         }
@@ -78,12 +90,14 @@ namespace AppliedAccounts.Pages.Accounts
         #region DropDown Changed
         private void BookNatureChanged(long _NatureID)
         {
+            //MyModel.SetKeys(MyModel.BookNatureID);
             MyModel.BookNatureID = _NatureID;
             MyModel.BookID = MyModel.Source.GetBookAccounts(MyModel.BookNatureID).First()?.ID ?? 0;
         }
 
         private void BookListChanged(long _BookID)
         {
+            //MyModel.SetKeys(MyModel.BookNatureID);
             MyModel.BookID = _BookID; //result;
             MyModel.SetKeys(MyModel.BookNatureID);
         }

@@ -15,6 +15,10 @@
     <ApplicationIcon>wwwroot\Icon200.ico</ApplicationIcon>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="wwwroot\ExcelFiles\**" />
     <Compile Remove="wwwroot\OutputPath\**" />

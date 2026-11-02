@@ -168,7 +168,7 @@ namespace AppliedAccounts.Pages.Users
                 var usersDBFile = Path.Combine(
                     AppGlobal.AppPaths.FirstPath,
                     AppGlobal.AppPaths.RootPath,
-                    AppGlobal.AppPaths.UsersPath,
+                    AppGlobal.AppPaths.SystemPath,
                     "AppliedUsers2.db");
 
                 // Verify database file exists
