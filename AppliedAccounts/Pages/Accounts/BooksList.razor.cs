@@ -43,6 +43,7 @@ namespace AppliedAccounts.Pages.Accounts
         {
             if (MyModel.BookID > 0)
             {
+                MyModel.SetKeys(MyModel.BookNatureID);
                 NavManager.NavigateTo($"/Accounts/Books/{MyModel.VoucherID}/{MyModel.BookID}");
             }
         }
@@ -89,12 +90,14 @@ namespace AppliedAccounts.Pages.Accounts
         #region DropDown Changed
         private void BookNatureChanged(long _NatureID)
         {
+            //MyModel.SetKeys(MyModel.BookNatureID);
             MyModel.BookNatureID = _NatureID;
             MyModel.BookID = MyModel.Source.GetBookAccounts(MyModel.BookNatureID).First()?.ID ?? 0;
         }
 
         private void BookListChanged(long _BookID)
         {
+            //MyModel.SetKeys(MyModel.BookNatureID);
             MyModel.BookID = _BookID; //result;
             MyModel.SetKeys(MyModel.BookNatureID);
         }

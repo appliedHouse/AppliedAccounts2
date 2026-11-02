@@ -1,19 +1,12 @@
 ﻿@inject NavigationManager NavManager;
 @using System.Data;
 
-
 @code {
-    [Parameter]
-    public string Title { get; set; } = string.Empty;
-
-    [Parameter]
-    public string NavTo { get; set; } = string.Empty;
-     
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string NavTo { get; set; } = string.Empty;
 
     public void Edit()
     {
-        
-
         if (NavTo.Length > 0)
         {
             NavManager.NavigateTo(NavTo);
