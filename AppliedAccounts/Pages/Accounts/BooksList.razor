@@ -27,7 +27,7 @@
 <ShowPrintWait Visiable="@MyModel.IsWaiting" />
 
 <EditForm Model="@MyModel">
-    <div class="d-flex flex-row mb-3 filter">
+    <div class="d-flex flex-row mb-3 filter align-items-center">
         <div class="p-2 ddwidth1">
             <MyDropDown id="ddNature"
                         Label="Account Nature"
@@ -42,27 +42,34 @@
                         ValueChanged="@((e) => BookListChanged(e))"
                         Items="@MyModel.Source.GetBookAccounts(MyModel.BookNatureID)" />
         </div>
+
         <div class="p-2">
-            <InputDate id="dateStat" class="item-height" @bind-Value="MyModel.DT_Start"></InputDate>
+            <div class="field field-date">
+                <label for="dateStat">From</label>
+                <InputDate id="dateStat" class="item-height" @bind-Value="MyModel.DT_Start" />
+            </div>
         </div>
         <div class="p-2">
-            <InputDate id="dateEnd" class="item-height" @bind-Value="MyModel.DT_End"></InputDate>
+            <div class="field field-date">
+                <label for="dateEnd">To</label>
+                <InputDate id="dateEnd" class="item-height" @bind-Value="MyModel.DT_End" />
+            </div>
         </div>
+
         <div class="p-2 search-btn">
-            <label for="floatingInput">
+            <div class="field">
+                <label for="txtSearch">Search</label>
                 <InputText id="txtSearch" class="item-height" placeholder="Filter list"
                            @bind-Value="MyModel.SearchText"
-                           @onclick="Refresh">
-                </InputText>
-            </label>
+                           @onclick="Refresh" />
+            </div>
         </div>
-        <div class="p-2">
+
+        <div class="p-2 ms-auto d-flex align-items-center gap-2 filter-actions">
             <Btn_Refresh OnClick="Refresh" />
             <Btn_Add OnClick="New" />
         </div>
-
     </div>
-
     <div class="container">
 
         <table class="table-list">
@@ -94,7 +101,6 @@
                         <td class="amount">@Record.TBalance</td>
                         <td>
                             <Btn1_Edit OnClick="(()=>Edit(Record.ID))"/>
-                            @* <EditButton NavTo=@_NavTo Title="Edit Voucher" /> *@
                             <PrintButton ReturnValue="Print" VoucherID=Record.ID />
 
                             @if (Record.Status == Status.Submitted.ToString())
@@ -176,21 +182,82 @@
 <style>
     .filter {
         background-color: antiquewhite;
-        margin-left: 15px;
-        margin-right: 15px;
-        margin-top: 3px;
-        margin-bottom: 3px;
-        padding: 5px;
-        height: 70px;
+        margin: 3px 15px;
+        padding: 8px 10px;
+        min-height: 76px;
         display: flex;
         align-items: center;
+        border-radius: 6px;
     }
 
     .ddwidth1 {
-        width: 175px
+        width: 190px;
     }
 
     .ddwidth2 {
-        width: 275px
+        width: 290px;
     }
+
+    .search-btn {
+        flex: 1;
+    }
+
+  
+    .field {
+        position: relative;
+        height: 56px;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        box-shadow: 0 1px 2px rgba(0,0,0,.05);
+        transition: border-color .15s, box-shadow .15s;
+    }
+
+        .field:focus-within {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13,110,253,.15);
+        }
+
+    .field-date {
+        width: 170px;
+    }
+
+    .field label {
+        position: absolute;
+        top: 6px;
+        left: 12px;
+        margin: 0;
+        font-size: 12px;
+        color: #6c757d;
+        pointer-events: none;
+    }
+
+    .field .item-height {
+        width: 100%;
+        height: 100%;
+        border: none;
+        outline: none;
+        background: transparent;
+        padding: 22px 12px 4px 12px;
+        font-size: 15px;
+        box-sizing: border-box;
+        border-radius: 6px;
+    }
+
+
+    .filter-actions .btn,
+    .filter-actions button {
+        height: 48px;
+        min-width: 48px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .filter-actions button:first-child {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 1px 2px rgba(0,0,0,.05);
+        }
 </style>
