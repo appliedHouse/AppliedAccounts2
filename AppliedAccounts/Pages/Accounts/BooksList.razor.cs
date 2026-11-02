@@ -14,10 +14,21 @@ namespace AppliedAccounts.Pages.Accounts
         protected override void OnInitialized()
         {
             Nature ??= 1;
-            MyModel = new(); ;
+            MyModel = new();
             MyModel.Source = new(AppGlobal.AppPaths);
             MyModel.MsgService = AppGlobal.MsgService;
+            MyModel.AppGlobals = AppGlobal;                 
             MyModel.GetKeys((long)Nature!);
+
+            // ===== Default dates =====
+            if (MyModel.DT_Start == DateTime.MinValue)
+                MyModel.DT_Start = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+
+            if (MyModel.DT_End == DateTime.MinValue)
+                MyModel.DT_End = DateTime.Today;
+
+            MyModel.SearchText ??= "";                      
+
             MyModel.LoadData();
 
             NavManager = AppGlobal.NavManager;
