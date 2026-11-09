@@ -1,0 +1,37 @@
+﻿.module-card {
+    border-radius: 14px;
+    border-top: 3px solid transparent !important;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    cursor: pointer;
+}
+
+    .module-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 .75rem 1.5rem rgba(0, 0, 0, .12) !important;
+        border-top-color: var(--bs-success) !important;
+    }
+
+.module-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background-color .2s ease, color .2s ease;
+}
+
+.module-card:hover .module-icon {
+    background-color: var(--bs-success) !important;
+    color: #fff !important;
+}
+
+.module-link i {
+    display: inline-block;
+    transition: transform .2s ease;
+}
+
+.module-card:hover .module-link i {
+    transform: translateX(4px);
+}

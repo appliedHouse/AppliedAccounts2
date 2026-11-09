@@ -199,5 +199,16 @@ namespace AppliedAccounts.Pages.Accounts
         }
         #endregion
 
+        #region disable or enable save button
+        public bool ShowBtnSave()
+        {
+            // btnSave disable = 'true' / 'false'
+            if (MyVoucher.Count == 0) { return true; }
+            if (MyModel.Tot_DR != MyModel.Tot_CR) { return true; }
+            if (MyModel.Tot_DR + MyModel.Tot_CR == 0) { return true; }
+
+            return false;
+        }
+        #endregion
     }
 }

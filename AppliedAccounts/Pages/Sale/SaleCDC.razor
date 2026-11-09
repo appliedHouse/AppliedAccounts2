@@ -62,7 +62,10 @@
         };
     }
 
-
+    private void OpenSalesInvoices()
+    {
+        throw new NotImplementedException();
+    }
 }
 
 <style>
@@ -105,3 +108,31 @@
     </div>
 </div>
 
+
+<div class="module-card card h-100 border-0 shadow-sm" role="button" @onclick="OpenSalesInvoices">
+    <div class="card-body p-4">
+        <div class="d-flex align-items-start gap-3">
+            <div class="module-icon bg-success bg-opacity-10 text-success">
+                <i class="bi bi-receipt fs-3"></i>
+            </div>
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h5 class="card-title fw-semibold mb-0">Sales Invoices</h5>
+                    <span class="badge rounded-pill text-bg-light border text-muted">Invoices</span>
+                </div>
+                <p class="card-text text-muted small mb-0">
+                    Keep customers accountable and your business solvent.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-footer bg-transparent border-0 px-4 pb-4 pt-0 d-flex justify-content-between align-items-center">
+        <small class="text-muted">
+            <i class="bi bi-clock-history me-1"></i>12 unpaid
+        </small>
+        <span class="module-link fw-semibold text-primary">
+            Open <i class="bi bi-arrow-right ms-1"></i>
+        </span>
+    </div>
+</div>

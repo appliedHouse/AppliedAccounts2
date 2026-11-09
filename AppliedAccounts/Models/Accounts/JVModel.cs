@@ -31,13 +31,14 @@ namespace AppliedAccounts.Models.Accounts
         public int Index { get; set; }
 
         public int Count => MyVoucher.Count;
-        public decimal TotalAmount => MyVoucher.Sum(v => v.DR);
+        public decimal TotalAmount => MyVoucher.Where(e=> e.Sr_No > 0).Sum(v => v.DR);
         public bool IsBalanced => Tot_DR == Tot_CR && (Tot_DR != 0 || Tot_CR != 0);
 
-        public decimal Tot_DR { get => MyVoucher.Sum(e => e.DR); set => MyVoucher.Sum(e => e.DR); }
-        public decimal Tot_CR { get => MyVoucher.Sum(e => e.CR); set => MyVoucher.Sum(e => e.CR); }
-        public bool IsWaiting { get; set; }
+        public decimal Tot_DR => GetDRAmount(); 
+        public decimal Tot_CR => GetCRAmount(); 
 
+       
+        public bool IsWaiting { get; set; }
         public string MyMessage { get; set; }
         private NumInWords InWords { get; set; }
         public string Currency { get; set; } = "Rs.";
@@ -48,6 +49,8 @@ namespace AppliedAccounts.Models.Accounts
 
         public DataRow CurrentRow { get; set; }
         public DataRow NewRow { get; set; }
+        decimal IVoucher.Tot_DR { get => Tot_DR; set => throw new NotImplementedException(); }
+        decimal IVoucher.Tot_CR { get => Tot_CR; set => throw new NotImplementedException(); }
 
         #endregion
 
@@ -83,15 +86,16 @@ namespace AppliedAccounts.Models.Accounts
             Projects = Source.GetProjects();
             Accounts = Source.GetAccounts();
 
-            MyVoucher = new();
+            MyVoucher = [];
             Transaction = new();
 
             Vou_No = _VouNo ?? "New";
-            NewRow = Source.GetNewRow(AppliedDB.Enums.Tables.Ledger);
+            NewRow = Source.GetNewRow(Enums.Tables.Ledger);
             CurrentRow = NewRow;
 
-            LoadData();
             GetKeys();
+            LoadData();
+
 
         }
 
@@ -113,12 +117,13 @@ namespace AppliedAccounts.Models.Accounts
                     return false;
                 }
 
-                if (Vou_No == "New")
+                if (Vou_No == "New" || string.IsNullOrWhiteSpace(Vou_No))
                 {
-                    MyVoucher = new();
-                    Transaction = new();
+                    Transaction.Vou_No = "New";
                     Transaction.Sr_No = 1;
                     Transaction.Vou_Date = Source.GetDate("JV");
+                    Transaction.Vou_Type = PostingTypes.JV.ToString();
+                    Transaction.Status = PostingStatus.Submitted.ToString();
                     return true;
                 }
 
@@ -131,6 +136,8 @@ namespace AppliedAccounts.Models.Accounts
                             ID = e.Field<long>("ID"),
                             Vou_No = e.Field<string>("Vou_No") ?? "",
                             Vou_Date = e.Field<DateTime>("Vou_Date"),
+                            Vou_Type = e.Field<string>("Vou_Type") ?? "",
+                            Ref_No = e.Field<string>("Ref_No") ?? "",
                             Sr_No = e.Field<int>("Sr_No"),
                             COA = e.Field<long?>("COA") ?? 0,
                             DR = e.Field<decimal?>("DR") ?? 0.0M,
@@ -140,6 +147,7 @@ namespace AppliedAccounts.Models.Accounts
                             Company = e.Field<long?>("Customer") ?? 0,
                             Project = e.Field<long?>("Project") ?? 0,
                             Employee = e.Field<long?>("Employee") ?? 0,
+                            Status = e.Field<string>("Status") ?? "",
 
                             TitleCompany = e.Field<string?>("TitleCompany") ?? "",
                             TitleProject = e.Field<string?>("TitleProject") ?? "",
@@ -267,18 +275,15 @@ namespace AppliedAccounts.Models.Accounts
 
 
         #region Remove / Delete
-        public void Remove(int _SrNo)
+
+        public void Remove(int srNo)
         {
-            if (Transaction.ID == 0)
-            {
-                MyVoucher.Remove(Transaction);
-            }
-            else if (MyVoucher.Count > 0)
-            {
-                Transaction = MyVoucher.Where(e => e.Sr_No == _SrNo).First();
-                Transaction.Sr_No = Transaction.Sr_No * -1;
-            }
+            var item = MyVoucher.FirstOrDefault(e => e.Sr_No == srNo);
+            if (item == null) return;
+            if (item.ID == 0) MyVoucher.Remove(item);          // never saved: just drop it
+            else item.Sr_No = -Math.Abs(item.Sr_No);           // saved: mark for delete on Save
         }
+        
         #endregion
 
         #region Save
@@ -286,7 +291,7 @@ namespace AppliedAccounts.Models.Accounts
         {
             if (IsTransValidated())
             {
-                var _Exist = MyVoucher.Where(e => e.Sr_No == Transaction.Sr_No).FirstOrDefault();
+                var _Exist = MyVoucher.FirstOrDefault(e => e.Sr_No == Transaction.Sr_No);
                 if (_Exist == null)
                 {
                     MyVoucher.Add(Transaction);
@@ -295,69 +300,65 @@ namespace AppliedAccounts.Models.Accounts
 
         }
 
-        public async Task<bool> SaveAllAsync()
+
+        public Task<bool> SaveAllAsync() => Task.FromResult(SaveVoucher());
+
+        private bool SaveVoucher()
         {
-            SetKey();
+            var isNew = Vou_No == "New";
+            var inTransaction = false;
             try
             {
-                var _Query = $"[Vou_Type]='{VoucherTypeClass.VoucherType.JV}' AND Vou_No='{Vou_No}'";
-                var _Ledger = Source.GetTable(AppliedDB.Enums.Tables.Ledger, _Query);
-                if (_Ledger.Columns.Count > 0)
+                var lines = MyVoucher.Where(e => e.Sr_No > 0).ToList();
+                if (lines.Count > 0)
                 {
-                    // Update Voucher date must be same in all voucher list. 
-                    var _date = MyVoucher.First().Vou_Date;
-                    MyVoucher.ForEach(e => { e.Vou_Date = _date; });
+                    var date = lines[0].Vou_Date;               // one date for the whole voucher
+                    MyVoucher.ForEach(e => e.Vou_Date = date);
+                }
+                if (!IsVoucherValidated()) return false;
 
-                    if (IsVoucherValidated())
-                    {
-                        if (Transaction.Vou_No == "New")
-                        {
-                            Vou_No = NewVoucherNo.GetJournalVoucher(AppGlobal.DBFile, Transaction.Vou_Date);
-                            MyVoucher.ForEach(e => e.Vou_No = Vou_No);
-                        }
-
-                        Source.BeginTransaction();
-
-                        // Delete existing transactions if (mark as deleted) sr_no < 0
-                        var _DeletedTrans = MyVoucher.Where(e => e.Sr_No < 0).ToList();
-                        foreach (var _Voucher in _DeletedTrans)
-                        {
-                            CurrentRow = Convert2Row(_Voucher);
-                            Source.Delete(CurrentRow);
-                        }
-
-                        var _SrNo = 1;
-
-                        foreach (var Tran in MyVoucher)
-                        {
-                            CurrentRow = Convert2Row(Tran);
-                            CurrentRow["Sr_No"] = _SrNo; _SrNo++;
-                            if ((long)CurrentRow["Customer"] == 0) { CurrentRow["Customer"] = DBNull.Value; }
-                            if ((long)CurrentRow["Employee"] == 0) { CurrentRow["Employee"] = DBNull.Value; }
-                            if ((long)CurrentRow["Project"] == 0) { CurrentRow["Project"] = DBNull.Value; }
-                            Source.Save(CurrentRow);
-                        }
-
-
-                        Source.CommitTransaction();
-                        return await Task.FromResult(true);
-                    }
+                if (isNew)
+                {
+                    Vou_No = NewVoucherNo.GetJournalVoucher(AppGlobal.DBFile, lines[0].Vou_Date);
+                    MyVoucher.ForEach(e => e.Vou_No = Vou_No);
                 }
 
+                Source.BeginTransaction(); inTransaction = true;
+
+                foreach (var deleted in MyVoucher.Where(e => e.Sr_No < 0).ToList())
+                {
+                    CurrentRow = Convert2Row(deleted);
+                    Source.Delete(CurrentRow);
+                }
+
+                var srNo = 1;
+                foreach (var tran in lines)                    // positive lines only
+                {
+                    CurrentRow = Convert2Row(tran);
+                    CurrentRow["Sr_No"] = srNo++;
+                    if ((long)CurrentRow["Customer"] == 0) CurrentRow["Customer"] = DBNull.Value;
+                    if ((long)CurrentRow["Employee"] == 0) CurrentRow["Employee"] = DBNull.Value;
+                    if ((long)CurrentRow["Project"] == 0) CurrentRow["Project"] = DBNull.Value;
+                    Source.Save(CurrentRow);
+                }
+
+                Source.CommitTransaction(); inTransaction = false;
+                SetKey();
+                LoadData();                                    // reload so lines get their IDs
+                return true;
             }
             catch (Exception error)
             {
-                MsgService.Error(error.Message);
-                Source.RollbackTransaction();
-
+                if (inTransaction) Source.RollbackTransaction();
+                if (isNew) { Vou_No = "New"; MyVoucher.ForEach(e => e.Vou_No = "New"); }
+                MsgService.Error(error);
             }
-            return await Task.FromResult(false);
-
+            return false;
         }
 
         private DataRow Convert2Row(JVViewModel _VModel)
         {
-            if (CurrentRow == null) { CurrentRow = Source.GetNewRow(AppliedDB.Enums.Tables.Ledger); }
+            if (CurrentRow == null) { CurrentRow = Source.GetNewRow(Enums.Tables.Ledger); }
             return _VModel.ToDataRow(CurrentRow);
         }
 
@@ -410,10 +411,27 @@ namespace AppliedAccounts.Models.Accounts
             ReportService.Model.AddReportParameter("ShowImages", true.ToString());
         }
 
-
-
-
         #endregion
+
+        #region Total Debit and Credit Amount
+        private decimal GetDRAmount()
+        {
+            if (MyVoucher != null)
+            {
+                return MyVoucher.Where(e => e.Sr_No > 0).Sum(e => e.DR);
+            }
+            return 0.00M;
+        }
+        private decimal GetCRAmount()
+        {
+            if (MyVoucher != null)
+            {
+                return MyVoucher.Where(e => e.Sr_No > 0).Sum(e => e.CR);
+            }
+            return 0.00M;
+        }
+        #endregion
+
 
         #region Get / Set Keys
         private void GetKeys()
