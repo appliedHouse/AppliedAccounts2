@@ -334,7 +334,7 @@ namespace AppliedAccounts.Models
                                 Row1["Vou_No"] = MyVoucher.Master.Vou_No;
                                 Row1["Vou_Date"] = MyVoucher.Master.Vou_Date;
                                 Row1["BookID"] = MyVoucher.Master.BookID;
-                                Row1["Ref_No"] = MyVoucher.Master.Vou_Date;
+                                Row1["Ref_No"] = string.IsNullOrWhiteSpace(MyVoucher.Master.Ref_No) ? DBNull.Value : MyVoucher.Master.Ref_No.Trim();
                                 Row1["SheetNo"] = string.IsNullOrWhiteSpace(MyVoucher.Master.SheetNo) ? DBNull.Value : MyVoucher.Master.SheetNo;
                                 Row1["Remarks"] = MyVoucher.Master.Remarks;
                                 Row1["Status"] = MyVoucher.Master.Status;
@@ -437,7 +437,7 @@ namespace AppliedAccounts.Models
                             var _NewSrNo = 1;
                             foreach (var trans in MyVoucher.Details)
                             {
-                                trans.Sr_No = _NewSrNo; _SrNo++;
+                                trans.Sr_No = _NewSrNo; _NewSrNo++;
                             }
                         }
                     }

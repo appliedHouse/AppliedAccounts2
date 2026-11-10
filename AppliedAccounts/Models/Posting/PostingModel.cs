@@ -65,10 +65,11 @@ namespace AppliedAccounts.Models.Posting
         #endregion
 
         #region Load Data
-              
+
 
         public async Task LoadData(PostingViewModel model)
         {
+            MsgService.Clear();             
             Init();
 
             if (model.PostingType == 0)
@@ -207,7 +208,6 @@ namespace AppliedAccounts.Models.Posting
             if (result)
             {
                 MsgService.Clear();
-                MsgService.Success(Messages.Posted);
                 await LoadData(model);
                 return true;
             }

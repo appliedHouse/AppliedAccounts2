@@ -16,6 +16,7 @@ namespace AppliedAccounts.Pages.Accounts.Post
             MyModel = new(AppGlobals); ;
             MyModel.Source = new(AppGlobals.AppPaths);
             MyModel.MsgService = AppGlobals.MsgService;
+            MyModel.MsgService.Clear();
 
             MyModel.Source.SetKey("IsUnPost", false, KeyTypes.Boolean, "Is Un-post is in progress..");
             MyViewModel = new(); ;
