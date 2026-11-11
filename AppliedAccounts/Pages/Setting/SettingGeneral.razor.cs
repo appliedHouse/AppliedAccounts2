@@ -37,7 +37,6 @@ namespace AppliedAccounts.Pages.Setting
             Source.SetKey("BankBkNature", MyModel.BankNatureID);
 
             Toaster.ShowSuccess("Setting values saved.");
-
         }
 
         private void CashNatureValueChange(long _ID)
@@ -52,7 +51,52 @@ namespace AppliedAccounts.Pages.Setting
             MyModel.BankNatureTitleAccount = NatureList.FirstOrDefault(e => e.ID == _ID)?.Title ?? "";
         }
 
+
+        #region Drop down of Payable
+        private void APPurchaseValueChange()
+        {
+            MyModel.PayableAccounts.Purchase = MyModel.PayableAccounts.Purchase;
+            MyModel.PayableAccounts.PayableTitle = AccountList.FirstOrDefault(e => e.ID == MyModel.PayableAccounts.Purchase)?.Title ?? "";
+        }
+
+        private void APTaxValueChange()
+        {
+            MyModel.PayableAccounts.Tax = MyModel.PayableAccounts.Tax;
+            MyModel.PayableAccounts.TaxTitle = AccountList.FirstOrDefault(e => e.ID == MyModel.PayableAccounts.Tax)?.Title ?? "";
+        }
+
+
+        private void APPayableValueChange()
+        {
+            MyModel.PayableAccounts.Payable = MyModel.PayableAccounts.Payable;
+            MyModel.PayableAccounts.PayableTitle = AccountList.FirstOrDefault(e => e.ID == MyModel.PayableAccounts.Payable)?.Title ?? "";
+        }
+        #endregion
+
+        #region Drop down of Receivable
+        private void ARStockValueChange()
+        {
+            MyModel.ReceivableAccounts.Stock = MyModel.ReceivableAccounts.Stock;
+            MyModel.ReceivableAccounts.StockTitle = AccountList.FirstOrDefault(e => e.ID == MyModel.ReceivableAccounts.Stock)?.Title ?? "";
+        }
+
+        private void ARTaxValueChange()
+        {
+            MyModel.ReceivableAccounts.Tax = MyModel.ReceivableAccounts.Tax;
+            MyModel.ReceivableAccounts.TaxTitle = AccountList.FirstOrDefault(e => e.ID == MyModel.ReceivableAccounts.Tax)?.Title ?? "";
+        }
+
+        private void ARReceivableValueChange()
+        {
+            MyModel.ReceivableAccounts.Receivable = MyModel.ReceivableAccounts.Receivable;
+            MyModel.ReceivableAccounts.ReceivableTitle = AccountList.FirstOrDefault(e => e.ID == MyModel.ReceivableAccounts.Receivable)?.Title ?? "";
+        }
+        #endregion
+
+
+        #region Back page
         protected void Back() { AppGlobal.NavManager.GoTo(MenuID.Setting); }
+        #endregion
     }
 
     public class GeneralSettngModel
@@ -73,7 +117,7 @@ namespace AppliedAccounts.Pages.Setting
         public string CashNatureTitleAccount { get; set; }
         public string BankNatureTitleAccount { get; set; }
 
-        public AccountsPurchase PayableAccounts { get; set; }
+        public AccountsPayable PayableAccounts { get; set; }
         public AccountsReceivable ReceivableAccounts { get; set; }
 
         public List<CodeTitle> NatureList { get; set; }
@@ -81,11 +125,15 @@ namespace AppliedAccounts.Pages.Setting
 
     }
 
-    public class AccountsPurchase
+    public class AccountsPayable
     {
         public long Purchase { get; set; }
         public long Tax { get; set; }
         public long Payable { get; set; }
+
+        public string PurchaseTitle { get; set; }
+        public string TaxTitle { get; set; }
+        public string PayableTitle { get; set; }
     }
 
     public class AccountsReceivable
@@ -93,5 +141,10 @@ namespace AppliedAccounts.Pages.Setting
         public long Stock { get; set; }
         public long Tax { get; set; }
         public long Receivable { get; set; }
+
+        public string StockTitle { get; set; }
+        public string TaxTitle { get; set; }
+        public string ReceivableTitle { get; set; }
+
     }
 }

@@ -3,11 +3,10 @@ using AppliedAccounts.Models.Interface;
 using AppliedAccounts.Services;
 using AppliedAccounts.Data.Mapping;
 using AppliedDB;
-using Microsoft.AspNetCore.Components;
-using System.Data;
 using MESSAGE = AppMessages.Enums.Messages;
 using Tables = AppliedDB.Enums.Tables;
-using FluentFTP.Helpers;
+using Microsoft.AspNetCore.Components;
+using System.Data;
 
 namespace AppliedAccounts.Models
 {
@@ -334,7 +333,7 @@ namespace AppliedAccounts.Models
                                 Row1["Vou_No"] = MyVoucher.Master.Vou_No;
                                 Row1["Vou_Date"] = MyVoucher.Master.Vou_Date;
                                 Row1["BookID"] = MyVoucher.Master.BookID;
-                                Row1["Ref_No"] = MyVoucher.Master.Vou_Date;
+                                Row1["Ref_No"] = MyVoucher.Master.Ref_No;
                                 Row1["SheetNo"] = string.IsNullOrWhiteSpace(MyVoucher.Master.SheetNo) ? DBNull.Value : MyVoucher.Master.SheetNo;
                                 Row1["Remarks"] = MyVoucher.Master.Remarks;
                                 Row1["Status"] = MyVoucher.Master.Status;
@@ -438,6 +437,7 @@ namespace AppliedAccounts.Models
                             foreach (var trans in MyVoucher.Details)
                             {
                                 trans.Sr_No = _NewSrNo; _SrNo++;
+                                trans.action = _Deleted;
                             }
                         }
                     }

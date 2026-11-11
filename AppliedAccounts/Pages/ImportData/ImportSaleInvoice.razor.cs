@@ -1,5 +1,4 @@
-﻿using AppliedAccounts.Authentication;
-using AppliedAccounts.Data;
+﻿using AppliedAccounts.Data;
 using AppliedAccounts.Models;
 using AppliedAccounts.Services;
 using AppliedDB;
@@ -478,8 +477,16 @@ namespace AppliedAccounts.Pages.ImportData
 
                 foreach (DataRow Scheme in SalesSchema.Rows)
                 {
+                    string _column = Scheme.Field<string>("Amount") ?? "";
+                    bool _ColumnExist = Row.Table.Columns.Contains(_column);
 
-                    if ((string)Scheme["Code"] == "0") continue;
+                    if(!_ColumnExist) 
+                    { 
+                        continue; 
+                    }
+
+
+                    if (Scheme.Field<string>("Code") == "0" || string.IsNullOrWhiteSpace(Scheme.Field<string>("Code"))) continue;
 
                     decimal _Amount = Conversion.ToDecimal(Row[(string)Scheme["Amount"]]);
                     if (_Amount == 0) { continue; }          // Skip if amount is zero.
@@ -734,13 +741,13 @@ namespace AppliedAccounts.Pages.ImportData
                 SelectedSale.Clear();
                 foreach (var Item in _detail)
                 {
-                    decimal _TaxRate = AppliedDB.Functions.GetTaxRate(DBFile, (long)Item["Tax"]);
+                    decimal _TaxRate = Functions.GetTaxRate(DBFile, (long)Item["Tax"]);
                     SelectedSaleInvoice _SaleInvoice = new(); ;
                     _SaleInvoice.SrNo = (int)Item["Sr_No"];
                     _SaleInvoice.Company = (string)_master["Description"];   //Functions.GetTitle(DBFile, Enums.Tables.Customers, (int)_master["Company"]);
                     _SaleInvoice.Vou_No = (string)_master["Vou_No"];
                     _SaleInvoice.Vou_Date = (DateTime)_master["Vou_Date"];
-                    _SaleInvoice.Inventory = AppliedDB.Functions.GetTitle(DBFile, Tables.Inventory, (long)Item["Inventory"]);
+                    _SaleInvoice.Inventory = Functions.GetTitle(DBFile, Tables.Inventory, (long)Item["Inventory"]);
                     _SaleInvoice.Batch = (string)Item["Batch"];
                     _SaleInvoice.Qty = (decimal)Item["Qty"];
                     _SaleInvoice.Rate = (decimal)Item["Rate"];

@@ -12,7 +12,8 @@
 
 <PageHeading Text="General Setting" />
 
-@if (IsAuthorized)
+@* @if (IsAuthorized) *@
+@if (true)
 {
     <EditForm Model="MyModel" OnValidSubmit="@SaveAsync">
 
@@ -38,6 +39,65 @@
                 </div>
 
             </div>
+
+            <div class="row">
+                <div class="col-md-3 col-12">
+                    <MyDropDown Id="ddAP_purchase"
+                                Label="Purchase Account"
+                                Value="@MyModel.PayableAccounts.Purchase"
+                                ValueChanged="APPurchaseValueChange"
+                                Items="AccountList">
+                    </MyDropDown>
+                </div>
+                <div class="col-md-3 col-12">
+                    <MyDropDown Id="ddAP_Tax"
+                                Label="Tax Account"
+                                Value="@MyModel.PayableAccounts.Tax"
+                                ValueChanged="APTaxValueChange"
+                                Items="AccountList">
+                    </MyDropDown>
+                </div>
+
+                <div class="col-md-3 col-12">
+                    <MyDropDown Id="ddAP_Payable"
+                                Label="Payable Account"
+                                Value="@MyModel.PayableAccounts.Payable"
+                                ValueChanged="APPayableValueChange"
+                                Items="AccountList">
+                    </MyDropDown>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-md-3 col-12">
+                    <MyDropDown Id="ddAR_stock"
+                                Label="Stock Account"
+                                Value="@MyModel.ReceivableAccounts.Stock"
+                                ValueChanged="ARStockValueChange"
+                                Items="AccountList">
+                    </MyDropDown>
+                </div>
+                <div class="col-md-3 col-12">
+                    <MyDropDown Id="ddAR_Tax"
+                                Label="Tax Account"
+                                Value="@MyModel.ReceivableAccounts.Tax"
+                                ValueChanged="ARTaxValueChange"
+                                Items="AccountList">
+                    </MyDropDown>
+                </div>
+
+                <div class="col-md-3 col-12">
+                    <MyDropDown Id="ddAR_Receivable"
+                                Label="Receivable Account"
+                                Value="@MyModel.ReceivableAccounts.Receivable"
+                                ValueChanged="ARReceivableValueChange"
+                                Items="AccountList">
+                    </MyDropDown>
+                </div>
+
+            </div>
+
 
             @* Control Buttons *@
             <div class="container mt-2 mb-2 control-buttons">
@@ -73,4 +133,6 @@ else
             to edit application general settings.
         </p>
     </div>
+}
+@code {
 }
